@@ -49,6 +49,8 @@ kafka/events/               # ListingCreatedEvent, PaymentConfirmedEvent, …
 
 Group related records in `*Dtos.java` holder classes — do not nest large types on controllers.
 
+Reference: `PaymentDtos` (`InitiatePaymentRequest`, `PaymentResponse`), `PaymentConfirmedEvent` in `kafka/events/`.
+
 ## Allowed exceptions
 
 - **Validation errors:** `Map<String, String>` field errors inside `GlobalExceptionHandler` only.

@@ -9,7 +9,7 @@ Adapted from Titan `java-dtos.mdc`. Cursor rule: [`.cursor/rules/java-dtos.mdc`]
 | Area | TokenRealty |
 |------|-------------|
 | No `Map`/`Object` in controller signatures | Same |
-| Grouped `*Dtos.java` holder classes | `PropertyDtos`, `MarketplaceDtos`, `AuthDtos` |
+| Grouped `*Dtos.java` holder classes | `PropertyDtos`, `MarketplaceDtos`, `AuthDtos`, `PaymentDtos` |
 | Typed inter-service client responses | `TokenIssuanceClient`, `PropertyRegistryClient` |
 | `@Valid` on requests | Same |
 | Map only at external/exception boundaries | Hardhat JSON, validation field errors |
@@ -24,11 +24,18 @@ Adapted from Titan `java-dtos.mdc`. Cursor rule: [`.cursor/rules/java-dtos.mdc`]
 | `application/command/` mandatory | Services take request records directly for now |
 | Full hexagonal `adapter/in/web/dto/` everywhere | `dto/` package in layered services |
 
-## Known gaps (cleanup when touching Kafka)
+## Kafka event payloads
+
+| Service | Pattern |
+|---------|---------|
+| Payment | Typed records in `kafka/events/` — `PaymentConfirmedEvent`, `RentCollectedEvent` |
+| Marketplace | `Map<String, Object>` in outbox (migrate to typed records) |
+
+## Known gaps
 
 | Location | Current | Target |
 |----------|---------|--------|
-| `MarketplaceEventPublisher` | `Map<String, Object>` payload | Typed `ListingCreatedEvent`, etc. in `kafka/events/` |
+| `MarketplaceEventPublisher` | `Map<String, Object>` payload | Typed events like Payment Service |
 | `ContractDeployer` | `Map` from Hardhat | OK at boundary — map to typed deploy result |
 
 ## File layout by service type

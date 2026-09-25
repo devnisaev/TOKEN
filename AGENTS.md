@@ -35,6 +35,7 @@ Human-readable expansions: [docs/rules/](docs/rules/)
 | Token Issuance | 8082 | `com.tokenrealty.issuance` |
 | Auth | 8083 | `com.tokenrealty.auth` |
 | Marketplace | 8084 | `com.tokenrealty.marketplace` |
+| Payment | 8085 | `com.tokenrealty.payment` |
 
 New services: copy structure from `marketplace-service/` or `auth-service/`.
 

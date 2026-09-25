@@ -30,6 +30,8 @@ Adapted from Titan `limits-engine.mdc`. Cursor rule: [`.cursor/rules/investment-
 | KYC whitelist | Token Issuance | `GET /v1/compliance/check/{wallet}` |
 | Min investment | Marketplace | `Listing.minInvestmentTokens` |
 | Token stock | Marketplace | `Listing.tokensAvailable` |
+| Payment idempotency | Payment | `Idempotency-Key` on `POST /v1/payments` |
+| Escrow before transfer | Payment | `POST /v1/payments` → confirm → release |
 | Role-based access | All | JWT + `@PreAuthorize` |
 
 ## Future (Compliance Service :8087)

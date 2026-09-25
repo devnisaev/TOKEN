@@ -85,7 +85,8 @@ adapter/in/web → application/service → adapter/out/{persistence,client,kafka
 | Property Registry | 8081 | `com.tokenrealty.registry` | Layered |
 | Token Issuance | 8082 | `com.tokenrealty.issuance` | Layered |
 | Marketplace | 8084 | `com.tokenrealty.marketplace` | Layered + kafka/outbox |
-| Auth | 8083 | `com.tokenrealty.auth` | Layered + JWT filter |
+| Auth | 8083 | `com.tokenrealty.auth` | Layered + JWT issuer |
+| Payment | 8085 | `com.tokenrealty.payment` | Layered + escrow + kafka/outbox |
 
 ---
 
@@ -93,7 +94,7 @@ adapter/in/web → application/service → adapter/out/{persistence,client,kafka
 
 - [ ] Spring Boot 4 / Java 21 Maven module
 - [ ] Port + DB from [PLATFORM-SPEC.md](../PLATFORM-SPEC.md) §7
-- [ ] `SecurityConfig` + `SecurityUserConfig` split
+- [ ] `SecurityConfig` + `tokenrealty-security` JWT filter
 - [ ] `GlobalExceptionHandler` with ProblemDetail
 - [ ] `application.yml` + `application-test.yml` (H2)
 - [ ] springdoc OpenAPI

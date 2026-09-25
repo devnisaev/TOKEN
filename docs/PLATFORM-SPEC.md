@@ -1,8 +1,8 @@
 # TokenRealty Platform — Implementation Spec & TODO
 
-> **Version:** 1.1  
+> **Version:** 1.2  
 > **Date:** 2025-09-25  
-> **Status:** In progress — Marketplace MVP implemented  
+> **Status:** In progress — Payment Service MVP implemented  
 > **Purpose:** Master specification and implementation backlog for the TokenRealty real-estate tokenization platform (buy, sell, rent with cryptocurrency).
 
 ---
@@ -54,6 +54,7 @@ TokenRealty tokenizes real estate assets (buildings, flats, and other property t
 | Token Issuance | `token-issuance-service/` | 8082 | `token_issuance` | Implemented (REST, tests; blockchain stubbed) |
 | Marketplace | `marketplace-service/` | 8084 | `marketplace_service` | **MVP implemented** (listings, buy orders, outbox stub) |
 | Auth | `auth-service/` | 8083 | `auth_service` | **MVP implemented** (JWT, refresh, service accounts) |
+| Payment | `payment-service/` | 8085 | `payment_service` | **MVP implemented** (escrow, payouts, ledger stub) |
 
 ### What works today
 
@@ -77,7 +78,8 @@ TokenRealty tokenizes real estate assets (buildings, flats, and other property t
 - [ ] **Kafka** — mentioned in README, not implemented
 - [x] **Auth service** — JWT MVP; registry/issuance/marketplace validate Bearer tokens
 - [ ] **IPFS upload** — `ipfsCid` field stored, no upload client
-- [ ] **Payment, Rental, Wallet** — not started
+- [x] **Payment** — MVP (escrow, confirm, release, payouts, outbox stub)
+- [ ] **Rental, Wallet** — not started
 - [x] **Marketplace** — MVP done; Payment integration and Kafka relay pending
 - [x] **Root README / platform docs** — [README.md](../README.md), [AGENTS.md](../AGENTS.md), Cursor rules
 - [ ] **`FULLY_SOLD` status** — enum exists, no service logic sets it
@@ -144,9 +146,11 @@ Notification Service         Polygon / Hardhat + IPFS
 
 ---
 
-#### 4.2 Payment Service (`payment-service`, :8085)
+#### 4.2 Payment Service (`payment-service`, :8085) — **MVP implemented**
 
-**Why:** Core to "sell/rent with crypto." No payment flow exists today.
+**Why:** Core to "sell/rent with crypto."
+
+**Status:** Escrow, confirm, release, payouts, ledger entries, outbox stub. See [payment-service/README.md](../payment-service/README.md). Marketplace auto-initiate pending.
 
 | Responsibility | Details |
 |----------------|---------|
@@ -489,16 +493,18 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 
 ### 10.5 Payment Service (Phase 2)
 
-- [ ] Scaffold project (`payment-service/`)
-- [ ] Entities: Payment, Escrow, Payout, WalletBalance
-- [ ] POST `/v1/payments` — initiate crypto payment
-- [ ] POST `/v1/payments/{id}/confirm` — webhook/callback on chain confirmation
-- [ ] Escrow hold/release logic
-- [ ] POST `/v1/payouts` — dividend/rent payout to holder wallets
-- [ ] Web3j integration for USDC/MATIC transfers
-- [ ] Transaction ledger with reconciliation
-- [ ] Publish `PaymentConfirmed`, `RentCollected` events
-- [ ] Unit + integration tests
+- [x] Scaffold project (`payment-service/`)
+- [x] Entities: Payment, Escrow, Payout, WalletBalance, LedgerEntry
+- [x] POST `/v1/payments` — initiate crypto payment (Idempotency-Key)
+- [x] POST `/v1/payments/{id}/confirm` — webhook/callback on chain confirmation
+- [x] Escrow hold/release/refund logic
+- [x] POST `/v1/payouts` — dividend/rent payout to holder wallets
+- [ ] Web3j integration for real USDC/MATIC transfers (simulated txHash for now)
+- [x] Transaction ledger entries (double-entry stub)
+- [ ] On-chain reconciliation job
+- [x] Publish `PaymentConfirmed`, `RentCollected` events (outbox stub)
+- [x] Unit + context tests (`./mvnw test`)
+- [ ] Integrate Marketplace order match → payment initiate
 
 ### 10.6 Rental Service (Phase 3)
 

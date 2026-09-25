@@ -17,6 +17,7 @@
         <module>token-issuance-service</module>
         <module>auth-service</module>
         <module>marketplace-service</module>
+        <module>payment-service</module>
     </modules>
 
     <properties>

@@ -39,6 +39,7 @@ Additional Cursor rules (no separate human doc yet):
 | Token Issuance | [token-issuance-service/README.md](../token-issuance-service/README.md) | 8082 |
 | Auth | [auth-service/README.md](../auth-service/README.md) | 8083 |
 | Marketplace | [marketplace-service/README.md](../marketplace-service/README.md) | 8084 |
+| Payment | [payment-service/README.md](../payment-service/README.md) | 8085 |
 
 ## Diagrams (PlantUML)
 

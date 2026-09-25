@@ -64,7 +64,8 @@ Spring conventions: [spring-java-services.md](spring-java-services.md)
 ### Phase 2+ — Commerce & rental
 
 - [ ] Marketplace: publish `listing.created`, `order.matched`; consume `flat.tokenized`, `payment.confirmed`
-- [ ] Payment: publish `payment.confirmed`, `rent.collected`; consume `order.matched`, `dividend.distributed`
+- [x] Payment: outbox stub for `payment.confirmed`, `rent.collected` (typed payload records)
+- [ ] Payment: Kafka relay + consume `order.matched`, `dividend.distributed`
 - [ ] Token Issuance: publish `transfer.completed`, `dividend.distributed`; consume `kyc-approved`, `payment.confirmed`, `rent.collected`
 
 ---

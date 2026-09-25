@@ -10,7 +10,7 @@ Port **8084** · Database **`marketplace_service`**
 - Accept investor buy orders with KYC compliance check
 - Reserve tokens and create matched orders + pending trades
 - Emit outbox events for Payment and Token Issuance (Kafka when enabled)
-- Settle trades after payment and on-chain transfer (admin callback until Payment Service exists)
+- Settle trades after payment and on-chain transfer (admin callback until Marketplace ↔ Payment wired)
 
 ## Architecture
 
@@ -68,7 +68,7 @@ JWT Bearer from Auth Service (:8083). Example: login as `investor@tokenrealty.co
 | GET | `/v1/orders/{id}` | Any | Get order |
 | POST | `/v1/orders` | INVESTOR, ADMIN | Place buy order |
 | GET | `/v1/orders/{id}/trade` | Any | Get trade for order |
-| PATCH | `/v1/orders/{id}/settle` | ADMIN | Mark settled (until Payment Service) |
+| PATCH | `/v1/orders/{id}/settle` | ADMIN | Mark settled (interim — until Payment auto-flow) |
 
 ## Buy flow (MVP)
 
@@ -77,8 +77,9 @@ JWT Bearer from Auth Service (:8083). Example: login as `investor@tokenrealty.co
 2. Investor POST /v1/orders with buyerWallet + tokenAmount
 3. Marketplace checks KYC via Token Issuance
 4. Tokens reserved; order MATCHED; trade PENDING
-5. Outbox event order.matched → (future) Payment Service
-6. Admin PATCH /orders/{id}/settle after manual payment + transfer
+5. Outbox event order.matched → Payment Service (integration pending)
+6. Payment: POST /v1/payments → confirm → release escrow
+7. Admin PATCH /orders/{id}/settle after transfer (interim until automated)
 ```
 
 ## Configuration
@@ -86,6 +87,7 @@ JWT Bearer from Auth Service (:8083). Example: login as `investor@tokenrealty.co
 | Property | Default | Description |
 |----------|---------|-------------|
 | `services.token-issuance.url` | `http://localhost:8082/api` | Compliance check |
+| `services.payment.url` | `http://localhost:8085/api` | (future) Initiate escrow |
 | `tokenrealty.kafka.enabled` | `false` | Enqueue outbox events |
 | `KAFKA_BOOTSTRAP_SERVERS` | `localhost:9092` | Kafka brokers |
 
@@ -99,9 +101,9 @@ JWT Bearer from Auth Service (:8083). Example: login as `investor@tokenrealty.co
 
 - [ ] Kafka relay for outbox → broker
 - [ ] Consumer: `flat.tokenized` auto-create listing
-- [ ] Payment Service integration (replace manual settle)
+- [ ] Payment Service integration — `PaymentClient` on order match (replace manual settle)
+- [ ] Consume `payment.confirmed` to auto-settle trades
 - [ ] Secondary market sell orders
-- [ ] Auth Service JWT (replace in-memory users)
 
 ## Conventions
 

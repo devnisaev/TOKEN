@@ -96,10 +96,16 @@ Inter-service URLs in `application.yml`:
 
 ```yaml
 services:
+  auth:
+    url: http://localhost:8083/api
   property-registry:
     url: http://localhost:8081/api
   token-issuance:
     url: http://localhost:8082/api
+  marketplace:
+    url: http://localhost:8084/api
+  payment:
+    url: http://localhost:8085/api
 ```
 
 ## Persistence
@@ -143,7 +149,7 @@ public OrderResponse placeOrder(PlaceOrderRequest req) {
 * Outbound calls via dedicated `*Client` classes using `RestClient` ([rest-client-errors.mdc](rest-client-errors.mdc)).
 * One `@Bean` RestClient per downstream base URL; inject with `@Qualifier`.
 * Propagate `traceId` header when available.
-* Service-to-service auth: service account JWT (when Auth Service exists); until then document the gap.
+* Service-to-service auth: Bearer JWT via `ServiceTokenProvider` + `tokenrealty-security` ([rest-client-errors.mdc](rest-client-errors.mdc)).
 * Config: `services.<name>.url` — never hardcode URLs in services.
 
 ```java
@@ -173,7 +179,7 @@ public TokenIssuanceClient(@Qualifier("tokenIssuanceRestClient") RestClient rest
 
 * Typed exceptions: `ResourceNotFoundException`, `ConflictException`, `ValidationException`
 * Use private `raiseException` helpers for repeated throws ([business-exception.mdc](business-exception.mdc))
-* Financial/state-changing POST: plan for `Idempotency-Key` header (Payment, transfers) — required when Payment Service lands
+* Financial/state-changing POST: `Idempotency-Key` header **required** on `POST /v1/payments` ([payment-ledger.mdc](payment-ledger.mdc))
 
 ## Paging
 
@@ -272,7 +278,7 @@ public OrderResponse place(@Valid @RequestBody PlaceOrderRequest req) {
 
 ## When adding a new microservice
 
-1. Copy structure from `marketplace-service/` (pom, config, security, exception handler)
+1. Copy structure from `marketplace-service/` or `payment-service/` (pom, JWT security, exception handler, outbox)
 2. Assign port from [PLATFORM-SPEC.md](../../docs/PLATFORM-SPEC.md) §7
 3. Create PostgreSQL database `{service_name}` with underscores
 4. Add README + link in [docs/README.md](../../docs/README.md)

@@ -1,0 +1,70 @@
+spring:
+  application:
+    name: payment-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payment_service
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    enabled: false
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+server:
+  port: 8085
+  servlet:
+    context-path: /api
+
+tokenrealty:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-change-in-production-min-32-chars!!}
+    issuer: tokenrealty-auth
+  kafka:
+    enabled: ${KAFKA_ENABLED:false}
+    topic:
+      payment-confirmed: tokenrealty.payment.payment.confirmed.v1
+      rent-collected: tokenrealty.payment.rent.collected.v1
+  payment:
+    escrow-wallet-address: ${ESCROW_WALLET_ADDRESS:0xEscrowDevWallet0000000000000000000001}
+
+jackson2:
+  serialization:
+    write-dates-as-timestamps: false
+  deserialization:
+    fail-on-unknown-properties: false
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    com.tokenrealty: DEBUG
+    org.springframework.security: INFO

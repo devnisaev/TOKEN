@@ -12,7 +12,9 @@ alwaysApply: false
 |-----------|------|-------------------|
 | `ResourceNotFoundException` | 404 | `/errors/not-found` |
 | `ConflictException` | 409 | `/errors/conflict` |
+| `IdempotencyConflictException` | 409 | `/errors/conflict` |
 | `ValidationException` | 422 | `/errors/business-rule` |
+| `InsufficientFundsException` | 422 | `/errors/business-rule` |
 | `MethodArgumentNotValidException` | 400 | `/errors/validation` |
 
 All services use `GlobalExceptionHandler` returning RFC 7807 `ProblemDetail` with `timestamp` property.
@@ -47,10 +49,13 @@ Use generic `<T> T raiseNotFound(String msg)` only when the compiler requires a 
 
 ## Financial operations
 
-When Payment Service lands, add:
+Implemented in `payment-service/`:
 
-* `IdempotencyConflictException` → 409
-* `InsufficientFundsException` → 422
-* `ComplianceBlockedException` → 422
+* `IdempotencyConflictException` → 409 (duplicate `Idempotency-Key` with different payload)
+* `InsufficientFundsException` → 422 (wallet balance guard — when custodial balances used)
+
+Planned across services:
+
+* `ComplianceBlockedException` → 422 (Marketplace KYC gate uses `ValidationException` today)
 
 Map in `GlobalExceptionHandler`; do not return generic 500 for business rejections.

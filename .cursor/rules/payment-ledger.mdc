@@ -13,7 +13,9 @@ Adapted from Titan ledger rules — simplified for crypto escrow + off-chain boo
 
 ## Scope
 
-Applies when building `payment-service/` (:8085). Not used in registry/issuance/marketplace until Payment exists.
+**MVP implemented** in `payment-service/` (:8085). Marketplace integration (auto-initiate escrow on order match) is pending.
+
+Reference: `PaymentService`, `LedgerService`, `PaymentEventPublisher`, `PaymentController`.
 
 ## Core invariant
 

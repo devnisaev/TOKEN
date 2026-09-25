@@ -182,11 +182,14 @@
 
 ## Payment domain
 
+> **Implementation:** Payment Service MVP publishes via outbox when `tokenrealty.kafka.enabled=true`.  
+> Typed payload: `PaymentConfirmedEvent`, `RentCollectedEvent` in `payment-service/.../kafka/events/`.
+
 ### `tokenrealty.payment.payment.confirmed.v1`
 
 | | |
 |---|---|
-| **Publisher** | Payment Service |
+| **Publisher** | Payment Service (outbox on `POST /v1/payments/{id}/confirm`) |
 | **Consumers** | Token Issuance, Marketplace |
 | **Partition key** | `paymentId` |
 
@@ -209,7 +212,7 @@
 
 | | |
 |---|---|
-| **Publisher** | Payment Service |
+| **Publisher** | Payment Service (outbox on `POST /v1/payouts` with purpose RENT) |
 | **Consumers** | Rental, Token Issuance |
 | **Partition key** | `leaseId` |
 
