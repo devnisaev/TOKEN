@@ -80,7 +80,7 @@ TokenRealty tokenizes real estate assets (buildings, flats, and other property t
 - [ ] **IPFS upload** — `ipfsCid` field stored, no upload client
 - [x] **Payment** — MVP (escrow, confirm, release, payouts, outbox stub)
 - [ ] **Rental, Wallet** — not started
-- [x] **Marketplace** — MVP done; Payment integration and Kafka relay pending
+- [x] **Marketplace** — MVP done; Payment integration and Kafka relay wired
 - [x] **Root README / platform docs** — [README.md](../README.md), [AGENTS.md](../AGENTS.md), Cursor rules
 - [ ] **`FULLY_SOLD` status** — enum exists, no service logic sets it
 
@@ -150,7 +150,7 @@ Notification Service         Polygon / Hardhat + IPFS
 
 **Why:** Core to "sell/rent with crypto."
 
-**Status:** Escrow, confirm, release, payouts, ledger entries, outbox stub. See [payment-service/README.md](../payment-service/README.md). Marketplace auto-initiate pending.
+**Status:** Escrow, confirm, release, payouts, ledger entries, outbox stub. See [payment-service/README.md](../payment-service/README.md). Marketplace auto-initiates escrow on order match via `PaymentClient`.
 
 | Responsibility | Details |
 |----------------|---------|
@@ -486,9 +486,9 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 - [x] Admin PATCH `/v1/orders/{id}/settle` (interim until Payment Service)
 - [x] Unit + context tests (`./mvnw test`)
 - [ ] Secondary market sell orders
-- [ ] Kafka relay (outbox → broker)
+- [x] Kafka relay (outbox → broker via `OutboxRelayWorker`)
 - [ ] Consumer: auto-create listing on `flat.tokenized`
-- [ ] Integrate with Payment Service (escrow on match)
+- [x] Integrate with Payment Service (escrow on match via `PaymentClient`)
 - [ ] Integrate with Token Issuance (transfer on payment confirmed)
 
 ### 10.5 Payment Service (Phase 2)
@@ -504,7 +504,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 - [ ] On-chain reconciliation job
 - [x] Publish `PaymentConfirmed`, `RentCollected` events (outbox stub)
 - [x] Unit + context tests (`./mvnw test`)
-- [ ] Integrate Marketplace order match → payment initiate
+- [x] Integrate Marketplace order match → payment initiate
 
 ### 10.6 Rental Service (Phase 3)
 

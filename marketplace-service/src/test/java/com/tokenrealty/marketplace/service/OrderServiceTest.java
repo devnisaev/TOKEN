@@ -1,5 +1,6 @@
 package com.tokenrealty.marketplace.service;
 
+import com.tokenrealty.marketplace.client.PaymentClient;
 import com.tokenrealty.marketplace.client.TokenIssuanceClient;
 import com.tokenrealty.marketplace.dto.MarketplaceDtos.PlaceOrderRequest;
 import com.tokenrealty.marketplace.dto.MarketplaceDtos.OrderResponse;
@@ -7,7 +8,8 @@ import com.tokenrealty.marketplace.entity.Listing;
 import com.tokenrealty.marketplace.entity.MarketOrder;
 import com.tokenrealty.marketplace.entity.Trade;
 import com.tokenrealty.marketplace.exception.ValidationException;
-import com.tokenrealty.marketplace.kafka.MarketplaceEventPublisher;
+import com.tokenrealty.marketplace.kafka.port.OrderMatchedPublisher;
+import com.tokenrealty.marketplace.kafka.port.TradeSettledPublisher;
 import com.tokenrealty.marketplace.mapper.MarketplaceMapper;
 import com.tokenrealty.marketplace.repository.ListingRepository;
 import com.tokenrealty.marketplace.repository.MarketOrderRepository;
@@ -36,8 +38,10 @@ class OrderServiceTest {
     @Mock ListingRepository listingRepository;
     @Mock TradeRepository tradeRepository;
     @Mock TokenIssuanceClient tokenIssuanceClient;
+    @Mock PaymentClient paymentClient;
     @Mock MarketplaceMapper mapper;
-    @Mock MarketplaceEventPublisher eventPublisher;
+    @Mock OrderMatchedPublisher orderMatchedPublisher;
+    @Mock TradeSettledPublisher tradeSettledPublisher;
     @InjectMocks OrderService orderService;
 
     private UUID listingId;
@@ -113,13 +117,21 @@ class OrderServiceTest {
         when(listingRepository.findById(listingId)).thenReturn(Optional.of(listing));
         when(tokenIssuanceClient.checkWallet("0xabc"))
                 .thenReturn(new TokenIssuanceClient.ComplianceCheckResponse("0xabc", true, "APPROVED"));
+        UUID paymentId = UUID.randomUUID();
         when(orderRepository.save(any(MarketOrder.class))).thenReturn(savedOrder);
         when(tradeRepository.save(any(Trade.class))).thenReturn(trade);
+        when(paymentClient.initiateTokenPurchase(
+                savedOrder.getId(), buyerId, "0xabc", new BigDecimal("100.00")))
+                .thenReturn(new PaymentClient.InitiatePaymentResponse(
+                        paymentId, savedOrder.getId(), null));
         when(mapper.toOrderResponse(savedOrder)).thenReturn(OrderResponse.builder().id(savedOrder.getId()).build());
 
         orderService.placeBuyOrder(request);
 
-        verify(eventPublisher).publishOrderMatched(savedOrder, trade);
+        verify(paymentClient).initiateTokenPurchase(
+                savedOrder.getId(), buyerId, "0xabc", new BigDecimal("100.00"));
+        verify(tradeRepository, times(2)).save(any(Trade.class));
+        verify(orderMatchedPublisher).publishOrderMatched(any());
         verify(orderRepository).save(any(MarketOrder.class));
     }
 }

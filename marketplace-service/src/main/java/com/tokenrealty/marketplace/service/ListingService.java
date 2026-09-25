@@ -5,7 +5,7 @@ import com.tokenrealty.marketplace.entity.Listing;
 import com.tokenrealty.marketplace.exception.ConflictException;
 import com.tokenrealty.marketplace.exception.ResourceNotFoundException;
 import com.tokenrealty.marketplace.exception.ValidationException;
-import com.tokenrealty.marketplace.kafka.MarketplaceEventPublisher;
+import com.tokenrealty.marketplace.kafka.port.ListingCreatedPublisher;
 import com.tokenrealty.marketplace.mapper.MarketplaceMapper;
 import com.tokenrealty.marketplace.repository.ListingRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class ListingService {
 
     private final ListingRepository listingRepository;
     private final MarketplaceMapper mapper;
-    private final MarketplaceEventPublisher eventPublisher;
+    private final ListingCreatedPublisher listingCreatedPublisher;
 
     public Page<ListingResponse> findAll(Listing.ListingStatus status, UUID flatId, Pageable pageable) {
         if (flatId != null) {
@@ -62,7 +62,12 @@ public class ListingService {
                 .build();
 
         Listing saved = listingRepository.save(listing);
-        eventPublisher.publishListingCreated(saved);
+        listingCreatedPublisher.publishListingCreated(new ListingCreatedPublisher.ListingCreatedEvent(
+                saved.getId(),
+                saved.getFlatId(),
+                saved.getListingType().name(),
+                saved.getPriceUsd(),
+                saved.getTokensAvailable()));
         return mapper.toListingResponse(saved);
     }
 

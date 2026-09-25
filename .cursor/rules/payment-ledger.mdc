@@ -13,7 +13,7 @@ Adapted from Titan ledger rules — simplified for crypto escrow + off-chain boo
 
 ## Scope
 
-**MVP implemented** in `payment-service/` (:8085). Marketplace integration (auto-initiate escrow on order match) is pending.
+**MVP implemented** in `payment-service/` (:8085). Marketplace `PaymentClient` auto-initiates escrow on order match.
 
 Reference: `PaymentService`, `LedgerService`, `PaymentEventPublisher`, `PaymentController`.
 

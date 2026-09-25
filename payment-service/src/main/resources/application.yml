@@ -40,6 +40,10 @@ tokenrealty:
     issuer: tokenrealty-auth
   kafka:
     enabled: ${KAFKA_ENABLED:false}
+    relay:
+      poll-ms: 1000
+      publish-timeout-ms: 10000
+      max-retries: 5
     topic:
       payment-confirmed: tokenrealty.payment.payment.confirmed.v1
       rent-collected: tokenrealty.payment.rent.collected.v1

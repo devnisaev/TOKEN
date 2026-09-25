@@ -77,9 +77,9 @@ JWT Bearer from Auth Service (:8083). Example: login as `investor@tokenrealty.co
 2. Investor POST /v1/orders with buyerWallet + tokenAmount
 3. Marketplace checks KYC via Token Issuance
 4. Tokens reserved; order MATCHED; trade PENDING
-5. Outbox event order.matched → Payment Service (integration pending)
-6. Payment: POST /v1/payments → confirm → release escrow
-7. Admin PATCH /orders/{id}/settle after transfer (interim until automated)
+5. Marketplace calls Payment Service — escrow created, `trade.paymentId` set
+6. Investor sends USDC to escrow wallet; admin/service confirms on-chain tx
+7. Admin PATCH /orders/{id}/settle after token transfer (interim until payment.confirmed consumer)
 ```
 
 ## Configuration
@@ -87,7 +87,8 @@ JWT Bearer from Auth Service (:8083). Example: login as `investor@tokenrealty.co
 | Property | Default | Description |
 |----------|---------|-------------|
 | `services.token-issuance.url` | `http://localhost:8082/api` | Compliance check |
-| `services.payment.url` | `http://localhost:8085/api` | (future) Initiate escrow |
+| `services.payment.url` | `http://localhost:8085/api` | Escrow on order match |
+| `tokenrealty.service-account.client-id` | `marketplace` | Service token for Payment API |
 | `tokenrealty.kafka.enabled` | `false` | Enqueue outbox events |
 | `KAFKA_BOOTSTRAP_SERVERS` | `localhost:9092` | Kafka brokers |
 
@@ -99,9 +100,9 @@ JWT Bearer from Auth Service (:8083). Example: login as `investor@tokenrealty.co
 
 ## Next steps
 
-- [ ] Kafka relay for outbox → broker
+- [x] Kafka relay for outbox → broker (`OutboxRelayWorker` + `OutboxPayload`)
 - [ ] Consumer: `flat.tokenized` auto-create listing
-- [ ] Payment Service integration — `PaymentClient` on order match (replace manual settle)
+- [x] Payment Service integration — `PaymentClient` initiates escrow on order match
 - [ ] Consume `payment.confirmed` to auto-settle trades
 - [ ] Secondary market sell orders
 

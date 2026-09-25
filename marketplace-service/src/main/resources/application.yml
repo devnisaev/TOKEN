@@ -44,6 +44,8 @@ services:
     url: ${AUTH_SERVICE_URL:http://localhost:8083/api}
   token-issuance:
     url: ${TOKEN_ISSUANCE_URL:http://localhost:8082/api}
+  payment:
+    url: ${PAYMENT_SERVICE_URL:http://localhost:8085/api}
 
 tokenrealty:
   jwt:
@@ -54,6 +56,10 @@ tokenrealty:
     client-secret: ${SERVICE_ACCOUNT_SECRET:marketplace-secret}
   kafka:
     enabled: ${KAFKA_ENABLED:false}
+    relay:
+      poll-ms: 1000
+      publish-timeout-ms: 10000
+      max-retries: 5
     topic:
       listing-created: tokenrealty.marketplace.listing.created.v1
       order-matched: tokenrealty.marketplace.order.matched.v1

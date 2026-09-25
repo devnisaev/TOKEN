@@ -40,7 +40,7 @@ public class PaymentController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('INVESTOR') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('INVESTOR') or hasRole('ADMIN') or hasRole('SERVICE')")
     @Operation(summary = "Initiate a crypto payment with escrow")
     public PaymentResponse initiate(
             @RequestHeader("Idempotency-Key") String idempotencyKey,

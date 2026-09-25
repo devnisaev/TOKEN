@@ -5,7 +5,7 @@ import com.tokenrealty.marketplace.dto.MarketplaceDtos.ListingResponse;
 import com.tokenrealty.marketplace.entity.Listing;
 import com.tokenrealty.marketplace.exception.ConflictException;
 import com.tokenrealty.marketplace.exception.ValidationException;
-import com.tokenrealty.marketplace.kafka.MarketplaceEventPublisher;
+import com.tokenrealty.marketplace.kafka.port.ListingCreatedPublisher;
 import com.tokenrealty.marketplace.mapper.MarketplaceMapper;
 import com.tokenrealty.marketplace.repository.ListingRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +31,7 @@ class ListingServiceTest {
 
     @Mock ListingRepository listingRepository;
     @Mock MarketplaceMapper mapper;
-    @Mock MarketplaceEventPublisher eventPublisher;
+    @Mock ListingCreatedPublisher listingCreatedPublisher;
     @InjectMocks ListingService listingService;
 
     private UUID flatId;
@@ -72,7 +72,7 @@ class ListingServiceTest {
         ListingResponse response = listingService.create(request);
 
         assertThat(response.id()).isEqualTo(saved.getId());
-        verify(eventPublisher).publishListingCreated(saved);
+        verify(listingCreatedPublisher).publishListingCreated(any());
     }
 
     @Test

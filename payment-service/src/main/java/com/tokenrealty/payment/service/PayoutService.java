@@ -2,7 +2,8 @@ package com.tokenrealty.payment.service;
 
 import com.tokenrealty.payment.dto.PaymentDtos.*;
 import com.tokenrealty.payment.entity.Payout;
-import com.tokenrealty.payment.kafka.PaymentEventPublisher;
+import com.tokenrealty.payment.kafka.events.RentCollectedEvent;
+import com.tokenrealty.payment.kafka.port.RentCollectedPublisher;
 import com.tokenrealty.payment.mapper.PaymentMapper;
 import com.tokenrealty.payment.repository.PayoutRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class PayoutService {
 
     private final PayoutRepository payoutRepository;
     private final PaymentMapper mapper;
-    private final PaymentEventPublisher eventPublisher;
+    private final RentCollectedPublisher rentCollectedPublisher;
 
     public Page<PayoutResponse> findAll(UUID recipientInvestorId, Pageable pageable) {
         if (recipientInvestorId != null) {
@@ -47,7 +48,15 @@ public class PayoutService {
         Payout saved = payoutRepository.save(payout);
         completePayout(saved);
         if (saved.getPurpose() == Payout.PayoutPurpose.RENT) {
-            eventPublisher.publishRentCollected(saved);
+            rentCollectedPublisher.publishRentCollected(new RentCollectedEvent(
+                    saved.getId(),
+                    saved.getReferenceId(),
+                    null,
+                    saved.getRecipientInvestorId(),
+                    saved.getPeriod(),
+                    new RentCollectedEvent.Amount(
+                            saved.getAmount().toPlainString(), saved.getCurrency()),
+                    saved.getTxHash()));
         }
         return mapper.toPayoutResponse(saved);
     }

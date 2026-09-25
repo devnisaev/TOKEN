@@ -28,3 +28,5 @@ tokenrealty:
 services:
   token-issuance:
     url: http://localhost:8082/api
+  payment:
+    url: http://localhost:8085/api

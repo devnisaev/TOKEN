@@ -22,7 +22,7 @@ Adapted from Titan `ledger-accounting.mdc`. Cursor rule: [`.cursor/rules/payment
 - Real Web3j USDC/MATIC transfers
 - Marketplace auto-initiate payment on order match
 - On-chain reconciliation job (`WalletBalance` vs chain)
-- Kafka relay (outbox → broker)
+- [x] Kafka relay (outbox → broker via `OutboxRelayWorker`; see [kafka-messaging.md](kafka-messaging.md))
 
 ---
 

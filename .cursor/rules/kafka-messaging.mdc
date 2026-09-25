@@ -61,7 +61,14 @@ Fields:
 | `traceId` | string | Propagate from HTTP header or generate; log on every handler |
 | `payload` | object | Domain-specific fields only |
 
-Shared types live in `tokenrealty-events` library (Java records + JSON serde).
+Shared types:
+
+| Library | Use |
+|---------|-----|
+| `tokenrealty-events` | `EventEnvelope`, `KafkaJsonEvent` (consumer parse) |
+| `tokenrealty-outbox` | `OutboxWriter` (base enqueue), `OutboxPayload` (fluent builder) |
+
+Install: `./token-realty-app/mvnw -pl tokenrealty-events,tokenrealty-outbox install`
 
 ## Payload rules (real estate / crypto)
 
@@ -95,28 +102,71 @@ id, aggregate_type, aggregate_id, event_type, payload, status,
 created_at, published_at, retry_count, trace_id
 ```
 
-For existing layered services (`token-realty-app`, `token-issuance-service`), start with a `kafka/outbox/` package; new services may use `adapter/out/kafka/`.
+Package layout per publishing service:
 
-Application/service layer calls a publisher interface — not `KafkaTemplate` or outbox INSERT directly:
+```text
+kafka/
+├── *KafkaEventTypes.java
+├── *KafkaConfig.java
+├── port/
+│   └── OrderMatchedPublisher.java       ← interface + nested event record
+└── outbox/
+    ├── OutboxEvent.java
+    ├── OutboxEventRepository.java
+    ├── OutboxWriter.java                ← @Service extends com.tokenrealty.outbox.OutboxWriter
+    ├── OutboxOrderMatchedPublisher.java ← one class per topic
+    └── OutboxRelayWorker.java
+```
+
+Application/service layer calls a **port interface** — not `KafkaTemplate`, `OutboxWriter`, or outbox INSERT directly:
 
 ```java
 // BAD — service publishes directly
 kafkaTemplate.send(topic, key, payload);
 
-// BAD — many positional args
-publisher.publishFlatTokenized(flatId, contractAddress, totalTokens, price, ...);
+// BAD — service calls OutboxWriter
+outboxWriter.enqueue(topic, key, payload, traceId);
 
-// GOOD — event record on port / publisher interface
-flatEventPublisher.publishFlatTokenized(
-    new FlatTokenizedEvent(flatId, contractAddress, totalTokens, tokenPriceUsd, traceId));
+// BAD — monolithic publisher with many methods / entity params
+marketplaceEventPublisher.publishOrderMatched(order, trade);
+
+// GOOD — typed event record on port
+orderMatchedPublisher.publishOrderMatched(
+    new OrderMatchedPublisher.OrderMatchedEvent(order.getId(), trade.getId(), ...));
 ```
+
+Outbox adapter (one per topic) — inject local `@Service OutboxWriter`, use `OutboxPayload`:
+
+```java
+@Component
+@RequiredArgsConstructor
+public class OutboxOrderMatchedPublisher implements OrderMatchedPublisher {
+
+    private final OutboxWriter outboxWriter;
+
+    @Value("${tokenrealty.kafka.topic.order-matched:" + MarketplaceKafkaEventTypes.ORDER_MATCHED + "}")
+    private String orderMatchedTopic;
+
+    @Override
+    public void publishOrderMatched(OrderMatchedEvent event) {
+        OutboxPayload.start()
+                .put("orderId", event.orderId())
+                .putIfPresent("paymentId", event.paymentId())
+                .enqueue(outboxWriter, orderMatchedTopic, event.orderId());
+    }
+}
+```
+
+`OutboxWriter` (service subclass) wraps payload in `EventEnvelope` via `enqueue` / `enqueueWithEventId`; relay publishes envelope JSON. When `tokenrealty.kafka.enabled=false`, writer no-ops — no guard in adapters.
 
 Other producer rules:
 
 * Partition key: primary business ID (`flatId`, `orderId`, `paymentId`, `contractId`, `investorId`).
+* Topic `@Value` default must match `*KafkaEventTypes` constant and `application.yml`.
 * Keep partition key and `traceId` distinct when they differ.
-* Do not merge unrelated topics into one publisher class.
+* Do not merge unrelated topics into one `Outbox*Publisher` class.
 * Publish methods with **4+ fields** take an event record, not positional parameters.
+* Use `OutboxPayload.putIfPresent` for optional UUIDs/strings — never enqueue null map values.
 
 ## Consumers
 
@@ -168,9 +218,11 @@ Both styles follow the same envelope, idempotency, and one-service-call rules.
 
 ## Local development
 
-* Kafka in root `docker-compose.yml` (port 9092).
+* Kafka: `docker compose --profile kafka up` from `token-realty-app/` (port 9092).
+* Enable outbox + relay: `KAFKA_ENABLED=true` (sets `tokenrealty.kafka.enabled`).
+* Relay config: `tokenrealty.kafka.relay.poll-ms`, `publish-timeout-ms`, `max-retries`.
 * Integration tests: Testcontainers Kafka + `@EmbeddedKafka` only for unit-level producer tests.
-* Profile `kafka` or `local` enables listeners; `test` profile disables `@KafkaListener` auto-start unless test explicitly needs it.
+* Default tests: `kafka.enabled=false` — outbox writer no-ops; mock port interfaces in service unit tests.
 
 ## TokenRealty event catalog (summary)
 

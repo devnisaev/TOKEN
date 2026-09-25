@@ -4,7 +4,7 @@ import com.tokenrealty.payment.config.PaymentProperties;
 import com.tokenrealty.payment.dto.PaymentDtos.*;
 import com.tokenrealty.payment.entity.*;
 import com.tokenrealty.payment.exception.ValidationException;
-import com.tokenrealty.payment.kafka.PaymentEventPublisher;
+import com.tokenrealty.payment.kafka.port.PaymentConfirmedPublisher;
 import com.tokenrealty.payment.mapper.PaymentMapper;
 import com.tokenrealty.payment.repository.EscrowRepository;
 import com.tokenrealty.payment.repository.PaymentRepository;
@@ -34,7 +34,7 @@ class PaymentServiceTest {
     @Mock PaymentMapper mapper;
     @Mock PaymentProperties paymentProperties;
     @Mock LedgerService ledgerService;
-    @Mock PaymentEventPublisher eventPublisher;
+    @Mock PaymentConfirmedPublisher paymentConfirmedPublisher;
     @InjectMocks PaymentService paymentService;
 
     private UUID orderId;

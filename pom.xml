@@ -12,6 +12,8 @@
     <description>TokenRealty monorepo parent</description>
 
     <modules>
+        <module>tokenrealty-events</module>
+        <module>tokenrealty-outbox</module>
         <module>tokenrealty-security</module>
         <module>token-realty-app</module>
         <module>token-issuance-service</module>
@@ -22,6 +24,7 @@
 
     <properties>
         <java.version>21</java.version>
+        <tokenrealty-events.version>0.0.1-SNAPSHOT</tokenrealty-events.version>
         <tokenrealty-security.version>0.0.1-SNAPSHOT</tokenrealty-security.version>
     </properties>
 </project>

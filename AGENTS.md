@@ -46,7 +46,7 @@ New services: copy structure from `marketplace-service/` or `auth-service/`.
 ./mvnw test                    # inside each service folder (after security lib installed)
 ```
 
-Shared JWT: `tokenrealty-security/` — `./token-realty-app/mvnw -pl tokenrealty-security install`
+Shared libs: `tokenrealty-security/` (JWT), `tokenrealty-events/` (envelope, `KafkaJsonEvent`), `tokenrealty-outbox/` (`OutboxWriter`, `OutboxPayload`) — `./token-realty-app/mvnw -pl tokenrealty-security,tokenrealty-events,tokenrealty-outbox install`
 
 ## Platform docs
 

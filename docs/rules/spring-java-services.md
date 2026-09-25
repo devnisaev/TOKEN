@@ -66,7 +66,10 @@ controller → service → repository → entity
 controller → service → repository → entity
                 ↓
             client/TokenIssuanceClient
-            kafka/MarketplaceEventPublisher
+            kafka/port/*Publisher          ← application port (typed event record)
+            kafka/outbox/Outbox{Event}Publisher
+            kafka/outbox/OutboxWriter      ← extends tokenrealty-outbox
+            kafka/outbox/OutboxRelayWorker
             kafka/outbox/OutboxEvent
 ```
 

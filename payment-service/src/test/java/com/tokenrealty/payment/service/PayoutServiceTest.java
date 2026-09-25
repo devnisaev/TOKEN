@@ -2,7 +2,7 @@ package com.tokenrealty.payment.service;
 
 import com.tokenrealty.payment.dto.PaymentDtos.*;
 import com.tokenrealty.payment.entity.*;
-import com.tokenrealty.payment.kafka.PaymentEventPublisher;
+import com.tokenrealty.payment.kafka.port.RentCollectedPublisher;
 import com.tokenrealty.payment.mapper.PaymentMapper;
 import com.tokenrealty.payment.repository.PayoutRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +25,7 @@ class PayoutServiceTest {
 
     @Mock PayoutRepository payoutRepository;
     @Mock PaymentMapper mapper;
-    @Mock PaymentEventPublisher eventPublisher;
+    @Mock RentCollectedPublisher rentCollectedPublisher;
     @InjectMocks PayoutService payoutService;
 
     @Test
@@ -43,6 +43,10 @@ class PayoutServiceTest {
 
         Payout saved = Payout.builder()
                 .recipientInvestorId(request.recipientInvestorId())
+                .amount(request.amount())
+                .currency(request.currency())
+                .referenceId(request.referenceId())
+                .period(request.period())
                 .purpose(Payout.PayoutPurpose.RENT)
                 .status(Payout.PayoutStatus.COMPLETED)
                 .build();
@@ -55,6 +59,6 @@ class PayoutServiceTest {
         PayoutResponse response = payoutService.create(request);
 
         assertThat(response.status()).isEqualTo(Payout.PayoutStatus.COMPLETED);
-        verify(eventPublisher).publishRentCollected(saved);
+        verify(rentCollectedPublisher).publishRentCollected(any());
     }
 }

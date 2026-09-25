@@ -28,14 +28,15 @@ Adapted from Titan `java-dtos.mdc`. Cursor rule: [`.cursor/rules/java-dtos.mdc`]
 
 | Service | Pattern |
 |---------|---------|
-| Payment | Typed records in `kafka/events/` — `PaymentConfirmedEvent`, `RentCollectedEvent` |
-| Marketplace | `Map<String, Object>` in outbox (migrate to typed records) |
+| Payment | Typed records in `kafka/events/`; port methods take `PaymentConfirmedEvent`, `RentCollectedEvent` |
+| Marketplace | Typed records nested in `kafka/port/*Publisher` interfaces (e.g. `OrderMatchedPublisher.OrderMatchedEvent`) |
+
+Outbox adapters map typed events → `OutboxPayload` fields — not raw `Map` in service layer. See [kafka-messaging.md](kafka-messaging.md).
 
 ## Known gaps
 
 | Location | Current | Target |
 |----------|---------|--------|
-| `MarketplaceEventPublisher` | `Map<String, Object>` payload | Typed events like Payment Service |
 | `ContractDeployer` | `Map` from Hardhat | OK at boundary — map to typed deploy result |
 
 ## File layout by service type

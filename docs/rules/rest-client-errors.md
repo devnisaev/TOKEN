@@ -8,7 +8,7 @@ Cursor rule: [`.cursor/rules/rest-client-errors.mdc`](../../.cursor/rules/rest-c
 |--------|---------|-------|------|
 | `PropertyRegistryClient` | Token Issuance → Registry | GET flat, GET SPV, PATCH token-info | Service token |
 | `TokenIssuanceClient` | Marketplace → Issuance | GET compliance check | Service token |
-| `PaymentClient` | Marketplace → Payment | (planned) POST initiate payment | Service token |
+| `PaymentClient` | Marketplace → Payment | POST `/v1/payments` on order match | Service token |
 
 ## Service name prefixes
 
@@ -31,4 +31,4 @@ Cursor rule: [`.cursor/rules/rest-client-errors.mdc`](../../.cursor/rules/rest-c
 ## Pending
 
 - Structured error mapping on `PropertyRegistryClient` and `TokenIssuanceClient`
-- `PaymentClient` when Marketplace ↔ Payment integration lands
+- Structured error mapping on `PaymentClient`

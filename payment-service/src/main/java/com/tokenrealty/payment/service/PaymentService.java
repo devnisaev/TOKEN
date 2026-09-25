@@ -4,7 +4,8 @@ import com.tokenrealty.payment.config.PaymentProperties;
 import com.tokenrealty.payment.dto.PaymentDtos.*;
 import com.tokenrealty.payment.entity.*;
 import com.tokenrealty.payment.exception.*;
-import com.tokenrealty.payment.kafka.PaymentEventPublisher;
+import com.tokenrealty.payment.kafka.events.PaymentConfirmedEvent;
+import com.tokenrealty.payment.kafka.port.PaymentConfirmedPublisher;
 import com.tokenrealty.payment.mapper.PaymentMapper;
 import com.tokenrealty.payment.repository.EscrowRepository;
 import com.tokenrealty.payment.repository.PaymentRepository;
@@ -27,7 +28,7 @@ public class PaymentService {
     private final PaymentMapper mapper;
     private final PaymentProperties paymentProperties;
     private final LedgerService ledgerService;
-    private final PaymentEventPublisher eventPublisher;
+    private final PaymentConfirmedPublisher paymentConfirmedPublisher;
 
     public Page<PaymentResponse> findAll(UUID payerId, UUID orderId, Pageable pageable) {
         if (payerId != null) {
@@ -70,7 +71,14 @@ public class PaymentService {
         payment.setTxHash(request.txHash());
         payment.setConfirmedAt(Instant.now());
         escrow.setStatus(Escrow.EscrowStatus.HELD);
-        eventPublisher.publishPaymentConfirmed(payment);
+        paymentConfirmedPublisher.publishPaymentConfirmed(new PaymentConfirmedEvent(
+                payment.getId(),
+                payment.getOrderId(),
+                payment.getPayerId(),
+                new PaymentConfirmedEvent.Amount(
+                        payment.getAmount().toPlainString(), payment.getCurrency()),
+                payment.getTxHash(),
+                payment.getConfirmedAt()));
         return mapper.toPaymentResponse(payment, escrow);
     }
 
