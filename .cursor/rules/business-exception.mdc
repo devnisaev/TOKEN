@@ -1,0 +1,56 @@
+---
+description: Typed exceptions and ProblemDetail mapping for TokenRealty services
+globs: "**/*.java"
+alwaysApply: false
+---
+
+# Business Exceptions — TokenRealty
+
+## Standard exceptions
+
+| Exception | HTTP | ProblemDetail type |
+|-----------|------|-------------------|
+| `ResourceNotFoundException` | 404 | `/errors/not-found` |
+| `ConflictException` | 409 | `/errors/conflict` |
+| `ValidationException` | 422 | `/errors/business-rule` |
+| `MethodArgumentNotValidException` | 400 | `/errors/validation` |
+
+All services use `GlobalExceptionHandler` returning RFC 7807 `ProblemDetail` with `timestamp` property.
+
+## Raise helpers
+
+Do not scatter `throw new ValidationException(...)` — use private helpers in services:
+
+```java
+// BAD
+if (!listing.isActive()) {
+    throw new ValidationException("Listing is not active");
+}
+
+// GOOD
+if (!listing.isActive()) {
+    raiseValidation("Listing is not active");
+}
+
+private static void raiseValidation(String message) {
+    throw new ValidationException(message);
+}
+```
+
+Use generic `<T> T raiseNotFound(String msg)` only when the compiler requires a return expression in `orElseThrow` chains.
+
+## Error message style
+
+* User-facing: clear, no stack traces in `detail`
+* Log full exception in `@ExceptionHandler(Exception.class)` only
+* Include entity type + id when helpful: `"Listing not found: " + id`
+
+## Financial operations
+
+When Payment Service lands, add:
+
+* `IdempotencyConflictException` → 409
+* `InsufficientFundsException` → 422
+* `ComplianceBlockedException` → 422
+
+Map in `GlobalExceptionHandler`; do not return generic 500 for business rejections.

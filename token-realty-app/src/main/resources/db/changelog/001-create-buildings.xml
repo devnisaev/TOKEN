@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="001-create-buildings" author="tokenrealty">
+        <createTable tableName="buildings">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)"><constraints nullable="false"/></column>
+            <column name="address" type="varchar(500)"><constraints nullable="false"/></column>
+            <column name="city" type="varchar(100)"><constraints nullable="false"/></column>
+            <column name="country" type="varchar(100)"><constraints nullable="false"/></column>
+            <column name="postal_code" type="varchar(20)"/>
+            <column name="total_floors" type="int"/>
+            <column name="total_flats" type="int"/>
+            <column name="construction_year" type="int"/>
+            <column name="total_area_sqm" type="double"/>
+            <column name="status" type="varchar(30)" defaultValue="PENDING_REVIEW">
+                <constraints nullable="false"/>
+            </column>
+            <column name="latitude" type="double"/>
+            <column name="longitude" type="double"/>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+
+        <createIndex tableName="buildings" indexName="idx_buildings_status">
+            <column name="status"/>
+        </createIndex>
+        <createIndex tableName="buildings" indexName="idx_buildings_city">
+            <column name="city"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

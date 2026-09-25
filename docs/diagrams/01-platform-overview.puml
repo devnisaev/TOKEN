@@ -1,0 +1,52 @@
+@startuml 01-platform-overview
+' TokenRealty — Current Platform Overview (as of spec v1.0)
+' Render: plantuml docs/diagrams/01-platform-overview.puml
+
+title TokenRealty — Current Platform Overview
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+actor "Admin / Investor" as User
+
+package "Existing Services" {
+  component "Property Registry\n:8081\ntoken-realty-app" as PR #LightBlue
+  component "Token Issuance\n:8082\ntoken-issuance-service" as TI #LightBlue
+}
+
+database "PostgreSQL" as PG {
+  frame "property_registry" as DB1
+  frame "token_issuance" as DB2
+}
+
+cloud "Blockchain" as Chain {
+  component "Hardhat\nlocalhost:8545" as Hardhat
+  component "Polygon Amoy\n(testnet)" as Amoy
+}
+
+User --> PR : REST /api\n(Basic auth)
+User --> TI : REST /api\n(Basic auth)
+
+PR --> DB1
+TI --> DB2
+
+TI --> PR : RestClient\nGET flat, GET SPV\nPATCH token-info\n(no auth yet)
+
+TI --> Hardhat : Web3j\n(local profile)
+TI --> Amoy : Web3j\n(staging profile)
+
+note right of TI
+  **Stubbed today:**
+  • PropertyToken.sol (empty)
+  • ComplianceRegistry.sol (empty)
+  • deployFlat.js (missing)
+  • Dividends simulated
+end note
+
+note bottom of PR
+  **Implemented:**
+  Buildings, Flats, SPV,
+  Valuations, Documents (metadata)
+end note
+
+@enduml

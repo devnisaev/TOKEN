@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="005-create-documents" author="tokenrealty">
+        <createTable tableName="property_documents">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="building_id" type="uuid"/>
+            <column name="flat_id" type="uuid"/>
+            <column name="document_name" type="varchar(255)"><constraints nullable="false"/></column>
+            <column name="document_type" type="varchar(50)"><constraints nullable="false"/></column>
+            <column name="ipfs_cid" type="varchar(255)"/>
+            <column name="storage_url" type="varchar(1000)"/>
+            <column name="file_size_bytes" type="bigint"/>
+            <column name="mime_type" type="varchar(100)"/>
+            <column name="uploaded_by" type="varchar(100)"/>
+            <column name="is_verified" type="boolean" defaultValueBoolean="false"/>
+            <column name="verified_by" type="varchar(100)"/>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="property_documents" baseColumnNames="building_id"
+                referencedTableName="buildings" referencedColumnNames="id"
+                constraintName="fk_docs_building"
+                onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+                baseTableName="property_documents" baseColumnNames="flat_id"
+                referencedTableName="flats" referencedColumnNames="id"
+                constraintName="fk_docs_flat"
+                onDelete="CASCADE"/>
+
+        <createIndex tableName="property_documents" indexName="idx_docs_building_id">
+            <column name="building_id"/>
+        </createIndex>
+        <createIndex tableName="property_documents" indexName="idx_docs_flat_id">
+            <column name="flat_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

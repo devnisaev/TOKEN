@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+        Paths are relative to THIS file's location on the classpath.
+        Master is at: classpath:db/changelog/db.changelog-master.xml
+        So siblings are referenced by filename only, no path prefix needed.
+    -->
+    <include file="001-create-buildings.xml" relativeToChangelogFile="true"/>
+    <include file="002-create-flats.xml"     relativeToChangelogFile="true"/>
+    <include file="003-create-spv.xml"       relativeToChangelogFile="true"/>
+    <include file="004-create-valuations.xml" relativeToChangelogFile="true"/>
+    <include file="005-create-documents.xml" relativeToChangelogFile="true"/>
+
+</databaseChangeLog>

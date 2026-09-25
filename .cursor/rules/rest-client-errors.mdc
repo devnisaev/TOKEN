@@ -1,0 +1,78 @@
+---
+description: RestClient error mapping for TokenRealty inter-service HTTP calls
+globs: "**/*Client*.java"
+alwaysApply: false
+---
+
+# Downstream REST Error Mapping — TokenRealty
+
+Human doc: [docs/rules/rest-client-errors.md](../../docs/rules/rest-client-errors.md).
+
+## Required mapping
+
+Every `RestClient.retrieve()` to another TokenRealty service or external API must map errors explicitly.
+
+| Condition | Code / exception |
+|-----------|------------------|
+| 5xx or timeout (`ResourceAccessException`) | `{service}_unavailable` |
+| 404 on resource lookup | `ResourceNotFoundException` or domain-specific not-found |
+| Other 4xx | `{service}_error` or `ValidationException` |
+
+Catch only `RestClientResponseException` and `ResourceAccessException` in client adapters — let domain exceptions propagate.
+
+## Service name prefixes
+
+| Downstream | Prefix | Example code |
+|------------|--------|--------------|
+| Property Registry | `property_registry_` | `property_registry_unavailable` |
+| Token Issuance | `token_issuance_` | `token_issuance_unavailable` |
+| Marketplace | `marketplace_` | `marketplace_unavailable` |
+| Payment | `payment_` | `payment_unavailable` |
+
+## Pattern
+
+One `RestClient` `@Bean` per base URL in `*ClientConfig`. Client class wraps calls:
+
+```java
+@Component
+public class TokenIssuanceClient {
+
+    private final RestClient restClient;
+
+    public TokenIssuanceClient(@Qualifier("tokenIssuanceRestClient") RestClient restClient) {
+        this.restClient = restClient;
+    }
+
+    public ComplianceCheckResponse checkWallet(String walletAddress) {
+        try {
+            return restClient.get()
+                    .uri("/v1/compliance/check/{walletAddress}", walletAddress)
+                    .retrieve()
+                    .body(ComplianceCheckResponse.class);
+        } catch (RestClientResponseException ex) {
+            if (ex.getStatusCode().is5xxServerError()) {
+                throw new ValidationException("Token Issuance service unavailable");
+            }
+            throw new ValidationException("Compliance check failed: " + ex.getStatusText());
+        } catch (ResourceAccessException ex) {
+            throw new ValidationException("Token Issuance service unavailable");
+        }
+    }
+}
+```
+
+Extract package-private `*ClientErrors` helper when a service has 3+ outbound clients.
+
+## Rules
+
+* No silent failures — no empty `catch (Exception)` that returns null
+* Do not use broad `catch (Exception)` for business logic
+* Propagate `Authorization` or service-account token when Auth Service exists
+* Propagate `X-Trace-Id` (or `traceId`) on outbound calls
+* Timeouts configured on `RestClient.Builder` — do not rely on defaults for financial paths
+* Retries: only for idempotent GET; never auto-retry POST without idempotency key
+
+## References
+
+* `token-issuance-service/.../client/PropertyRegistryClient.java` — needs auth + error mapping
+* `marketplace-service/.../client/TokenIssuanceClient.java` — compliance check

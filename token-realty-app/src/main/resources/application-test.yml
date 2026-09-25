@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    # H2 2.x PostgreSQL compatibility mode
+    #url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL;DEFAULT_NULL_ORDERING=HIGH
+    url: jdbc:h2:mem:testdb-${random.uuid};MODE=PostgreSQL;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        # H2 dialect — Hibernate 6 auto-detects but explicit is safer
+        dialect: org.hibernate.dialect.H2Dialect
+
+  liquibase:
+    enabled: false
+
+logging:
+  level:
+    com.tokenrealty: DEBUG
+    org.hibernate.SQL: DEBUG

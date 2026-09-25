@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="002-create-flats" author="tokenrealty">
+        <createTable tableName="flats">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="building_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="flat_number" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="floor" type="int"/>
+            <column name="area_sqm" type="double"/>
+            <column name="num_rooms" type="int"/>
+            <column name="num_bathrooms" type="int"/>
+            <column name="status" type="varchar(30)" defaultValue="AVAILABLE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="token_contract_address" type="varchar(100)"/>
+            <column name="total_tokens" type="bigint"/>
+            <column name="token_price_usd" type="decimal(18,2)"/>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="flats" baseColumnNames="building_id"
+                referencedTableName="buildings" referencedColumnNames="id"
+                constraintName="fk_flats_building"
+                onDelete="CASCADE"/>
+
+        <addUniqueConstraint tableName="flats"
+                             columnNames="building_id, flat_number"
+                             constraintName="uq_flat_number_per_building"/>
+
+        <createIndex tableName="flats" indexName="idx_flats_building_id">
+            <column name="building_id"/>
+        </createIndex>
+        <createIndex tableName="flats" indexName="idx_flats_status">
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

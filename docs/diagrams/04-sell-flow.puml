@@ -1,0 +1,66 @@
+@startuml 04-sell-flow
+' TokenRealty — Primary Market Buy Flow
+' Render: plantuml docs/diagrams/04-sell-flow.puml
+
+title TokenRealty — Primary Market Buy Flow (Sell with Crypto)
+
+skinparam shadowing false
+autonumber
+
+actor Investor
+participant "API Gateway" as GW
+participant "Marketplace\n:8084" as MP
+participant "Compliance\n:8087" as KYC
+participant "Payment\n:8085" as PAY
+participant "Token Issuance\n:8082" as TI
+participant "Property Registry\n:8081" as PR
+participant "Blockchain\n(Polygon)" as CHAIN
+queue "Kafka" as KAFKA
+
+== Discovery ==
+Investor -> GW : GET /listings?city=...
+GW -> MP : forward
+MP --> Investor : listings (flat, price, tokens available)
+
+== Checkout ==
+Investor -> GW : POST /orders (buy 100 tokens)
+GW -> MP : forward
+MP -> KYC : GET /compliance/check/{wallet}
+KYC --> MP : whitelisted ✓
+MP -> TI : GET /tokens/by-flat/{flatId}
+TI --> MP : contract details
+MP --> Investor : order created (PENDING)
+
+== Payment ==
+Investor -> GW : POST /payments (USDC amount)
+GW -> PAY : forward
+PAY -> CHAIN : transfer USDC to escrow
+CHAIN --> PAY : txHash
+PAY -> KAFKA : PaymentConfirmed
+PAY --> Investor : payment pending
+
+CHAIN --> PAY : confirmed (N blocks)
+PAY -> KAFKA : PaymentConfirmed (final)
+
+== Token Transfer ==
+KAFKA --> MP : PaymentConfirmed
+MP -> TI : POST /tokens/{id}/transfers
+TI -> KYC : verify buyer wallet
+TI -> CHAIN : transfer tokens on-chain
+CHAIN --> TI : txHash
+TI -> TI : update holder registry
+TI -> KAFKA : TransferCompleted
+
+== Settlement ==
+KAFKA --> PR : TransferCompleted
+PR -> PR : update flat status\n(FULLY_SOLD if all sold)
+
+KAFKA --> PAY : TransferCompleted
+PAY -> CHAIN : release escrow to SPV wallet
+
+KAFKA --> MP : TransferCompleted
+MP -> MP : mark order SETTLED
+
+MP --> Investor : trade complete ✓
+
+@enduml

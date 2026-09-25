@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:marketplace_test;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+  kafka:
+    bootstrap-servers: ${spring.embedded.kafka.brokers:localhost:9092}
+
+tokenrealty:
+  kafka:
+    enabled: false
+
+services:
+  token-issuance:
+    url: http://localhost:8082/api

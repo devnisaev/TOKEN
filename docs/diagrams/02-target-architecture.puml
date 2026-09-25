@@ -1,0 +1,96 @@
+@startuml 02-target-architecture
+' TokenRealty — Target Microservices Architecture
+' Render: plantuml docs/diagrams/02-target-architecture.puml
+
+title TokenRealty — Target Architecture
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+actor "Investor" as Investor
+actor "Admin" as Admin
+actor "Tenant" as Tenant
+
+package "Clients" {
+  component "Investor Portal" as Web
+  component "Admin Dashboard" as AdminUI
+}
+
+component "API Gateway / BFF\n:8080" as GW #Gold
+
+package "Platform Services" #LightYellow {
+  component "Auth Service\n:8083" as AUTH
+  component "Notification\n:8089" as NOTIF
+}
+
+package "Core Services (exist)" #LightBlue {
+  component "Property Registry\n:8081" as PR
+  component "Token Issuance\n:8082" as TI
+}
+
+package "Commerce Services (new)" #LightGreen {
+  component "Marketplace\n:8084" as MP
+  component "Payment\n:8085" as PAY
+  component "Wallet\n:8090" as WALLET
+}
+
+package "Operations Services (new)" #LightCoral {
+  component "Rental / Property Mgmt\n:8086" as RENT
+  component "Document / IPFS\n:8088" as DOC
+  component "KYC / Compliance\n:8087" as KYC
+}
+
+queue "Kafka\nEvent Bus" as KAFKA #Wheat
+
+database "PostgreSQL\n(per service DB)" as PG
+
+cloud "External Infrastructure" as EXT {
+  component "Polygon + Hardhat" as CHAIN
+  component "IPFS / Pinata" as IPFS
+}
+
+Investor --> Web
+Admin --> AdminUI
+Tenant --> Web
+
+Web --> GW
+AdminUI --> GW
+
+GW --> AUTH
+GW --> PR
+GW --> TI
+GW --> MP
+GW --> PAY
+GW --> RENT
+GW --> KYC
+GW --> DOC
+
+TI --> PR : sync HTTP
+MP --> TI
+MP --> PAY
+PAY --> WALLET
+PAY --> CHAIN
+RENT --> PR
+RENT --> TI
+DOC --> IPFS
+KYC --> TI
+
+PR --> KAFKA : publish
+TI --> KAFKA : publish
+MP --> KAFKA : publish
+PAY --> KAFKA : publish
+RENT --> KAFKA : publish
+KYC --> KAFKA : publish
+
+KAFKA --> NOTIF : consume
+
+PR --> PG
+TI --> PG
+MP --> PG
+PAY --> PG
+RENT --> PG
+KYC --> PG
+DOC --> PG
+AUTH --> PG
+
+@enduml

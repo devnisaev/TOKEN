@@ -1,0 +1,111 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# TokenRealty — NEVER commit build output, dependencies, or IDE junk
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Maven / Java build output
+target/
+**/target/
+build/
+**/build/
+out/
+**/out/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+# Maven wrapper JAR only (keep mvnw, mvnw.cmd, maven-wrapper.properties)
+.mvn/wrapper/maven-wrapper.jar
+**/.mvn/wrapper/maven-wrapper.jar
+
+# Node.js dependencies & caches
+node_modules/
+**/node_modules/
+.npm/
+.yarn/
+.pnpm-store/
+.pnp.*
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.node_repl_history
+*.tsbuildinfo
+.eslintcache
+.parcel-cache/
+.turbo/
+dist/
+**/dist/
+
+# Hardhat / Solidity generated files
+**/hardhat/cache/
+**/hardhat/artifacts/
+**/hardhat/typechain-types/
+**/hardhat/coverage/
+**/hardhat/coverage.json
+**/hardhat/.openzeppelin/
+**/contracts/build/
+
+# IntelliJ IDEA
+.idea/
+**/.idea/
+*.iml
+**/*.iml
+*.ipr
+*.iws
+.idea_modules/
+atlassian-ide-plugin.xml
+*.hprof
+
+# VS Code / Cursor (keep shared agent rules)
+.vscode/
+.cursor/*
+!.cursor/rules/
+
+# OS junk
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+Desktop.ini
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+secrets/
+credentials.json
+
+# Logs & test reports
+*.log
+logs/
+**/logs/
+spring.log
+coverage/
+.nyc_output/
+*.lcov
+.jacoco/
+test-results/
+surefire-reports/
+failsafe-reports/
+
+# Spring Boot generated help
+HELP.md
+**/HELP.md
+
+# Docker local volumes
+postgres_data/
+*.pid
+
+# Temp / swap
+*.tmp
+*.bak
+*.swp
+*~
+hs_err_pid*
+replay_pid*

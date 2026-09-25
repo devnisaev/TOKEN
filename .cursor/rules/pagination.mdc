@@ -1,0 +1,40 @@
+---
+description: List endpoint paging defaults for TokenRealty REST APIs
+globs: "**/*Controller.java"
+alwaysApply: false
+---
+
+# Pagination — TokenRealty
+
+## Defaults
+
+| Setting | Value |
+|---------|-------|
+| Default page size | 20 (`@PageableDefault(size = 20)`) |
+| Maximum page size | 500 |
+| Page index | 0-based (Spring Data) |
+
+## Controller pattern
+
+```java
+@GetMapping
+public Page<ListingResponse> list(
+        @RequestParam(required = false) ListingStatus status,
+        @PageableDefault(size = 20) Pageable pageable) {
+    return listingService.findAll(status, pageable);
+}
+```
+
+## Rules
+
+* All collection GET endpoints accept `page`, `size`, `sort`
+* Clamp `size` to max 500 at controller if accepting raw `@RequestParam int size`
+* Service layer receives `Pageable` — do not re-clamp in every service method
+* Return `Page<ResponseDto>` — never expose JPA entities in paginated responses
+* Stable sort: default `createdAt,desc` or `id,asc` for deterministic pages
+* High-volume tables (orders, transfers): require filter params (`buyerId`, `listingId`, date range) — no unbounded full scans in prod
+
+## References
+
+* `marketplace-service/.../ListingController.java`
+* `token-realty-app/.../BuildingController.java`

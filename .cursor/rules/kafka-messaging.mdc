@@ -1,0 +1,193 @@
+---
+description: Kafka topics, event envelope, consumers, and outbox publishing for TokenRealty
+globs: "**/*{Event,Producer,Consumer,Kafka,Outbox,Publisher,Listener}*.java"
+alwaysApply: false
+---
+
+# Kafka Conventions — TokenRealty
+
+Human doc: [docs/rules/kafka-messaging.md](../../docs/rules/kafka-messaging.md).  
+Event catalog: [docs/EVENTS.md](../../docs/EVENTS.md).  
+Platform spec: [docs/PLATFORM-SPEC.md](../../docs/PLATFORM-SPEC.md) §6.
+
+## Topics
+
+Pattern:
+
+```text
+tokenrealty.{domain}.{aggregate}.{past-tense-verb}.v1
+```
+
+Examples:
+
+```text
+tokenrealty.registry.building.approved.v1
+tokenrealty.registry.flat.tokenized.v1
+tokenrealty.marketplace.order.matched.v1
+tokenrealty.payment.payment.confirmed.v1
+tokenrealty.issuance.transfer.completed.v1
+```
+
+Rules:
+
+* Catalog topic names per service in `{service}/src/main/java/.../kafka/*KafkaEventTypes` as `public static final String`.
+* Use those constants in `@KafkaListener`, `@Value("${tokenrealty.kafka.topic.*:…}")` defaults, outbox enqueue, `processed_event.event_type`, and `NewTopic` beans — keep `application.yml` defaults in sync.
+* Canonical cross-service list: `docs/EVENTS.md`.
+* `NewTopic` beans share one `newTopic(name)` helper (same partitions/replicas).
+* Put `@EnableKafka` and topic beans in a dedicated `*KafkaConfig` — not in general `*Config` used by tests without a broker.
+* Every topic a service **publishes** must have a matching `NewTopic` bean and `tokenrealty.kafka.topic.*` key in that service's `application.yml`.
+
+## Envelope
+
+Every Kafka message uses the same JSON envelope:
+
+```json
+{
+  "eventId": "uuid",
+  "eventType": "tokenrealty.registry.flat.tokenized.v1",
+  "occurredAt": "2025-09-25T10:00:00Z",
+  "traceId": "uuid-or-correlation-id",
+  "payload": { }
+}
+```
+
+Fields:
+
+| Field | Type | Rule |
+|-------|------|------|
+| `eventId` | UUID | Unique per event; used for idempotent consume |
+| `eventType` | string | Same value as Kafka topic name |
+| `occurredAt` | ISO-8601 instant | Business time of the fact |
+| `traceId` | string | Propagate from HTTP header or generate; log on every handler |
+| `payload` | object | Domain-specific fields only |
+
+Shared types live in `tokenrealty-events` library (Java records + JSON serde).
+
+## Payload rules (real estate / crypto)
+
+**Never publish in Kafka payloads:**
+
+* Private keys, mnemonics, or wallet seeds
+* Full KYC documents or government ID numbers
+* Unmasked sensitive PII beyond what the consumer needs
+
+**Prefer IDs and references:**
+
+* `flatId`, `buildingId`, `contractId`, `investorId`, `orderId`, `paymentId`, `leaseId`
+* `walletAddress` only when required by the consumer (e.g. whitelist sync)
+* On-chain `txHash` — OK
+* Money as `{ "amount": "123.45", "currency": "USD" }` or `{ "amount": "1000000", "currency": "USDC", "decimals": 6 }` — never raw float
+
+## Producers
+
+### Outbox (required for domain events)
+
+Domain state change and its event must commit together:
+
+* Write aggregate + insert outbox row in the **same** `@Transactional`.
+* **Never** call `KafkaTemplate.send` inside an uncommitted business transaction.
+* Relay process publishes from outbox and sets `published_at` after broker ack.
+
+Outbox row fields:
+
+```text
+id, aggregate_type, aggregate_id, event_type, payload, status,
+created_at, published_at, retry_count, trace_id
+```
+
+For existing layered services (`token-realty-app`, `token-issuance-service`), start with a `kafka/outbox/` package; new services may use `adapter/out/kafka/`.
+
+Application/service layer calls a publisher interface — not `KafkaTemplate` or outbox INSERT directly:
+
+```java
+// BAD — service publishes directly
+kafkaTemplate.send(topic, key, payload);
+
+// BAD — many positional args
+publisher.publishFlatTokenized(flatId, contractAddress, totalTokens, price, ...);
+
+// GOOD — event record on port / publisher interface
+flatEventPublisher.publishFlatTokenized(
+    new FlatTokenizedEvent(flatId, contractAddress, totalTokens, tokenPriceUsd, traceId));
+```
+
+Other producer rules:
+
+* Partition key: primary business ID (`flatId`, `orderId`, `paymentId`, `contractId`, `investorId`).
+* Keep partition key and `traceId` distinct when they differ.
+* Do not merge unrelated topics into one publisher class.
+* Publish methods with **4+ fields** take an event record, not positional parameters.
+
+## Consumers
+
+* **Idempotent:** store processed `eventId` in `processed_event` table before handling.
+* **At-least-once:** duplicate delivery must be safe (check `eventId` first).
+* Listeners live in `{service}/kafka/` (layered) or `adapter/in/kafka/` (new services).
+* Listener parses envelope → maps to command/DTO → **one** `@Service` method call.
+* Do not inject `*JpaRepository` for `processed_event` into business `@Service` — use a small `ProcessedEventService` or repository wrapper.
+* Retry with backoff; after max retries send to DLQ: `<topic>.dlq`.
+* Same-shape parse logic: use shared `KafkaJsonEvent.consume(...)` from `tokenrealty-events` — do not copy `readTree` / try-catch into every listener.
+
+```java
+// BAD — parse duplicated; many args on service
+@KafkaListener(topics = RegistryKafkaEventTypes.FLAT_TOKENIZED)
+public void onFlatTokenized(String message) {
+    JsonNode n = objectMapper.readTree(message);
+    UUID eventId = UUID.fromString(n.get("eventId").asText());
+    JsonNode p = n.get("payload");
+    marketplaceService.handleFlatTokenized(eventId,
+        UUID.fromString(p.get("flatId").asText()), ...);
+}
+
+// GOOD — shared parse; command → one service call
+@KafkaListener(topics = RegistryKafkaEventTypes.FLAT_TOKENIZED)
+public void onFlatTokenized(String message) {
+    KafkaJsonEvent.consume(objectMapper, message, "Flat tokenized processing failed",
+        event -> marketplaceService.handleFlatTokenized(
+            FlatTokenizedCommand.from(event)));
+}
+```
+
+When several listeners share identical claim + parse wiring, extract `{Service}KafkaIngestSupport` in the same package.
+
+Do **not** add a fan-in orchestrator for a single listener — one listener → one service method.
+
+## Layering (TokenRealty)
+
+| Service generation | Listener location | Publisher location |
+|--------------------|-------------------|--------------------|
+| Existing (registry, issuance) | `kafka/` | `kafka/outbox/` |
+| New (marketplace, payment, …) | `adapter/in/kafka/` | `adapter/out/kafka/` |
+
+Both styles follow the same envelope, idempotency, and one-service-call rules.
+
+## Schema evolution
+
+* **Additive** payload fields in `.v1` — OK; consumers ignore unknown fields.
+* **Breaking** change — new topic suffix `.v2`; dual-consume during migration; retire `.v1` when all producers upgraded.
+
+## Local development
+
+* Kafka in root `docker-compose.yml` (port 9092).
+* Integration tests: Testcontainers Kafka + `@EmbeddedKafka` only for unit-level producer tests.
+* Profile `kafka` or `local` enables listeners; `test` profile disables `@KafkaListener` auto-start unless test explicitly needs it.
+
+## TokenRealty event catalog (summary)
+
+Full detail: `docs/EVENTS.md`.
+
+| Topic | Publisher | Key consumers |
+|-------|-----------|---------------|
+| `tokenrealty.registry.building.approved.v1` | Property Registry | Marketplace, Notification |
+| `tokenrealty.registry.flat.tokenized.v1` | Property Registry | Marketplace, Notification |
+| `tokenrealty.compliance.investor.kyc-approved.v1` | Compliance | Token Issuance |
+| `tokenrealty.compliance.investor.kyc-revoked.v1` | Compliance | Token Issuance |
+| `tokenrealty.marketplace.listing.created.v1` | Marketplace | Notification |
+| `tokenrealty.marketplace.order.matched.v1` | Marketplace | Payment, Token Issuance |
+| `tokenrealty.payment.payment.confirmed.v1` | Payment | Token Issuance, Marketplace |
+| `tokenrealty.payment.rent.collected.v1` | Payment | Rental, Token Issuance |
+| `tokenrealty.issuance.transfer.completed.v1` | Token Issuance | Marketplace, Registry, Notification |
+| `tokenrealty.issuance.dividend.distributed.v1` | Token Issuance | Payment, Notification |
+| `tokenrealty.document.document.uploaded.v1` | Document | Property Registry |
+
+Partition keys: `buildingId`, `flatId`, `investorId`, `orderId`, `paymentId`, `contractId`, `leaseId`, `documentId` respectively.

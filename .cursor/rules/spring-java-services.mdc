@@ -1,0 +1,281 @@
+---
+description: TokenRealty Spring Boot microservice structure, Java conventions, layering, and API rules
+globs: "**/*.java"
+alwaysApply: false
+---
+
+# Spring Service Conventions — TokenRealty
+
+Human doc: [docs/rules/spring-java-services.md](../../docs/rules/spring-java-services.md).  
+Platform spec: [docs/PLATFORM-SPEC.md](../../docs/PLATFORM-SPEC.md).
+
+## Stack
+
+- Java 21, Spring Boot 4, Maven
+- PostgreSQL + JPA; Liquibase (forward-only when enabled)
+- MapStruct + Lombok (entities/services/controllers — not rich domain models)
+- Spring Security (Basic auth dev; JWT via Auth Service later)
+- Kafka + transactional outbox ([kafka-messaging.mdc](kafka-messaging.mdc))
+- OpenAPI via springdoc
+
+## Architecture — two layouts
+
+### Layered (existing services)
+
+Use for `token-realty-app`, `token-issuance-service`:
+
+```text
+com.tokenrealty.<service>/
+├── controller/
+├── service/
+├── repository/
+├── entity/
+├── dto/
+├── mapper/          (or inline mapping in service)
+├── client/          (outbound RestClient to other services)
+├── exception/
+├── config/
+└── kafka/           (event types, outbox, listeners)
+```
+
+Reference: Property Registry (`com.tokenrealty.registry`), Token Issuance (`com.tokenrealty.issuance`).
+
+### Light hexagonal (new Tier 1+ services)
+
+Use for `marketplace-service`, `auth-service`, `payment-service`, etc.:
+
+```text
+com.tokenrealty.<service>/
+├── adapter/in/web/       REST controllers + request/response DTOs
+├── adapter/in/kafka/     @KafkaListener (when consuming)
+├── adapter/out/
+│   ├── persistence/      JPA entities + repositories
+│   ├── client/           RestClient implementations
+│   └── kafka/            outbox publishers, relay
+├── application/service/  use-case orchestration, @Transactional
+├── application/port/out/ interfaces for DB, Kafka, external APIs (when extracting)
+├── domain/               optional rich models (Payment, Marketplace)
+├── dto/                  shared records (OK in layered style too)
+├── exception/
+├── config/
+└── kafka/                OK at top level until full hexagonal split
+```
+
+**Marketplace reference:** `marketplace-service` — layered with `kafka/outbox/`; migrate to `adapter/*` incrementally.
+
+Rules:
+
+* Controllers: validate DTO → call service → map response. No repository, no business logic.
+* Services: orchestrate use cases, own `@Transactional` boundaries.
+* Do **not** hold DB transactions open during blockchain, IPFS, or HTTP calls to other services.
+* External I/O (RestClient, Web3j, Hardhat subprocess) runs outside long `@Transactional` blocks when possible.
+* Business rules live in services (layered) or domain (when extracted) — not in controllers or DTOs.
+
+## Naming
+
+* REST paths: plural nouns — `/v1/listings`, `/v1/orders`, `/v1/tokens`
+* DTO records: `CreateListingRequest`, `ListingResponse`, grouped in `*Dtos.java` or per-feature records
+* Services: `ListingService`, `OrderService`, `TokenIssuanceService`
+* Clients: `PropertyRegistryClient`, `TokenIssuanceClient`
+* Controllers: `ListingController`, `OrderController`
+* IDs: `UUID` in API and JPA
+* Money: `BigDecimal` with `precision = 19, scale = 2` on columns; use `RoundingMode.HALF_UP` for totals
+
+## Package & port convention
+
+| Service | Folder | Port | Context |
+|---------|--------|------|---------|
+| Property Registry | `token-realty-app/` | 8081 | `/api` |
+| Token Issuance | `token-issuance-service/` | 8082 | `/api` |
+| Auth | `auth-service/` | 8083 | `/api` |
+| Marketplace | `marketplace-service/` | 8084 | `/api` |
+| Payment | `payment-service/` | 8085 | `/api` |
+
+Inter-service URLs in `application.yml`:
+
+```yaml
+services:
+  property-registry:
+    url: http://localhost:8081/api
+  token-issuance:
+    url: http://localhost:8082/api
+```
+
+## Persistence
+
+* JPA entities in `entity/` (layered) or `adapter/out/persistence/` (hexagonal).
+* `@Version` on mutable aggregates — see `BaseEntity` in registry and marketplace.
+* `@Enumerated(EnumType.STRING)` for new enum columns.
+* Prefer LAZY associations; avoid EAGER unless justified.
+* DB uniqueness via constraints + repository checks before insert.
+* **Liquibase/Flyway forward-only** — never edit applied migrations; add a new changeset.
+* Dev profile may use `hibernate.ddl-auto: update`; production uses Liquibase.
+
+## Transaction boundaries
+
+* `@Transactional(readOnly = true)` on service class; override with `@Transactional` on write methods.
+* `@Transactional` on the **public** service method that commits the unit of work.
+* Same-class internal calls do not pass through Spring proxy — fold logic into the public method.
+* Outbox enqueue in the **same** transaction as the domain write ([kafka-messaging.mdc](kafka-messaging.mdc)).
+* Never `KafkaTemplate.send` inside an uncommitted business transaction.
+
+```java
+// BAD — blockchain call inside TX
+@Transactional
+public OrderResponse placeOrder(PlaceOrderRequest req) {
+    orderRepository.save(order);
+    blockchain.transfer(...);  // slow; holds connection
+    return response;
+}
+
+// GOOD — persist + outbox in TX; external calls after or in separate step
+@Transactional
+public OrderResponse placeOrder(PlaceOrderRequest req) {
+    MarketOrder saved = orderRepository.save(order);
+    eventPublisher.publishOrderMatched(saved, trade);
+    return mapper.toOrderResponse(saved);
+}
+```
+
+## Inter-service HTTP
+
+* Outbound calls via dedicated `*Client` classes using `RestClient` ([rest-client-errors.mdc](rest-client-errors.mdc)).
+* One `@Bean` RestClient per downstream base URL; inject with `@Qualifier`.
+* Propagate `traceId` header when available.
+* Service-to-service auth: service account JWT (when Auth Service exists); until then document the gap.
+* Config: `services.<name>.url` — never hardcode URLs in services.
+
+```java
+// BAD — generic RestClient without qualifier
+private final RestClient restClient;
+
+// GOOD — marketplace-service
+public TokenIssuanceClient(@Qualifier("tokenIssuanceRestClient") RestClient restClient)
+```
+
+## API
+
+* OpenAPI 3 per service; Swagger UI at `/api/swagger-ui.html`
+* Bean Validation (`@Valid`, `@NotNull`, `@NotBlank`) on request DTOs
+* Errors: RFC 7807 `ProblemDetail` via `GlobalExceptionHandler`
+* Standard codes/types:
+
+```text
+400  /errors/validation
+401  unauthorized (Spring Security)
+403  forbidden
+404  /errors/not-found
+409  /errors/conflict
+422  /errors/business-rule
+500  /errors/internal
+```
+
+* Typed exceptions: `ResourceNotFoundException`, `ConflictException`, `ValidationException`
+* Use private `raiseException` helpers for repeated throws ([business-exception.mdc](business-exception.mdc))
+* Financial/state-changing POST: plan for `Idempotency-Key` header (Payment, transfers) — required when Payment Service lands
+
+## Paging
+
+* All list endpoints support Spring `Pageable` ([pagination.mdc](pagination.mdc))
+* Default size: 20 (`@PageableDefault(size = 20)`)
+* Max size: 500 — clamp at controller if exposing raw `size` param
+* Return `Page<ResponseDto>` directly
+
+## Security (dev → prod)
+
+**Dev (current):** in-memory users in `SecurityUserConfig`; HTTP Basic; stateless sessions.
+
+| User | Role | Services |
+|------|------|----------|
+| admin | ADMIN | all |
+| manager | PROPERTY_MANAGER | registry, marketplace listings |
+| investor | INVESTOR | marketplace orders, read |
+| compliance | COMPLIANCE | issuance, registry docs |
+
+**Prod (target):** JWT from Auth Service; `@PreAuthorize` on controllers; service accounts for internal calls.
+
+Rules:
+
+* Split `SecurityConfig` (filter chain) from `SecurityUserConfig` (users) for `@WebMvcTest` slices.
+* `@PreAuthorize` for fine-grained rules beyond HTTP method patterns.
+* Never log private keys, wallet seeds, or full KYC document content.
+
+## Kafka & events
+
+See [kafka-messaging.mdc](kafka-messaging.mdc) and [docs/EVENTS.md](../../docs/EVENTS.md).
+
+* Topic pattern: `tokenrealty.{domain}.{aggregate}.{verb}.v1`
+* Catalog in `*KafkaEventTypes`; sync with `application.yml`
+* Outbox table per publishing service; relay when `tokenrealty.kafka.enabled=true`
+* Consumers: idempotent on `eventId`; listener → one service call
+
+## MapStruct & DTOs
+
+* Java **records** for request/response DTOs, commands, events
+* MapStruct in `mapper/` package, or manual mapper `@Component` (marketplace uses manual)
+* Do not expose JPA entities from controllers
+* Records for DTOs; Lombok `@Builder` on entities
+
+## Testing
+
+| Layer | Approach |
+|-------|----------|
+| Service unit | JUnit 5 + Mockito; no Spring context |
+| Controller slice | `@WebMvcTest` + `@Import(SecurityConfig)` |
+| Integration | `@SpringBootTest` + `@ActiveProfiles("test")` + H2 |
+| Full stack | Testcontainers PostgreSQL (+ Kafka when wired) |
+
+Run: `./mvnw test` per service module.
+
+## Observability
+
+* Spring Actuator: `/actuator/health`, `/actuator/info`, `/actuator/metrics`
+* Structured logs; include `traceId` when propagating
+* Target: Prometheus + OpenTelemetry (Phase 5)
+
+## Documentation per service
+
+Each service module requires:
+
+* `README.md` — quick start, port, API table, test users
+* Swagger/OpenAPI (springdoc)
+* Link to [docs/PLATFORM-SPEC.md](../../docs/PLATFORM-SPEC.md) for platform context
+
+## Controller rules
+
+```java
+// BAD — business logic in controller
+@PostMapping
+public OrderResponse place(@RequestBody PlaceOrderRequest req) {
+    if (req.tokenAmount() < 10) throw ...
+    listing.setTokensAvailable(...);
+}
+
+// GOOD
+@PostMapping
+public OrderResponse place(@Valid @RequestBody PlaceOrderRequest req) {
+    return orderService.placeBuyOrder(req);
+}
+```
+
+## Configuration
+
+* `@ConfigurationProperties` for typed service config (prefer over scattered `@Value`)
+* Secrets from environment — `OPERATOR_PRIVATE_KEY`, `DB_PASSWORD`, never committed
+* Profiles: `local`, `test`, `staging`, `prod`
+
+## Sensitive domain rules (real estate / crypto)
+
+* KYC gate before token purchase — call Token Issuance `/v1/compliance/check/{wallet}`
+* Token transfer and payment must be reconcilable (order ↔ trade ↔ payment ↔ txHash)
+* Dividends: pro-rata by ownership %; immutable payout records once SETTLED
+* Property status sync: `TransferCompleted` → registry flat status (`FULLY_SOLD` when applicable)
+
+## When adding a new microservice
+
+1. Copy structure from `marketplace-service/` (pom, config, security, exception handler)
+2. Assign port from [PLATFORM-SPEC.md](../../docs/PLATFORM-SPEC.md) §7
+3. Create PostgreSQL database `{service_name}` with underscores
+4. Add README + link in [docs/README.md](../../docs/README.md)
+5. Add Kafka event types to [docs/EVENTS.md](../../docs/EVENTS.md) if publishing/consuming
+6. Follow [kafka-messaging.mdc](kafka-messaging.mdc) for events

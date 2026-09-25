@@ -1,0 +1,79 @@
+spring:
+  application:
+    name: marketplace-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/marketplace_service
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    enabled: false
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: marketplace-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+server:
+  port: 8084
+  servlet:
+    context-path: /api
+
+services:
+  token-issuance:
+    url: ${TOKEN_ISSUANCE_URL:http://localhost:8082/api}
+
+tokenrealty:
+  kafka:
+    enabled: ${KAFKA_ENABLED:false}
+    topic:
+      listing-created: tokenrealty.marketplace.listing.created.v1
+      order-matched: tokenrealty.marketplace.order.matched.v1
+      trade-settled: tokenrealty.marketplace.trade.settled.v1
+
+jackson2:
+  serialization:
+    write-dates-as-timestamps: false
+  deserialization:
+    fail-on-unknown-properties: false
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.tokenrealty: DEBUG
+    org.springframework.security: INFO

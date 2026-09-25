@@ -1,0 +1,63 @@
+@startuml 05-rent-flow
+' TokenRealty — Rent Collection → Dividend Distribution Flow
+' Render: plantuml docs/diagrams/05-rent-flow.puml
+
+title TokenRealty — Rent Collection & Dividend Flow
+
+skinparam shadowing false
+autonumber
+
+actor Tenant
+actor "Token Holders" as Holders
+participant "Rental Service\n:8086" as RENT
+participant "Payment\n:8085" as PAY
+participant "Token Issuance\n:8082" as TI
+participant "Property Registry\n:8081" as PR
+participant "Blockchain\n(Polygon)" as CHAIN
+queue "Kafka" as KAFKA
+participant "Notification\n:8089" as NOTIF
+
+== Lease Setup (one-time) ==
+RENT -> PR : GET /flats/{id} (tokenized flat)
+RENT -> RENT : create Lease\n(rent amount, schedule)
+RENT -> KAFKA : LeaseCreated
+
+== Monthly Rent Due ==
+RENT -> KAFKA : RentDue (leaseId, amount, period)
+KAFKA --> NOTIF : send rent reminder to Tenant
+
+== Tenant Pays Rent (Crypto) ==
+Tenant -> PAY : POST /payments\n(USDC rent amount)
+PAY -> CHAIN : transfer USDC to SPV wallet
+CHAIN --> PAY : txHash confirmed
+PAY -> KAFKA : RentCollected
+
+== Trigger Dividend ==
+KAFKA --> RENT : RentCollected
+RENT -> RENT : confirm rent for period
+RENT -> TI : POST /tokens/{id}/dividends/distribute\n(grossRentalIncomeUsd)
+
+== Calculate & Distribute ==
+TI -> TI : calculate pro-rata\nby holder ownership %
+TI -> CHAIN : distribute to holder wallets\n(on-chain or via Payment)
+CHAIN --> TI : txHash(s)
+
+alt On-chain dividend (target)
+  TI -> CHAIN : DividendDistributor.distribute()
+else Simulated (current)
+  TI -> TI : txHash = "0xSIMULATED_..."
+endif
+
+TI -> KAFKA : DividendDistributed
+
+== Payout to Holders ==
+KAFKA --> PAY : DividendDistributed
+loop for each holder
+  PAY -> CHAIN : transfer USDC to holder wallet
+end
+PAY -> KAFKA : PayoutCompleted
+
+KAFKA --> NOTIF : send dividend notification
+NOTIF --> Holders : "Dividend paid: $X.XX"
+
+@enduml

@@ -1,0 +1,110 @@
+package com.tokenrealty.marketplace.service;
+
+import com.tokenrealty.marketplace.dto.MarketplaceDtos.CreateListingRequest;
+import com.tokenrealty.marketplace.dto.MarketplaceDtos.ListingResponse;
+import com.tokenrealty.marketplace.entity.Listing;
+import com.tokenrealty.marketplace.exception.ConflictException;
+import com.tokenrealty.marketplace.exception.ValidationException;
+import com.tokenrealty.marketplace.kafka.MarketplaceEventPublisher;
+import com.tokenrealty.marketplace.mapper.MarketplaceMapper;
+import com.tokenrealty.marketplace.repository.ListingRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.math.BigDecimal;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+@DisplayName("ListingService unit tests")
+class ListingServiceTest {
+
+    @Mock ListingRepository listingRepository;
+    @Mock MarketplaceMapper mapper;
+    @Mock MarketplaceEventPublisher eventPublisher;
+    @InjectMocks ListingService listingService;
+
+    private UUID flatId;
+
+    @BeforeEach
+    void setUp() {
+        flatId = UUID.randomUUID();
+    }
+
+    @Test
+    @DisplayName("create saves active listing")
+    void createSavesListing() {
+        CreateListingRequest request = CreateListingRequest.builder()
+                .flatId(flatId)
+                .listingType(Listing.ListingType.PRIMARY)
+                .priceUsd(new BigDecimal("100.00"))
+                .tokensTotal(1000L)
+                .minInvestmentTokens(10L)
+                .title("Sunrise Tower Flat 12")
+                .build();
+
+        Listing saved = Listing.builder()
+                .flatId(flatId)
+                .listingType(Listing.ListingType.PRIMARY)
+                .status(Listing.ListingStatus.ACTIVE)
+                .priceUsd(new BigDecimal("100.00"))
+                .tokensAvailable(1000L)
+                .tokensTotal(1000L)
+                .minInvestmentTokens(10L)
+                .build();
+        saved.setId(UUID.randomUUID());
+
+        when(listingRepository.findByFlatIdAndStatus(flatId, Listing.ListingStatus.ACTIVE))
+                .thenReturn(Optional.empty());
+        when(listingRepository.save(any(Listing.class))).thenReturn(saved);
+        when(mapper.toListingResponse(saved)).thenReturn(ListingResponse.builder().id(saved.getId()).flatId(flatId).build());
+
+        ListingResponse response = listingService.create(request);
+
+        assertThat(response.id()).isEqualTo(saved.getId());
+        verify(eventPublisher).publishListingCreated(saved);
+    }
+
+    @Test
+    @DisplayName("create rejects duplicate active listing")
+    void createRejectsDuplicate() {
+        CreateListingRequest request = CreateListingRequest.builder()
+                .flatId(flatId)
+                .listingType(Listing.ListingType.PRIMARY)
+                .priceUsd(new BigDecimal("100.00"))
+                .tokensTotal(1000L)
+                .minInvestmentTokens(10L)
+                .build();
+
+        when(listingRepository.findByFlatIdAndStatus(flatId, Listing.ListingStatus.ACTIVE))
+                .thenReturn(Optional.of(new Listing()));
+
+        assertThatThrownBy(() -> listingService.create(request))
+                .isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    @DisplayName("create validates min investment")
+    void createValidatesMinInvestment() {
+        CreateListingRequest request = CreateListingRequest.builder()
+                .flatId(flatId)
+                .listingType(Listing.ListingType.PRIMARY)
+                .priceUsd(new BigDecimal("100.00"))
+                .tokensTotal(100L)
+                .minInvestmentTokens(200L)
+                .build();
+
+        assertThatThrownBy(() -> listingService.create(request))
+                .isInstanceOf(ValidationException.class);
+    }
+}

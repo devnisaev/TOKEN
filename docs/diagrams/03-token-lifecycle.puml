@@ -1,0 +1,55 @@
+@startuml 03-token-lifecycle
+' TokenRealty — Token Lifecycle (8 steps)
+' Render: plantuml docs/diagrams/03-token-lifecycle.puml
+
+title TokenRealty — Token Lifecycle
+
+skinparam shadowing false
+
+|Property Registry|
+start
+:Flat registered\n(status: AVAILABLE);
+:SPV registered for building;
+:SPV KYC verified;
+
+|Token Issuance|
+:POST /v1/tokens\n(deploy PropertyToken.sol);
+note right: **Blocked today:**\nempty Solidity contracts
+
+|Property Registry|
+:PATCH /v1/flats/{id}/token-info\n(flat → TOKENIZED);
+:Building → TOKENIZED;
+
+|Compliance Service|
+:Investors registered;
+:KYC verified + whitelisted;
+
+|Token Issuance|
+:PATCH /v1/tokens/{id}/enable-transfers\n(trading opens);
+
+|Marketplace|
+:Listing created for flat;
+
+|Investor|
+:Browse listings;
+:Buy tokens (see sell-flow diagram);
+
+|Token Issuance|
+:POST /v1/tokens/{id}/transfers\n(token transfer on-chain);
+
+|Property Registry|
+if (All tokens sold?) then (yes)
+  :Flat → FULLY_SOLD;
+else (no)
+  :Flat remains TOKENIZED;
+endif
+
+|Rental Service|
+:Rent collected (see rent-flow diagram);
+
+|Token Issuance|
+:POST /v1/tokens/{id}/dividends/distribute\n(pro-rata to holders);
+
+stop
+
+@enduml

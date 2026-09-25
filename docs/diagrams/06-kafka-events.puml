@@ -1,0 +1,69 @@
+@startuml 06-kafka-events
+' TokenRealty — Kafka Event Bus Topology
+' Render: plantuml docs/diagrams/06-kafka-events.puml
+
+title TokenRealty — Kafka Event Bus
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+queue "Kafka\n(tokenrealty.*)" as KAFKA #Wheat
+
+package "Publishers" {
+  component "Property Registry" as PR #LightBlue
+  component "Token Issuance" as TI #LightBlue
+  component "Marketplace" as MP #LightGreen
+  component "Payment" as PAY #LightGreen
+  component "Rental" as RENT #LightCoral
+  component "Compliance/KYC" as KYC #LightCoral
+  component "Document/IPFS" as DOC #LightCoral
+}
+
+package "Consumers" {
+  component "Notification" as NOTIF #LightYellow
+  component "Marketplace" as MP2 #LightGreen
+  component "Payment" as PAY2 #LightGreen
+  component "Token Issuance" as TI2 #LightBlue
+  component "Property Registry" as PR2 #LightBlue
+  component "Rental" as RENT2 #LightCoral
+}
+
+' --- Registry events ---
+PR -down-> KAFKA : **BuildingApproved**\nbuildingId, approvedAt
+PR -down-> KAFKA : **FlatTokenized**\nflatId, contractAddress,\ntotalTokens
+
+' --- Compliance events ---
+KYC -down-> KAFKA : **InvestorKycApproved**\ninvestorId, walletAddress
+KYC -down-> KAFKA : **InvestorKycRevoked**\ninvestorId, reason
+
+' --- Marketplace events ---
+MP -down-> KAFKA : **ListingCreated**\nlistingId, flatId, priceUsd
+MP -down-> KAFKA : **OrderMatched**\norderId, buyerId, amount
+MP -down-> KAFKA : **TradeSettled**\ntradeId, txHash
+
+' --- Payment events ---
+PAY -down-> KAFKA : **PaymentConfirmed**\npaymentId, amount, txHash
+PAY -down-> KAFKA : **RentCollected**\nleaseId, amount, period
+
+' --- Issuance events ---
+TI -down-> KAFKA : **TransferCompleted**\ntransferId, from, to, amount
+TI -down-> KAFKA : **DividendDistributed**\ncontractId, payouts[]
+
+' --- Document events ---
+DOC -down-> KAFKA : **DocumentUploaded**\ndocumentId, ipfsCid
+
+' --- Consumption ---
+KAFKA -down-> NOTIF : all events\n(email/push)
+KAFKA -down-> MP2 : PaymentConfirmed\nTransferCompleted
+KAFKA -down-> PAY2 : OrderMatched\nDividendDistributed
+KAFKA -down-> TI2 : InvestorKycApproved\nPaymentConfirmed\nRentCollected
+KAFKA -down-> PR2 : TransferCompleted\n(FULLY_SOLD update)
+KAFKA -down-> RENT2 : RentCollected\nPaymentConfirmed
+
+note bottom of KAFKA
+  **Topic naming:** tokenrealty.{domain}.{event}
+  **Schema:** TBD — Avro + Schema Registry or JSON Schema
+  **Library:** tokenrealty-events (shared Java module)
+end note
+
+@enduml

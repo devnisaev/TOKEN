@@ -1,0 +1,55 @@
+# Agent Instructions — TokenRealty
+
+Monorepo of Spring Boot 4 / Java 21 microservices for tokenized real estate.
+
+## Stack
+
+- Java 21, Maven, Spring Boot 4, PostgreSQL, JPA
+- MapStruct, Lombok, springdoc OpenAPI
+- Hardhat + Web3j (Token Issuance)
+- Kafka + outbox (planned/enabled per service)
+
+## Cursor rules
+
+Read and follow rules in `.cursor/rules/`:
+
+| Rule | When |
+|------|------|
+| [spring-java-services.mdc](.cursor/rules/spring-java-services.mdc) | Any Java / Spring work |
+| [kafka-messaging.mdc](.cursor/rules/kafka-messaging.mdc) | Kafka, events, outbox |
+| [rest-client-errors.mdc](.cursor/rules/rest-client-errors.mdc) | RestClient / inter-service calls |
+| [business-exception.mdc](.cursor/rules/business-exception.mdc) | Exceptions & ProblemDetail |
+| [pagination.mdc](.cursor/rules/pagination.mdc) | List endpoints |
+
+Human-readable expansions: [docs/rules/](docs/rules/)
+
+## Services
+
+| Service | Port | Package |
+|---------|------|---------|
+| Property Registry | 8081 | `com.tokenrealty.registry` |
+| Token Issuance | 8082 | `com.tokenrealty.issuance` |
+| Auth | 8083 | `com.tokenrealty.auth` |
+| Marketplace | 8084 | `com.tokenrealty.marketplace` |
+
+New services: copy structure from `marketplace-service/` or `auth-service/`.
+
+## Run tests
+
+```bash
+./mvnw test   # inside each service folder
+```
+
+## Platform docs
+
+- Spec & TODO: [docs/PLATFORM-SPEC.md](docs/PLATFORM-SPEC.md)
+- Kafka events: [docs/EVENTS.md](docs/EVENTS.md)
+- Diagrams: [docs/diagrams/](docs/diagrams/)
+
+## Conventions
+
+- Controllers: validate → service → map; no business logic
+- `@Transactional` on service write methods; no blockchain/HTTP inside long TX
+- RFC 7807 ProblemDetail for errors
+- Records for DTOs; secrets from env only
+- Implement only what is requested; minimal diff

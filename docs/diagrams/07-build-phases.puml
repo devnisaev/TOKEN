@@ -1,0 +1,76 @@
+@startuml 07-build-phases
+' TokenRealty — Implementation Phases Timeline
+' Render: plantuml docs/diagrams/07-build-phases.puml
+
+title TokenRealty — Implementation Phases
+
+skinparam shadowing false
+
+@startgantt
+Project starts 2025-09-25
+
+-- Phase 0: Foundation Fixes --
+[Implement Solidity contracts] as [P0a] lasts 2 weeks
+[deployFlat.js + compile] as [P0b] lasts 3 days
+[Inter-service auth fix] as [P0c] lasts 3 days
+[Enable Liquibase both services] as [P0d] lasts 3 days
+[Real dividend tx (replace simulated)] as [P0e] lasts 1 week
+[Root README + doc sync] as [P0f] lasts 2 days
+
+[P0a] -> [P0b]
+[P0b] -> [P0c]
+[P0c] -> [P0d]
+[P0d] -> [P0e]
+[P0e] -> [P0f]
+
+-- Phase 1: Platform Layer --
+[Auth Service :8083] as [P1a] lasts 2 weeks
+[Kafka infra + event library] as [P1b] lasts 1 week
+[API Gateway :8080] as [P1c] lasts 1 week
+[Migrate services to JWT] as [P1d] lasts 1 week
+
+[P0f] -> [P1a]
+[P1a] -> [P1b]
+[P1b] -> [P1c]
+[P1c] -> [P1d]
+
+-- Phase 2: Commerce --
+[Payment Service :8085] as [P2a] lasts 3 weeks
+[Marketplace Service :8084] as [P2b] lasts 3 weeks
+
+[P1d] -> [P2a]
+[P2a] -> [P2b]
+
+-- Phase 3: Rental --
+[Rental Service :8086] as [P3a] lasts 2 weeks
+[Rent → dividend pipeline] as [P3b] lasts 1 week
+
+[P2b] -> [P3a]
+[P3a] -> [P3b]
+
+-- Phase 4: Compliance & Docs --
+[Compliance Service :8087] as [P4a] lasts 2 weeks
+[Document/IPFS Service :8088] as [P4b] lasts 1 week
+
+[P3b] -> [P4a]
+[P4a] -> [P4b]
+
+-- Phase 5: Scale & UX --
+[Wallet Service :8090] as [P5a] lasts 2 weeks
+[Notification Service :8089] as [P5b] lasts 1 week
+[Blockchain Indexer] as [P5c] lasts 2 weeks
+[Investor Portal (frontend)] as [P5d] lasts 4 weeks
+
+[P4b] -> [P5a]
+[P5a] -> [P5b]
+[P5b] -> [P5c]
+[P5c] -> [P5d]
+
+@endgantt
+
+note bottom
+  **Phases:** 0 Foundation | 1 Platform | 2 Commerce
+  | 3 Rental | 4 Compliance & Docs | 5 Scale & UX
+end note
+
+@enduml

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TokenRealty Platform Spec &amp; TODO</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4f;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --yellow: #d29922;
+      --red: #f85149;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    h1, h2, h3 { color: var(--text); margin-top: 2rem; }
+    h1 { border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    h2 { border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; font-size: 1.4rem; }
+    a { color: var(--accent); }
+    .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+    th, td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; }
+    th { background: var(--surface); }
+    tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+    code { background: var(--surface); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85em; }
+    pre { background: var(--surface); border: 1px solid var(--border); padding: 1rem; overflow-x: auto; border-radius: 6px; }
+    .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; }
+    .phase h3 { margin-top: 0; color: var(--accent); }
+    .todo { list-style: none; padding: 0; }
+    .todo li { padding: 0.25rem 0; padding-left: 1.5rem; position: relative; }
+    .todo li::before { content: "☐"; position: absolute; left: 0; color: var(--muted); }
+    .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+    .badge-done { background: rgba(63,185,80,0.2); color: var(--green); }
+    .badge-todo { background: rgba(248,81,73,0.2); color: var(--red); }
+    .badge-wip { background: rgba(210,153,34,0.2); color: var(--yellow); }
+    nav.toc { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.5rem; margin: 1.5rem 0; }
+    nav.toc ol { margin: 0; padding-left: 1.25rem; }
+    nav.toc a { text-decoration: none; }
+    nav.toc a:hover { text-decoration: underline; }
+    .diagram-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin: 1rem 0; }
+    .diagram-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+    .diagram-card h4 { margin: 0 0 0.5rem; font-size: 0.95rem; }
+    .diagram-card p { margin: 0; font-size: 0.85rem; color: var(--muted); }
+    footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+
+<h1>TokenRealty Platform — Implementation Spec &amp; TODO</h1>
+<p class="meta">
+  <strong>Version:</strong> 1.0 &nbsp;|&nbsp;
+  <strong>Date:</strong> 2025-09-25 &nbsp;|&nbsp;
+  <strong>Status:</strong> Planning / Reference<br>
+  Markdown source: <a href="PLATFORM-SPEC.md">PLATFORM-SPEC.md</a>
+</p>
+
+<nav class="toc">
+  <strong>Contents</strong>
+  <ol>
+    <li><a href="#vision">Vision</a></li>
+    <li><a href="#current">Current State</a></li>
+    <li><a href="#architecture">Target Architecture</a></li>
+    <li><a href="#services">Microservices Catalog</a></li>
+    <li><a href="#flows">Sell &amp; Rent Flows</a></li>
+    <li><a href="#kafka">Kafka Events</a></li>
+    <li><a href="#ports">Ports &amp; Naming</a></li>
+    <li><a href="#phases">Implementation Phases</a></li>
+    <li><a href="#phase0">Phase 0 — Foundation Fixes</a></li>
+    <li><a href="#diagrams">Diagrams</a></li>
+  </ol>
+</nav>
+
+<h2 id="vision">1. Vision</h2>
+<p>TokenRealty tokenizes real estate (buildings, flats, other property) so investors can <strong>buy fractional ownership</strong> and <strong>earn rental income</strong> using cryptocurrency (USDC, MATIC, ETH).</p>
+
+<table>
+  <tr><th>Capability</th><th>Description</th></tr>
+  <tr><td>Asset registry</td><td>Buildings, flats, SPVs, valuations, legal documents</td></tr>
+  <tr><td>Tokenization</td><td>ERC-1400 property tokens on Polygon per flat</td></tr>
+  <tr><td>Primary market</td><td>Investors buy tokens with crypto</td></tr>
+  <tr><td>Secondary market</td><td>P2P token trading with compliance gates</td></tr>
+  <tr><td>Rental operations</td><td>Lease management, crypto rent, pro-rata dividends</td></tr>
+  <tr><td>Compliance</td><td>KYC/AML whitelist (off-chain + on-chain)</td></tr>
+  <tr><td>Documents</td><td>Title deeds, leases on IPFS</td></tr>
+</table>
+
+<h2 id="current">2. Current State</h2>
+<table>
+  <tr><th>Service</th><th>Port</th><th>Status</th></tr>
+  <tr>
+    <td>Property Registry (<code>token-realty-app</code>)</td>
+    <td>8081</td>
+    <td><span class="badge badge-done">Implemented</span></td>
+  </tr>
+  <tr>
+    <td>Token Issuance (<code>token-issuance-service</code>)</td>
+    <td>8082</td>
+    <td><span class="badge badge-wip">API done; chain stubbed</span></td>
+  </tr>
+</table>
+
+<h3>Critical gaps</h3>
+<ul class="todo">
+  <li>Smart contracts empty (<code>Propertytoken.sol</code>, <code>Complianceregistry.sol</code>)</li>
+  <li>Missing <code>deployFlat.js</code></li>
+  <li>Dividends simulated (no real crypto payout)</li>
+  <li>No inter-service auth (Issuance → Registry 401)</li>
+  <li>Kafka, JWT, IPFS, Marketplace, Payment — not started</li>
+</ul>
+
+<h2 id="architecture">3. Target Architecture</h2>
+<pre>
+Clients → API Gateway (:8080)
+              ↓
+    ┌─────────────────────────────────────────┐
+    │ Auth (:8083)  │  Registry (:8081)       │
+    │ Issuance (:8082)  │  Marketplace (:8084)│
+    │ Payment (:8085)  │  Rental (:8086)       │
+    │ Compliance (:8087)  │  Document (:8088)  │
+    └─────────────────────────────────────────┘
+              ↓                    ↓
+         Kafka Event Bus      PostgreSQL + Polygon + IPFS
+</pre>
+<p>Full diagram: <a href="diagrams/02-target-architecture.puml">02-target-architecture.puml</a></p>
+
+<h2 id="services">4. Microservices Catalog</h2>
+
+<div class="phase">
+  <h3>Tier 1 — Build first</h3>
+  <table>
+    <tr><th>Service</th><th>Port</th><th>Purpose</th></tr>
+    <tr><td>Auth Service</td><td>8083</td><td>JWT, roles, service accounts, wallet linking</td></tr>
+    <tr><td>Payment Service</td><td>8085</td><td>Crypto payments, escrow, rent, dividend payouts</td></tr>
+    <tr><td>Marketplace Service</td><td>8084</td><td>Listings, orders, primary &amp; secondary market</td></tr>
+  </table>
+</div>
+
+<div class="phase">
+  <h3>Tier 2 — Rental &amp; compliance</h3>
+  <table>
+    <tr><th>Service</th><th>Port</th><th>Purpose</th></tr>
+    <tr><td>Rental / Property Mgmt</td><td>8086</td><td>Leases, rent schedules, dividend triggers</td></tr>
+    <tr><td>KYC / Compliance</td><td>8087</td><td>Investor KYC, whitelist sync, audit trail</td></tr>
+    <tr><td>Document / IPFS</td><td>8088</td><td>Upload legal docs, return CIDs</td></tr>
+  </table>
+</div>
+
+<div class="phase">
+  <h3>Tier 3 — Platform polish</h3>
+  <ul>
+    <li><strong>API Gateway</strong> (:8080) — single entry point</li>
+    <li><strong>Notification</strong> (:8089) — email/push from Kafka events</li>
+    <li><strong>Wallet</strong> (:8090) — custodial or WalletConnect</li>
+    <li><strong>Blockchain Indexer</strong> — sync on-chain events to DB</li>
+  </ul>
+</div>
+
+<h2 id="flows">5. Domain Flows</h2>
+<table>
+  <tr><th>Use case</th><th>Services</th></tr>
+  <tr><td>Tokenize flat for sale</td><td>Registry → Issuance → Marketplace</td></tr>
+  <tr><td>Investor buys tokens</td><td>Marketplace → Payment → Issuance → Registry</td></tr>
+  <tr><td>Tenant pays rent</td><td>Rental → Payment → SPV wallet</td></tr>
+  <tr><td>Investors get dividends</td><td>Rental → Issuance → Payment → holders</td></tr>
+  <tr><td>Secondary sale</td><td>Marketplace → Compliance → Payment → Issuance</td></tr>
+</table>
+<p>Sequence diagrams: <a href="diagrams/04-sell-flow.puml">sell-flow</a>, <a href="diagrams/05-rent-flow.puml">rent-flow</a>, <a href="diagrams/03-token-lifecycle.puml">token-lifecycle</a></p>
+
+<h2 id="kafka">6. Kafka Events</h2>
+<table>
+  <tr><th>Event</th><th>Publisher</th><th>Consumers</th></tr>
+  <tr><td><code>BuildingApproved</code></td><td>Registry</td><td>Marketplace, Notification</td></tr>
+  <tr><td><code>FlatTokenized</code></td><td>Registry</td><td>Marketplace, Notification</td></tr>
+  <tr><td><code>InvestorKycApproved</code></td><td>Compliance</td><td>Token Issuance</td></tr>
+  <tr><td><code>OrderMatched</code></td><td>Marketplace</td><td>Payment, Issuance</td></tr>
+  <tr><td><code>PaymentConfirmed</code></td><td>Payment</td><td>Issuance, Marketplace</td></tr>
+  <tr><td><code>TransferCompleted</code></td><td>Issuance</td><td>Marketplace, Registry, Notification</td></tr>
+  <tr><td><code>RentCollected</code></td><td>Payment</td><td>Rental, Issuance</td></tr>
+  <tr><td><code>DividendDistributed</code></td><td>Issuance</td><td>Payment, Notification</td></tr>
+</table>
+<p>Topology: <a href="diagrams/06-kafka-events.puml">06-kafka-events.puml</a></p>
+
+<h2 id="ports">7. Service Ports</h2>
+<table>
+  <tr><th>Service</th><th>Port</th><th>Database</th></tr>
+  <tr><td>API Gateway</td><td>8080</td><td>—</td></tr>
+  <tr><td>Property Registry</td><td>8081</td><td>property_registry</td></tr>
+  <tr><td>Token Issuance</td><td>8082</td><td>token_issuance</td></tr>
+  <tr><td>Auth</td><td>8083</td><td>auth_service</td></tr>
+  <tr><td>Marketplace</td><td>8084</td><td>marketplace_service</td></tr>
+  <tr><td>Payment</td><td>8085</td><td>payment_service</td></tr>
+  <tr><td>Rental</td><td>8086</td><td>rental_service</td></tr>
+  <tr><td>Compliance</td><td>8087</td><td>compliance_service</td></tr>
+  <tr><td>Document</td><td>8088</td><td>document_service</td></tr>
+  <tr><td>Notification</td><td>8089</td><td>notification_service</td></tr>
+  <tr><td>Wallet</td><td>8090</td><td>wallet_service</td></tr>
+</table>
+
+<h2 id="phases">8. Implementation Phases</h2>
+<table>
+  <tr><th>Phase</th><th>Focus</th><th>Outcome</th></tr>
+  <tr><td><strong>0</strong></td><td>Foundation fixes</td><td>Blockchain works; inter-service auth; Liquibase</td></tr>
+  <tr><td><strong>1</strong></td><td>Platform</td><td>Auth, Kafka, API Gateway</td></tr>
+  <tr><td><strong>2</strong></td><td>Commerce</td><td>Payment + Marketplace — buy with crypto</td></tr>
+  <tr><td><strong>3</strong></td><td>Rental</td><td>Rent → dividend pipeline</td></tr>
+  <tr><td><strong>4</strong></td><td>Compliance &amp; docs</td><td>KYC Service, Document/IPFS</td></tr>
+  <tr><td><strong>5</strong></td><td>Scale &amp; UX</td><td>Wallet, Notification, Indexer, frontend</td></tr>
+</table>
+<p>Timeline: <a href="diagrams/07-build-phases.puml">07-build-phases.puml</a></p>
+
+<h2 id="phase0">9. Phase 0 — Foundation Fixes (must do first)</h2>
+<ul class="todo">
+  <li>Implement <code>PropertyToken.sol</code> and <code>ComplianceRegistry.sol</code></li>
+  <li>Create <code>hardhat/scripts/deployFlat.js</code></li>
+  <li>Fix inter-service auth (Issuance → Registry callback)</li>
+  <li>Enable Liquibase in both services</li>
+  <li>Replace simulated dividends with real on-chain txs</li>
+  <li>Implement <code>FULLY_SOLD</code> flat status logic</li>
+  <li>Create root README with platform overview</li>
+</ul>
+
+<h2 id="diagrams">10. PlantUML Diagrams</h2>
+<div class="diagram-grid">
+  <div class="diagram-card">
+    <h4><a href="diagrams/01-platform-overview.puml">01-platform-overview</a></h4>
+    <p>Current two-service setup with PostgreSQL and blockchain</p>
+  </div>
+  <div class="diagram-card">
+    <h4><a href="diagrams/02-target-architecture.puml">02-target-architecture</a></h4>
+    <p>Full target microservices architecture</p>
+  </div>
+  <div class="diagram-card">
+    <h4><a href="diagrams/03-token-lifecycle.puml">03-token-lifecycle</a></h4>
+    <p>Token lifecycle from registration to dividends</p>
+  </div>
+  <div class="diagram-card">
+    <h4><a href="diagrams/04-sell-flow.puml">04-sell-flow</a></h4>
+    <p>Primary market buy flow with crypto payment</p>
+  </div>
+  <div class="diagram-card">
+    <h4><a href="diagrams/05-rent-flow.puml">05-rent-flow</a></h4>
+    <p>Rent collection and dividend distribution</p>
+  </div>
+  <div class="diagram-card">
+    <h4><a href="diagrams/06-kafka-events.puml">06-kafka-events</a></h4>
+    <p>Kafka event bus publishers and consumers</p>
+  </div>
+  <div class="diagram-card">
+    <h4><a href="diagrams/07-build-phases.puml">07-build-phases</a></h4>
+    <p>Implementation phase Gantt timeline</p>
+  </div>
+</div>
+
+<p><strong>Render diagrams:</strong></p>
+<pre>brew install plantuml
+plantuml docs/diagrams/*.puml</pre>
+
+<footer>
+  TokenRealty Platform Spec v1.0 — See <a href="PLATFORM-SPEC.md">PLATFORM-SPEC.md</a> for the full checklist with per-service TODOs.
+</footer>
+
+</body>
+</html>

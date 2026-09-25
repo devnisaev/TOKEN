@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="003-create-spv" author="tokenrealty">
+        <createTable tableName="spv_entities">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="building_id" type="uuid"><constraints nullable="false" unique="true"/></column>
+            <column name="legal_name" type="varchar(255)"><constraints nullable="false"/></column>
+            <column name="registration_number" type="varchar(100)"><constraints unique="true"/></column>
+            <column name="registration_country" type="varchar(100)"/>
+            <column name="registration_date" type="date"/>
+            <column name="registered_address" type="varchar(500)"/>
+            <column name="wallet_address" type="varchar(100)"/>
+            <column name="tax_id" type="varchar(100)"/>
+            <column name="status" type="varchar(30)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="kyc_verified" type="boolean" defaultValueBoolean="false"/>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="spv_entities" baseColumnNames="building_id"
+                referencedTableName="buildings" referencedColumnNames="id"
+                constraintName="fk_spv_building"
+                onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>
