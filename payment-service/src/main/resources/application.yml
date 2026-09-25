@@ -60,6 +60,9 @@ tokenrealty:
     blockchain:
       enabled: ${PAYMENT_BLOCKCHAIN_ENABLED:false}
     escrow-wallet-address: ${ESCROW_WALLET_ADDRESS:0xEscrowDevWallet0000000000000000000001}
+    auto-confirm:
+      enabled: ${PAYMENT_AUTO_CONFIRM:false}
+      poll-ms: 3000
 
 jackson2:
   serialization:

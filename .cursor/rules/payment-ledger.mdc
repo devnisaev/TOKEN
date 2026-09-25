@@ -46,7 +46,7 @@ escrowService.hold(paymentId, Currency.USDC, amount);
 | Step | Off-chain state | On-chain |
 |------|-----------------|----------|
 | Order matched | `Escrow.AWAITING` → `HELD` on confirm | Sync `PaymentClient`; investor sends USDC |
-| Payment confirmed | `payment.confirmed` event | Manual/service `POST …/confirm` (for now) |
+| Payment confirmed | `payment.confirmed` event | `POST …/confirm` or dev `PaymentAutoConfirmWorker` (`PAYMENT_AUTO_CONFIRM=true`) |
 | Transfer confirmed | `Escrow.RELEASED` | Marketplace `PaymentClient.releaseEscrow` after `transfer.completed` |
 | Timeout / cancel | `Escrow.REFUNDED` | Return to investor wallet |
 
@@ -74,6 +74,10 @@ Rules:
 - `BigDecimal` with `precision = 19, scale = 2` for USD/USDC display amounts.
 - Never `double` for money.
 - Store crypto amounts with explicit decimals + `currency` enum (`USDC`, `MATIC`, `ETH`).
+
+## Dev auto-confirm
+
+`PaymentAutoConfirmWorker` — `@Scheduled`, gated on `tokenrealty.payment.auto-confirm.enabled`. Polls `PENDING` payments and calls `PaymentService.confirm()` with `0xSIMULATED_{paymentId}`. Enable via `PAYMENT_AUTO_CONFIRM=true` or `local` profile.
 
 ## Kafka + outbox
 

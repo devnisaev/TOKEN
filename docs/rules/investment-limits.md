@@ -33,6 +33,7 @@ Adapted from Titan `limits-engine.mdc`. Cursor rule: [`.cursor/rules/investment-
 | Payment idempotency | Payment | `Idempotency-Key` on `POST /v1/payments` |
 | Escrow before transfer | Payment | `POST /v1/payments` on match; release after `transfer.completed` |
 | Event-driven settle | Marketplace + Issuance | Kafka: `payment.confirmed` → transfer → `transfer.completed` |
+| Dev payment confirm | Payment | `PAYMENT_AUTO_CONFIRM=true` — auto-confirms pending escrow |
 | Role-based access | All | JWT + `@PreAuthorize`; SERVICE role for inter-service release |
 
 ## Future (Compliance Service :8087)

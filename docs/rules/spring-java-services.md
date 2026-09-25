@@ -57,7 +57,9 @@ Cursor rule: [`.cursor/rules/spring-java-services.mdc`](../../.cursor/rules/spri
 controller → service → repository → entity
                 ↓
             client/ (RestClient)
-            kafka/  (events)
+            kafka/port/*Publisher          ← Registry: FlatTokenizedPublisher
+            kafka/outbox/                  ← Registry: outbox + relay (when publishing)
+            kafka/in/                      ← Issuance: consumers
 ```
 
 ### New services (Marketplace — template for Auth, Payment)
@@ -89,11 +91,27 @@ adapter/in/web → application/service → adapter/out/{persistence,client,kafka
 
 | Service | Port | Package | Layout |
 |---------|------|---------|--------|
-| Property Registry | 8081 | `com.tokenrealty.registry` | Layered |
+| API Gateway | 8080 | `com.tokenrealty.gateway` | Reverse proxy + JWT (no DB) |
+| Property Registry | 8081 | `com.tokenrealty.registry` | Layered + kafka out |
 | Token Issuance | 8082 | `com.tokenrealty.issuance` | Layered + kafka in/out |
-| Marketplace | 8084 | `com.tokenrealty.marketplace` | Layered + kafka in/out |
 | Auth | 8083 | `com.tokenrealty.auth` | Layered + JWT issuer |
+| Marketplace | 8084 | `com.tokenrealty.marketplace` | Layered + kafka in/out |
 | Payment | 8085 | `com.tokenrealty.payment` | Layered + escrow + kafka in/out |
+| Notification | 8089 | `com.tokenrealty.notification` | Kafka consumer stub only |
+
+### API Gateway (edge)
+
+Servlet reverse proxy on `:8080` — Spring Cloud Gateway deferred until Boot 4 compatibility.
+
+```
+config/GatewayRouteProperties.java   ← path prefix → downstream URL
+config/SecurityConfig.java           ← JWT; public auth register/login/refresh
+proxy/GatewayProxyController.java    ← forwards /api/** to services
+```
+
+Routes in `application.yml` under `tokenrealty.gateway.routes`. Downstream services keep `/api` context path; gateway forwards full path unchanged.
+
+Clients should call `http://localhost:8080/api/v1/...` instead of individual service ports.
 
 ---
 

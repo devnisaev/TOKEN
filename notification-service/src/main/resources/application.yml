@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: notification-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/notification_service
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: notification-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+server:
+  port: 8089
+  servlet:
+    context-path: /api
+
+tokenrealty:
+  kafka:
+    enabled: ${KAFKA_ENABLED:false}
+    topic:
+      flat-tokenized: tokenrealty.registry.flat.tokenized.v1
+      listing-created: tokenrealty.marketplace.listing.created.v1
+      order-matched: tokenrealty.marketplace.order.matched.v1
+      payment-confirmed: tokenrealty.payment.payment.confirmed.v1
+      transfer-completed: tokenrealty.issuance.transfer.completed.v1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    com.tokenrealty: DEBUG

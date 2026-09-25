@@ -64,6 +64,12 @@ com.tokenrealty.<service>/
 
 **Marketplace reference:** `marketplace-service` — layered with `kafka/in/` (consumers), `kafka/outbox/` (publishers), `kafka/command/`; migrate to `adapter/*` incrementally.
 
+**Registry reference:** `token-realty-app` — publishes `flat.tokenized` from `FlatService.setTokenInfo()` via outbox.
+
+**API Gateway reference:** `api-gateway` — servlet reverse proxy + JWT; routes in `tokenrealty.gateway.routes`; no DB. Spring Cloud Gateway deferred (Boot 4).
+
+**Notification reference:** `notification-service` — Kafka consumer stub only; `NotificationLogService` until email provider.
+
 Rules:
 
 * Controllers: validate DTO → call service → map response. No repository, no business logic.
@@ -86,11 +92,13 @@ Rules:
 
 | Service | Folder | Port | Context |
 |---------|--------|------|---------|
+| API Gateway | `api-gateway/` | 8080 | `/` (proxies `/api/**`) |
 | Property Registry | `token-realty-app/` | 8081 | `/api` |
 | Token Issuance | `token-issuance-service/` | 8082 | `/api` |
 | Auth | `auth-service/` | 8083 | `/api` |
 | Marketplace | `marketplace-service/` | 8084 | `/api` |
 | Payment | `payment-service/` | 8085 | `/api` |
+| Notification | `notification-service/` | 8089 | `/api` |
 
 Inter-service URLs in `application.yml`:
 

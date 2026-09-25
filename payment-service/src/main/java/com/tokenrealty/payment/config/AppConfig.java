@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @Configuration
 @EnableJpaAuditing
-@EnableConfigurationProperties(PaymentProperties.class)
+@EnableConfigurationProperties({PaymentProperties.class, PaymentAutoConfirmProperties.class})
 public class AppConfig {
 }

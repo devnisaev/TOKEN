@@ -1,0 +1,6 @@
+tokenrealty:
+  payment:
+    auto-confirm:
+      enabled: true
+  kafka:
+    enabled: true

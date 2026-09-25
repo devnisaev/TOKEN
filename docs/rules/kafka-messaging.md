@@ -47,20 +47,21 @@ Spring conventions: [spring-java-services.md](spring-java-services.md)
 - [x] Add Kafka to root `docker-compose.yml` (`docker compose --profile kafka up`)
 - [x] Create `tokenrealty-events` Maven module (envelope record, `KafkaJsonEvent`)
 - [x] Create `tokenrealty-outbox` Maven module (`OutboxWriter`, `OutboxPayload`)
-- [x] Add `processed_event` table + repository per consuming service (Marketplace, Payment, Issuance)
-- [x] Add outbox table + relay job per publishing service (Marketplace, Payment, Issuance)
+- [x] Add `processed_event` table + repository per consuming service (Marketplace, Payment, Issuance, Notification)
+- [x] Add outbox table + relay job per publishing service (Marketplace, Payment, Issuance, Property Registry)
 
 ### Phase 1 — First producers (Property Registry)
 
-- [ ] `RegistryKafkaEventTypes` class
-- [ ] `RegistryKafkaConfig` with `NewTopic` beans
-- [ ] Outbox publisher for `building.approved`, `flat.tokenized`
-- [ ] Emit after DB commit in `BuildingService` / `FlatService`
+- [x] `RegistryKafkaEventTypes` class
+- [x] `RegistryKafkaConfig` with `NewTopic` beans
+- [ ] Outbox publisher for `building.approved`
+- [x] Outbox publisher for `flat.tokenized` (Property Registry)
+- [x] Emit `flat.tokenized` after DB commit in `FlatService.setTokenInfo()`
 
 ### Phase 1 — First consumers (Notification stub)
 
-- [ ] `NotificationKafkaListener` with idempotent `eventId` check
-- [ ] Log-only handler until email provider connected
+- [x] `NotificationEventListener` with idempotent `eventId` check (`notification-service`)
+- [x] Log-only handler until email provider connected
 
 ### Phase 2+ — Commerce & rental
 
@@ -304,13 +305,13 @@ Inter-service REST (service JWT):
 | Marketplace → Payment | `PaymentClient` | `POST /v1/payments`, `PATCH /v1/payments/{id}/release` |
 | Marketplace → Issuance | `TokenIssuanceClient` | `GET /v1/tokens/by-flat/{flatId}`, `GET /v1/compliance/check/{wallet}` |
 
-**Pending:** Property Registry producer for `flat.tokenized` (consumer ready). Manual `POST /v1/payments/{id}/confirm` until on-chain deposit detection.
+**Dev auto-confirm:** `PaymentAutoConfirmWorker` polls `PENDING` payments when `tokenrealty.payment.auto-confirm.enabled=true` (`PAYMENT_AUTO_CONFIRM` env or `local` profile). Uses `0xSIMULATED_{paymentId}` tx hash. Production still needs on-chain deposit detection.
 
 ---
 
 ## Package layout examples
 
-**Property Registry (layered — target):**
+**Property Registry (implemented):**
 
 ```text
 com.tokenrealty.registry/
@@ -362,6 +363,33 @@ com.tokenrealty.issuance/
 ```
 
 **Payment (implemented):** outbox publishers + `kafka/in/OrderMatchedListener` for escrow reconciliation.
+
+**Notification (implemented — consumer stub):**
+
+```text
+com.tokenrealty.notification/
+├── entity/ProcessedEvent.java
+├── service/ProcessedEventService.java
+├── service/NotificationLogService.java    ← log-only until email provider
+├── kafka/
+│   ├── NotificationKafkaEventTypes.java
+│   ├── NotificationKafkaConfig.java
+│   └── in/
+│       ├── NotificationKafkaIngestSupport.java
+│       └── NotificationEventListener.java   ← multi-topic @KafkaListener
+```
+
+No outbox — Notification is consume-only for now.
+
+---
+
+## Local dev flags
+
+| Flag / profile | Service | Effect |
+|----------------|---------|--------|
+| `KAFKA_ENABLED=true` | All Kafka services | Outbox relay + listeners active |
+| `PAYMENT_AUTO_CONFIRM=true` | Payment | Auto-confirms pending payments every 3s |
+| `spring.profiles.active=local` | Payment | Enables auto-confirm + Kafka (see `application-local.yml`) |
 
 ---
 

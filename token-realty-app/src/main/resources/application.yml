@@ -26,6 +26,12 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.xml
     enabled: false
 
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
 server:
   port: 8081
   servlet:
@@ -35,6 +41,14 @@ tokenrealty:
   jwt:
     secret: ${JWT_SECRET:dev-secret-change-in-production-min-32-chars!!}
     issuer: tokenrealty-auth
+  kafka:
+    enabled: ${KAFKA_ENABLED:false}
+    relay:
+      poll-ms: 1000
+      publish-timeout-ms: 10000
+      max-retries: 5
+    topic:
+      flat-tokenized: tokenrealty.registry.flat.tokenized.v1
 
 jackson2:
   serialization:

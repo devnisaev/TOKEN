@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: api-gateway
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+
+server:
+  port: 8080
+
+tokenrealty:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-change-in-production-min-32-chars!!}
+    issuer: tokenrealty-auth
+  gateway:
+    routes:
+      - id: auth
+        target: http://localhost:8083
+        paths:
+          - /api/v1/auth
+          - /api/v1/users
+      - id: property-registry
+        target: http://localhost:8081
+        paths:
+          - /api/v1/buildings
+          - /api/v1/flats
+          - /api/v1/spv
+          - /api/v1/valuations
+          - /api/v1/documents
+      - id: token-issuance
+        target: http://localhost:8082
+        paths:
+          - /api/v1/tokens
+          - /api/v1/compliance
+          - /api/v1/transfers
+          - /api/v1/dividends
+      - id: marketplace
+        target: http://localhost:8084
+        paths:
+          - /api/v1/listings
+          - /api/v1/orders
+      - id: payment
+        target: http://localhost:8085
+        paths:
+          - /api/v1/payments
+          - /api/v1/payouts
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    com.tokenrealty: DEBUG

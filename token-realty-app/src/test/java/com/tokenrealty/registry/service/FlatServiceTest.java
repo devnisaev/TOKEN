@@ -5,6 +5,7 @@ import com.tokenrealty.registry.entity.Building;
 import com.tokenrealty.registry.entity.Flat;
 import com.tokenrealty.registry.exception.ConflictException;
 import com.tokenrealty.registry.exception.ResourceNotFoundException;
+import com.tokenrealty.registry.kafka.port.FlatTokenizedPublisher;
 import com.tokenrealty.registry.mapper.PropertyMapper;
 import com.tokenrealty.registry.repository.BuildingRepository;
 import com.tokenrealty.registry.repository.FlatRepository;
@@ -34,6 +35,7 @@ class FlatServiceTest {
     @Mock FlatRepository flatRepository;
     @Mock BuildingRepository buildingRepository;
     @Mock PropertyMapper mapper;
+    @Mock FlatTokenizedPublisher flatTokenizedPublisher;
     @InjectMocks FlatService flatService;
 
     private UUID buildingId;
@@ -169,6 +171,7 @@ class FlatServiceTest {
         assertThat(flat.getStatus()).isEqualTo(Flat.FlatStatus.TOKENIZED);
         assertThat(building.getStatus()).isEqualTo(Building.BuildingStatus.TOKENIZED);
         assertThat(result.tokenContractAddress()).isEqualTo("0xABC123");
+        verify(flatTokenizedPublisher).publishFlatTokenized(any(FlatTokenizedPublisher.FlatTokenizedEvent.class));
     }
 
     @Test

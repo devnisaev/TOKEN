@@ -31,11 +31,13 @@ Human-readable expansions: [docs/rules/](docs/rules/)
 
 | Service | Port | Package |
 |---------|------|---------|
+| API Gateway | 8080 | `com.tokenrealty.gateway` |
 | Property Registry | 8081 | `com.tokenrealty.registry` |
 | Token Issuance | 8082 | `com.tokenrealty.issuance` |
 | Auth | 8083 | `com.tokenrealty.auth` |
 | Marketplace | 8084 | `com.tokenrealty.marketplace` |
 | Payment | 8085 | `com.tokenrealty.payment` |
+| Notification | 8089 | `com.tokenrealty.notification` |
 
 New services: copy structure from `marketplace-service/` or `auth-service/`.
 

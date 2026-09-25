@@ -215,8 +215,9 @@ Do **not** add a fan-in orchestrator for a single listener — one listener → 
 
 | Service generation | Listener location | Publisher location |
 |--------------------|-------------------|--------------------|
-| Implemented (marketplace, payment, issuance) | `kafka/in/` | `kafka/outbox/` + `kafka/port/` |
-| Future hexagonal (registry, rental, …) | `adapter/in/kafka/` | `adapter/out/kafka/` |
+| Implemented (marketplace, payment, issuance, registry) | `kafka/in/` | `kafka/outbox/` + `kafka/port/` |
+| Consumer-only (notification) | `kafka/in/` | — |
+| Future hexagonal (rental, compliance, …) | `adapter/in/kafka/` | `adapter/out/kafka/` |
 
 Both styles follow the same envelope, idempotency, and one-service-call rules.
 
@@ -229,7 +230,9 @@ Both styles follow the same envelope, idempotency, and one-service-call rules.
 
 * Kafka: `docker compose --profile kafka up` from `token-realty-app/` (port 9092).
 * Enable outbox + relay: `KAFKA_ENABLED=true` (sets `tokenrealty.kafka.enabled`).
+* Dev payment auto-confirm: `PAYMENT_AUTO_CONFIRM=true` or `spring.profiles.active=local` on Payment Service.
 * Relay config: `tokenrealty.kafka.relay.poll-ms`, `publish-timeout-ms`, `max-retries`.
+* Notification stub: `notification-service` (:8089) — log-only consumers; no email provider yet.
 * Integration tests: Testcontainers Kafka + `@EmbeddedKafka` only for unit-level producer tests.
 * Default tests: `kafka.enabled=false` — outbox writer no-ops; mock port interfaces in service unit tests.
 

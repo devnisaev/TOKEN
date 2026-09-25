@@ -23,6 +23,8 @@ tokenrealty:
   jwt:
     secret: test-jwt-secret-min-32-characters-long!!
     issuer: tokenrealty-auth
+  kafka:
+    enabled: false
 
 logging:
   level:

@@ -6,6 +6,7 @@ import com.tokenrealty.registry.entity.Flat;
 import com.tokenrealty.registry.exception.ConflictException;
 import com.tokenrealty.registry.exception.ResourceNotFoundException;
 import com.tokenrealty.registry.mapper.PropertyMapper;
+import com.tokenrealty.registry.kafka.port.FlatTokenizedPublisher;
 import com.tokenrealty.registry.repository.BuildingRepository;
 import com.tokenrealty.registry.repository.FlatRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class FlatService {
     private final FlatRepository flatRepository;
     private final BuildingRepository buildingRepository;
     private final PropertyMapper mapper;
+    private final FlatTokenizedPublisher flatTokenizedPublisher;
 
     public Page<FlatResponse> findByBuilding(UUID buildingId, Pageable pageable) {
         ensureBuildingExists(buildingId);
@@ -116,8 +118,15 @@ public class FlatService {
         flat.setStatus(Flat.FlatStatus.TOKENIZED);
         flat.getBuilding().setStatus(Building.BuildingStatus.TOKENIZED);
 
+        Flat saved = flatRepository.save(flat);
+        flatTokenizedPublisher.publishFlatTokenized(new FlatTokenizedPublisher.FlatTokenizedEvent(
+                saved.getId(),
+                saved.getBuilding().getId(),
+                contractAddress,
+                totalTokens,
+                tokenPriceUsd));
         log.info("Token contract {} assigned to flat {}", contractAddress, id);
-        return mapper.toFlatResponse(flatRepository.save(flat));
+        return mapper.toFlatResponse(saved);
     }
 
     @Transactional

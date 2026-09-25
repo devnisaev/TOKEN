@@ -19,11 +19,12 @@ Adapted from Titan `ledger-accounting.mdc`. Cursor rule: [`.cursor/rules/payment
 | Marketplace escrow | `PaymentClient` initiates on order match; `releaseEscrow` on `transfer.completed` |
 | Optional tx verify | `PaymentBlockchainService` — set `PAYMENT_BLOCKCHAIN_ENABLED=true` + `blockchain.rpc-url` |
 | Kafka consumer | `OrderMatchedListener` — reconciliation when escrow missing for order |
+| Dev auto-confirm | `PaymentAutoConfirmWorker` — `PAYMENT_AUTO_CONFIRM=true` or `local` profile |
 
 ## Pending
 
 - Real Web3j USDC/MATIC outbound transfers from Payment Service
-- On-chain deposit auto-detection (replace manual confirm)
+- On-chain deposit auto-detection for production (dev uses `PaymentAutoConfirmWorker`)
 - On-chain reconciliation job (`WalletBalance` vs chain)
 - DLQ for failed consumer retries
 
@@ -51,5 +52,17 @@ Dividends → Issuance (calculate) → Payment (payout)
 ```
 
 See [kafka-messaging.md](kafka-messaging.md) for the event-driven buy loop.
+
+### Auto-confirm config (dev)
+
+```yaml
+tokenrealty:
+  payment:
+    auto-confirm:
+      enabled: ${PAYMENT_AUTO_CONFIRM:false}
+      poll-ms: 3000
+```
+
+`PaymentAutoConfirmWorker` calls existing `PaymentService.confirm()` — no duplicate state logic.
 
 See [payment-service/README.md](../../payment-service/README.md) and [PLATFORM-SPEC.md](../PLATFORM-SPEC.md) §4.2.
