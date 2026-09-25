@@ -7,14 +7,15 @@ alwaysApply: false
 # Spring Service Conventions — TokenRealty
 
 Human doc: [docs/rules/spring-java-services.md](../../docs/rules/spring-java-services.md).  
-Platform spec: [docs/PLATFORM-SPEC.md](../../docs/PLATFORM-SPEC.md).
+Platform spec: [docs/PLATFORM-SPEC.md](../../docs/PLATFORM-SPEC.md).  
+See also: [lombok.mdc](lombok.mdc), [java-dtos.mdc](java-dtos.mdc), [payment-ledger.mdc](payment-ledger.mdc), [investment-limits.mdc](investment-limits.mdc).
 
 ## Stack
 
 - Java 21, Spring Boot 4, Maven
 - PostgreSQL + JPA; Liquibase (forward-only when enabled)
 - MapStruct + Lombok (entities/services/controllers — not rich domain models)
-- Spring Security (Basic auth dev; JWT via Auth Service later)
+- Spring Security (JWT via shared `tokenrealty-security` library)
 - Kafka + transactional outbox ([kafka-messaging.mdc](kafka-messaging.mdc))
 - OpenAPI via springdoc
 
@@ -181,23 +182,21 @@ public TokenIssuanceClient(@Qualifier("tokenIssuanceRestClient") RestClient rest
 * Max size: 500 — clamp at controller if exposing raw `size` param
 * Return `Page<ResponseDto>` directly
 
-## Security (dev → prod)
+## Security
 
-**Dev (current):** in-memory users in `SecurityUserConfig`; HTTP Basic; stateless sessions.
+**Current:** JWT Bearer via shared `tokenrealty-security` library; login at Auth Service (:8083).
 
-| User | Role | Services |
-|------|------|----------|
-| admin | ADMIN | all |
-| manager | PROPERTY_MANAGER | registry, marketplace listings |
-| investor | INVESTOR | marketplace orders, read |
-| compliance | COMPLIANCE | issuance, registry docs |
-
-**Prod (target):** JWT from Auth Service; `@PreAuthorize` on controllers; service accounts for internal calls.
+| Dev login | Role | Token |
+|-----------|------|-------|
+| admin@tokenrealty.com / admin123 | ADMIN | POST `/v1/auth/login` |
+| investor@tokenrealty.com / investor123 | INVESTOR | same |
+| token-issuance / issuance-secret | service ADMIN | POST `/v1/auth/service-token` |
 
 Rules:
 
-* Split `SecurityConfig` (filter chain) from `SecurityUserConfig` (users) for `@WebMvcTest` slices.
+* Import `TokenRealtyJwtAutoConfiguration` in each service `SecurityConfig`; use `@Import` for `@WebMvcTest` slices.
 * `@PreAuthorize` for fine-grained rules beyond HTTP method patterns.
+* Inter-service RestClient: `ServiceTokenProvider` adds Bearer header when `tokenrealty.service-account.client-id` is set.
 * Never log private keys, wallet seeds, or full KYC document content.
 
 ## Kafka & events

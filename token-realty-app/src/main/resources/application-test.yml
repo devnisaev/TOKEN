@@ -19,6 +19,11 @@ spring:
   liquibase:
     enabled: false
 
+tokenrealty:
+  jwt:
+    secret: test-jwt-secret-min-32-characters-long!!
+    issuer: tokenrealty-auth
+
 logging:
   level:
     com.tokenrealty: DEBUG

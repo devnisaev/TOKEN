@@ -49,8 +49,18 @@ server:
 
 # ─── Property Registry FeignClient ────────────────────────────────────────────
 services:
+  auth:
+    url: ${AUTH_SERVICE_URL:http://localhost:8083/api}
   property-registry:
     url: ${PROPERTY_REGISTRY_URL:http://localhost:8081/api}
+
+tokenrealty:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-change-in-production-min-32-chars!!}
+    issuer: tokenrealty-auth
+  service-account:
+    client-id: token-issuance
+    client-secret: ${SERVICE_ACCOUNT_SECRET:issuance-secret}
 
 feign:
   client:

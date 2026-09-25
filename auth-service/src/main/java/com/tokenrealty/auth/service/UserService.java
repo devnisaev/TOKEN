@@ -4,7 +4,7 @@ import com.tokenrealty.auth.dto.AuthDtos.*;
 import com.tokenrealty.auth.entity.User;
 import com.tokenrealty.auth.exception.ResourceNotFoundException;
 import com.tokenrealty.auth.repository.UserRepository;
-import com.tokenrealty.auth.security.TokenPrincipal;
+import com.tokenrealty.security.TokenPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

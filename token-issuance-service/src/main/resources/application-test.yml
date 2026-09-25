@@ -25,6 +25,7 @@ spring:
     exclude:
       - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
       - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+      - com.tokenrealty.security.config.ServiceTokenAutoConfiguration
 
 blockchain:
   network: hardhat
@@ -37,6 +38,11 @@ blockchain:
 services:
   property-registry:
     url: http://localhost:9999
+
+tokenrealty:
+  jwt:
+    secret: test-jwt-secret-min-32-characters-long!!
+    issuer: tokenrealty-auth
 
 logging:
   level:

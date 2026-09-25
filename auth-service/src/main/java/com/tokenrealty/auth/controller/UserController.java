@@ -1,7 +1,7 @@
 package com.tokenrealty.auth.controller;
 
 import com.tokenrealty.auth.dto.AuthDtos.*;
-import com.tokenrealty.auth.security.TokenPrincipal;
+import com.tokenrealty.security.TokenPrincipal;
 import com.tokenrealty.auth.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -71,11 +71,11 @@ TokenRealty tokenizes real estate assets (buildings, flats, and other property t
 - [ ] **Smart contracts** — `Propertytoken.sol`, `Complianceregistry.sol` are empty (0 bytes)
 - [ ] **Per-flat deploy script** — `deployFlat.js` referenced but missing
 - [ ] **On-chain dividends** — simulated (`txHash = "0xSIMULATED_..."`)
-- [ ] **Inter-service auth** — RestClient has no credentials (401 on secured registry)
+- [x] **Inter-service auth** — JWT via `tokenrealty-security`; service tokens on RestClient
 - [ ] **Liquibase** — disabled; Hibernate `ddl-auto: update` used instead
 - [ ] **Issuance Liquibase** — referenced in config but no migration files exist
 - [ ] **Kafka** — mentioned in README, not implemented
-- [x] **Auth service** — JWT MVP; other services still use in-memory Basic auth
+- [x] **Auth service** — JWT MVP; registry/issuance/marketplace validate Bearer tokens
 - [ ] **IPFS upload** — `ipfsCid` field stored, no upload client
 - [ ] **Payment, Rental, Wallet** — not started
 - [x] **Marketplace** — MVP done; Payment integration and Kafka relay pending
@@ -403,10 +403,10 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 
 ### 9.2 Inter-service authentication
 
-- [ ] Add service account credentials to Auth Service (or interim API key)
-- [ ] Configure `PropertyRegistryClient` RestClient with Basic auth or Bearer token
+- [x] Add service account credentials to Auth Service (`DevDataInitializer`)
+- [x] Configure `PropertyRegistryClient` / `TokenIssuanceClient` RestClient with Bearer service token
 - [ ] Test Issuance → Registry `PATCH /v1/flats/{id}/token-info` callback end-to-end
-- [ ] Document service-to-service auth pattern for future services
+- [x] Document service-to-service auth pattern (`tokenrealty-security` + `ServiceTokenProvider`)
 
 ### 9.3 Database schema management
 
@@ -448,9 +448,9 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 - [x] GET `/v1/users/me`, PATCH `/v1/users/me/wallet`
 - [x] Dev seed users + service accounts (`DevDataInitializer`)
 - [x] Unit + context tests (`./mvnw test`)
-- [ ] Shared `tokenrealty-security` library for other services (JWT validation filter)
-- [ ] Migrate registry/issuance/marketplace from Basic auth to JWT resource server
-- [ ] Wire `PropertyRegistryClient` with Bearer service token
+- [x] Shared `tokenrealty-security` library for other services (JWT validation filter)
+- [x] Migrate registry/issuance/marketplace from Basic auth to JWT resource server
+- [x] Wire `PropertyRegistryClient` and `TokenIssuanceClient` with Bearer service token
 
 ### 10.2 API Gateway (Phase 1)
 
@@ -643,10 +643,14 @@ Agent and IDE conventions live in `.cursor/rules/` (adapted from Titan fintech r
 | Rule file | Purpose |
 |-----------|---------|
 | [`.cursor/rules/spring-java-services.mdc`](../.cursor/rules/spring-java-services.mdc) | Layering, transactions, API, security, testing |
+| [`.cursor/rules/lombok.mdc`](../.cursor/rules/lombok.mdc) | Lombok on entities, services; records for DTOs |
+| [`.cursor/rules/java-dtos.mdc`](../.cursor/rules/java-dtos.mdc) | Typed request/response records; no Map in controllers |
 | [`.cursor/rules/kafka-messaging.mdc`](../.cursor/rules/kafka-messaging.mdc) | Topics, envelope, outbox, consumers |
 | [`.cursor/rules/rest-client-errors.mdc`](../.cursor/rules/rest-client-errors.mdc) | Inter-service RestClient error mapping |
 | [`.cursor/rules/business-exception.mdc`](../.cursor/rules/business-exception.mdc) | ProblemDetail & typed exceptions |
 | [`.cursor/rules/pagination.mdc`](../.cursor/rules/pagination.mdc) | List endpoint paging defaults |
+| [`.cursor/rules/payment-ledger.mdc`](../.cursor/rules/payment-ledger.mdc) | Escrow, ledger, idempotency (Payment Service) |
+| [`.cursor/rules/investment-limits.mdc`](../.cursor/rules/investment-limits.mdc) | KYC gates, min investment, compliance order |
 
 Human-readable guides: [docs/rules/](rules/)
 

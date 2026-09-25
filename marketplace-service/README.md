@@ -52,13 +52,9 @@ psql -U postgres -c "CREATE DATABASE marketplace_service;"
 http://localhost:8084/api/swagger-ui.html
 ```
 
-## Test users (dev only)
+## Authentication
 
-| Username | Password | Role |
-|----------|----------|------|
-| admin | admin123 | ADMIN |
-| manager | manager123 | PROPERTY_MANAGER |
-| investor | investor123 | INVESTOR |
+JWT Bearer from Auth Service (:8083). Example: login as `investor@tokenrealty.com` / `investor123`, then `Authorization: Bearer <token>`.
 
 ## API Overview
 

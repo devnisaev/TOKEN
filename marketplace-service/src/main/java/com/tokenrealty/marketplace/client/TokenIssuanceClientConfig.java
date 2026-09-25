@@ -1,8 +1,11 @@
 package com.tokenrealty.marketplace.client;
 
+import com.tokenrealty.security.ServiceTokenProvider;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
 
 @Configuration
@@ -10,9 +13,14 @@ public class TokenIssuanceClientConfig {
 
     @Bean("tokenIssuanceRestClient")
     RestClient tokenIssuanceRestClient(
-            @Value("${services.token-issuance.url}") String baseUrl) {
-        return RestClient.builder()
-                .baseUrl(baseUrl)
-                .build();
+            @Value("${services.token-issuance.url}") String baseUrl,
+            ObjectProvider<ServiceTokenProvider> serviceTokenProvider
+    ) {
+        RestClient.Builder builder = RestClient.builder().baseUrl(baseUrl);
+        serviceTokenProvider.ifAvailable(provider -> builder.requestInterceptor((request, body, execution) -> {
+            request.getHeaders().set(HttpHeaders.AUTHORIZATION, "Bearer " + provider.getAccessToken());
+            return execution.execute(request, body);
+        }));
+        return builder.build();
     }
 }

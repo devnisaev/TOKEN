@@ -10,10 +10,14 @@ Cursor rule: [`.cursor/rules/spring-java-services.mdc`](../../.cursor/rules/spri
 | Rule | Scope |
 |------|-------|
 | [spring-java-services.mdc](../../.cursor/rules/spring-java-services.mdc) | Architecture, layering, transactions, API |
+| [lombok.mdc](../../.cursor/rules/lombok.mdc) | Lombok on entities and services |
+| [java-dtos.mdc](../../.cursor/rules/java-dtos.mdc) | Typed request/response records |
 | [kafka-messaging.mdc](../../.cursor/rules/kafka-messaging.mdc) | Topics, outbox, consumers |
 | [rest-client-errors.mdc](../../.cursor/rules/rest-client-errors.mdc) | Inter-service HTTP errors |
 | [business-exception.mdc](../../.cursor/rules/business-exception.mdc) | ProblemDetail mapping |
 | [pagination.mdc](../../.cursor/rules/pagination.mdc) | List endpoint defaults |
+| [payment-ledger.mdc](../../.cursor/rules/payment-ledger.mdc) | Escrow, ledger, payment idempotency (Payment Service) |
+| [investment-limits.mdc](../../.cursor/rules/investment-limits.mdc) | KYC gates, min investment rules |
 
 ---
 
@@ -39,7 +43,8 @@ Cursor rule: [`.cursor/rules/spring-java-services.mdc`](../../.cursor/rules/spri
 | `cardsystem-common` Money type | `BigDecimal` + scale 2 for USD |
 | Maker-checker approval tables | Simple admin approval later |
 | PCI / PAN rules | No private keys in logs/payloads |
-| ISO8583, HSM, ledger engine | N/A |
+| ISO8583, HSM, card ledger engine | N/A — see [payment-ledger.md](payment-ledger.md) for escrow |
+| Redis limits / velocity engine | N/A — see [investment-limits.md](investment-limits.md) |
 | Multi-tenant | Not yet |
 
 ---

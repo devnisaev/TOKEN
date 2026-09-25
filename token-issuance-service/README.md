@@ -70,14 +70,9 @@ http://localhost:8082/api/swagger-ui.html
 | PATCH | `/v1/compliance/{id}/verify` | ADMIN/COMPLIANCE | Verify KYC + whitelist |
 | GET | `/v1/compliance/check/{wallet}` | Any | Check wallet whitelist status |
 
-## Test users
+## Authentication
 
-| Username | Password | Role |
-|----------|----------|------|
-| admin | admin123 | ADMIN |
-| manager | manager123 | PROPERTY_MANAGER |
-| compliance | compliance123 | COMPLIANCE |
-| investor | investor123 | INVESTOR |
+JWT Bearer from Auth Service (:8083). Inter-service calls to Property Registry use service account `token-issuance` / `issuance-secret` via `ServiceTokenProvider`.
 
 ## Token lifecycle
 

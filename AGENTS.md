@@ -16,10 +16,14 @@ Read and follow rules in `.cursor/rules/`:
 | Rule | When |
 |------|------|
 | [spring-java-services.mdc](.cursor/rules/spring-java-services.mdc) | Any Java / Spring work |
+| [lombok.mdc](.cursor/rules/lombok.mdc) | Lombok on entities, services, tests |
+| [java-dtos.mdc](.cursor/rules/java-dtos.mdc) | Request/response records, Kafka payloads |
 | [kafka-messaging.mdc](.cursor/rules/kafka-messaging.mdc) | Kafka, events, outbox |
 | [rest-client-errors.mdc](.cursor/rules/rest-client-errors.mdc) | RestClient / inter-service calls |
 | [business-exception.mdc](.cursor/rules/business-exception.mdc) | Exceptions & ProblemDetail |
 | [pagination.mdc](.cursor/rules/pagination.mdc) | List endpoints |
+| [payment-ledger.mdc](.cursor/rules/payment-ledger.mdc) | Payment Service — escrow, ledger, idempotency |
+| [investment-limits.mdc](.cursor/rules/investment-limits.mdc) | KYC gates, min investment, compliance order |
 
 Human-readable expansions: [docs/rules/](docs/rules/)
 
@@ -37,8 +41,11 @@ New services: copy structure from `marketplace-service/` or `auth-service/`.
 ## Run tests
 
 ```bash
-./mvnw test   # inside each service folder
+./token-realty-app/mvnw test   # from repo root (builds tokenrealty-security first)
+./mvnw test                    # inside each service folder (after security lib installed)
 ```
+
+Shared JWT: `tokenrealty-security/` — `./token-realty-app/mvnw -pl tokenrealty-security install`
 
 ## Platform docs
 

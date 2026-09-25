@@ -1,9 +1,11 @@
 package com.tokenrealty.auth.config;
 
-import com.tokenrealty.auth.security.JwtAuthenticationFilter;
+import com.tokenrealty.security.JwtAuthenticationFilter;
+import com.tokenrealty.security.config.TokenRealtyJwtAutoConfiguration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@Import(TokenRealtyJwtAutoConfiguration.class)
 @RequiredArgsConstructor
 public class SecurityConfig {
 

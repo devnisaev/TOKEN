@@ -104,9 +104,9 @@ curl -s -X POST http://localhost:8083/api/v1/auth/service-token \
 
 ## Next steps
 
-- [ ] Shared `tokenrealty-security` library for other services
-- [ ] Migrate registry/issuance/marketplace from Basic auth to JWT validation
-- [ ] Wire `PropertyRegistryClient` with service-token Bearer header
+- [x] Shared `tokenrealty-security` library for other services
+- [x] Migrate registry/issuance/marketplace from Basic auth to JWT validation
+- [x] Wire `PropertyRegistryClient` / `TokenIssuanceClient` with service-token Bearer header
 - [ ] OAuth2 / social login (optional)
 
 Conventions: [`.cursor/rules/spring-java-services.mdc`](../.cursor/rules/spring-java-services.mdc)

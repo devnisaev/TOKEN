@@ -1,7 +1,11 @@
 package com.tokenrealty.registry.config;
 
+import com.tokenrealty.security.JwtAuthenticationFilter;
+import com.tokenrealty.security.config.TokenRealtyJwtAutoConfiguration;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,16 +13,16 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/**
- * Web security filter chain — safe to import in @WebMvcTest.
- * Does NOT define UserDetailsService or PasswordEncoder beans
- * (those are in SecurityUserConfig to avoid circular dependencies in test slices).
- */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@Import(TokenRealtyJwtAutoConfiguration.class)
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,7 +42,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/v1/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .httpBasic(basic -> basic.realmName("TokenRealty Property Registry"));
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

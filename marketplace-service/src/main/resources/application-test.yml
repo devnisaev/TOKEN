@@ -1,4 +1,7 @@
 spring:
+  autoconfigure:
+    exclude:
+      - com.tokenrealty.security.config.ServiceTokenAutoConfiguration
   datasource:
     url: jdbc:h2:mem:marketplace_test;DB_CLOSE_DELAY=-1
     username: sa
@@ -16,6 +19,9 @@ spring:
     bootstrap-servers: ${spring.embedded.kafka.brokers:localhost:9092}
 
 tokenrealty:
+  jwt:
+    secret: test-jwt-secret-min-32-characters-long!!
+    issuer: tokenrealty-auth
   kafka:
     enabled: false
 

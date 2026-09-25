@@ -17,8 +17,12 @@ Central documentation for the TokenRealty real-estate tokenization platform.
 | Guide | Cursor rule |
 |-------|-------------|
 | [rules/spring-java-services.md](rules/spring-java-services.md) | [spring-java-services.mdc](../.cursor/rules/spring-java-services.mdc) |
+| [rules/lombok.md](rules/lombok.md) | [lombok.mdc](../.cursor/rules/lombok.mdc) |
+| [rules/java-dtos.md](rules/java-dtos.md) | [java-dtos.mdc](../.cursor/rules/java-dtos.mdc) |
 | [rules/kafka-messaging.md](rules/kafka-messaging.md) | [kafka-messaging.mdc](../.cursor/rules/kafka-messaging.mdc) |
 | [rules/rest-client-errors.md](rules/rest-client-errors.md) | [rest-client-errors.mdc](../.cursor/rules/rest-client-errors.mdc) |
+| [rules/payment-ledger.md](rules/payment-ledger.md) | [payment-ledger.mdc](../.cursor/rules/payment-ledger.mdc) |
+| [rules/investment-limits.md](rules/investment-limits.md) | [investment-limits.mdc](../.cursor/rules/investment-limits.mdc) |
 
 Additional Cursor rules (no separate human doc yet):
 

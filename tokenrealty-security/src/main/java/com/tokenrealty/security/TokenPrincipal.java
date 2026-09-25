@@ -1,6 +1,5 @@
-package com.tokenrealty.auth.security;
+package com.tokenrealty.security;
 
-import com.tokenrealty.auth.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +11,7 @@ import java.util.UUID;
 public record TokenPrincipal(
         UUID userId,
         String email,
-        User.UserRole role,
+        UserRole role,
         boolean serviceAccount
 ) implements UserDetails {
 

@@ -1,6 +1,6 @@
 package com.tokenrealty.issuance.client;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -8,10 +8,13 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Component
-@RequiredArgsConstructor
 public class PropertyRegistryClient {
 
     private final RestClient restClient;
+
+    public PropertyRegistryClient(@Qualifier("propertyRegistryRestClient") RestClient restClient) {
+        this.restClient = restClient;
+    }
 
     public FlatResponse getFlatById(UUID id) {
         return restClient.get()

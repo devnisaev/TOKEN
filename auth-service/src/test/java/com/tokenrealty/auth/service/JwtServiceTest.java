@@ -1,8 +1,10 @@
 package com.tokenrealty.auth.service;
 
-import com.tokenrealty.auth.config.JwtProperties;
 import com.tokenrealty.auth.entity.User;
-import com.tokenrealty.auth.security.TokenPrincipal;
+import com.tokenrealty.security.JwtProperties;
+import com.tokenrealty.security.JwtTokenService;
+import com.tokenrealty.security.TokenPrincipal;
+import com.tokenrealty.security.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +24,7 @@ class JwtServiceTest {
         properties.setSecret("test-jwt-secret-min-32-characters-long!!");
         properties.setIssuer("tokenrealty-auth-test");
         properties.setAccessTokenTtlMinutes(15);
-        jwtService = new JwtService(properties);
+        jwtService = new JwtService(new JwtTokenService(properties));
     }
 
     @Test
@@ -36,7 +38,7 @@ class JwtServiceTest {
 
         assertThat(principal.userId()).isEqualTo(userId);
         assertThat(principal.email()).isEqualTo("investor@tokenrealty.com");
-        assertThat(principal.role()).isEqualTo(User.UserRole.INVESTOR);
+        assertThat(principal.role()).isEqualTo(UserRole.INVESTOR);
         assertThat(principal.serviceAccount()).isFalse();
     }
 }

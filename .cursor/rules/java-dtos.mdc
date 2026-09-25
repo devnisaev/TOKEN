@@ -1,0 +1,73 @@
+---
+description: Typed DTOs at API and service boundaries — no untyped Maps in controllers
+globs: "**/*.java"
+alwaysApply: false
+---
+
+# Typed DTOs — TokenRealty
+
+Human doc: [docs/rules/java-dtos.md](../../docs/rules/java-dtos.md).
+
+## Required
+
+- **Controllers:** `@RequestBody` and return types are **records or classes** — never `Map`, `Object`, or raw `List<?>`.
+- **List endpoints:** return `Page<ResponseDto>` — never expose JPA entities.
+- **Mutations:** return typed response records (`PaymentResponse`, `OrderResponse`) — not `Object`.
+- **Validation:** `@Valid` on request records; Bean Validation on fields.
+
+## Forbidden in API / service layers
+
+```java
+// BAD
+public Object initiatePayment(...) { return Map.of("status", "PENDING"); }
+public Page<Map<String, Object>> listPayments();
+```
+
+```java
+// GOOD
+public PaymentResponse initiate(@Valid @RequestBody InitiatePaymentRequest req);
+public Page<PaymentResponse> listPayments(Pageable pageable);
+```
+
+## File layout
+
+**Layered** (registry, issuance):
+
+```
+dto/PropertyDtos.java       # grouped request/response records
+client/                     # downstream API response records
+kafka/events/               # typed event payload records (target)
+```
+
+**Hexagonal** (marketplace, auth, payment):
+
+```
+dto/                        # OK today
+adapter/in/web/dto/         # preferred when refactoring
+kafka/events/               # ListingCreatedEvent, PaymentConfirmedEvent, …
+```
+
+Group related records in `*Dtos.java` holder classes — do not nest large types on controllers.
+
+## Allowed exceptions
+
+- **Validation errors:** `Map<String, String>` field errors inside `GlobalExceptionHandler` only.
+- **External boundaries:** parse Hardhat/Web3j JSON as `Map` — convert to typed result immediately.
+- **Outbox JSON column:** serialize typed event records; avoid building `Map<String, Object>` in publishers ([kafka-messaging.mdc](kafka-messaging.mdc)).
+
+## Inter-service clients
+
+Prefer typed records per downstream API. Map errors via [rest-client-errors.mdc](rest-client-errors.mdc).
+
+```java
+// GOOD — marketplace-service
+public ComplianceCheckResponse checkWallet(String walletAddress);
+```
+
+## Mapping
+
+- Controller: validate DTO → call service → map response.
+- Entity → response: MapStruct mapper or static `from(entity)` on response record.
+- Do not return JPA entities from controllers or assemble long field lists inline.
+
+See [lombok.mdc](lombok.mdc), [spring-java-services.mdc](spring-java-services.mdc), [pagination.mdc](pagination.mdc).

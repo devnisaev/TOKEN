@@ -40,10 +40,18 @@ server:
     context-path: /api
 
 services:
+  auth:
+    url: ${AUTH_SERVICE_URL:http://localhost:8083/api}
   token-issuance:
     url: ${TOKEN_ISSUANCE_URL:http://localhost:8082/api}
 
 tokenrealty:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-change-in-production-min-32-chars!!}
+    issuer: tokenrealty-auth
+  service-account:
+    client-id: marketplace
+    client-secret: ${SERVICE_ACCOUNT_SECRET:marketplace-secret}
   kafka:
     enabled: ${KAFKA_ENABLED:false}
     topic:

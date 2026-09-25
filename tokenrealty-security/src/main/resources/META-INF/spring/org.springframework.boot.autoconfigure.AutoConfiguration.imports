@@ -1,0 +1,2 @@
+com.tokenrealty.security.config.TokenRealtyJwtAutoConfiguration
+com.tokenrealty.security.config.ServiceTokenAutoConfiguration

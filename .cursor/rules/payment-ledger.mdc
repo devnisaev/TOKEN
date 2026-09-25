@@ -1,0 +1,87 @@
+---
+description: Payment ledger, escrow, and money invariants for payment-service
+globs: "**/payment-service/**/*.java"
+alwaysApply: false
+---
+
+# Payment Ledger — TokenRealty
+
+Human doc: [docs/rules/payment-ledger.md](../../docs/rules/payment-ledger.md).  
+Platform spec: [docs/PLATFORM-SPEC.md](../../docs/PLATFORM-SPEC.md) §4.2, §5.3.
+
+Adapted from Titan ledger rules — simplified for crypto escrow + off-chain bookkeeping (no card GL).
+
+## Scope
+
+Applies when building `payment-service/` (:8085). Not used in registry/issuance/marketplace until Payment exists.
+
+## Core invariant
+
+Every financial state change is **traceable, idempotent, and reconcilable** with on-chain `txHash`.
+
+Off-chain journal (when used): **sum(debits) = sum(credits)** per `transactionId`.
+
+## Account concepts
+
+| Kind | Examples | Notes |
+|------|----------|-------|
+| **Escrow** | per `orderId` / `paymentId` | HOLD → RELEASE or REFUND |
+| **System buckets** | `PLATFORM_FEE`, `SPV_COLLECTION` | enum or seeded reference table |
+| **Investor balance** | per `investorId` + currency | optional custodial wallet ledger |
+
+Use typed codes/enums for system accounts — not magic strings scattered in services.
+
+```java
+// BAD
+escrow.hold("USDC", amount);
+
+// GOOD
+escrowService.hold(paymentId, Currency.USDC, amount);
+```
+
+## Escrow lifecycle
+
+| Step | Off-chain state | On-chain |
+|------|-----------------|----------|
+| Order matched | `Escrow.HELD` | Investor sends USDC to escrow address |
+| Transfer confirmed | `Escrow.RELEASED` | Issuance transfer completes |
+| Timeout / cancel | `Escrow.REFUNDED` | Return to investor wallet |
+
+Persist escrow transitions and link `paymentId` ↔ `orderId` ↔ `tradeId` ↔ `txHash`.
+
+## Persistence
+
+| Entity | Role |
+|--------|------|
+| `Payment` | Intent + status + amount + currency + idempotency key |
+| `Escrow` | Hold/release/refund state tied to order |
+| `Payout` | Dividend/rent disbursement to holder wallets |
+| `LedgerEntry` | Append-only journal lines (optional double-entry) |
+| `WalletBalance` | Materialized balance per investor/currency (`@Version`) |
+
+Rules:
+
+- **Entries** = immutable history — never UPDATE or DELETE posted rows.
+- **Corrections** = reversal entries or new compensating payment — not in-place edits.
+- **Idempotency:** `Idempotency-Key` header on POST `/v1/payments`; dedupe table before side effects.
+- Balance updates: guard against negative available balance → `InsufficientFundsException` (422).
+
+## Amounts
+
+- `BigDecimal` with `precision = 19, scale = 2` for USD/USDC display amounts.
+- Never `double` for money.
+- Store crypto amounts with explicit decimals + `currency` enum (`USDC`, `MATIC`, `ETH`).
+
+## Kafka + outbox
+
+- Publish typed events: `PaymentConfirmed`, `RentCollected` — see [docs/EVENTS.md](../../docs/EVENTS.md).
+- Enqueue outbox in same `@Transactional` boundary as payment write ([kafka-messaging.mdc](kafka-messaging.mdc)).
+- Consumer idempotency on `eventId` before crediting or releasing escrow.
+
+## Rules
+
+- No blockchain/Web3j calls inside long `@Transactional` blocks — confirm on-chain, then persist in a separate step.
+- Reconcile: scheduled job compares on-chain balance vs `WalletBalance` / holder registry.
+- Log `paymentId`, `orderId`, `txHash` — never log private keys or full wallet seeds.
+
+See [business-exception.mdc](business-exception.mdc), [java-dtos.mdc](java-dtos.mdc).

@@ -1,0 +1,69 @@
+---
+description: Lombok usage for TokenRealty Spring services — entities and wiring, not domain logic
+globs: "**/*.java"
+alwaysApply: false
+---
+
+# Lombok — TokenRealty
+
+Human doc: [docs/rules/lombok.md](../../docs/rules/lombok.md).
+
+Lombok is declared per service `pom.xml` (`provided` scope). Use it to remove boilerplate — not to hide business invariants.
+
+## Use
+
+| Annotation | Where |
+|------------|--------|
+| `@RequiredArgsConstructor` | `@Service`, `@Component`, `@RestController` with `final` dependencies |
+| `@Getter` / `@Setter` | JPA entities in `entity/` or `adapter/out/persistence/` |
+| `@NoArgsConstructor(access = PROTECTED)` | JPA entities (Hibernate requirement) |
+| `@AllArgsConstructor` | JPA entities, simple value holders |
+| `@Builder` | JPA entities, outbox rows, test fixtures |
+| `@Slf4j` | Services, publishers, exception handlers |
+
+## Prefer Java records for
+
+- HTTP request/response DTOs (`dto/*Dtos.java`)
+- Kafka event payload records (`kafka/events/`)
+- RestClient request/response types
+- Commands and port result types
+
+`@Builder` on records is **optional** — allowed for test/seed ergonomics (see `AuthDtos`, `MarketplaceDtos`).
+
+## Do NOT use Lombok on
+
+- Future rich domain models in `domain/` — no `@Data` / `@Setter` on aggregates
+- `tokenrealty-security` shared library — keep plain Java
+- Classes where `@ToString` / `@EqualsAndHashCode` would leak secrets (password hashes, private keys, full KYC payloads)
+
+## JPA entity pattern
+
+```java
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+public class Payment extends BaseEntity { /* ... */ }
+```
+
+## Injection pattern
+
+```java
+@Service
+@RequiredArgsConstructor
+public class PaymentService {
+    private final PaymentRepository paymentRepository;
+}
+```
+
+Keep manual constructors when building `RestClient` in the constructor body.
+
+## Forbidden
+
+```java
+@Data on JPA entities or domain aggregates
+@SneakyThrows in production code
+@Setter on future domain model classes
+```

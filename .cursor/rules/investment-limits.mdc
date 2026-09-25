@@ -1,0 +1,59 @@
+---
+description: Compliance gates and investment limits — marketplace, issuance, payment boundaries
+globs: "**/{marketplace-service,token-issuance-service,payment-service}/**/*.java"
+alwaysApply: false
+---
+
+# Investment & Compliance Limits — TokenRealty
+
+Human doc: [docs/rules/investment-limits.md](../../docs/rules/investment-limits.md).
+
+Adapted from Titan limits engine — **no Redis Lua / card velocity engine**. TokenRealty uses compliance checks + listing rules + future policy service.
+
+## What we skip from Titan
+
+- `limits-service`, Redis atomic counters, ISO8583 decline codes (61/65/57)
+- Per-card daily/monthly velocity, MCC/country blocks on auth hot path
+
+## What we use instead
+
+| Concern | Where | Mechanism |
+|---------|-------|-----------|
+| KYC / whitelist | Token Issuance | `GET /v1/compliance/check/{wallet}` before order match |
+| Min investment | Marketplace listing | `minInvestmentTokens` on `Listing` |
+| Token availability | Marketplace | `tokensAvailable` decrement on match |
+| Compliance block | Payment (future) | Re-check wallet before escrow release |
+| Jurisdiction (future) | Compliance Service (:8087) | Country rules → whitelist sync |
+
+## Evaluation order (marketplace buy flow)
+
+1. Listing active + sufficient `tokensAvailable`
+2. `tokenAmount >= listing.minInvestmentTokens`
+3. KYC check via `TokenIssuanceClient.checkWallet(buyerWallet)` — fail → 422 `ComplianceBlockedException`
+4. Order match + escrow (Payment Service)
+5. On-chain transfer + settle
+
+Evaluate compliance **before** creating matched order / holding escrow.
+
+## Rules
+
+- Never hardcode bypass of KYC in production paths — use service token + compliance API.
+- Listing min/max investment belongs on `Listing` entity — not ad-hoc controller checks.
+- Decline with typed exceptions (`ValidationException`, `ComplianceBlockedException`) — not generic 500.
+- Idempotent reversal: cancel order → restore `tokensAvailable`; release escrow via Payment API.
+
+## Future Compliance Service
+
+When `compliance-service` exists:
+
+- Centralize KYC status, jurisdiction rules, accredited-investor flags
+- Token Issuance keeps whitelist sync; Marketplace/Payment call Compliance port
+- Policy changes via DB — not hardcoded in Marketplace service
+
+## Payment limits (future)
+
+- Max single payment amount per profile (config or compliance policy)
+- Payout batch size limits for dividend distribution
+- Require `Idempotency-Key` on payment POST — see [payment-ledger.mdc](payment-ledger.mdc)
+
+See [PLATFORM-SPEC.md](../../docs/PLATFORM-SPEC.md) §4.5, [business-exception.mdc](business-exception.mdc).

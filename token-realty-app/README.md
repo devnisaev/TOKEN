@@ -23,15 +23,15 @@ http://localhost:8081/api/swagger-ui.html
 
 ---
 
-## Test users (dev only)
+## Authentication
 
-| Username     | Password       | Role               |
-|--------------|----------------|--------------------|
-| `admin`      | `admin123`     | ADMIN              |
-| `manager`    | `manager123`   | PROPERTY_MANAGER   |
-| `appraiser`  | `appraiser123` | APPRAISER          |
-| `compliance` | `compliance123`| COMPLIANCE         |
-| `investor`   | `investor123`  | INVESTOR (read)    |
+JWT Bearer tokens from **Auth Service** (:8083). Login at `POST /api/v1/auth/login`, then send `Authorization: Bearer <token>` on all `/v1/**` requests.
+
+| Email | Password | Role |
+|-------|----------|------|
+| admin@tokenrealty.com | admin123 | ADMIN |
+| manager@tokenrealty.com | manager123 | PROPERTY_MANAGER |
+| investor@tokenrealty.com | investor123 | INVESTOR |
 
 ---
 
