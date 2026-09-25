@@ -67,4 +67,20 @@ public class PaymentClient {
             String status
     ) {
     }
+
+    public void releaseEscrow(UUID paymentId) {
+        try {
+            restClient.patch()
+                    .uri("/v1/payments/{id}/release", paymentId)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (RestClientResponseException ex) {
+            if (ex.getStatusCode().is5xxServerError()) {
+                throw new ValidationException("Payment service unavailable");
+            }
+            throw new ValidationException("Escrow release failed: " + ex.getStatusText());
+        } catch (ResourceAccessException ex) {
+            throw new ValidationException("Payment service unavailable");
+        }
+    }
 }

@@ -65,10 +65,14 @@ controller → service → repository → entity
 ```
 controller → service → repository → entity
                 ↓
-            client/TokenIssuanceClient
-            kafka/port/*Publisher          ← application port (typed event record)
+            client/*Client                 ← inter-service RestClient wrappers
+            entity/ProcessedEvent.java     ← if service consumes Kafka
+            service/ProcessedEventService.java
+            kafka/command/*Command.java    ← from(KafkaJsonEvent)
+            kafka/in/*Listener.java        ← @KafkaListener + IngestSupport
+            kafka/port/*Publisher.java     ← outbox port (typed event record)
             kafka/outbox/Outbox{Event}Publisher
-            kafka/outbox/OutboxWriter      ← extends tokenrealty-outbox
+            kafka/outbox/OutboxWriter        ← extends tokenrealty-outbox
             kafka/outbox/OutboxRelayWorker
             kafka/outbox/OutboxEvent
 ```
@@ -86,10 +90,10 @@ adapter/in/web → application/service → adapter/out/{persistence,client,kafka
 | Service | Port | Package | Layout |
 |---------|------|---------|--------|
 | Property Registry | 8081 | `com.tokenrealty.registry` | Layered |
-| Token Issuance | 8082 | `com.tokenrealty.issuance` | Layered |
-| Marketplace | 8084 | `com.tokenrealty.marketplace` | Layered + kafka/outbox |
+| Token Issuance | 8082 | `com.tokenrealty.issuance` | Layered + kafka in/out |
+| Marketplace | 8084 | `com.tokenrealty.marketplace` | Layered + kafka in/out |
 | Auth | 8083 | `com.tokenrealty.auth` | Layered + JWT issuer |
-| Payment | 8085 | `com.tokenrealty.payment` | Layered + escrow + kafka/outbox |
+| Payment | 8085 | `com.tokenrealty.payment` | Layered + escrow + kafka in/out |
 
 ---
 

@@ -41,7 +41,7 @@ public class TransferController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROPERTY_MANAGER')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROPERTY_MANAGER') or hasRole('SERVICE')")
     @Operation(summary = "Execute token transfer — checks compliance, submits on-chain")
     public TokenTransferResponse transfer(
             @PathVariable UUID contractId,

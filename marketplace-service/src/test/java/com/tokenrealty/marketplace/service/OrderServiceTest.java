@@ -4,6 +4,8 @@ import com.tokenrealty.marketplace.client.PaymentClient;
 import com.tokenrealty.marketplace.client.TokenIssuanceClient;
 import com.tokenrealty.marketplace.dto.MarketplaceDtos.PlaceOrderRequest;
 import com.tokenrealty.marketplace.dto.MarketplaceDtos.OrderResponse;
+import com.tokenrealty.marketplace.kafka.command.PaymentConfirmedCommand;
+import com.tokenrealty.marketplace.kafka.command.TransferCompletedCommand;
 import com.tokenrealty.marketplace.entity.Listing;
 import com.tokenrealty.marketplace.entity.MarketOrder;
 import com.tokenrealty.marketplace.entity.Trade;
@@ -26,6 +28,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -133,5 +136,54 @@ class OrderServiceTest {
         verify(tradeRepository, times(2)).save(any(Trade.class));
         verify(orderMatchedPublisher).publishOrderMatched(any());
         verify(orderRepository).save(any(MarketOrder.class));
+    }
+
+    @Test
+    @DisplayName("onPaymentConfirmed marks trade PAID")
+    void onPaymentConfirmedMarksPaid() {
+        UUID orderId = UUID.randomUUID();
+        UUID paymentId = UUID.randomUUID();
+        Trade trade = Trade.builder()
+                .orderId(orderId)
+                .status(Trade.TradeStatus.PENDING)
+                .build();
+        when(tradeRepository.findByOrderId(orderId)).thenReturn(Optional.of(trade));
+
+        orderService.onPaymentConfirmed(new PaymentConfirmedCommand(
+                UUID.randomUUID(), paymentId, orderId, UUID.randomUUID(), "0xabc"));
+
+        assertThat(trade.getStatus()).isEqualTo(Trade.TradeStatus.PAID);
+        assertThat(trade.getPaymentId()).isEqualTo(paymentId);
+    }
+
+    @Test
+    @DisplayName("settleFromTransfer marks trade SETTLED and publishes event")
+    void settleFromTransfer() {
+        UUID orderId = UUID.randomUUID();
+        UUID paymentId = UUID.randomUUID();
+        UUID transferId = UUID.randomUUID();
+        MarketOrder order = MarketOrder.builder()
+                .status(MarketOrder.OrderStatus.MATCHED)
+                .build();
+        order.setId(orderId);
+        Trade trade = Trade.builder()
+                .orderId(orderId)
+                .listingId(UUID.randomUUID())
+                .status(Trade.TradeStatus.PAID)
+                .paymentId(paymentId)
+                .build();
+        trade.setId(UUID.randomUUID());
+
+        when(tradeRepository.findByOrderId(orderId)).thenReturn(Optional.of(trade));
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+
+        UUID result = orderService.settleFromTransfer(new TransferCompletedCommand(
+                UUID.randomUUID(), transferId, UUID.randomUUID(), UUID.randomUUID(),
+                orderId, trade.getId(), paymentId, "0xtx"));
+
+        assertThat(result).isEqualTo(paymentId);
+        assertThat(trade.getStatus()).isEqualTo(Trade.TradeStatus.SETTLED);
+        assertThat(trade.getTransferId()).isEqualTo(transferId);
+        verify(tradeSettledPublisher).publishTradeSettled(any());
     }
 }

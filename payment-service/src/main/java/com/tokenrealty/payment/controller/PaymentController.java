@@ -58,7 +58,7 @@ public class PaymentController {
     }
 
     @PatchMapping("/{id}/release")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SERVICE')")
     @Operation(summary = "Release escrow after token transfer")
     public PaymentResponse release(@PathVariable UUID id) {
         return paymentService.releaseEscrow(id);

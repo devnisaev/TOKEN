@@ -16,13 +16,16 @@ Adapted from Titan `ledger-accounting.mdc`. Cursor rule: [`.cursor/rules/payment
 | Ledger entries | `LedgerService` — debit/credit pairs on hold and release |
 | Outbox events | `PaymentConfirmedEvent`, `RentCollectedEvent` (typed records) |
 | Simulated on-chain | Payout `txHash = 0xSIMULATED_...`; confirm accepts external `txHash` |
+| Marketplace escrow | `PaymentClient` initiates on order match; `releaseEscrow` on `transfer.completed` |
+| Optional tx verify | `PaymentBlockchainService` — set `PAYMENT_BLOCKCHAIN_ENABLED=true` + `blockchain.rpc-url` |
+| Kafka consumer | `OrderMatchedListener` — reconciliation when escrow missing for order |
 
 ## Pending
 
-- Real Web3j USDC/MATIC transfers
-- Marketplace auto-initiate payment on order match
+- Real Web3j USDC/MATIC outbound transfers from Payment Service
+- On-chain deposit auto-detection (replace manual confirm)
 - On-chain reconciliation job (`WalletBalance` vs chain)
-- [x] Kafka relay (outbox → broker via `OutboxRelayWorker`; see [kafka-messaging.md](kafka-messaging.md))
+- DLQ for failed consumer retries
 
 ---
 
@@ -40,9 +43,13 @@ Adapted from Titan `ledger-accounting.mdc`. Cursor rule: [`.cursor/rules/payment
 ## Flows
 
 ```
-Investor → Payment (escrow) → Issuance (transfer) → Payment (release) → Marketplace (settle)
+Investor → Payment (escrow, sync) → confirm → payment.confirmed (Kafka)
+         → Issuance (transfer) → transfer.completed (Kafka)
+         → Payment (release escrow) + Marketplace (settle)
 Tenant rent → Payment (payout) → Rental confirms (future)
 Dividends → Issuance (calculate) → Payment (payout)
 ```
+
+See [kafka-messaging.md](kafka-messaging.md) for the event-driven buy loop.
 
 See [payment-service/README.md](../../payment-service/README.md) and [PLATFORM-SPEC.md](../PLATFORM-SPEC.md) §4.2.

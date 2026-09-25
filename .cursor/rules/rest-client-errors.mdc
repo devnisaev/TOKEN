@@ -75,4 +75,6 @@ Extract package-private `*ClientErrors` helper when a service has 3+ outbound cl
 ## References
 
 * `token-issuance-service/.../client/PropertyRegistryClient.java` — needs auth + error mapping
-* `marketplace-service/.../client/TokenIssuanceClient.java` — compliance check
+* `token-issuance-service/.../client/MarketplaceClient.java` — GET trade by orderId
+* `marketplace-service/.../client/TokenIssuanceClient.java` — compliance, contract, transfer
+* `marketplace-service/.../client/PaymentClient.java` — initiate + release escrow

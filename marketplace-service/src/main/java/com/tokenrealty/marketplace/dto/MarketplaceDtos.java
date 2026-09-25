@@ -84,6 +84,7 @@ public final class MarketplaceDtos {
             UUID contractId,
             UUID buyerId,
             UUID sellerId,
+            String buyerWallet,
             long tokenAmount,
             BigDecimal totalPriceUsd,
             Trade.TradeStatus status,

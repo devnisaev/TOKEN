@@ -487,9 +487,9 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 - [x] Unit + context tests (`./mvnw test`)
 - [ ] Secondary market sell orders
 - [x] Kafka relay (outbox → broker via `OutboxRelayWorker`)
-- [ ] Consumer: auto-create listing on `flat.tokenized`
+- [x] Consumer: auto-create listing on `flat.tokenized`
 - [x] Integrate with Payment Service (escrow on match via `PaymentClient`)
-- [ ] Integrate with Token Issuance (transfer on payment confirmed)
+- [x] Integrate with Token Issuance (transfer on payment confirmed via Kafka)
 
 ### 10.5 Payment Service (Phase 2)
 

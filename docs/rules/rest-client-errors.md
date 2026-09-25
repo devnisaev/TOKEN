@@ -7,8 +7,9 @@ Cursor rule: [`.cursor/rules/rest-client-errors.mdc`](../../.cursor/rules/rest-c
 | Client | Service | Calls | Auth |
 |--------|---------|-------|------|
 | `PropertyRegistryClient` | Token Issuance → Registry | GET flat, GET SPV, PATCH token-info | Service token |
-| `TokenIssuanceClient` | Marketplace → Issuance | GET compliance check | Service token |
-| `PaymentClient` | Marketplace → Payment | POST `/v1/payments` on order match | Service token |
+| `TokenIssuanceClient` | Marketplace → Issuance | Compliance check, contract by flat, transfer | Service token |
+| `PaymentClient` | Marketplace → Payment | Initiate escrow, release escrow | Service token |
+| `MarketplaceClient` | Token Issuance → Marketplace | GET trade by orderId | Service token |
 
 ## Service name prefixes
 

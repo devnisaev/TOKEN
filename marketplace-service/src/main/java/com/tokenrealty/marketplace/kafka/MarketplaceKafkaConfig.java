@@ -34,4 +34,22 @@ public class MarketplaceKafkaConfig {
             @Value("${tokenrealty.kafka.topic.trade-settled}") String topic) {
         return new NewTopic(topic, PARTITIONS, REPLICAS);
     }
+
+    @Bean
+    NewTopic flatTokenizedTopic(
+            @Value("${tokenrealty.kafka.topic.flat-tokenized}") String topic) {
+        return new NewTopic(topic, PARTITIONS, REPLICAS);
+    }
+
+    @Bean
+    NewTopic paymentConfirmedTopic(
+            @Value("${tokenrealty.kafka.topic.payment-confirmed}") String topic) {
+        return new NewTopic(topic, PARTITIONS, REPLICAS);
+    }
+
+    @Bean
+    NewTopic transferCompletedTopic(
+            @Value("${tokenrealty.kafka.topic.transfer-completed}") String topic) {
+        return new NewTopic(topic, PARTITIONS, REPLICAS);
+    }
 }

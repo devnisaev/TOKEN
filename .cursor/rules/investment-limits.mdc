@@ -31,9 +31,9 @@ Adapted from Titan limits engine — **no Redis Lua / card velocity engine**. To
 2. `tokenAmount >= listing.minInvestmentTokens`
 3. KYC check via `TokenIssuanceClient.checkWallet(buyerWallet)` — fail → 422 `ComplianceBlockedException`
 4. Order match → `PaymentClient.initiateTokenPurchase` (escrow + `trade.paymentId`)
-5. On-chain transfer + `POST /v1/payments/{id}/confirm` + release escrow + settle
+5. `POST /v1/payments/{id}/confirm` → `payment.confirmed` → Issuance transfer → `transfer.completed` → settle + `PaymentClient.releaseEscrow`
 
-Evaluate compliance **before** creating matched order / holding escrow.
+Evaluate compliance **before** creating matched order / holding escrow. Escrow release only after on-chain transfer confirmed (via `transfer.completed` event).
 
 ## Rules
 

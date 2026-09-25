@@ -47,8 +47,8 @@ Spring conventions: [spring-java-services.md](spring-java-services.md)
 - [x] Add Kafka to root `docker-compose.yml` (`docker compose --profile kafka up`)
 - [x] Create `tokenrealty-events` Maven module (envelope record, `KafkaJsonEvent`)
 - [x] Create `tokenrealty-outbox` Maven module (`OutboxWriter`, `OutboxPayload`)
-- [ ] Add `processed_event` table + repository per consuming service
-- [x] Add outbox table + relay job per publishing service (Marketplace, Payment)
+- [x] Add `processed_event` table + repository per consuming service (Marketplace, Payment, Issuance)
+- [x] Add outbox table + relay job per publishing service (Marketplace, Payment, Issuance)
 
 ### Phase 1 — First producers (Property Registry)
 
@@ -65,11 +65,13 @@ Spring conventions: [spring-java-services.md](spring-java-services.md)
 ### Phase 2+ — Commerce & rental
 
 - [x] Marketplace: publish `listing.created`, `order.matched`, `trade.settled` via outbox
-- [ ] Marketplace: consume `flat.tokenized`, `payment.confirmed`
+- [x] Marketplace: consume `flat.tokenized`, `payment.confirmed`, `transfer.completed`
 - [x] Payment: outbox for `payment.confirmed`, `rent.collected` (typed payload records)
 - [x] Payment + Marketplace: Kafka relay (`OutboxRelayWorker`)
-- [ ] Payment: consume `order.matched`, `dividend.distributed`
-- [ ] Token Issuance: publish `transfer.completed`, `dividend.distributed`; consume `kyc-approved`, `payment.confirmed`, `rent.collected`
+- [x] Payment: consume `order.matched` (reconciliation)
+- [ ] Payment: consume `dividend.distributed`
+- [x] Token Issuance: publish `transfer.completed`; consume `payment.confirmed`
+- [ ] Token Issuance: publish `dividend.distributed`; consume `kyc-approved`, `rent.collected`
 
 ---
 
@@ -201,6 +203,111 @@ Local Kafka: `docker compose --profile kafka up` from `token-realty-app/`.
 
 ---
 
+## Consumer pattern (implemented)
+
+Every consuming service uses the same three-layer shape:
+
+1. **`ProcessedEvent`** entity + `ProcessedEventService.tryClaim(eventId, eventType)` — idempotency before handler runs
+2. **`{Service}KafkaIngestSupport`** — wraps `KafkaJsonEvent.consume` + claim
+3. **`{Event}Listener`** in `kafka/in/` — `@KafkaListener` → parse command → one `@Service` call
+
+### ProcessedEvent
+
+```text
+processed_events (event_id PK, event_type, processed_at)
+```
+
+```java
+@Transactional
+public boolean tryClaim(UUID eventId, String eventType) {
+    if (repository.existsByEventId(eventId)) return false;
+    try {
+        repository.save(new ProcessedEvent(eventId, eventType, Instant.now()));
+        return true;
+    } catch (DataIntegrityViolationException ex) {
+        return false; // concurrent duplicate
+    }
+}
+```
+
+Do **not** inject `ProcessedEventRepository` into business services — only `ProcessedEventService`.
+
+### Ingest support + listener
+
+```java
+@Component
+@RequiredArgsConstructor
+public class MarketplaceKafkaIngestSupport {
+    private final ObjectMapper objectMapper;
+    private final ProcessedEventService processedEventService;
+
+    public void consume(String message, String eventType, String failure,
+                        Consumer<KafkaJsonEvent> handler) {
+        KafkaJsonEvent.consume(objectMapper, message, failure, event -> {
+            if (!processedEventService.tryClaim(event.eventId(), eventType)) return;
+            handler.accept(event);
+        });
+    }
+}
+
+@Component
+@ConditionalOnProperty(name = "tokenrealty.kafka.enabled", havingValue = "true")
+public class PaymentConfirmedListener {
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.payment-confirmed}")
+    public void onPaymentConfirmed(String message) {
+        ingestSupport.consume(message, MarketplaceKafkaEventTypes.PAYMENT_CONFIRMED,
+                "Payment confirmed processing failed",
+                event -> orderService.onPaymentConfirmed(PaymentConfirmedCommand.from(event)));
+    }
+}
+```
+
+Commands live in `kafka/command/` — static `from(KafkaJsonEvent event)` factory, no parse logic in listeners.
+
+Rules:
+
+* `@ConditionalOnProperty(tokenrealty.kafka.enabled=true)` on every listener class.
+* **No** `@Transactional` on listener methods that trigger HTTP or blockchain — keep TX on the service method only.
+* HTTP/blockchain after DB commit: e.g. `TransferCompletedListener` calls `orderService.settleFromTransfer()` then `paymentClient.releaseEscrow()` outside the settle TX.
+* Add consumed topics to `*KafkaConfig` (`NewTopic` beans) and `application.yml` even when this service does not publish them.
+
+---
+
+## Automated buy flow (implemented)
+
+Event-driven primary-market settlement (replaces admin `PATCH /orders/{id}/settle` when Kafka enabled):
+
+```text
+1. POST /v1/orders (BUY)     → match + PaymentClient escrow (sync)
+2. POST /v1/payments/{id}/confirm → payment.confirmed (outbox → Kafka)
+3. Marketplace consumer    → trade.status = PAID
+4. Issuance consumer       → TransferService.transfer (on-chain)
+                           → transfer.completed (outbox → Kafka)
+5. Marketplace consumer    → trade.status = SETTLED + PaymentClient.releaseEscrow
+                           → trade.settled event
+```
+
+| Step | Topic | Consumer service | Handler |
+|------|-------|------------------|---------|
+| Escrow on match | — | Marketplace (sync) | `PaymentClient.initiateTokenPurchase` |
+| Payment confirmed | `payment.confirmed` | Marketplace | `OrderService.onPaymentConfirmed` |
+| Payment confirmed | `payment.confirmed` | Issuance | `PaymentTransferService.executeTransfer` |
+| Transfer done | `transfer.completed` | Marketplace | `OrderService.settleFromTransfer` + `PaymentClient.releaseEscrow` |
+| Auto listing | `flat.tokenized` | Marketplace | `ListingService.createFromFlatTokenized` |
+| Reconciliation | `order.matched` | Payment | `OrderEscrowService.ensureEscrowLinked` |
+
+Inter-service REST (service JWT):
+
+| Caller | Client | Endpoint |
+|--------|--------|----------|
+| Issuance → Marketplace | `MarketplaceClient` | `GET /v1/orders/{id}/trade` |
+| Marketplace → Payment | `PaymentClient` | `POST /v1/payments`, `PATCH /v1/payments/{id}/release` |
+| Marketplace → Issuance | `TokenIssuanceClient` | `GET /v1/tokens/by-flat/{flatId}`, `GET /v1/compliance/check/{wallet}` |
+
+**Pending:** Property Registry producer for `flat.tokenized` (consumer ready). Manual `POST /v1/payments/{id}/confirm` until on-chain deposit detection.
+
+---
+
 ## Package layout examples
 
 **Property Registry (layered — target):**
@@ -224,26 +331,37 @@ com.tokenrealty.registry/
 
 ```text
 com.tokenrealty.marketplace/
+├── entity/ProcessedEvent.java
+├── service/ProcessedEventService.java
+├── client/PaymentClient.java              ← initiate + releaseEscrow
 ├── kafka/
 │   ├── MarketplaceKafkaEventTypes.java
 │   ├── MarketplaceKafkaConfig.java
-│   ├── port/
-│   │   ├── ListingCreatedPublisher.java
-│   │   ├── OrderMatchedPublisher.java
-│   │   └── TradeSettledPublisher.java
-│   └── outbox/
-│       ├── OutboxEvent.java
-│       ├── OutboxEventRepository.java
-│       ├── OutboxWriter.java
-│       ├── OutboxListingCreatedPublisher.java
-│       ├── OutboxOrderMatchedPublisher.java
-│       ├── OutboxTradeSettledPublisher.java
-│       └── OutboxRelayWorker.java
+│   ├── command/                           ← PaymentConfirmedCommand, FlatTokenizedCommand, …
+│   ├── in/                                ← *Listener, MarketplaceKafkaIngestSupport
+│   ├── port/                              ← *Publisher interfaces
+│   └── outbox/                            ← OutboxWriter, Outbox*Publisher, OutboxRelayWorker
 └── service/
-    └── OrderService.java                  ← calls port, not OutboxWriter
+    ├── OrderService.java                  ← onPaymentConfirmed, settleFromTransfer
+    └── ListingService.java                ← createFromFlatTokenized
 ```
 
-**Payment (implemented):** same shape under `com.tokenrealty.payment.kafka/` with `PaymentConfirmedPublisher`, `RentCollectedPublisher`, and matching `Outbox*` classes.
+**Token Issuance (implemented):**
+
+```text
+com.tokenrealty.issuance/
+├── client/MarketplaceClient.java          ← GET trade by orderId
+├── kafka/
+│   ├── IssuanceKafkaEventTypes.java
+│   ├── IssuanceKafkaConfig.java
+│   ├── command/PaymentConfirmedCommand.java
+│   ├── in/PaymentConfirmedListener.java
+│   ├── port/TransferCompletedPublisher.java
+│   └── outbox/                            ← OutboxTransferCompletedPublisher, relay
+└── service/PaymentTransferService.java    ← transfer on payment.confirmed
+```
+
+**Payment (implemented):** outbox publishers + `kafka/in/OrderMatchedListener` for escrow reconciliation.
 
 ---
 

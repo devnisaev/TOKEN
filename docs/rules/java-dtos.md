@@ -30,6 +30,9 @@ Adapted from Titan `java-dtos.mdc`. Cursor rule: [`.cursor/rules/java-dtos.mdc`]
 |---------|---------|
 | Payment | Typed records in `kafka/events/`; port methods take `PaymentConfirmedEvent`, `RentCollectedEvent` |
 | Marketplace | Typed records nested in `kafka/port/*Publisher` interfaces (e.g. `OrderMatchedPublisher.OrderMatchedEvent`) |
+| Issuance | `TransferCompletedPublisher.TransferCompletedEvent` includes `orderId`, `tradeId`, `paymentId` for settlement |
+
+**Consumers:** parse via `kafka/command/*Command.from(KafkaJsonEvent)` — not raw `Map` in listeners. Commands carry only fields the handler needs (e.g. `TransferCompletedCommand` omits wallet addresses).
 
 Outbox adapters map typed events → `OutboxPayload` fields — not raw `Map` in service layer. See [kafka-messaging.md](kafka-messaging.md).
 

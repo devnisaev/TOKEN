@@ -249,6 +249,9 @@
   "transferId": "uuid",
   "contractId": "uuid",
   "flatId": "uuid",
+  "orderId": "uuid",
+  "tradeId": "uuid",
+  "paymentId": "uuid",
   "fromWallet": "0x...",
   "toWallet": "0x...",
   "tokenAmount": 100,
@@ -256,6 +259,8 @@
   "completedAt": "2025-09-25T16:00:00Z"
 }
 ```
+
+`orderId`, `tradeId`, and `paymentId` link the on-chain transfer to marketplace settlement and escrow release.
 
 ---
 

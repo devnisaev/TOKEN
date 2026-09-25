@@ -47,6 +47,10 @@ public class MarketplaceMapper {
     }
 
     public TradeResponse toTradeResponse(Trade trade) {
+        return toTradeResponse(trade, null);
+    }
+
+    public TradeResponse toTradeResponse(Trade trade, MarketOrder order) {
         return TradeResponse.builder()
                 .id(trade.getId())
                 .orderId(trade.getOrderId())
@@ -55,6 +59,7 @@ public class MarketplaceMapper {
                 .contractId(trade.getContractId())
                 .buyerId(trade.getBuyerId())
                 .sellerId(trade.getSellerId())
+                .buyerWallet(order != null ? order.getBuyerWallet() : null)
                 .tokenAmount(trade.getTokenAmount())
                 .totalPriceUsd(trade.getTotalPriceUsd())
                 .status(trade.getStatus())

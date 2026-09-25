@@ -25,9 +25,17 @@ spring:
 
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: payment-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+blockchain:
+  rpc-url: ${BLOCKCHAIN_RPC_URL:http://localhost:8545}
 
 server:
   port: 8085
@@ -47,7 +55,10 @@ tokenrealty:
     topic:
       payment-confirmed: tokenrealty.payment.payment.confirmed.v1
       rent-collected: tokenrealty.payment.rent.collected.v1
+      order-matched: tokenrealty.marketplace.order.matched.v1
   payment:
+    blockchain:
+      enabled: ${PAYMENT_BLOCKCHAIN_ENABLED:false}
     escrow-wallet-address: ${ESCROW_WALLET_ADDRESS:0xEscrowDevWallet0000000000000000000001}
 
 jackson2:

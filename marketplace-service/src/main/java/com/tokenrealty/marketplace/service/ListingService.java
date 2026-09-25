@@ -5,6 +5,8 @@ import com.tokenrealty.marketplace.entity.Listing;
 import com.tokenrealty.marketplace.exception.ConflictException;
 import com.tokenrealty.marketplace.exception.ResourceNotFoundException;
 import com.tokenrealty.marketplace.exception.ValidationException;
+import com.tokenrealty.marketplace.client.TokenIssuanceClient;
+import com.tokenrealty.marketplace.kafka.command.FlatTokenizedCommand;
 import com.tokenrealty.marketplace.kafka.port.ListingCreatedPublisher;
 import com.tokenrealty.marketplace.mapper.MarketplaceMapper;
 import com.tokenrealty.marketplace.repository.ListingRepository;
@@ -24,6 +26,7 @@ public class ListingService {
     private final ListingRepository listingRepository;
     private final MarketplaceMapper mapper;
     private final ListingCreatedPublisher listingCreatedPublisher;
+    private final TokenIssuanceClient tokenIssuanceClient;
 
     public Page<ListingResponse> findAll(Listing.ListingStatus status, UUID flatId, Pageable pageable) {
         if (flatId != null) {
@@ -69,6 +72,26 @@ public class ListingService {
                 saved.getPriceUsd(),
                 saved.getTokensAvailable()));
         return mapper.toListingResponse(saved);
+    }
+
+    @Transactional
+    public ListingResponse createFromFlatTokenized(FlatTokenizedCommand command) {
+        var existing = listingRepository.findByFlatIdAndStatus(command.flatId(), Listing.ListingStatus.ACTIVE);
+        if (existing.isPresent()) {
+            return mapper.toListingResponse(existing.get());
+        }
+        TokenIssuanceClient.TokenContractResponse contract = tokenIssuanceClient.getContractByFlatId(command.flatId());
+        CreateListingRequest request = CreateListingRequest.builder()
+                .flatId(command.flatId())
+                .contractId(contract.id())
+                .listingType(Listing.ListingType.PRIMARY)
+                .priceUsd(command.tokenPriceUsd())
+                .tokensTotal(command.totalTokens())
+                .minInvestmentTokens(1L)
+                .title("Tokenized flat " + command.flatId())
+                .description("Auto-created from flat.tokenized event")
+                .build();
+        return create(request);
     }
 
     @Transactional

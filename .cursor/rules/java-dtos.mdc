@@ -45,6 +45,7 @@ kafka/events/               # typed event payload records (target)
 dto/                        # OK today
 adapter/in/web/dto/         # preferred when refactoring
 kafka/events/               # ListingCreatedEvent, PaymentConfirmedEvent, …
+kafka/command/              # PaymentConfirmedCommand.from(KafkaJsonEvent) — consumer parse
 ```
 
 Group related records in `*Dtos.java` holder classes — do not nest large types on controllers.

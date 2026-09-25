@@ -48,11 +48,24 @@ server:
     context-path: /api
 
 # ─── Property Registry FeignClient ────────────────────────────────────────────
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: token-issuance-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
 services:
   auth:
     url: ${AUTH_SERVICE_URL:http://localhost:8083/api}
   property-registry:
     url: ${PROPERTY_REGISTRY_URL:http://localhost:8081/api}
+  marketplace:
+    url: ${MARKETPLACE_SERVICE_URL:http://localhost:8084/api}
 
 tokenrealty:
   jwt:
@@ -61,6 +74,15 @@ tokenrealty:
   service-account:
     client-id: token-issuance
     client-secret: ${SERVICE_ACCOUNT_SECRET:issuance-secret}
+  kafka:
+    enabled: ${KAFKA_ENABLED:false}
+    relay:
+      poll-ms: 1000
+      publish-timeout-ms: 10000
+      max-retries: 5
+    topic:
+      payment-confirmed: tokenrealty.payment.payment.confirmed.v1
+      transfer-completed: tokenrealty.issuance.transfer.completed.v1
 
 feign:
   client:

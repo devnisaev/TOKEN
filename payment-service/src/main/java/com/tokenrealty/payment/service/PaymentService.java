@@ -1,5 +1,6 @@
 package com.tokenrealty.payment.service;
 
+import com.tokenrealty.payment.blockchain.PaymentBlockchainService;
 import com.tokenrealty.payment.config.PaymentProperties;
 import com.tokenrealty.payment.dto.PaymentDtos.*;
 import com.tokenrealty.payment.entity.*;
@@ -29,6 +30,7 @@ public class PaymentService {
     private final PaymentProperties paymentProperties;
     private final LedgerService ledgerService;
     private final PaymentConfirmedPublisher paymentConfirmedPublisher;
+    private final PaymentBlockchainService paymentBlockchainService;
 
     public Page<PaymentResponse> findAll(UUID payerId, UUID orderId, Pageable pageable) {
         if (payerId != null) {
@@ -65,6 +67,10 @@ public class PaymentService {
         Payment payment = getPayment(paymentId);
         if (payment.getStatus() != Payment.PaymentStatus.PENDING) {
             raiseValidation("Payment is not pending confirmation");
+        }
+        if (paymentBlockchainService.isEnabled()
+                && paymentBlockchainService.findReceipt(request.txHash()).isEmpty()) {
+            raiseValidation("On-chain transaction not confirmed: " + request.txHash());
         }
         Escrow escrow = getEscrow(paymentId);
         payment.setStatus(Payment.PaymentStatus.CONFIRMED);

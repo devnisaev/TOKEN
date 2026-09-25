@@ -8,6 +8,8 @@ import com.tokenrealty.marketplace.entity.MarketOrder;
 import com.tokenrealty.marketplace.entity.Trade;
 import com.tokenrealty.marketplace.exception.ResourceNotFoundException;
 import com.tokenrealty.marketplace.exception.ValidationException;
+import com.tokenrealty.marketplace.kafka.command.PaymentConfirmedCommand;
+import com.tokenrealty.marketplace.kafka.command.TransferCompletedCommand;
 import com.tokenrealty.marketplace.kafka.port.OrderMatchedPublisher;
 import com.tokenrealty.marketplace.kafka.port.TradeSettledPublisher;
 import com.tokenrealty.marketplace.mapper.MarketplaceMapper;
@@ -124,7 +126,46 @@ public class OrderService {
     public TradeResponse findTradeByOrderId(UUID orderId) {
         Trade trade = tradeRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trade not found for order: " + orderId));
-        return mapper.toTradeResponse(trade);
+        MarketOrder order = getOrder(orderId);
+        return mapper.toTradeResponse(trade, order);
+    }
+
+    @Transactional
+    public void onPaymentConfirmed(PaymentConfirmedCommand command) {
+        Trade trade = tradeRepository.findByOrderId(command.orderId())
+                .orElseThrow(() -> new ResourceNotFoundException("Trade not found for order: " + command.orderId()));
+        if (trade.getStatus() == Trade.TradeStatus.SETTLED) {
+            return;
+        }
+        if (command.paymentId() != null) {
+            trade.setPaymentId(command.paymentId());
+        }
+        trade.setStatus(Trade.TradeStatus.PAID);
+    }
+
+    @Transactional
+    public UUID settleFromTransfer(TransferCompletedCommand command) {
+        Trade trade = tradeRepository.findByOrderId(command.orderId())
+                .orElseThrow(() -> new ResourceNotFoundException("Trade not found for order: " + command.orderId()));
+        if (trade.getStatus() == Trade.TradeStatus.SETTLED) {
+            return trade.getPaymentId();
+        }
+        if (command.transferId() != null) {
+            trade.setTransferId(command.transferId());
+        }
+        if (command.paymentId() != null) {
+            trade.setPaymentId(command.paymentId());
+        }
+        trade.setStatus(Trade.TradeStatus.SETTLED);
+        MarketOrder order = getOrder(command.orderId());
+        order.setStatus(MarketOrder.OrderStatus.SETTLED);
+        tradeSettledPublisher.publishTradeSettled(new TradeSettledPublisher.TradeSettledEvent(
+                trade.getId(),
+                trade.getOrderId(),
+                trade.getListingId(),
+                trade.getPaymentId(),
+                trade.getTransferId()));
+        return trade.getPaymentId();
     }
 
     private void linkEscrowPayment(MarketOrder order, Trade trade) {

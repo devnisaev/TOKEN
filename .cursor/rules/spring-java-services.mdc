@@ -62,7 +62,7 @@ com.tokenrealty.<service>/
 └── kafka/                OK at top level until full hexagonal split
 ```
 
-**Marketplace reference:** `marketplace-service` — layered with `kafka/outbox/`; migrate to `adapter/*` incrementally.
+**Marketplace reference:** `marketplace-service` — layered with `kafka/in/` (consumers), `kafka/outbox/` (publishers), `kafka/command/`; migrate to `adapter/*` incrementally.
 
 Rules:
 

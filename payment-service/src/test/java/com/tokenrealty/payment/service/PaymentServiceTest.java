@@ -1,5 +1,6 @@
 package com.tokenrealty.payment.service;
 
+import com.tokenrealty.payment.blockchain.PaymentBlockchainService;
 import com.tokenrealty.payment.config.PaymentProperties;
 import com.tokenrealty.payment.dto.PaymentDtos.*;
 import com.tokenrealty.payment.entity.*;
@@ -35,6 +36,7 @@ class PaymentServiceTest {
     @Mock PaymentProperties paymentProperties;
     @Mock LedgerService ledgerService;
     @Mock PaymentConfirmedPublisher paymentConfirmedPublisher;
+    @Mock PaymentBlockchainService paymentBlockchainService;
     @InjectMocks PaymentService paymentService;
 
     private UUID orderId;

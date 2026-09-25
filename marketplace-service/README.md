@@ -79,7 +79,7 @@ JWT Bearer from Auth Service (:8083). Example: login as `investor@tokenrealty.co
 4. Tokens reserved; order MATCHED; trade PENDING
 5. Marketplace calls Payment Service — escrow created, `trade.paymentId` set
 6. Investor sends USDC to escrow wallet; admin/service confirms on-chain tx
-7. Admin PATCH /orders/{id}/settle after token transfer (interim until payment.confirmed consumer)
+7. payment.confirmed → Issuance transfers tokens → transfer.completed → auto-settle + escrow release
 ```
 
 ## Configuration
@@ -101,9 +101,9 @@ JWT Bearer from Auth Service (:8083). Example: login as `investor@tokenrealty.co
 ## Next steps
 
 - [x] Kafka relay for outbox → broker (`OutboxRelayWorker` + `OutboxPayload`)
-- [ ] Consumer: `flat.tokenized` auto-create listing
+- [x] Consumer: `flat.tokenized` auto-create listing
 - [x] Payment Service integration — `PaymentClient` initiates escrow on order match
-- [ ] Consume `payment.confirmed` to auto-settle trades
+- [x] Consume `payment.confirmed` + `transfer.completed` to auto-settle trades
 - [ ] Secondary market sell orders
 
 ## Conventions

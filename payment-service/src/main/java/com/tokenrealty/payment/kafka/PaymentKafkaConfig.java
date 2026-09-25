@@ -28,4 +28,10 @@ public class PaymentKafkaConfig {
             @Value("${tokenrealty.kafka.topic.rent-collected}") String topic) {
         return new NewTopic(topic, PARTITIONS, REPLICAS);
     }
+
+    @Bean
+    NewTopic orderMatchedTopic(
+            @Value("${tokenrealty.kafka.topic.order-matched}") String topic) {
+        return new NewTopic(topic, PARTITIONS, REPLICAS);
+    }
 }

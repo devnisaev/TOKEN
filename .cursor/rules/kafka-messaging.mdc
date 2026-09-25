@@ -189,16 +189,25 @@ public void onFlatTokenized(String message) {
         UUID.fromString(p.get("flatId").asText()), ...);
 }
 
-// GOOD — shared parse; command → one service call
-@KafkaListener(topics = RegistryKafkaEventTypes.FLAT_TOKENIZED)
-public void onFlatTokenized(String message) {
-    KafkaJsonEvent.consume(objectMapper, message, "Flat tokenized processing failed",
-        event -> marketplaceService.handleFlatTokenized(
-            FlatTokenizedCommand.from(event)));
+// GOOD — ingest support: claim eventId + parse + one service call
+@KafkaListener(topics = "${tokenrealty.kafka.topic.payment-confirmed}")
+public void onPaymentConfirmed(String message) {
+    ingestSupport.consume(message, MarketplaceKafkaEventTypes.PAYMENT_CONFIRMED,
+            "Payment confirmed processing failed",
+            event -> orderService.onPaymentConfirmed(PaymentConfirmedCommand.from(event)));
 }
 ```
 
-When several listeners share identical claim + parse wiring, extract `{Service}KafkaIngestSupport` in the same package.
+Every consumer service:
+
+* `entity/ProcessedEvent` + `ProcessedEventService.tryClaim(eventId, eventType)` before handler
+* `{Service}KafkaIngestSupport` in `kafka/in/` — shared claim + `KafkaJsonEvent.consume`
+* Commands in `kafka/command/` with `static from(KafkaJsonEvent event)` — no parse in listener
+* `@ConditionalOnProperty(name = "tokenrealty.kafka.enabled", havingValue = "true")` on listener classes
+
+**Automated buy flow (implemented):** `payment.confirmed` → Marketplace marks PAID + Issuance transfers → `transfer.completed` → Marketplace settles + `PaymentClient.releaseEscrow`. See [kafka-messaging.md](../../docs/rules/kafka-messaging.md).
+
+Do **not** call HTTP or blockchain inside listener `@Transactional` — service method for DB; HTTP after commit (e.g. escrow release).
 
 Do **not** add a fan-in orchestrator for a single listener — one listener → one service method.
 
@@ -206,8 +215,8 @@ Do **not** add a fan-in orchestrator for a single listener — one listener → 
 
 | Service generation | Listener location | Publisher location |
 |--------------------|-------------------|--------------------|
-| Existing (registry, issuance) | `kafka/` | `kafka/outbox/` |
-| New (marketplace, payment, …) | `adapter/in/kafka/` | `adapter/out/kafka/` |
+| Implemented (marketplace, payment, issuance) | `kafka/in/` | `kafka/outbox/` + `kafka/port/` |
+| Future hexagonal (registry, rental, …) | `adapter/in/kafka/` | `adapter/out/kafka/` |
 
 Both styles follow the same envelope, idempotency, and one-service-call rules.
 
