@@ -4,7 +4,10 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
-    <include file="db/changelog/001-initial-schema.xml"/>
-    <include file="db/changelog/002-dividend-distributor-address.xml"/>
+    <changeSet id="002-dividend-distributor-address" author="tokenrealty">
+        <addColumn tableName="token_contracts">
+            <column name="dividend_distributor_address" type="varchar(66)"/>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>

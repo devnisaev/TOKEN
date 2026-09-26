@@ -1,6 +1,8 @@
 tokenrealty:
   issuance:
     seed-dev-token-contract: true
+    # Optional: set DIVIDEND_DISTRIBUTOR_ADDRESS after `npm run deploy:local` in hardhat/
+    # dividend-distributor-address: ${DIVIDEND_DISTRIBUTOR_ADDRESS:}
   kafka:
     enabled: true
     dlq:

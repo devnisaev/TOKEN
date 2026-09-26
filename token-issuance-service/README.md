@@ -33,6 +33,11 @@ npm run node          # starts at localhost:8545
 npm run deploy:local  # deploys contracts, copy addresses to application.yml
 ```
 
+**DividendDistributor (optional):** after deploy, set `DIVIDEND_DISTRIBUTOR_ADDRESS` or
+`tokenrealty.issuance.dividend-distributor-address` in env / `application-local.yml`.
+Per-contract overrides may be stored in `token_contracts.dividend_distributor_address`.
+On-chain dividend payouts will reuse Payment Service's `PaymentBlockchainService` pattern.
+
 ### 2. Create database
 ```bash
 psql -U postgres -c "CREATE DATABASE token_issuance;"

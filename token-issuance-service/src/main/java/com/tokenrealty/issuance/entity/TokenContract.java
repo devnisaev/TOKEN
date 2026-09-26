@@ -29,6 +29,10 @@ public class TokenContract extends BaseEntity {
     @Column(name = "spv_wallet_address", nullable = false)
     private String spvWalletAddress;
 
+    /** On-chain DividendDistributor contract — optional until deployed. */
+    @Column(name = "dividend_distributor_address", length = 66)
+    private String dividendDistributorAddress;
+
     // On-chain details
     @Column(name = "contract_address", unique = true)
     private String contractAddress;

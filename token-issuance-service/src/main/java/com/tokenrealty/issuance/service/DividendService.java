@@ -64,6 +64,9 @@ public class DividendService {
      * Distribute rental income to all token holders of a flat.
      * Creates DividendPayment records for each holder and publishes
      * dividend.distributed — Payment Service sends on-chain USDC payouts.
+     * Future on-chain path: invoke DividendDistributor via PaymentBlockchainService-style
+     * Web3j helper using {@code tokenrealty.issuance.dividend-distributor-address} or
+     * {@code TokenContract.dividendDistributorAddress}.
      */
     @Transactional
     public DividendSummaryResponse distribute(UUID contractId,
