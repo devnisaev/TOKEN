@@ -113,8 +113,8 @@ src/test/
 
 ## Next Steps
 
-- [ ] Connect to **Token Issuance Service** — call `PATCH /flats/{id}/token-info` after contract deployment
-- [ ] Add **Kafka events** — publish `FlatTokenized`, `BuildingApproved` events
-- [ ] Replace in-memory users with **JWT filter** from Auth Service
-- [ ] Connect **IPFS** client for actual document upload
+- [x] Connect to **Token Issuance Service** — Issuance calls `PATCH /v1/flats/{id}/token-info` after deploy (`PropertyRegistryClientIntegrationTest`)
+- [x] Add **Kafka events** — publish `FlatTokenized`, `BuildingApproved` via outbox relay
+- [x] Replace in-memory users with **JWT filter** from Auth Service (`tokenrealty-security`)
+- [ ] Connect **IPFS** client for actual document upload (Document Service owns upload flow)
 - [ ] Add **Testcontainers** integration test against real PostgreSQL

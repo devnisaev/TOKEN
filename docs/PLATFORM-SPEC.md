@@ -447,9 +447,9 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 ### 9.6 Documentation
 
 - [x] Tier-1 business invariants doc ([docs/BUSINESS_RULES.md](BUSINESS_RULES.md) + `.cursor/rules/business-rules.mdc`)
-- [ ] Create root `README.md` with platform overview and startup order
+- [x] Create root `README.md` with platform overview and startup order
 - [ ] Sync API tables in service READMEs with actual controllers
-- [ ] Update Property Registry "Next Steps" (mark Issuance integration partial)
+- [x] Update Property Registry "Next Steps" (Issuance token-info callback + Kafka + JWT done)
 
 ---
 
@@ -481,11 +481,11 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 
 ### 10.3 Kafka infrastructure (Phase 1)
 
-- [ ] Root `docker-compose.yml` with Kafka, Zookeeper, Schema Registry
-- [ ] Shared event library (`tokenrealty-events/`)
+- [x] Root `docker-compose.yml` with Kafka profile (Schema Registry optional — not required for JSON events)
+- [x] Shared event library (`tokenrealty-events/`)
 - [ ] Define all event schemas (see Section 6.2)
 - [x] Add Kafka producers to Property Registry (BuildingApproved, FlatTokenized)
-- [ ] Add Kafka consumers in Notification Service (stub)
+- [x] Add Kafka consumers in Notification Service (email + preference-aware delivery)
 
 ### 10.4 Marketplace Service (Phase 2)
 

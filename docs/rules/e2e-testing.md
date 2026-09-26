@@ -59,6 +59,8 @@ CI: `frontend-e2e-full` runs on `workflow_dispatch` when repo secret `E2E_GATEWA
 ./scripts/demo-start.sh              # Postgres + Kafka + Jaeger + startup checklist
 ./scripts/demo-start.sh --infra-only  # Postgres + Kafka only (no Jaeger)
 ./scripts/demo-start.sh --seed       # Also runs seed-demo.sh if gateway :8080 is up
+./scripts/demo-services.sh           # Start buy-flow backend in background (auth → gateway)
+./scripts/demo-services.sh --stop    # Stop background Spring Boot processes
 ```
 
 Jaeger UI: http://localhost:16686 (OTLP HTTP `:4318`).

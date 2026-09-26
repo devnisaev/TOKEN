@@ -72,31 +72,42 @@ cd frontend/tenant-portal && npm install && npm run dev
 
 ## Local startup order
 
+### Quick demo (recommended)
+
 ```bash
-# 1. PostgreSQL (+ optional Kafka)
-docker compose up postgres -d
-docker compose --profile kafka up -d
-
-# 2. Auth first (JWT for all services)
-cd auth-service && ./mvnw spring-boot:run
-
-# 3. Core domain services
-cd token-realty-app && ./mvnw spring-boot:run          # Registry :8081
-cd token-issuance-service && ./mvnw spring-boot:run    # Issuance :8082
-cd marketplace-service && ./mvnw spring-boot:run       # Marketplace :8084
-cd payment-service && ./mvnw spring-boot:run           # Payment :8085
-cd compliance-service && ./mvnw spring-boot:run        # Compliance :8087
-cd rental-service && ./mvnw spring-boot:run            # Rental :8086
-cd wallet-service && ./mvnw spring-boot:run            # Wallet :8090
-
-# 4. API Gateway (browser entry point)
-cd api-gateway && ./mvnw spring-boot:run               # :8080
-
-# 5. Optional: Hardhat node for on-chain flows
-cd token-issuance-service/hardhat && npm run node
+./scripts/demo-start.sh              # Postgres + Kafka + Jaeger + checklist
+./scripts/demo-services.sh           # background buy-flow stack (auth → gateway)
+./scripts/wait-for-services.sh     # wait until :8080 health is OK
+./scripts/seed-demo.sh               # demo buildings, flats, users
+./scripts/e2e-run.sh --no-wait       # Playwright full E2E (gateway must be up)
 ```
 
-Demo seed helper: `./scripts/seed-demo.sh`
+Stop background services: `./scripts/demo-services.sh --stop`
+
+### Manual startup (separate terminals)
+
+```bash
+# 1. PostgreSQL (+ optional Kafka)
+./scripts/demo-start.sh --infra-only
+
+# 2. Auth first (JWT for all services)
+cd auth-service && ../token-realty-app/mvnw spring-boot:run -Dspring-boot.run.profiles=local
+
+# 3. Core domain services
+cd token-realty-app && ../token-realty-app/mvnw spring-boot:run -Dspring-boot.run.profiles=local          # Registry :8081
+cd token-issuance-service && ../token-realty-app/mvnw spring-boot:run -Dspring-boot.run.profiles=local    # Issuance :8082
+cd marketplace-service && ../token-realty-app/mvnw spring-boot:run -Dspring-boot.run.profiles=local       # Marketplace :8084
+cd payment-service && ../token-realty-app/mvnw spring-boot:run -Dspring-boot.run.profiles=local           # Payment :8085
+cd compliance-service && ../token-realty-app/mvnw spring-boot:run -Dspring-boot.run.profiles=local        # Compliance :8087
+
+# 4. API Gateway (browser entry point)
+cd api-gateway && ../token-realty-app/mvnw spring-boot:run -Dspring-boot.run.profiles=local               # :8080
+
+# 5. Optional: Hardhat node for on-chain flows
+cd token-issuance-service/hardhat && npm run node && npm run deploy:local
+```
+
+See [docs/hardhat-demo.md](docs/hardhat-demo.md) for tokenize → list → buy flow.
 
 ## Swagger UI (direct service ports)
 

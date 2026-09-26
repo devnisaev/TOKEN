@@ -252,7 +252,9 @@ Notification Service persists per-user settings in `notification_preferences` (`
 
 Fields: `emailEnabled`, `tradeAlerts`, `dividendAlerts`, `rentReminders`. Missing rows return defaults (all `true`); `update` upserts by `userId`.
 
-Test: `NotificationPreferenceServiceTest` (H2, `@ActiveProfiles("test")`).
+Kafka delivery respects preferences via `NotificationPreferenceGate` — resolves `userId`/`investorId`/`buyerId` from event payload; skips email when the matching alert category is disabled. Admin `POST /v1/notifications/send` bypasses the gate.
+
+Tests: `NotificationPreferenceServiceTest`, `NotificationPreferenceGateTest`, `NotificationLogServiceTest`.
 
 ---
 

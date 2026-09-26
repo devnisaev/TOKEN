@@ -13,6 +13,7 @@ Central documentation for the TokenRealty real-estate tokenization platform.
 | [**hardhat-demo.md**](hardhat-demo.md) | Local on-chain demo: invest → token → dividend |
 | Demo infra script | [`../scripts/demo-start.sh`](../scripts/demo-start.sh) — Postgres + Kafka + Jaeger + startup checklist |
 | E2E runner | [`../scripts/e2e-run.sh`](../scripts/e2e-run.sh) — wait for gateway + Playwright `test:full` |
+| Demo services | [`../scripts/demo-services.sh`](../scripts/demo-services.sh) — background buy-flow stack |
 | [**../README.md**](../README.md) | Root platform overview & startup order |
 | [**../AGENTS.md**](../AGENTS.md) | Cursor agent instructions |
 
