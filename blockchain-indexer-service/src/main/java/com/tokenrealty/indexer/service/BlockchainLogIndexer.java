@@ -7,6 +7,7 @@ import com.tokenrealty.indexer.blockchain.OnChainBalanceReader;
 import com.tokenrealty.indexer.client.IssuanceClient;
 import com.tokenrealty.indexer.entity.IndexedEvent;
 import com.tokenrealty.indexer.entity.IndexerCursor;
+import com.tokenrealty.indexer.kafka.outbox.OutboxIndexedEventPublisher;
 import com.tokenrealty.indexer.repository.IndexedEventRepository;
 import com.tokenrealty.indexer.repository.IndexerCursorRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,7 @@ public class BlockchainLogIndexer {
     private final IndexedEventRepository eventRepository;
     private final OnChainBalanceReader balanceReader;
     private final ObjectMapper objectMapper;
+    private final OutboxIndexedEventPublisher indexedEventPublisher;
 
     @Value("${tokenrealty.indexer.batch-blocks:500}")
     private int batchBlocks;
@@ -132,7 +134,7 @@ public class BlockchainLogIndexer {
             payload.put("topic2", logEntry.getTopics().get(2));
         }
 
-        eventRepository.save(IndexedEvent.builder()
+        IndexedEvent saved = eventRepository.save(IndexedEvent.builder()
                 .eventType(eventType)
                 .contractAddress(logEntry.getAddress())
                 .txHash(logEntry.getTransactionHash())
@@ -140,6 +142,13 @@ public class BlockchainLogIndexer {
                 .blockNumber(logEntry.getBlockNumber())
                 .payload(payload.toString())
                 .build());
+        indexedEventPublisher.publishIndexedEvent(
+                saved.getId(),
+                eventType,
+                logEntry.getAddress(),
+                logEntry.getTransactionHash(),
+                logEntry.getLogIndex().intValue(),
+                logEntry.getBlockNumber().longValue());
     }
 
     private static String resolveEventType(String topic0) {

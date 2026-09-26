@@ -28,6 +28,7 @@ public class PayoutService {
     private final RentCollectedPublisher rentCollectedPublisher;
     private final PayoutCompletedPublisher payoutCompletedPublisher;
     private final PaymentBlockchainService paymentBlockchainService;
+    private final WalletBalanceService walletBalanceService;
 
     public Page<PayoutResponse> findAll(UUID recipientInvestorId, Pageable pageable) {
         if (recipientInvestorId != null) {
@@ -55,6 +56,7 @@ public class PayoutService {
 
         Payout saved = payoutRepository.save(payout);
         completePayout(saved);
+        walletBalanceService.credit(saved.getRecipientInvestorId(), saved.getAmount(), saved.getCurrency());
         if (saved.getPurpose() == Payout.PayoutPurpose.DIVIDEND
                 && saved.getDividendPaymentId() != null) {
             payoutCompletedPublisher.publishPayoutCompleted(new PayoutCompletedEvent(

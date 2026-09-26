@@ -1,8 +1,12 @@
 package com.tokenrealty.issuance.client;
 
+import com.tokenrealty.web.exception.ResourceNotFoundException;
+import com.tokenrealty.web.exception.ValidationException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -17,17 +21,35 @@ public class PropertyRegistryClient {
     }
 
     public FlatResponse getFlatById(UUID id) {
-        return restClient.get()
-                .uri("/v1/flats/{id}", id)
-                .retrieve()
-                .body(FlatResponse.class);
+        try {
+            return restClient.get()
+                    .uri("/v1/flats/{id}", id)
+                    .retrieve()
+                    .body(FlatResponse.class);
+        } catch (RestClientResponseException ex) {
+            if (ex.getStatusCode().value() == 404) {
+                throw new ResourceNotFoundException("Flat not found: " + id);
+            }
+            throw registryUnavailable(ex);
+        } catch (ResourceAccessException ex) {
+            throw new ValidationException("Property Registry service unavailable");
+        }
     }
 
     public SpvResponse getSpvByBuilding(UUID buildingId) {
-        return restClient.get()
-                .uri("/v1/buildings/{buildingId}/spv", buildingId)
-                .retrieve()
-                .body(SpvResponse.class);
+        try {
+            return restClient.get()
+                    .uri("/v1/buildings/{buildingId}/spv", buildingId)
+                    .retrieve()
+                    .body(SpvResponse.class);
+        } catch (RestClientResponseException ex) {
+            if (ex.getStatusCode().value() == 404) {
+                throw new ResourceNotFoundException("SPV not found for building: " + buildingId);
+            }
+            throw registryUnavailable(ex);
+        } catch (ResourceAccessException ex) {
+            throw new ValidationException("Property Registry service unavailable");
+        }
     }
 
     public FlatResponse setTokenInfo(
@@ -36,18 +58,29 @@ public class PropertyRegistryClient {
             Long totalTokens,
             BigDecimal tokenPriceUsd
     ) {
-        return restClient.patch()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/v1/flats/{id}/token-info")
-                        .queryParam("contractAddress", contractAddress)
-                        .queryParam("totalTokens", totalTokens)
-                        .queryParam("tokenPriceUsd", tokenPriceUsd)
-                        .build(id))
-                .retrieve()
-                .body(FlatResponse.class);
+        try {
+            return restClient.patch()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/v1/flats/{id}/token-info")
+                            .queryParam("contractAddress", contractAddress)
+                            .queryParam("totalTokens", totalTokens)
+                            .queryParam("tokenPriceUsd", tokenPriceUsd)
+                            .build(id))
+                    .retrieve()
+                    .body(FlatResponse.class);
+        } catch (RestClientResponseException ex) {
+            throw new ValidationException("Property Registry token-info callback failed: " + ex.getStatusText());
+        } catch (ResourceAccessException ex) {
+            throw new ValidationException("Property Registry service unavailable");
+        }
     }
 
-    // ─── DTOs (unchanged) ───────────────────────────────────────────────
+    private static ValidationException registryUnavailable(RestClientResponseException ex) {
+        if (ex.getStatusCode().is5xxServerError()) {
+            return new ValidationException("Property Registry service unavailable");
+        }
+        return new ValidationException("Property Registry request failed: " + ex.getStatusText());
+    }
 
     public record FlatResponse(
             UUID id,
@@ -62,7 +95,8 @@ public class PropertyRegistryClient {
             String tokenContractAddress,
             Long totalTokens,
             BigDecimal tokenPriceUsd
-    ) {}
+    ) {
+    }
 
     public record SpvResponse(
             UUID id,
@@ -72,62 +106,6 @@ public class PropertyRegistryClient {
             String walletAddress,
             Boolean kycVerified,
             String status
-    ) {}
+    ) {
+    }
 }
-
-
-
-/*package com.tokenrealty.issuance.client;
-
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.*;
-
-import java.math.BigDecimal;
-import java.util.UUID;
-
-@FeignClient(
-        name = "property-registry",
-        url = "${services.property-registry.url}"
-)
-public interface PropertyRegistryClient {
-
-    @GetMapping("/v1/flats/{id}")
-    FlatResponse getFlatById(@PathVariable UUID id);
-
-    @GetMapping("/v1/buildings/{buildingId}/spv")
-    SpvResponse getSpvByBuilding(@PathVariable UUID buildingId);
-
-    @PatchMapping("/v1/flats/{id}/token-info")
-    FlatResponse setTokenInfo(
-            @PathVariable UUID id,
-            @RequestParam String contractAddress,
-            @RequestParam Long totalTokens,
-            @RequestParam BigDecimal tokenPriceUsd);
-
-    // ─── Response records (mirrors Property Registry DTOs) ─────────────────
-
-    record FlatResponse(
-            UUID id,
-            UUID buildingId,
-            String buildingName,
-            String flatNumber,
-            Integer floor,
-            Double areaSqm,
-            Integer numRooms,
-            Integer numBathrooms,
-            String status,
-            String tokenContractAddress,
-            Long totalTokens,
-            BigDecimal tokenPriceUsd
-    ) {}
-
-    record SpvResponse(
-            UUID id,
-            UUID buildingId,
-            String legalName,
-            String registrationNumber,
-            String walletAddress,
-            Boolean kycVerified,
-            String status
-    ) {}
-}*/

@@ -34,6 +34,7 @@ public class PaymentService {
     private final LedgerService ledgerService;
     private final PaymentConfirmedPublisher paymentConfirmedPublisher;
     private final PaymentBlockchainService paymentBlockchainService;
+    private final WalletBalanceService walletBalanceService;
 
     public Page<PaymentResponse> findAll(UUID payerId, UUID orderId, Pageable pageable) {
         if (payerId != null) {
@@ -62,6 +63,7 @@ public class PaymentService {
         Payment payment = paymentRepository.save(buildPendingPayment(request, idempotencyKey));
         Escrow escrow = escrowRepository.save(buildEscrow(payment, request));
         ledgerService.recordEscrowHold(payment.getId(), payment.getAmount(), payment.getCurrency());
+        walletBalanceService.holdForPayment(request.payerId(), request.amount(), request.currency());
         return mapper.toPaymentResponse(payment, escrow);
     }
 
@@ -80,6 +82,8 @@ public class PaymentService {
         payment.setTxHash(request.txHash());
         payment.setConfirmedAt(Instant.now());
         escrow.setStatus(Escrow.EscrowStatus.HELD);
+        walletBalanceService.settleConfirmedPayment(
+                payment.getPayerId(), payment.getAmount(), payment.getCurrency());
         paymentConfirmedPublisher.publishPaymentConfirmed(new PaymentConfirmedEvent(
                 payment.getId(),
                 payment.getOrderId(),
@@ -116,6 +120,7 @@ public class PaymentService {
         }
         escrow.setStatus(Escrow.EscrowStatus.REFUNDED);
         payment.setStatus(Payment.PaymentStatus.REFUNDED);
+        walletBalanceService.releaseHold(payment.getPayerId(), payment.getAmount(), payment.getCurrency());
         return mapper.toPaymentResponse(payment, escrow);
     }
 

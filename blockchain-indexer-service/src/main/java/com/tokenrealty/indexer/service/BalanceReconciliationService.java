@@ -3,6 +3,7 @@ package com.tokenrealty.indexer.service;
 import com.tokenrealty.indexer.blockchain.OnChainBalanceReader;
 import com.tokenrealty.indexer.client.IssuanceClient;
 import com.tokenrealty.indexer.entity.ReconciliationMismatch;
+import com.tokenrealty.indexer.kafka.outbox.OutboxBalanceMismatchPublisher;
 import com.tokenrealty.indexer.repository.ReconciliationMismatchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ public class BalanceReconciliationService {
     private final IssuanceClient issuanceClient;
     private final OnChainBalanceReader balanceReader;
     private final ReconciliationMismatchRepository mismatchRepository;
+    private final OutboxBalanceMismatchPublisher mismatchPublisher;
 
     @Value("${tokenrealty.indexer.enabled:true}")
     private boolean indexerEnabled;
@@ -55,13 +57,20 @@ public class BalanceReconciliationService {
             long chainBalance = balanceReader.balanceOf(contract.contractAddress(), holder.walletAddress());
             if (chainBalance != holder.balance()) {
                 count++;
-                mismatchRepository.save(ReconciliationMismatch.builder()
+                var mismatch = mismatchRepository.save(ReconciliationMismatch.builder()
                         .contractId(contract.id())
                         .contractAddress(contract.contractAddress().toLowerCase())
                         .walletAddress(holder.walletAddress().toLowerCase())
                         .dbBalance(holder.balance())
                         .chainBalance(chainBalance)
                         .build());
+                mismatchPublisher.publishMismatch(
+                        mismatch.getId(),
+                        contract.id(),
+                        contract.contractAddress(),
+                        holder.walletAddress(),
+                        holder.balance(),
+                        chainBalance);
                 log.warn("Balance mismatch contract={} wallet={} db={} chain={}",
                         contract.id(), holder.walletAddress(), holder.balance(), chainBalance);
             }

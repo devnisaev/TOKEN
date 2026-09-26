@@ -30,6 +30,7 @@ class PayoutServiceTest {
     @Mock RentCollectedPublisher rentCollectedPublisher;
     @Mock PayoutCompletedPublisher payoutCompletedPublisher;
     @Mock PaymentBlockchainService paymentBlockchainService;
+    @Mock WalletBalanceService walletBalanceService;
     @InjectMocks PayoutService payoutService;
 
     @Test

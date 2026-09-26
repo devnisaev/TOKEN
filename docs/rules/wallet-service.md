@@ -111,5 +111,5 @@ Returns `AggregateBalanceResponse`: primary wallet address, fiat balances, token
 - [ ] WalletConnect session handshake (currently address-only link)
 - [ ] Key rotation and re-encryption migration
 - [ ] HSM / KMS-backed encryption (replace env symmetric key)
-- [ ] Payment Service callback to credit `WalletBalance` on `payment.confirmed`
+- [x] Payment Service syncs `WalletBalance` on initiate/confirm/payout (see [payment-ledger.md](payment-ledger.md))
 - [ ] Rate limits on `/sign` endpoint

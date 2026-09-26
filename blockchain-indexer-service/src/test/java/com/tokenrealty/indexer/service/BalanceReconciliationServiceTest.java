@@ -2,6 +2,7 @@ package com.tokenrealty.indexer.service;
 
 import com.tokenrealty.indexer.blockchain.OnChainBalanceReader;
 import com.tokenrealty.indexer.client.IssuanceClient;
+import com.tokenrealty.indexer.kafka.outbox.OutboxBalanceMismatchPublisher;
 import com.tokenrealty.indexer.repository.ReconciliationMismatchRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ class BalanceReconciliationServiceTest {
     @Mock IssuanceClient issuanceClient;
     @Mock OnChainBalanceReader balanceReader;
     @Mock ReconciliationMismatchRepository mismatchRepository;
+    @Mock OutboxBalanceMismatchPublisher mismatchPublisher;
     @InjectMocks BalanceReconciliationService reconciliationService;
 
     @Test

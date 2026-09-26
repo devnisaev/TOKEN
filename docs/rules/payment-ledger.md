@@ -22,12 +22,13 @@ Adapted from Titan `ledger-accounting.mdc`. Cursor rule: [`.cursor/rules/payment
 | Dev auto-confirm | `PaymentAutoConfirmWorker` — `PAYMENT_AUTO_CONFIRM=true` or `local` profile |
 | Wallet balance API | `GET /v1/wallet-balances/{investorId}` — used by Wallet Service aggregate view |
 | On-chain tx reconciliation | `PaymentBlockchainReconciliationWorker` — CONFIRMED payments / COMPLETED payouts vs receipt |
+| Wallet balance sync | `WalletBalanceService` — hold on initiate, settle on confirm, credit on payout; dev seed 10k USDC |
 
 ## Pending
 
 - On-chain deposit auto-detection for production (dev uses `PaymentAutoConfirmWorker`)
 - Polygon mainnet USDC contract address (local dev uses `MockUSDC` from `npm run deploy:local`)
-- Credit `WalletBalance` rows automatically on payment confirm (currently read-only API)
+- Strict custodial debit on initiate when balance insufficient (currently skips hold for external-wallet path)
 - DLQ for failed consumer retries
 
 Token holder balance reconciliation lives in [blockchain-indexer.md](blockchain-indexer.md) (`BalanceReconciliationService`).

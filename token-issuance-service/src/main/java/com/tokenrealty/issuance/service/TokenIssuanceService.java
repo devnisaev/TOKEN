@@ -156,19 +156,14 @@ public class TokenIssuanceService {
                     .build();
             holderRepository.save(spvHolder);
 
-            // 8. Notify Property Registry — update flat's token info
-            try {
-                registryClient.setTokenInfo(
-                        request.flatId(),
-                        result.contractAddress(),
-                        request.totalSupply(),
-                        request.tokenPriceUsd()
-                );
-                log.info("Property Registry updated with token info for flat={}", request.flatId());
-            } catch (Exception e) {
-                // Non-fatal — the contract is deployed, just log the callback failure
-                log.warn("Failed to update Property Registry for flat {}: {}", request.flatId(), e.getMessage());
-            }
+            // 8. Notify Property Registry — update flat's token info (required for listing auto-create)
+            registryClient.setTokenInfo(
+                    request.flatId(),
+                    result.contractAddress(),
+                    request.totalSupply(),
+                    request.tokenPriceUsd()
+            );
+            log.info("Property Registry updated with token info for flat={}", request.flatId());
 
             enableTransfersOnChain(contract);
 

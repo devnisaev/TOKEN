@@ -132,10 +132,20 @@ Auth dev seed: service account `blockchain-indexer` / `indexer-secret` (ADMIN ro
 
 ---
 
+## Kafka (outbox)
+
+When `KAFKA_ENABLED=true`:
+
+| Topic | Publisher | Payload |
+|-------|-----------|---------|
+| `tokenrealty.indexer.transfer.indexed.v1` | `OutboxIndexedEventPublisher` | `indexedEventId`, `eventType`, `contractAddress`, `txHash`, `logIndex`, `blockNumber` |
+| `tokenrealty.indexer.balance.mismatch.v1` | `OutboxBalanceMismatchPublisher` | `mismatchId`, `contractId`, `walletAddress`, `dbBalance`, `chainBalance` |
+
+Relay: `OutboxRelayWorker` (same pattern as Payment Service).
+
 ## Pending / future
 
 - [ ] WebSocket / eth_subscribe instead of polling
-- [ ] Publish indexed events to Kafka for downstream consumers
 - [ ] Auto-remediation workflow (Issuance holder balance sync with approval)
 - [ ] DividendPaid / custom PropertyToken events
 - [ ] Metrics: lag blocks, mismatch count (Micrometer)

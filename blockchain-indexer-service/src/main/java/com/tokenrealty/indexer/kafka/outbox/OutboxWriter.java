@@ -1,0 +1,51 @@
+package com.tokenrealty.indexer.kafka.outbox;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tokenrealty.outbox.OutboxStatus;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.util.UUID;
+
+@Service
+public class OutboxWriter extends com.tokenrealty.outbox.OutboxWriter {
+
+    private static final String AGGREGATE_TYPE = "indexer";
+
+    private final OutboxEventRepository repository;
+
+    @Value("${tokenrealty.kafka.enabled:false}")
+    private boolean kafkaEnabled;
+
+    public OutboxWriter(OutboxEventRepository repository, ObjectMapper objectMapper) {
+        super(objectMapper);
+        this.repository = repository;
+    }
+
+    @Override
+    @Transactional
+    public void enqueue(String eventType, String partitionKey, Object payload, String traceId) {
+        if (!kafkaEnabled) {
+            return;
+        }
+        super.enqueue(eventType, partitionKey, payload, traceId);
+    }
+
+    @Override
+    protected void persistOutboxEvent(String eventType, String partitionKey, String envelopeJson,
+                                      String traceId, UUID eventId, Instant createdAt) {
+        OutboxEvent event = OutboxEvent.builder()
+                .aggregateType(AGGREGATE_TYPE)
+                .aggregateId(UUID.fromString(partitionKey))
+                .eventType(eventType)
+                .payload(envelopeJson)
+                .status(OutboxStatus.PENDING)
+                .createdAt(createdAt)
+                .retryCount(0)
+                .traceId(traceId)
+                .build();
+        repository.save(event);
+    }
+}

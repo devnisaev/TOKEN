@@ -37,6 +37,7 @@ class PaymentServiceTest {
     @Mock LedgerService ledgerService;
     @Mock PaymentConfirmedPublisher paymentConfirmedPublisher;
     @Mock PaymentBlockchainService paymentBlockchainService;
+    @Mock WalletBalanceService walletBalanceService;
     @InjectMocks PaymentService paymentService;
 
     private UUID orderId;
