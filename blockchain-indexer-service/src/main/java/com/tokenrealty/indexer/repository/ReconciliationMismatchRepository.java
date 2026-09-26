@@ -9,4 +9,6 @@ import java.util.UUID;
 public interface ReconciliationMismatchRepository extends JpaRepository<ReconciliationMismatch, UUID> {
 
     List<ReconciliationMismatch> findTop50ByResolvedFalseOrderByCreatedAtDesc();
+
+    long countByResolvedFalse();
 }

@@ -148,4 +148,4 @@ Relay: `OutboxRelayWorker` (same pattern as Payment Service).
 - [ ] WebSocket / eth_subscribe instead of polling
 - [ ] Auto-remediation workflow (Issuance holder balance sync with approval)
 - [ ] DividendPaid / custom PropertyToken events
-- [ ] Metrics: lag blocks, mismatch count (Micrometer)
+- [x] Metrics: lag blocks, mismatch count (Micrometer) — `indexer.block.lag`, `indexer.events.indexed.total`, `indexer.balance.mismatches.open`

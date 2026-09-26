@@ -3,6 +3,7 @@ package com.tokenrealty.indexer.service;
 import com.tokenrealty.indexer.blockchain.OnChainBalanceReader;
 import com.tokenrealty.indexer.client.IssuanceClient;
 import com.tokenrealty.indexer.kafka.outbox.OutboxBalanceMismatchPublisher;
+import com.tokenrealty.indexer.metrics.IndexerMetrics;
 import com.tokenrealty.indexer.repository.ReconciliationMismatchRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ class BalanceReconciliationServiceTest {
     @Mock OnChainBalanceReader balanceReader;
     @Mock ReconciliationMismatchRepository mismatchRepository;
     @Mock OutboxBalanceMismatchPublisher mismatchPublisher;
+    @Mock IndexerMetrics indexerMetrics;
     @InjectMocks BalanceReconciliationService reconciliationService;
 
     @Test
@@ -41,6 +43,7 @@ class BalanceReconciliationServiceTest {
         when(issuanceClient.listHolders(contractId)).thenReturn(List.of(holder));
         when(balanceReader.balanceOf("0xCONTRACT", "0xWALLET")).thenReturn(90L);
         when(mismatchRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(mismatchRepository.countByResolvedFalse()).thenReturn(1L);
         ReflectionTestUtils.setField(reconciliationService, "indexerEnabled", true);
 
         reconciliationService.reconcileHolderBalances();

@@ -8,6 +8,7 @@ import com.tokenrealty.indexer.client.IssuanceClient;
 import com.tokenrealty.indexer.entity.IndexedEvent;
 import com.tokenrealty.indexer.entity.IndexerCursor;
 import com.tokenrealty.indexer.kafka.outbox.OutboxIndexedEventPublisher;
+import com.tokenrealty.indexer.metrics.IndexerMetrics;
 import com.tokenrealty.indexer.repository.IndexedEventRepository;
 import com.tokenrealty.indexer.repository.IndexerCursorRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,7 @@ public class BlockchainLogIndexer {
     private final OnChainBalanceReader balanceReader;
     private final ObjectMapper objectMapper;
     private final OutboxIndexedEventPublisher indexedEventPublisher;
+    private final IndexerMetrics indexerMetrics;
 
     @Value("${tokenrealty.indexer.batch-blocks:500}")
     private int batchBlocks;
@@ -78,6 +80,8 @@ public class BlockchainLogIndexer {
 
         cursor.setLastBlockNumber(toBlock);
         cursorRepository.save(cursor);
+        indexerMetrics.setBlockLag(latest.subtract(toBlock).longValue());
+        indexerMetrics.recordEventsIndexed(indexed);
         if (indexed > 0) {
             log.info("Indexed {} events blocks {}-{}", indexed, fromBlock, toBlock);
         }

@@ -4,6 +4,7 @@ import com.tokenrealty.indexer.blockchain.OnChainBalanceReader;
 import com.tokenrealty.indexer.client.IssuanceClient;
 import com.tokenrealty.indexer.entity.ReconciliationMismatch;
 import com.tokenrealty.indexer.kafka.outbox.OutboxBalanceMismatchPublisher;
+import com.tokenrealty.indexer.metrics.IndexerMetrics;
 import com.tokenrealty.indexer.repository.ReconciliationMismatchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ public class BalanceReconciliationService {
     private final OnChainBalanceReader balanceReader;
     private final ReconciliationMismatchRepository mismatchRepository;
     private final OutboxBalanceMismatchPublisher mismatchPublisher;
+    private final IndexerMetrics indexerMetrics;
 
     @Value("${tokenrealty.indexer.enabled:true}")
     private boolean indexerEnabled;
@@ -40,6 +42,7 @@ public class BalanceReconciliationService {
             }
             mismatches += reconcileContract(contract);
         }
+        indexerMetrics.setOpenMismatches(mismatchRepository.countByResolvedFalse());
         if (mismatches > 0) {
             log.warn("Balance reconciliation found {} mismatch(es)", mismatches);
         } else {
