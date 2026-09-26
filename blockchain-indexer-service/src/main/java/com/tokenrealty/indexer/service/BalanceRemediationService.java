@@ -35,6 +35,7 @@ public class BalanceRemediationService {
                 mismatch.getChainBalance());
         mismatch.setResolved(true);
         mismatchRepository.save(mismatch);
+        indexerMetrics.recordReconciliationRemediated();
         indexerMetrics.setOpenMismatches(mismatchRepository.countByResolvedFalse());
         log.info("Remediated balance mismatch {} contract={} wallet={} chainBalance={}",
                 mismatchId, mismatch.getContractId(), mismatch.getWalletAddress(), mismatch.getChainBalance());

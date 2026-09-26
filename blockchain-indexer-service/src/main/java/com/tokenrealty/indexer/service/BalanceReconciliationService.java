@@ -35,6 +35,7 @@ public class BalanceReconciliationService {
         if (!indexerEnabled) {
             return;
         }
+        indexerMetrics.recordReconciliationRun();
         int mismatches = 0;
         for (IssuanceClient.TokenContractView contract : issuanceClient.listContracts()) {
             if (contract.contractAddress() == null || contract.contractAddress().isBlank()) {
@@ -60,6 +61,7 @@ public class BalanceReconciliationService {
             long chainBalance = balanceReader.balanceOf(contract.contractAddress(), holder.walletAddress());
             if (chainBalance != holder.balance()) {
                 count++;
+                indexerMetrics.recordReconciliationMismatchDetected();
                 var mismatch = mismatchRepository.save(ReconciliationMismatch.builder()
                         .contractId(contract.id())
                         .contractAddress(contract.contractAddress().toLowerCase())

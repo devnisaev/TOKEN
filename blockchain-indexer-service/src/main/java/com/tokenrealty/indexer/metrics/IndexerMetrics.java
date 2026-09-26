@@ -13,6 +13,9 @@ public class IndexerMetrics {
     private final AtomicLong blockLag = new AtomicLong(0);
     private final AtomicLong openMismatches = new AtomicLong(0);
     private final Counter eventsIndexed;
+    private final Counter reconciliationRuns;
+    private final Counter reconciliationMismatchesDetected;
+    private final Counter reconciliationRemediated;
 
     public IndexerMetrics(MeterRegistry registry) {
         Gauge.builder("indexer.block.lag", blockLag, AtomicLong::get)
@@ -23,6 +26,15 @@ public class IndexerMetrics {
                 .register(registry);
         eventsIndexed = Counter.builder("indexer.events.indexed.total")
                 .description("On-chain log events persisted by the indexer")
+                .register(registry);
+        reconciliationRuns = Counter.builder("indexer.reconciliation.runs.total")
+                .description("Balance reconciliation job executions")
+                .register(registry);
+        reconciliationMismatchesDetected = Counter.builder("indexer.reconciliation.mismatches.detected.total")
+                .description("On-chain vs DB balance mismatches detected")
+                .register(registry);
+        reconciliationRemediated = Counter.builder("indexer.reconciliation.remediated.total")
+                .description("Balance mismatches remediated by syncing DB to chain")
                 .register(registry);
     }
 
@@ -38,5 +50,17 @@ public class IndexerMetrics {
         if (count > 0) {
             eventsIndexed.increment(count);
         }
+    }
+
+    public void recordReconciliationRun() {
+        reconciliationRuns.increment();
+    }
+
+    public void recordReconciliationMismatchDetected() {
+        reconciliationMismatchesDetected.increment();
+    }
+
+    public void recordReconciliationRemediated() {
+        reconciliationRemediated.increment();
     }
 }
