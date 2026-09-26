@@ -94,4 +94,9 @@ public final class RentalDtos {
             Instant createdAt
     ) {
     }
+
+    public record UpdateMaintenanceTicketStatusRequest(
+            @NotNull com.tokenrealty.rental.entity.MaintenanceTicket.TicketStatus status
+    ) {
+    }
 }

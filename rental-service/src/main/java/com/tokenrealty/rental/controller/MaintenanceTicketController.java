@@ -24,8 +24,13 @@ public class MaintenanceTicketController {
     @GetMapping
     public List<MaintenanceTicketResponse> list(
             @RequestParam(required = false) UUID tenantId,
-            @RequestParam(required = false) UUID leaseId) {
-        return maintenanceTicketService.list(tenantId, leaseId);
+            @RequestParam(required = false) UUID leaseId,
+            @AuthenticationPrincipal TokenPrincipal principal) {
+        boolean listAll = principal != null
+                && (principal.role() == UserRole.ADMIN || principal.role() == UserRole.PROPERTY_MANAGER)
+                && tenantId == null
+                && leaseId == null;
+        return maintenanceTicketService.list(tenantId, leaseId, listAll);
     }
 
     @GetMapping("/{id}")
@@ -41,5 +46,13 @@ public class MaintenanceTicketController {
             @AuthenticationPrincipal TokenPrincipal principal) {
         UUID callerTenantId = principal.role() == UserRole.TENANT ? principal.userId() : null;
         return maintenanceTicketService.create(request, callerTenantId);
+    }
+
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROPERTY_MANAGER')")
+    public MaintenanceTicketResponse updateStatus(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateMaintenanceTicketStatusRequest request) {
+        return maintenanceTicketService.updateStatus(id, request);
     }
 }

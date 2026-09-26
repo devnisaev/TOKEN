@@ -40,6 +40,8 @@ public class SecurityConfig {
                         .hasAnyRole("ADMIN", "PROPERTY_MANAGER", "TENANT")
                         .requestMatchers(HttpMethod.POST, "/v1/maintenance-tickets")
                         .hasAnyRole("ADMIN", "PROPERTY_MANAGER", "TENANT")
+                        .requestMatchers(HttpMethod.PATCH, "/v1/maintenance-tickets/**")
+                        .hasAnyRole("ADMIN", "PROPERTY_MANAGER")
                         .requestMatchers(HttpMethod.POST, "/v1/**")
                         .hasAnyRole("ADMIN", "PROPERTY_MANAGER")
                         .anyRequest().authenticated()

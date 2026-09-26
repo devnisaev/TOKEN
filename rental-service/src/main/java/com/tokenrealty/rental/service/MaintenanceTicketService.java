@@ -21,7 +21,7 @@ public class MaintenanceTicketService {
     private final MaintenanceTicketRepository ticketRepository;
     private final LeaseService leaseService;
 
-    public List<MaintenanceTicketResponse> list(UUID tenantId, UUID leaseId) {
+    public List<MaintenanceTicketResponse> list(UUID tenantId, UUID leaseId, boolean listAll) {
         if (tenantId != null) {
             return ticketRepository.findByTenantIdOrderByCreatedAtDesc(tenantId).stream()
                     .map(this::toResponse)
@@ -29,6 +29,11 @@ public class MaintenanceTicketService {
         }
         if (leaseId != null) {
             return ticketRepository.findByLeaseIdOrderByCreatedAtDesc(leaseId).stream()
+                    .map(this::toResponse)
+                    .toList();
+        }
+        if (listAll) {
+            return ticketRepository.findAllByOrderByCreatedAtDesc().stream()
                     .map(this::toResponse)
                     .toList();
         }
@@ -53,6 +58,13 @@ public class MaintenanceTicketService {
                 .description(request.description())
                 .status(MaintenanceTicket.TicketStatus.OPEN)
                 .build();
+        return toResponse(ticketRepository.save(ticket));
+    }
+
+    @Transactional
+    public MaintenanceTicketResponse updateStatus(UUID id, UpdateMaintenanceTicketStatusRequest request) {
+        MaintenanceTicket ticket = getTicket(id);
+        ticket.setStatus(request.status());
         return toResponse(ticketRepository.save(ticket));
     }
 

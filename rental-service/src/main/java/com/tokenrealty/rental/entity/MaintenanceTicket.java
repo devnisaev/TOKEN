@@ -40,6 +40,7 @@ public class MaintenanceTicket extends BaseEntity {
 
     public enum TicketStatus {
         OPEN,
+        IN_PROGRESS,
         RESOLVED
     }
 }
