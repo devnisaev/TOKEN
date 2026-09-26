@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { StatusBadge } from '@tokenrealty/shared-ui';
+import { EmptyState, StatusBadge } from '@tokenrealty/shared-ui';
 
 const STATUS_TABS = [
   { label: 'All', value: '' },
@@ -88,8 +88,8 @@ export function OrdersPage() {
               ))}
               {data?.content.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
-                    No orders yet.
+                  <td colSpan={6} className="px-4 py-2">
+                    <EmptyState title="No orders yet" description="Marketplace orders will appear here." />
                   </td>
                 </tr>
               )}

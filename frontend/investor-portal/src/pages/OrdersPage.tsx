@@ -5,7 +5,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { formatUsd } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { StatusBadge } from '@tokenrealty/shared-ui';
+import { EmptyState, StatusBadge } from '@tokenrealty/shared-ui';
 
 export function OrdersPage() {
   const { user } = useAuth();
@@ -40,11 +40,16 @@ export function OrdersPage() {
 
       {data && data.content.length === 0 && (
         <Card>
-          <CardContent className="py-10 text-center text-muted-foreground">
-            No orders yet.{' '}
-            <Link to="/" className="text-primary underline-offset-4 hover:underline">
-              Browse listings
-            </Link>
+          <CardContent>
+            <EmptyState
+              title="No orders yet"
+              description="Place a buy order from a listing to track settlement here."
+              action={
+                <Link to="/" className="text-sm text-primary underline-offset-4 hover:underline">
+                  Browse listings
+                </Link>
+              }
+            />
           </CardContent>
         </Card>
       )}

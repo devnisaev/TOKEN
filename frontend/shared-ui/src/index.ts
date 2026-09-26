@@ -28,3 +28,4 @@ export {
   type SettlementAuditTrailProps,
 } from './components/SettlementAuditTrail';
 export { StatusBadge, type StatusBadgeProps } from './components/StatusBadge';
+export { EmptyState, type EmptyStateProps } from './components/EmptyState';

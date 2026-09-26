@@ -32,6 +32,8 @@ docker compose --profile kafka up -d
 if [[ "${INFRA_ONLY}" == "false" ]]; then
   echo "==> Starting Jaeger (OTLP :4318, UI :16686)..."
   docker compose --profile otel up -d
+  echo "==> Starting MinIO (API :9000, console :9001)..."
+  docker compose --profile storage up -d
 fi
 
 echo "==> Waiting for Postgres..."
