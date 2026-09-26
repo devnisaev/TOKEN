@@ -106,6 +106,9 @@ public class OrderService {
                 .build();
 
         MarketOrder savedOrder = orderRepository.save(order);
+        if (listing.getListingType() == Listing.ListingType.SECONDARY) {
+            matchPendingSellOrder(listing.getId(), request.buyerId(), request.buyerWallet());
+        }
         Trade trade = createPendingTrade(savedOrder);
         linkEscrowPayment(savedOrder, trade);
         publishOrderMatched(savedOrder, trade);
@@ -221,12 +224,27 @@ public class OrderService {
         return trade.getPaymentId();
     }
 
+    private void matchPendingSellOrder(UUID listingId, UUID buyerId, String buyerWallet) {
+        orderRepository.findFirstByListingIdAndOrderTypeAndStatus(
+                        listingId, MarketOrder.OrderType.SELL, MarketOrder.OrderStatus.PENDING)
+                .ifPresent(sellOrder -> {
+                    sellOrder.setStatus(MarketOrder.OrderStatus.MATCHED);
+                    sellOrder.setBuyerId(buyerId);
+                    sellOrder.setBuyerWallet(buyerWallet);
+                    orderRepository.save(sellOrder);
+                });
+    }
+
     private void linkEscrowPayment(MarketOrder order, Trade trade) {
+        UUID sellerRecipientId = order.getListingType() == Listing.ListingType.SECONDARY
+                ? order.getSellerId()
+                : null;
         PaymentClient.InitiatePaymentResponse payment = paymentClient.initiateTokenPurchase(
                 order.getId(),
                 order.getBuyerId(),
                 order.getBuyerWallet(),
-                order.getTotalPriceUsd());
+                order.getTotalPriceUsd(),
+                sellerRecipientId);
         if (payment == null || payment.id() == null) {
             raiseValidation("Payment service returned empty response");
         }

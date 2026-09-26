@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface MarketOrderRepository extends JpaRepository<MarketOrder, UUID> {
@@ -14,4 +15,7 @@ public interface MarketOrderRepository extends JpaRepository<MarketOrder, UUID> 
     Page<MarketOrder> findByListingId(UUID listingId, Pageable pageable);
 
     Page<MarketOrder> findByStatus(MarketOrder.OrderStatus status, Pageable pageable);
+
+    Optional<MarketOrder> findFirstByListingIdAndOrderTypeAndStatus(
+            UUID listingId, MarketOrder.OrderType orderType, MarketOrder.OrderStatus status);
 }

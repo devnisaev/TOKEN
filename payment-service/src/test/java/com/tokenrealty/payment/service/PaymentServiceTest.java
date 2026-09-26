@@ -131,4 +131,31 @@ class PaymentServiceTest {
         assertThatThrownBy(() -> paymentService.initiate(request, " "))
                 .isInstanceOf(ValidationException.class);
     }
+
+    @Test
+    @DisplayName("releaseEscrow credits seller recipient on secondary payout")
+    void releaseEscrowCreditsSellerRecipient() {
+        UUID paymentId = UUID.randomUUID();
+        UUID sellerId = UUID.randomUUID();
+        Payment payment = Payment.builder()
+                .status(Payment.PaymentStatus.CONFIRMED)
+                .amount(new BigDecimal("250.00"))
+                .currency(PaymentCurrency.USDC)
+                .sellerRecipientId(sellerId)
+                .build();
+        payment.setId(paymentId);
+        Escrow escrow = Escrow.builder()
+                .status(Escrow.EscrowStatus.HELD)
+                .build();
+
+        when(paymentRepository.findById(paymentId)).thenReturn(Optional.of(payment));
+        when(escrowRepository.findByPaymentId(paymentId)).thenReturn(Optional.of(escrow));
+        when(mapper.toPaymentResponse(payment, escrow)).thenReturn(
+                PaymentResponse.builder().id(paymentId).build());
+
+        paymentService.releaseEscrow(paymentId);
+
+        verify(walletBalanceService).credit(sellerId, payment.getAmount(), PaymentCurrency.USDC);
+        verify(ledgerService).recordEscrowRelease(paymentId, payment.getAmount(), PaymentCurrency.USDC);
+    }
 }

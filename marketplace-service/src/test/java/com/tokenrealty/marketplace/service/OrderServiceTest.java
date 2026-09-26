@@ -134,7 +134,7 @@ class OrderServiceTest {
         when(orderRepository.save(any(MarketOrder.class))).thenReturn(savedOrder);
         when(tradeRepository.save(any(Trade.class))).thenReturn(trade);
         when(paymentClient.initiateTokenPurchase(
-                savedOrder.getId(), buyerId, "0xabc", new BigDecimal("100.00")))
+                savedOrder.getId(), buyerId, "0xabc", new BigDecimal("100.00"), null))
                 .thenReturn(new PaymentClient.InitiatePaymentResponse(
                         paymentId, savedOrder.getId(), null));
         when(mapper.toOrderResponse(savedOrder)).thenReturn(OrderResponse.builder().id(savedOrder.getId()).build());
@@ -143,7 +143,7 @@ class OrderServiceTest {
 
         verify(complianceClient).checkInvestment(buyerId, "US", new BigDecimal("100.00"));
         verify(paymentClient).initiateTokenPurchase(
-                savedOrder.getId(), buyerId, "0xabc", new BigDecimal("100.00"));
+                savedOrder.getId(), buyerId, "0xabc", new BigDecimal("100.00"), null);
         verify(tradeRepository, times(2)).save(any(Trade.class));
         verify(orderMatchedPublisher).publishOrderMatched(any());
         verify(orderRepository).save(any(MarketOrder.class));
@@ -192,7 +192,7 @@ class OrderServiceTest {
                         "0xabc", true, "APPROVED", buyerId, "KG", null));
         when(orderRepository.save(any(MarketOrder.class))).thenReturn(savedOrder);
         when(tradeRepository.save(any(Trade.class))).thenReturn(trade);
-        when(paymentClient.initiateTokenPurchase(any(), any(), any(), any()))
+        when(paymentClient.initiateTokenPurchase(any(), any(), any(), any(), any()))
                 .thenReturn(new PaymentClient.InitiatePaymentResponse(
                         UUID.randomUUID(), savedOrder.getId(), null));
         when(mapper.toOrderResponse(savedOrder)).thenReturn(OrderResponse.builder().id(savedOrder.getId()).build());
@@ -226,6 +226,105 @@ class OrderServiceTest {
         assertThatThrownBy(() -> orderService.placeBuyOrder(request))
                 .isInstanceOf(ComplianceBlockedException.class)
                 .hasMessageContaining("Investment below minimum");
+    }
+
+    @Test
+    @DisplayName("placeBuyOrder on secondary listing matches pending sell order")
+    void placeBuyOrderOnSecondaryMatchesPendingSellOrder() {
+        listing.setListingType(Listing.ListingType.SECONDARY);
+        listing.setSellerInvestorId(UUID.randomUUID());
+        listing.setSellerWallet("0xSeller");
+        listing.setContractId(UUID.randomUUID());
+        listing.setTokensAvailable(50L);
+        listing.setMinInvestmentTokens(1L);
+
+        UUID buyerId = UUID.randomUUID();
+        PlaceOrderRequest request = PlaceOrderRequest.builder()
+                .listingId(listingId)
+                .buyerId(buyerId)
+                .buyerWallet("0xBuyer")
+                .tokenAmount(50L)
+                .build();
+
+        MarketOrder pendingSell = MarketOrder.builder()
+                .listingId(listingId)
+                .flatId(listing.getFlatId())
+                .contractId(listing.getContractId())
+                .listingType(Listing.ListingType.SECONDARY)
+                .orderType(MarketOrder.OrderType.SELL)
+                .status(MarketOrder.OrderStatus.PENDING)
+                .sellerId(listing.getSellerInvestorId())
+                .sellerWallet("0xSeller")
+                .tokenAmount(50L)
+                .totalPriceUsd(new BigDecimal("600.00"))
+                .build();
+        pendingSell.setId(UUID.randomUUID());
+
+        MarketOrder savedBuy = MarketOrder.builder()
+                .listingId(listingId)
+                .flatId(listing.getFlatId())
+                .contractId(listing.getContractId())
+                .listingType(Listing.ListingType.SECONDARY)
+                .orderType(MarketOrder.OrderType.BUY)
+                .status(MarketOrder.OrderStatus.MATCHED)
+                .buyerId(buyerId)
+                .sellerId(listing.getSellerInvestorId())
+                .buyerWallet("0xBuyer")
+                .sellerWallet("0xSeller")
+                .tokenAmount(50L)
+                .totalPriceUsd(new BigDecimal("600.00"))
+                .build();
+        savedBuy.setId(UUID.randomUUID());
+
+        Trade trade = Trade.builder()
+                .orderId(savedBuy.getId())
+                .listingId(listingId)
+                .flatId(listing.getFlatId())
+                .listingType(Listing.ListingType.SECONDARY)
+                .buyerId(buyerId)
+                .tokenAmount(50L)
+                .totalPriceUsd(new BigDecimal("600.00"))
+                .status(Trade.TradeStatus.PENDING)
+                .build();
+        trade.setId(UUID.randomUUID());
+
+        when(listingRepository.findById(listingId)).thenReturn(Optional.of(listing));
+        when(complianceClient.checkWallet("0xBuyer")).thenReturn(
+                new ComplianceClient.ComplianceCheckResponse(
+                        "0xBuyer", true, "APPROVED", buyerId, "US", null));
+        when(complianceClient.checkWallet("0xSeller")).thenReturn(
+                new ComplianceClient.ComplianceCheckResponse(
+                        "0xSeller", true, "APPROVED", listing.getSellerInvestorId(), "US", null));
+        when(orderRepository.save(any(MarketOrder.class))).thenAnswer(invocation -> {
+            MarketOrder order = invocation.getArgument(0);
+            if (order.getOrderType() == MarketOrder.OrderType.BUY) {
+                return savedBuy;
+            }
+            return order;
+        });
+        when(orderRepository.findFirstByListingIdAndOrderTypeAndStatus(
+                listingId, MarketOrder.OrderType.SELL, MarketOrder.OrderStatus.PENDING))
+                .thenReturn(Optional.of(pendingSell));
+        when(tradeRepository.save(any(Trade.class))).thenReturn(trade);
+        when(paymentClient.initiateTokenPurchase(any(), any(), any(), any(), any()))
+                .thenReturn(new PaymentClient.InitiatePaymentResponse(
+                        UUID.randomUUID(), savedBuy.getId(), null));
+        when(mapper.toOrderResponse(savedBuy)).thenReturn(OrderResponse.builder().id(savedBuy.getId()).build());
+
+        orderService.placeBuyOrder(request);
+
+        verify(paymentClient).initiateTokenPurchase(
+                savedBuy.getId(),
+                buyerId,
+                "0xBuyer",
+                new BigDecimal("600.00"),
+                listing.getSellerInvestorId());
+        assertThat(pendingSell.getStatus()).isEqualTo(MarketOrder.OrderStatus.MATCHED);
+        assertThat(pendingSell.getBuyerId()).isEqualTo(buyerId);
+        assertThat(pendingSell.getBuyerWallet()).isEqualTo("0xBuyer");
+        verify(orderRepository).findFirstByListingIdAndOrderTypeAndStatus(
+                listingId, MarketOrder.OrderType.SELL, MarketOrder.OrderStatus.PENDING);
+        verify(orderRepository, times(2)).save(any(MarketOrder.class));
     }
 
     @Test

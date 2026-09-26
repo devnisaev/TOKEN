@@ -70,7 +70,7 @@ class BuyFlowIntegrationTest {
         when(complianceClient.checkWallet(any())).thenReturn(
                 new ComplianceClient.ComplianceCheckResponse(
                         "0xwallet", true, "APPROVED", buyerId, "US", null));
-        when(paymentClient.initiateTokenPurchase(any(), any(), any(), any()))
+        when(paymentClient.initiateTokenPurchase(any(), any(), any(), any(), any()))
                 .thenAnswer(invocation -> new PaymentClient.InitiatePaymentResponse(
                         UUID.randomUUID(),
                         invocation.getArgument(0),

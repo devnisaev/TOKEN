@@ -27,6 +27,10 @@ public class Payment extends BaseEntity {
     @Column(name = "payer_id", nullable = false)
     private UUID payerId;
 
+    /** Secondary market: seller investor credited when escrow is released (track 199). */
+    @Column(name = "seller_recipient_id")
+    private UUID sellerRecipientId;
+
     @Column(name = "payer_wallet", nullable = false, length = 66)
     private String payerWallet;
 

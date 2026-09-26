@@ -23,8 +23,18 @@ public class PaymentClient extends DownstreamRestClientSupport {
             String payerWallet,
             BigDecimal amountUsd
     ) {
+        return initiateTokenPurchase(orderId, payerId, payerWallet, amountUsd, null);
+    }
+
+    public InitiatePaymentResponse initiateTokenPurchase(
+            UUID orderId,
+            UUID payerId,
+            String payerWallet,
+            BigDecimal amountUsd,
+            UUID sellerRecipientId
+    ) {
         InitiatePaymentRequest body = new InitiatePaymentRequest(
-                orderId, payerId, payerWallet, amountUsd, "USDC", "TOKEN_PURCHASE");
+                orderId, payerId, payerWallet, amountUsd, "USDC", "TOKEN_PURCHASE", sellerRecipientId);
         return post(
                 "/v1/payments",
                 body,
@@ -43,7 +53,8 @@ public class PaymentClient extends DownstreamRestClientSupport {
             String payerWallet,
             BigDecimal amount,
             String currency,
-            String paymentType
+            String paymentType,
+            UUID sellerRecipientId
     ) {
     }
 

@@ -138,6 +138,8 @@ public class ListingService {
         if (balance < request.tokenAmount()) {
             throw new ValidationException("Insufficient token balance for secondary listing");
         }
+        // Token Issuance has no lock/reserve API yet; balance is verified read-only here.
+        // Seller tokens remain transferable until on-chain settlement of a matched buy.
 
         CreateListingRequest listingRequest = CreateListingRequest.builder()
                 .flatId(request.flatId())

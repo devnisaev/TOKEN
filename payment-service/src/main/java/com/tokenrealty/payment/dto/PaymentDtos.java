@@ -20,7 +20,8 @@ public final class PaymentDtos {
             @NotBlank @Size(max = 66) String payerWallet,
             @NotNull @DecimalMin("0.01") BigDecimal amount,
             @NotNull PaymentCurrency currency,
-            Payment.PaymentType paymentType
+            Payment.PaymentType paymentType,
+            UUID sellerRecipientId
     ) {
         public Payment.PaymentType paymentType() {
             return paymentType != null ? paymentType : Payment.PaymentType.TOKEN_PURCHASE;

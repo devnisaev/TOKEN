@@ -4,7 +4,13 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
-    <include file="001-initial-schema.xml" relativeToChangelogFile="true"/>
-    <include file="002-seller-recipient.xml" relativeToChangelogFile="true"/>
+    <changeSet id="002-payments-seller-recipient" author="tokenrealty">
+        <addColumn tableName="payments">
+            <column name="seller_recipient_id" type="uuid"/>
+        </addColumn>
+        <createIndex tableName="payments" indexName="idx_payments_seller_recipient_id">
+            <column name="seller_recipient_id"/>
+        </createIndex>
+    </changeSet>
 
 </databaseChangeLog>

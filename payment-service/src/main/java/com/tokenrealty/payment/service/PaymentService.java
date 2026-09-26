@@ -108,6 +108,10 @@ public class PaymentService {
         escrow.setStatus(Escrow.EscrowStatus.RELEASED);
         payment.setStatus(Payment.PaymentStatus.RELEASED);
         ledgerService.recordEscrowRelease(payment.getId(), payment.getAmount(), payment.getCurrency());
+        if (payment.getSellerRecipientId() != null) {
+            walletBalanceService.credit(
+                    payment.getSellerRecipientId(), payment.getAmount(), payment.getCurrency());
+        }
         return mapper.toPaymentResponse(payment, escrow);
     }
 
@@ -153,6 +157,7 @@ public class PaymentService {
         return Payment.builder()
                 .orderId(request.orderId())
                 .payerId(request.payerId())
+                .sellerRecipientId(request.sellerRecipientId())
                 .payerWallet(request.payerWallet())
                 .amount(request.amount())
                 .currency(request.currency())
