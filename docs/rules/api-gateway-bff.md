@@ -29,6 +29,7 @@ Service account: `api-gateway` / `gateway-secret` (ADMIN) — used by BFF RestCl
 | `GET` | `/v1/bff/flats/{flatId}` | Registry flat + Issuance contract by flat + active Marketplace listing |
 | `GET` | `/v1/bff/listings/{listingId}` | Marketplace listing + Registry flat summary + Issuance contract |
 | `GET` | `/v1/bff/buildings/{buildingId}` | Registry building detail (flats + SPV) + tokenized/available counts |
+| `GET` | `/v1/bff/investors/{investorId}/portfolio` | Wallet aggregate balance + recent dividend payments (Issuance) |
 
 Same JWT as other gateway routes — investor token required.
 
@@ -107,7 +108,7 @@ tokenrealty:
 
 ## Pending / future
 
-- [ ] `GET /v1/bff/investors/{id}/portfolio` — thin wrapper over Wallet balance
+- [x] `GET /v1/bff/investors/{id}/portfolio` — wallet balance + recent dividends
 - [x] `GET /v1/bff/buildings/{id}` — building + SPV + tokenized/available flat counts
 - [ ] Response caching (short TTL) for public listing pages
 - [ ] GraphQL layer (optional; REST BFF sufficient for MVP)

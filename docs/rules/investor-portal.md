@@ -44,7 +44,8 @@ Vite proxies `/api` → `http://localhost:8080` (see `vite.config.ts`). Producti
 | `/listings/:id` | Detail + buy | `GET /v1/bff/listings/{id}`, `POST /v1/orders` |
 | `/orders` | Order list | `GET /v1/orders?buyerId=…` |
 | `/orders/:id` | Order status (polls 3s) | `GET /v1/orders/{id}`, `GET /v1/orders/{id}/trade` |
-| `/portfolio` | Balances + holdings | `GET /v1/wallets/{investorId}/balance` |
+| `/portfolio` | Balances + holdings + recent dividends | `GET /v1/bff/investors/{id}/portfolio` |
+| `/dividends` | Dividend history | `GET /v1/investors/{id}/dividends` |
 
 Protected routes require JWT (`ProtectedRoute` + `AuthProvider`).
 
@@ -135,7 +136,7 @@ Gateway CORS allows `http://localhost:5173` (`tokenrealty.gateway.cors.allowed-o
 ## Pending / future
 
 - [ ] WebSocket push for order status (replace polling)
-- [ ] Refresh token rotation before access expiry
+- [x] Refresh token rotation before access expiry (`shared-api-client/auth-storage`)
 - [x] openapi-typescript codegen (`frontend/shared-api-types/`)
-- [ ] Dividend history page
-- [ ] E2E tests (Playwright against docker-compose)
+- [x] Dividend history page (`/dividends`)
+- [x] E2E smoke tests (`frontend/e2e/` — full flow requires live gateway)

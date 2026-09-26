@@ -31,6 +31,8 @@ Session key: `tokenrealty.tenant.auth` (separate from investor/admin portals).
 
 Shared fetch + types: `@tokenrealty/shared-api-client` (`frontend/shared-api-client/`).
 
+E2E smoke: `frontend/e2e/tests/smoke/tenant-login.spec.ts` — see [e2e-testing.md](e2e-testing.md).
+
 Gateway CORS allows `http://localhost:5175`.
 
 ---

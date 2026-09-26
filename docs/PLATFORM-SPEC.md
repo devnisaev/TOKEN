@@ -655,8 +655,10 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] openapi-typescript codegen (`frontend/openapi/` → `frontend/shared-api-types/`)
 - [x] Shared API client (`frontend/shared-api-client/`) — wired into all three portals
 - [x] Admin building detail BFF + flat CRUD UI + order monitoring
+- [x] Investor portfolio BFF + dividend history page + JWT refresh rotation
+- [x] Playwright E2E smoke suite (`frontend/e2e/`) in CI
 
-See [docs/rules/investor-portal.md](rules/investor-portal.md), [docs/rules/admin-dashboard.md](rules/admin-dashboard.md), [docs/rules/api-gateway-bff.md](rules/api-gateway-bff.md).
+See [docs/rules/investor-portal.md](rules/investor-portal.md), [docs/rules/admin-dashboard.md](rules/admin-dashboard.md), [docs/rules/api-gateway-bff.md](rules/api-gateway-bff.md), [docs/rules/e2e-testing.md](rules/e2e-testing.md).
 
 ---
 

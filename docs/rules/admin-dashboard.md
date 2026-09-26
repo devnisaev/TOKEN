@@ -79,4 +79,4 @@ Gateway CORS allows `http://localhost:5174` (`tokenrealty.gateway.cors.allowed-o
 - [x] Flat create/edit within building detail
 - [x] Order monitoring for ops
 - [ ] Trade detail drill-down per order
-- [ ] E2E tests (Playwright)
+- [x] E2E smoke tests (Playwright — `frontend/e2e/tests/smoke/admin-login.spec.ts`)
