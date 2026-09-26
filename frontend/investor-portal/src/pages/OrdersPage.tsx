@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { formatUsd } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { StatusBadge } from '@tokenrealty/shared-ui';
 
 export function OrdersPage() {
   const { user } = useAuth();
@@ -61,7 +62,7 @@ export function OrdersPage() {
                 </CardHeader>
                 <CardContent className="flex justify-between text-sm text-muted-foreground">
                   <span>{formatUsd(order.totalPriceUsd)}</span>
-                  <span className="font-medium text-foreground">{order.status}</span>
+                  <StatusBadge status={order.status} />
                 </CardContent>
               </Card>
             </Link>

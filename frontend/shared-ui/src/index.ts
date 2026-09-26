@@ -27,3 +27,4 @@ export {
   type SettlementAuditTrade,
   type SettlementAuditTrailProps,
 } from './components/SettlementAuditTrail';
+export { StatusBadge, type StatusBadgeProps } from './components/StatusBadge';

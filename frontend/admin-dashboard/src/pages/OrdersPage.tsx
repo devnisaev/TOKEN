@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { StatusBadge } from '@tokenrealty/shared-ui';
 
 const STATUS_TABS = [
   { label: 'All', value: '' },
@@ -81,7 +82,7 @@ export function OrdersPage() {
                   <td className="px-4 py-3">{order.tokenAmount}</td>
                   <td className="px-4 py-3">${order.totalPriceUsd}</td>
                   <td className="px-4 py-3">
-                    <span className="rounded-md bg-secondary px-2 py-0.5 text-xs">{order.status}</span>
+                    <StatusBadge status={order.status} />
                   </td>
                 </tr>
               ))}

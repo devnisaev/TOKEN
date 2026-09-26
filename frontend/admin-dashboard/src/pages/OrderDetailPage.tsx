@@ -5,7 +5,7 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { OrderStatusTimeline, SettlementAuditTrail } from '@tokenrealty/shared-ui';
+import { OrderStatusTimeline, SettlementAuditTrail, StatusBadge } from '@tokenrealty/shared-ui';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -103,7 +103,7 @@ export function OrderDetailPage() {
         <CardContent className="grid gap-3 text-sm md:grid-cols-2">
           <div>
             <span className="text-muted-foreground">Status</span>
-            <p className="font-medium">{order.status}</p>
+            <p><StatusBadge status={order.status} /></p>
           </div>
           <div>
             <span className="text-muted-foreground">Listing</span>

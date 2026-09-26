@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { StatusBadge } from '@tokenrealty/shared-ui';
 
 const STATUS_FILTERS = ['ALL', 'PENDING', 'APPROVED', 'REJECTED', 'EXPIRED', 'REVOKED'] as const;
 type StatusFilter = (typeof STATUS_FILTERS)[number];
@@ -70,16 +70,7 @@ export function CompliancePage() {
                   <CardTitle className="text-base">{record.fullName ?? record.investorId}</CardTitle>
                   <p className="font-mono text-xs text-muted-foreground">{record.walletAddress}</p>
                 </div>
-                <span
-                  className={cn(
-                    'rounded-md px-2 py-1 text-xs font-medium',
-                    record.status === 'APPROVED' && 'bg-green-100 text-green-800',
-                    record.status === 'PENDING' && 'bg-secondary',
-                    record.status === 'REJECTED' && 'bg-destructive/10 text-destructive',
-                  )}
-                >
-                  {record.status}
-                </span>
+                <StatusBadge status={record.status} />
               </CardHeader>
               <CardContent className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">{record.countryCode ?? '—'}</span>
