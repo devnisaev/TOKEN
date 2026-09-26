@@ -1,5 +1,6 @@
 package com.tokenrealty.gateway.dto;
 
+import com.tokenrealty.gateway.client.PropertyRegistryClient;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -43,6 +44,14 @@ public final class BffDtos {
             Long totalSupply,
             BigDecimal tokenPriceUsd,
             String status
+    ) {
+    }
+
+    @Builder
+    public record BuildingBffDetailResponse(
+            PropertyRegistryClient.BuildingDetailView building,
+            int tokenizedFlatCount,
+            int availableFlatCount
     ) {
     }
 

@@ -1,5 +1,6 @@
 package com.tokenrealty.gateway.bff;
 
+import com.tokenrealty.gateway.dto.BffDtos.BuildingBffDetailResponse;
 import com.tokenrealty.gateway.dto.BffDtos.FlatDetailResponse;
 import com.tokenrealty.gateway.dto.BffDtos.ListingDetailResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ public class BffController {
 
     private final BffFlatService flatService;
     private final BffListingService listingService;
+    private final BffBuildingService buildingService;
 
     @GetMapping("/flats/{flatId}")
     public FlatDetailResponse flatDetail(@PathVariable UUID flatId) {
@@ -26,5 +28,10 @@ public class BffController {
     @GetMapping("/listings/{listingId}")
     public ListingDetailResponse listingDetail(@PathVariable UUID listingId) {
         return listingService.getListingDetail(listingId);
+    }
+
+    @GetMapping("/buildings/{buildingId}")
+    public BuildingBffDetailResponse buildingDetail(@PathVariable UUID buildingId) {
+        return buildingService.getBuildingDetail(buildingId);
     }
 }
