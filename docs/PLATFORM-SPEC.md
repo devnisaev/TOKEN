@@ -403,8 +403,8 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 - [x] Fix file naming: `Propertytoken.sol` → `PropertyToken.sol`, `Complianceregistry.sol` → `ComplianceRegistry.sol`
 - [x] Create `hardhat/scripts/deployFlat.js` (called by `ContractDeployer`)
 - [x] Run `npm run compile` and verify artifacts generated
-- [ ] Test deploy on local Hardhat node
-- [ ] Copy contract addresses to `application.yml` profiles
+- [x] Test deploy on local Hardhat node (`hardhat/scripts/deploy.js` → `deployments/localhost.json`)
+- [x] Copy contract addresses to profiles (`export-env.sh`, `local` Spring profiles — see [hardhat-demo.md](hardhat-demo.md))
 
 ### 9.2 Inter-service authentication
 
@@ -422,13 +422,15 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 
 ### 9.4 Dividend implementation
 
-- [ ] Replace simulated `txHash` with real on-chain dividend transactions
+- [x] Dividend calculation in Issuance → `dividend.distributed` → Payment on-chain USDC payouts (when `PAYMENT_BLOCKCHAIN_ENABLED=true`)
+- [ ] Replace simulated dividend `txHash` in Issuance DB with Payment payout callback
 - [ ] Implement `@Scheduled` monthly dividend job (currently skeleton)
 - [ ] Replace hardcoded `MATIC_USD_RATE = 0.85` with price oracle or config
 
 ### 9.5 Business logic gaps
 
 - [x] Implement `FULLY_SOLD` flat status when all tokens distributed (Marketplace → Registry on primary sell-out)
+- [x] Primary token transfer via `operatorTransfer` (custodial operator signs for SPV wallet)
 - [ ] Complete ComplianceService on-chain ABI encoding (currently simplified/stub)
 - [ ] Generate Web3j contract wrappers (replace manual ABI encoding in `BlockchainConnector`)
 

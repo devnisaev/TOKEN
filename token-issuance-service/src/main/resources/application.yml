@@ -144,6 +144,12 @@ blockchain:
   chain-id: 31337
   # Hardhat account #0 default private key (public knowledge — dev only)
   operator-private-key: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+  # Set after: cd hardhat && npm run deploy:local (see docs/hardhat-demo.md)
+  compliance-registry-address: ${COMPLIANCE_REGISTRY_ADDRESS:}
+
+tokenrealty:
+  kafka:
+    enabled: ${KAFKA_ENABLED:true}
 
 ---
 # ─── STAGING profile — Polygon Amoy testnet ───────────────────────────────────

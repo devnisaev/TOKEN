@@ -40,6 +40,9 @@ async function main() {
   const address = await token.getAddress();
   const network = await hre.ethers.provider.getNetwork();
 
+  const enableTx = await token.enableTransfers();
+  await enableTx.wait();
+
   console.log(JSON.stringify({
     contractAddress: address,
     txHash: deployTx ? deployTx.hash : null,

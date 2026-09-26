@@ -7,7 +7,7 @@ Real-estate tokenization platform — fractional property ownership, crypto paym
 | Service | Folder | Port | Status |
 |---------|--------|------|--------|
 | Property Registry | `token-realty-app/` | 8081 | Implemented |
-| Token Issuance | `token-issuance-service/` | 8082 | Implemented (blockchain stubbed) |
+| Token Issuance | `token-issuance-service/` | 8082 | Implemented (Hardhat + Web3j) |
 | Auth | `auth-service/` | 8083 | Implemented (JWT) |
 | Marketplace | `marketplace-service/` | 8084 | Implemented (MVP) |
 | Payment | `payment-service/` | 8085 | Implemented (MVP — escrow, payouts) |
@@ -19,6 +19,7 @@ Real-estate tokenization platform — fractional property ownership, crypto paym
 | [docs/PLATFORM-SPEC.md](docs/PLATFORM-SPEC.md) | Platform spec & implementation TODO |
 | [docs/EVENTS.md](docs/EVENTS.md) | Kafka event catalog |
 | [docs/README.md](docs/README.md) | Docs index & diagrams |
+| [docs/hardhat-demo.md](docs/hardhat-demo.md) | Local on-chain demo runbook |
 | [AGENTS.md](AGENTS.md) | Agent / Cursor instructions |
 
 ## Cursor rules

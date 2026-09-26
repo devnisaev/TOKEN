@@ -110,8 +110,9 @@ public class TransferService {
 
         // 6. Submit on-chain transaction
         try {
-            // ABI encode: transfer(address to, uint256 amount)
-            String encodedData = encodeTransfer(request.toAddress(), request.amount());
+            // Custodial transfer: operator moves tokens from SPV/seller wallet
+            String encodedData = BlockchainConnector.encodeOperatorTransfer(
+                    request.fromAddress(), request.toAddress(), request.amount());
             String txHash = blockchain.sendContractTransaction(
                     contract.getContractAddress(), encodedData, BigInteger.ZERO);
 
@@ -203,19 +204,6 @@ public class TransferService {
                     .build();
             holderRepository.save(newHolder);
         }
-    }
-
-    private String encodeTransfer(String toAddress, Long amount) {
-        // keccak256("transfer(address,uint256)") = 0xa9059cbb
-        String paddedAddress = padLeft(toAddress.replace("0x", ""), 64);
-        String paddedAmount = padLeft(Long.toHexString(amount), 64);
-        return "0xa9059cbb" + paddedAddress + paddedAmount;
-    }
-
-    private static String padLeft(String value, int length) {
-        StringBuilder sb = new StringBuilder(value);
-        while (sb.length() < length) sb.insert(0, '0');
-        return sb.toString();
     }
 
     private TokenTransferResponse toResponse(TokenTransfer t) {

@@ -86,6 +86,7 @@ class TokenIssuanceServiceTest {
         });
         when(deployer.deployPropertyToken(any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(deployResult);
+        when(blockchain.sendContractTransaction(any(), any(), any())).thenReturn("0xEnableTx");
 
         var result = service.issueTokens(request);
 
@@ -95,6 +96,8 @@ class TokenIssuanceServiceTest {
                 "Bishkek City Plaza — Flat 101", "BKCP-101",
                 1000L, BigDecimal.valueOf(45.00), "0xSPVWallet123");
         verify(holderRepository).save(any());
+        verify(blockchain).sendContractTransaction(
+                eq("0xContractAddress123"), eq(BlockchainConnector.encodeEnableTransfers()), any());
     }
 
     @Test

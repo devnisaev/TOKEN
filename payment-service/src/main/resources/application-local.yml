@@ -2,5 +2,11 @@ tokenrealty:
   payment:
     auto-confirm:
       enabled: true
+    blockchain:
+      enabled: true
+      rpc-url: http://localhost:8545
+      chain-id: 31337
+      operator-private-key: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+      usdc-contract-address: ${USDC_CONTRACT_ADDRESS:}
   kafka:
     enabled: true

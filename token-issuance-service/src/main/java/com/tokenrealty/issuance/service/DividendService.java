@@ -31,9 +31,6 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class DividendService {
 
-    // MATIC/USD conversion rate — in production fetch from price oracle
-    private static final BigDecimal MATIC_USD_RATE = BigDecimal.valueOf(0.85);
-
     private final DividendPaymentRepository dividendRepository;
     private final TokenContractRepository contractRepository;
     private final TokenHolderRepository holderRepository;
@@ -61,8 +58,8 @@ public class DividendService {
 
     /**
      * Distribute rental income to all token holders of a flat.
-     * Creates DividendPayment records for each holder and submits
-     * on-chain transactions to the DividendDistributor contract.
+     * Creates DividendPayment records for each holder and publishes
+     * dividend.distributed — Payment Service sends on-chain USDC payouts.
      */
     @Transactional
     public DividendSummaryResponse distribute(UUID contractId,
@@ -105,9 +102,6 @@ public class DividendService {
                     .multiply(ownershipPct)
                     .setScale(2, RoundingMode.HALF_UP);
 
-            BigDecimal maticAmount = holderShare
-                    .divide(MATIC_USD_RATE, 8, RoundingMode.HALF_UP);
-
             DividendPayment payment = DividendPayment.builder()
                     .tokenContract(contract)
                     .investorId(holder.getInvestorId())
@@ -118,7 +112,6 @@ public class DividendService {
                     .ownershipPct(ownershipPct.multiply(BigDecimal.valueOf(100)))
                     .grossRentalIncomeUsd(request.grossRentalIncomeUsd())
                     .amountUsd(holderShare)
-                    .amountMatic(maticAmount)
                     .status(DividendPayment.PaymentStatus.PENDING)
                     .build();
 
@@ -126,19 +119,7 @@ public class DividendService {
             totalDistributed = totalDistributed.add(holderShare);
         }
 
-        // In production: submit on-chain dividend distribution tx here
-        // For now: mark all as PAID (simulated payment)
-        for (DividendPayment payment : payments) {
-            payment.setStatus(DividendPayment.PaymentStatus.PAID);
-            payment.setPaidAt(Instant.now());
-            String simId = payment.getId() != null
-                    ? payment.getId().toString().replace("-", "").substring(0, 16)
-                    : java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 16);
-            payment.setTxHash("0xSIMULATED_" + simId);
-            dividendRepository.save(payment);
-        }
-
-        log.info("Distributed ${} to {} holders for contract {}",
+        log.info("Scheduled ${} dividend payout to {} holders for contract {} (Payment Service settles on-chain)",
                 totalDistributed, payments.size(), contractId);
 
         String period = request.periodStart().format(DateTimeFormatter.ofPattern("yyyy-MM"));
@@ -164,7 +145,7 @@ public class DividendService {
                 request.grossRentalIncomeUsd(),
                 payments.size(),
                 totalDistributed,
-                "PAID"
+                "PENDING_PAYOUT"
         );
     }
 

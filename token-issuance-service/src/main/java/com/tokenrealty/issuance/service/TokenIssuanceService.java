@@ -170,6 +170,8 @@ public class TokenIssuanceService {
                 log.warn("Failed to update Property Registry for flat {}: {}", request.flatId(), e.getMessage());
             }
 
+            enableTransfersOnChain(contract);
+
         } catch (Exception e) {
             contract.setStatus(TokenContract.ContractStatus.PENDING);
             contractRepository.save(contract);
@@ -214,6 +216,23 @@ public class TokenIssuanceService {
             throw new RuntimeException("Failed to suspend transfers on-chain: " + e.getMessage(), e);
         }
         return toResponse(contract);
+    }
+
+    private void enableTransfersOnChain(TokenContract contract) {
+        if (contract.getContractAddress() == null || contract.getContractAddress().isBlank()) {
+            return;
+        }
+        try {
+            String txHash = blockchain.sendContractTransaction(
+                    contract.getContractAddress(),
+                    BlockchainConnector.encodeEnableTransfers(),
+                    java.math.BigInteger.ZERO);
+            log.info("Transfers enabled after deploy for contract {} tx={}",
+                    contract.getContractAddress(), txHash);
+        } catch (Exception e) {
+            log.warn("Failed to auto-enable transfers for contract {}: {}",
+                    contract.getContractAddress(), e.getMessage());
+        }
     }
 
     // ─── Helpers ─────────────────────────────────────────────────────────────

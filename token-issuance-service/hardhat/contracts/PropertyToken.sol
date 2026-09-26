@@ -46,6 +46,11 @@ contract PropertyToken is ERC20, Ownable {
         transfersEnabled = false;
     }
 
+    /// @dev Custodial transfer signed by operator (SPV wallet does not hold a private key in MVP).
+    function operatorTransfer(address from, address to, uint256 amount) external onlyOwner {
+        _update(from, to, amount);
+    }
+
     function _update(address from, address to, uint256 value) internal override {
         if (from != address(0) && to != address(0)) {
             require(transfersEnabled, "Transfers disabled");

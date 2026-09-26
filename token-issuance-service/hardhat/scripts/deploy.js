@@ -11,6 +11,15 @@
  */
 
 const { ethers, network } = require("hardhat");
+const fs = require("fs");
+const path = require("path");
+
+/** Hardhat default accounts #0–#2 (public dev keys). Use #0 as operator/SPV in local demos. */
+const DEV_WALLETS = [
+    "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "0x70997970C51812dc3A010C724d1AfE6Fc599aa84",
+    "0x3C44CdDdB6a8fa426Eb90476d3413321120A0A01",
+];
 
 async function main() {
     console.log(`\n🚀 Deploying to network: ${network.name} (chainId: ${network.config.chainId})\n`);
@@ -67,16 +76,25 @@ async function main() {
     const tokenAddress = await propertyToken.getAddress();
     console.log(`✅ PropertyToken deployed at: ${tokenAddress}`);
 
-    // ─── 4. Whitelist operator in ComplianceRegistry ───────────────────────
-    console.log("\n🔐 Whitelisting operator in ComplianceRegistry...");
+    // ─── 4. Whitelist dev wallets in ComplianceRegistry ────────────────────
+    console.log("\n🔐 Whitelisting dev wallets in ComplianceRegistry...");
     const oneYearFromNow = Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60;
-    const whitelistTx = await complianceRegistry.addToWhitelist(
-        operator.address,
-        "KG",
-        oneYearFromNow
-    );
-    await whitelistTx.wait();
-    console.log(`✅ Operator ${operator.address} whitelisted`);
+    for (const wallet of DEV_WALLETS) {
+        const whitelistTx = await complianceRegistry.addToWhitelist(wallet, "KG", oneYearFromNow);
+        await whitelistTx.wait();
+        console.log(`✅ Whitelisted ${wallet}`);
+    }
+
+    // ─── 4b. Mint MockUSDC to operator (dividend payout funding) ───────────
+    const mintAmount = 1_000_000n * 10n ** 6n; // 1M USDC
+    const mintTx = await mockUsdc.mint(operator.address, mintAmount);
+    await mintTx.wait();
+    console.log(`✅ Minted ${mintAmount} MockUSDC to operator ${operator.address}`);
+
+    // ─── 4c. Enable transfers on demo token ────────────────────────────────
+    const enableTx = await propertyToken.enableTransfers();
+    await enableTx.wait();
+    console.log("✅ Transfers enabled on demo PropertyToken");
 
     // ─── 5. Verify deployment ───────────────────────────────────────────────
     const operatorBalance = await propertyToken.balanceOf(operator.address);
@@ -109,6 +127,23 @@ async function main() {
     console.log(`COMPLIANCE_REGISTRY_ADDRESS=${complianceAddress}`);
     console.log(`USDC_CONTRACT_ADDRESS=${usdcAddress}`);
 
+    const deployment = {
+        network: network.name,
+        chainId: Number(network.config.chainId),
+        operatorAddress: operator.address,
+        complianceRegistryAddress: complianceAddress,
+        usdcContractAddress: usdcAddress,
+        demoPropertyTokenAddress: tokenAddress,
+        devWallets: DEV_WALLETS,
+        deployedAt: new Date().toISOString(),
+    };
+
+    const deploymentsDir = path.join(__dirname, "../deployments");
+    fs.mkdirSync(deploymentsDir, { recursive: true });
+    const deploymentPath = path.join(deploymentsDir, "localhost.json");
+    fs.writeFileSync(deploymentPath, JSON.stringify(deployment, null, 2));
+    console.log(`\n💾 Wrote ${deploymentPath}`);
+
     if (network.name !== "localhost" && network.name !== "hardhat") {
         console.log("\n🔍 Verify on Polygonscan (wait ~30s for indexing):");
         console.log(`npx hardhat verify --network ${network.name} ${complianceAddress} "${operator.address}"`);
@@ -117,7 +152,7 @@ async function main() {
         console.log(`  "${tokenArgs.operator}" "${complianceAddress}" "${tokenArgs.flatId}" "${tokenArgs.buildingId}"`);
     }
 
-    return { complianceAddress, tokenAddress };
+    return deployment;
 }
 
 main()

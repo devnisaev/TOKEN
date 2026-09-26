@@ -100,7 +100,7 @@ class DividendServiceTest {
         assertThat(result.grossRentalIncomeUsd()).isEqualByComparingTo(BigDecimal.valueOf(1000));
         // Total distributed should equal gross income
         assertThat(result.totalDistributedUsd()).isEqualByComparingTo(BigDecimal.valueOf(1000));
-        verify(dividendRepository, times(4)).save(any(DividendPayment.class));
+        verify(dividendRepository, times(2)).save(any(DividendPayment.class));
         verify(dividendDistributedPublisher).publishDividendDistributed(any());
     }
 

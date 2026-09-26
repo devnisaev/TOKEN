@@ -186,6 +186,16 @@ public class BlockchainConnector {
     }
 
     /**
+     * Encodes: operatorTransfer(address from, address to, uint256 amount)
+     */
+    public static String encodeOperatorTransfer(String fromAddress, String toAddress, Long amount) {
+        String paddedFrom = padLeft(fromAddress.replace("0x", ""), 64);
+        String paddedTo = padLeft(toAddress.replace("0x", ""), 64);
+        String paddedAmount = padLeft(Long.toHexString(amount), 64);
+        return "0x0d1af103" + paddedFrom + paddedTo + paddedAmount;
+    }
+
+    /**
      * Encodes: isWhitelisted(address) — for ComplianceRegistry
      */
     public static String encodeIsWhitelisted(String address) {
