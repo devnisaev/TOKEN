@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="001-payments" author="tokenrealty">
+        <createTable tableName="payments">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="order_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="payer_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="payer_wallet" type="varchar(66)"><constraints nullable="false"/></column>
+            <column name="amount" type="numeric(19,2)"><constraints nullable="false"/></column>
+            <column name="currency" type="varchar(10)"><constraints nullable="false"/></column>
+            <column name="status" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="payment_type" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="idempotency_key" type="varchar(128)"><constraints nullable="false"/></column>
+            <column name="tx_hash" type="varchar(66)"/>
+            <column name="confirmed_at" type="timestamptz"/>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <createIndex tableName="payments" indexName="idx_payments_order_id">
+            <column name="order_id"/>
+        </createIndex>
+        <createIndex tableName="payments" indexName="idx_payments_payer_id">
+            <column name="payer_id"/>
+        </createIndex>
+        <addUniqueConstraint tableName="payments" columnNames="idempotency_key"
+                             constraintName="uk_payments_idempotency_key"/>
+    </changeSet>
+
+    <changeSet id="002-escrows" author="tokenrealty">
+        <createTable tableName="escrows">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="payment_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="order_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="amount" type="numeric(19,2)"><constraints nullable="false"/></column>
+            <column name="currency" type="varchar(10)"><constraints nullable="false"/></column>
+            <column name="status" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="escrow_wallet_address" type="varchar(66)"><constraints nullable="false"/></column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <addUniqueConstraint tableName="escrows" columnNames="payment_id"
+                             constraintName="uk_escrows_payment_id"/>
+        <createIndex tableName="escrows" indexName="idx_escrows_order_id">
+            <column name="order_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="003-ledger-entries" author="tokenrealty">
+        <createTable tableName="ledger_entries">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="transaction_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="payment_id" type="uuid"/>
+            <column name="payout_id" type="uuid"/>
+            <column name="account_code" type="varchar(30)"><constraints nullable="false"/></column>
+            <column name="entry_type" type="varchar(10)"><constraints nullable="false"/></column>
+            <column name="amount" type="numeric(19,2)"><constraints nullable="false"/></column>
+            <column name="currency" type="varchar(10)"><constraints nullable="false"/></column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+        </createTable>
+        <createIndex tableName="ledger_entries" indexName="idx_ledger_entries_transaction_id">
+            <column name="transaction_id"/>
+        </createIndex>
+        <createIndex tableName="ledger_entries" indexName="idx_ledger_entries_payment_id">
+            <column name="payment_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="004-payouts" author="tokenrealty">
+        <createTable tableName="payouts">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="recipient_investor_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="recipient_wallet" type="varchar(66)"><constraints nullable="false"/></column>
+            <column name="amount" type="numeric(19,2)"><constraints nullable="false"/></column>
+            <column name="currency" type="varchar(10)"><constraints nullable="false"/></column>
+            <column name="purpose" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="reference_id" type="uuid"/>
+            <column name="dividend_payment_id" type="uuid"/>
+            <column name="flat_id" type="uuid"/>
+            <column name="tenant_id" type="uuid"/>
+            <column name="period" type="varchar(20)"/>
+            <column name="status" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="tx_hash" type="varchar(66)"/>
+            <column name="completed_at" type="timestamptz"/>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <createIndex tableName="payouts" indexName="idx_payouts_recipient_id">
+            <column name="recipient_investor_id"/>
+        </createIndex>
+        <createIndex tableName="payouts" indexName="idx_payouts_reference_id">
+            <column name="reference_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="005-wallet-balances" author="tokenrealty">
+        <createTable tableName="wallet_balances">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="investor_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="currency" type="varchar(10)"><constraints nullable="false"/></column>
+            <column name="available_balance" type="numeric(19,2)"><constraints nullable="false"/></column>
+            <column name="held_balance" type="numeric(19,2)"><constraints nullable="false"/></column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <addUniqueConstraint tableName="wallet_balances" columnNames="investor_id,currency"
+                             constraintName="uk_wallet_balances_investor_currency"/>
+    </changeSet>
+
+    <changeSet id="006-outbox-events" author="tokenrealty">
+        <createTable tableName="outbox_events">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="aggregate_type" type="varchar(50)"><constraints nullable="false"/></column>
+            <column name="aggregate_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="event_type" type="varchar(120)"><constraints nullable="false"/></column>
+            <column name="payload" type="text"><constraints nullable="false"/></column>
+            <column name="status" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="published_at" type="timestamptz"/>
+            <column name="retry_count" type="int" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="trace_id" type="varchar(64)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="007-processed-events" author="tokenrealty">
+        <createTable tableName="processed_events">
+            <column name="event_id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="event_type" type="varchar(120)"><constraints nullable="false"/></column>
+            <column name="processed_at" type="timestamptz"><constraints nullable="false"/></column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

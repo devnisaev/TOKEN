@@ -1,12 +1,17 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
+  liquibase:
+    enabled: true
 
 tokenrealty:
   payment:
     auto-confirm:
       enabled: false
+    blockchain:
+      deposit-watcher:
+        enabled: false
 
 logging:
   level:

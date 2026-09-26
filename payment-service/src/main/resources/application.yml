@@ -21,6 +21,7 @@ spring:
         format_sql: true
 
   liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
     enabled: false
 
   kafka:
@@ -67,6 +68,9 @@ tokenrealty:
       operator-private-key: ${OPERATOR_PRIVATE_KEY:}
       usdc-contract-address: ${USDC_CONTRACT_ADDRESS:}
       gas-limit: 200000
+      deposit-watcher:
+        enabled: ${PAYMENT_DEPOSIT_WATCHER_ENABLED:false}
+        poll-ms: 5000
     escrow-wallet-address: ${ESCROW_WALLET_ADDRESS:0xEscrowDevWallet0000000000000000000001}
     auto-confirm:
       enabled: ${PAYMENT_AUTO_CONFIRM:false}
