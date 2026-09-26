@@ -36,6 +36,7 @@ public final class MarketplaceDtos {
             UUID flatId,
             UUID contractId,
             Listing.ListingType listingType,
+            Listing.InstrumentType instrumentType,
             Listing.ListingStatus status,
             BigDecimal priceUsd,
             long tokensAvailable,

@@ -15,6 +15,7 @@ public class MarketplaceMapper {
                 .flatId(listing.getFlatId())
                 .contractId(listing.getContractId())
                 .listingType(listing.getListingType())
+                .instrumentType(listing.getInstrumentType())
                 .status(listing.getStatus())
                 .priceUsd(listing.getPriceUsd())
                 .tokensAvailable(listing.getTokensAvailable())

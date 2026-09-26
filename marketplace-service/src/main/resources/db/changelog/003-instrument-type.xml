@@ -4,7 +4,12 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
-    <include file="001-initial-schema.xml" relativeToChangelogFile="true"/>
-    <include file="003-instrument-type.xml" relativeToChangelogFile="true"/>
+    <changeSet id="003-listing-instrument-type" author="tokenrealty">
+        <addColumn tableName="listings">
+            <column name="instrument_type" type="varchar(30)" defaultValue="EQUITY">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>

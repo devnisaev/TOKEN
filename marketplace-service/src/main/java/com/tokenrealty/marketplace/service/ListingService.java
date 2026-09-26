@@ -55,7 +55,7 @@ public class ListingService {
     @Transactional
     public ListingResponse create(CreateListingRequest request) {
         validateCreateRequest(request);
-        assertEquityOwnershipStructure(request.flatId());
+        Listing.InstrumentType instrumentType = resolveInstrumentType(request.flatId());
         if (request.listingType() == Listing.ListingType.PRIMARY) {
             listingRepository.findByFlatIdAndStatus(request.flatId(), Listing.ListingStatus.ACTIVE)
                     .ifPresent(existing -> {
@@ -67,6 +67,7 @@ public class ListingService {
                 .flatId(request.flatId())
                 .contractId(request.contractId())
                 .listingType(request.listingType())
+                .instrumentType(instrumentType)
                 .status(Listing.ListingStatus.ACTIVE)
                 .priceUsd(request.priceUsd())
                 .tokensAvailable(request.tokensTotal())
@@ -127,6 +128,9 @@ public class ListingService {
 
     @Transactional
     public ListingResponse createSecondary(CreateSecondaryListingRequest request) {
+        if (resolveInstrumentType(request.flatId()) != Listing.InstrumentType.EQUITY) {
+            throw new ValidationException("Secondary listings require equity instrument type");
+        }
         if (!complianceClient.isWalletApproved(request.sellerWallet())) {
             throw new ValidationException("Seller wallet is not KYC approved");
         }
@@ -171,14 +175,18 @@ public class ListingService {
         }
     }
 
-    private void assertEquityOwnershipStructure(UUID flatId) {
+    private Listing.InstrumentType resolveInstrumentType(UUID flatId) {
         var flat = propertyRegistryClient.getFlat(flatId);
         var spv = propertyRegistryClient.getSpvByBuilding(flat.buildingId());
-        if ("PART_DEBT_INSTRUMENT".equals(spv.ownershipType())
-                || "PROFIT_SHARING_AGREEMENT".equals(spv.ownershipType())) {
-            throw new ValidationException(
-                    "Token marketplace listings require equity SPV ownership; found "
-                            + spv.ownershipType());
-        }
+        return switch (spv.ownershipType()) {
+            case "SPV_SHARE_EQUITY" -> Listing.InstrumentType.EQUITY;
+            case "PROFIT_SHARING_AGREEMENT" -> Listing.InstrumentType.PROFIT_SHARING;
+            case "PART_DEBT_INSTRUMENT" -> Listing.InstrumentType.DEBT_INSTRUMENT;
+            default -> raiseValidation("Unsupported SPV ownership type: " + spv.ownershipType());
+        };
+    }
+
+    private static Listing.InstrumentType raiseValidation(String message) {
+        throw new ValidationException(message);
     }
 }

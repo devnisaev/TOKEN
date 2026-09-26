@@ -1,13 +1,17 @@
 package com.tokenrealty.marketplace.service;
 
+import com.tokenrealty.marketplace.client.ComplianceClient;
 import com.tokenrealty.marketplace.client.PropertyRegistryClient;
+import com.tokenrealty.marketplace.client.TokenIssuanceClient;
 import com.tokenrealty.marketplace.dto.MarketplaceDtos.CreateListingRequest;
+import com.tokenrealty.marketplace.dto.MarketplaceDtos.CreateSecondaryListingRequest;
 import com.tokenrealty.marketplace.dto.MarketplaceDtos.ListingResponse;
 import com.tokenrealty.marketplace.entity.Listing;
 import com.tokenrealty.web.exception.ConflictException;
 import com.tokenrealty.web.exception.ValidationException;
 import com.tokenrealty.marketplace.kafka.port.ListingCreatedPublisher;
 import com.tokenrealty.marketplace.mapper.MarketplaceMapper;
+import com.tokenrealty.marketplace.repository.ApprovedBuildingRepository;
 import com.tokenrealty.marketplace.repository.ListingRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,9 +38,12 @@ import static org.mockito.Mockito.*;
 class ListingServiceTest {
 
     @Mock ListingRepository listingRepository;
+    @Mock ApprovedBuildingRepository approvedBuildingRepository;
     @Mock MarketplaceMapper mapper;
     @Mock ListingCreatedPublisher listingCreatedPublisher;
     @Mock PropertyRegistryClient propertyRegistryClient;
+    @Mock TokenIssuanceClient tokenIssuanceClient;
+    @Mock ComplianceClient complianceClient;
     @InjectMocks ListingService listingService;
 
     private UUID flatId;
@@ -69,6 +76,7 @@ class ListingServiceTest {
         Listing saved = Listing.builder()
                 .flatId(flatId)
                 .listingType(Listing.ListingType.PRIMARY)
+                .instrumentType(Listing.InstrumentType.EQUITY)
                 .status(Listing.ListingStatus.ACTIVE)
                 .priceUsd(new BigDecimal("100.00"))
                 .tokensAvailable(1000L)
@@ -107,8 +115,8 @@ class ListingServiceTest {
     }
 
     @Test
-    @DisplayName("create rejects non-equity SPV ownership")
-    void createRejectsNonEquitySpv() {
+    @DisplayName("create allows primary listing for debt instrument SPV")
+    void createAllowsPrimaryForDebtInstrument() {
         when(propertyRegistryClient.getSpvByBuilding(buildingId)).thenReturn(
                 new PropertyRegistryClient.SpvView(
                         UUID.randomUUID(), buildingId, "SPV", "REG-1", "0xspv",
@@ -122,9 +130,52 @@ class ListingServiceTest {
                 .minInvestmentTokens(10L)
                 .build();
 
-        assertThatThrownBy(() -> listingService.create(request))
+        Listing saved = Listing.builder()
+                .flatId(flatId)
+                .listingType(Listing.ListingType.PRIMARY)
+                .instrumentType(Listing.InstrumentType.DEBT_INSTRUMENT)
+                .status(Listing.ListingStatus.ACTIVE)
+                .priceUsd(new BigDecimal("100.00"))
+                .tokensAvailable(100L)
+                .tokensTotal(100L)
+                .minInvestmentTokens(10L)
+                .build();
+        saved.setId(UUID.randomUUID());
+
+        when(listingRepository.findByFlatIdAndStatus(flatId, Listing.ListingStatus.ACTIVE))
+                .thenReturn(Optional.empty());
+        when(listingRepository.save(any(Listing.class))).thenAnswer(invocation -> {
+            Listing listing = invocation.getArgument(0);
+            assertThat(listing.getInstrumentType()).isEqualTo(Listing.InstrumentType.DEBT_INSTRUMENT);
+            return saved;
+        });
+        when(mapper.toListingResponse(saved)).thenReturn(ListingResponse.builder().id(saved.getId()).flatId(flatId).build());
+
+        listingService.create(request);
+
+        verify(listingRepository).save(any(Listing.class));
+    }
+
+    @Test
+    @DisplayName("createSecondary rejects non-equity instrument type")
+    void createSecondaryRejectsNonEquity() {
+        when(propertyRegistryClient.getSpvByBuilding(buildingId)).thenReturn(
+                new PropertyRegistryClient.SpvView(
+                        UUID.randomUUID(), buildingId, "SPV", "REG-1", "0xspv",
+                        "PART_DEBT_INSTRUMENT", true, "ACTIVE"));
+
+        CreateSecondaryListingRequest request = CreateSecondaryListingRequest.builder()
+                .flatId(flatId)
+                .contractId(UUID.randomUUID())
+                .sellerInvestorId(UUID.randomUUID())
+                .sellerWallet("0xSeller")
+                .priceUsd(new BigDecimal("50.00"))
+                .tokenAmount(10L)
+                .build();
+
+        assertThatThrownBy(() -> listingService.createSecondary(request))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("PART_DEBT_INSTRUMENT");
+                .hasMessageContaining("equity instrument type");
     }
 
     @Test

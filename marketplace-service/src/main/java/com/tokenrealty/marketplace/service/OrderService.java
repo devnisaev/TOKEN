@@ -141,7 +141,7 @@ public class OrderService {
                 .contractId(listing.getContractId())
                 .listingType(Listing.ListingType.SECONDARY)
                 .orderType(MarketOrder.OrderType.SELL)
-                .status(MarketOrder.OrderStatus.MATCHED)
+                .status(MarketOrder.OrderStatus.PENDING)
                 .sellerId(request.sellerInvestorId())
                 .sellerWallet(request.sellerWallet())
                 .tokenAmount(request.tokenAmount())

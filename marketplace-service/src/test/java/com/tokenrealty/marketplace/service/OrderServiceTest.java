@@ -3,7 +3,10 @@ package com.tokenrealty.marketplace.service;
 import com.tokenrealty.marketplace.client.ComplianceClient;
 import com.tokenrealty.marketplace.client.PaymentClient;
 import com.tokenrealty.marketplace.client.PropertyRegistryClient;
+import com.tokenrealty.marketplace.dto.MarketplaceDtos.CreateSecondaryListingRequest;
+import com.tokenrealty.marketplace.dto.MarketplaceDtos.ListingResponse;
 import com.tokenrealty.marketplace.dto.MarketplaceDtos.PlaceOrderRequest;
+import com.tokenrealty.marketplace.dto.MarketplaceDtos.PlaceSellOrderRequest;
 import com.tokenrealty.marketplace.dto.MarketplaceDtos.OrderResponse;
 import com.tokenrealty.marketplace.kafka.command.PaymentConfirmedCommand;
 import com.tokenrealty.marketplace.kafka.command.TransferCompletedCommand;
@@ -223,6 +226,80 @@ class OrderServiceTest {
         assertThatThrownBy(() -> orderService.placeBuyOrder(request))
                 .isInstanceOf(ComplianceBlockedException.class)
                 .hasMessageContaining("Investment below minimum");
+    }
+
+    @Test
+    @DisplayName("placeSellOrder creates pending sell order for active secondary listing")
+    void placeSellOrderCreatesPendingOrder() {
+        UUID listingUuid = UUID.randomUUID();
+        UUID sellerId = UUID.randomUUID();
+        ListingResponse listingResponse = ListingResponse.builder()
+                .id(listingUuid)
+                .flatId(UUID.randomUUID())
+                .contractId(UUID.randomUUID())
+                .listingType(Listing.ListingType.SECONDARY)
+                .instrumentType(Listing.InstrumentType.EQUITY)
+                .status(Listing.ListingStatus.ACTIVE)
+                .priceUsd(new BigDecimal("12.00"))
+                .tokensAvailable(50L)
+                .tokensTotal(50L)
+                .minInvestmentTokens(1L)
+                .sellerInvestorId(sellerId)
+                .sellerWallet("0xSeller")
+                .build();
+
+        PlaceSellOrderRequest request = PlaceSellOrderRequest.builder()
+                .flatId(listingResponse.flatId())
+                .contractId(listingResponse.contractId())
+                .sellerInvestorId(sellerId)
+                .sellerWallet("0xSeller")
+                .priceUsd(new BigDecimal("12.00"))
+                .tokenAmount(50L)
+                .build();
+
+        Listing listing = Listing.builder()
+                .flatId(listingResponse.flatId())
+                .contractId(listingResponse.contractId())
+                .listingType(Listing.ListingType.SECONDARY)
+                .instrumentType(Listing.InstrumentType.EQUITY)
+                .status(Listing.ListingStatus.ACTIVE)
+                .priceUsd(new BigDecimal("12.00"))
+                .tokensAvailable(50L)
+                .tokensTotal(50L)
+                .minInvestmentTokens(1L)
+                .sellerInvestorId(sellerId)
+                .sellerWallet("0xSeller")
+                .build();
+        listing.setId(listingUuid);
+
+        MarketOrder saved = MarketOrder.builder()
+                .listingId(listingUuid)
+                .flatId(listing.getFlatId())
+                .contractId(listing.getContractId())
+                .listingType(Listing.ListingType.SECONDARY)
+                .orderType(MarketOrder.OrderType.SELL)
+                .status(MarketOrder.OrderStatus.PENDING)
+                .sellerId(sellerId)
+                .sellerWallet("0xSeller")
+                .tokenAmount(50L)
+                .totalPriceUsd(new BigDecimal("600.00"))
+                .build();
+        saved.setId(UUID.randomUUID());
+
+        when(listingService.createSecondary(any(CreateSecondaryListingRequest.class)))
+                .thenReturn(listingResponse);
+        when(listingRepository.findById(listingUuid)).thenReturn(Optional.of(listing));
+        when(orderRepository.save(any(MarketOrder.class))).thenAnswer(invocation -> {
+            MarketOrder order = invocation.getArgument(0);
+            assertThat(order.getStatus()).isEqualTo(MarketOrder.OrderStatus.PENDING);
+            return saved;
+        });
+        when(mapper.toOrderResponse(saved)).thenReturn(OrderResponse.builder().id(saved.getId()).build());
+
+        orderService.placeSellOrder(request);
+
+        verify(orderRepository).save(any(MarketOrder.class));
+        verify(orderMatchedPublisher, never()).publishOrderMatched(any());
     }
 
     @Test

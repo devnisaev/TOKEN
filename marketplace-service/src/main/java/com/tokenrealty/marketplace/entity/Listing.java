@@ -57,6 +57,17 @@ public class Listing extends BaseEntity {
     @Column(name = "seller_wallet", length = 66)
     private String sellerWallet;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "instrument_type", nullable = false, length = 30)
+    @Builder.Default
+    private InstrumentType instrumentType = InstrumentType.EQUITY;
+
+    public enum InstrumentType {
+        EQUITY,
+        PROFIT_SHARING,
+        DEBT_INSTRUMENT
+    }
+
     public enum ListingType {
         PRIMARY,
         SECONDARY
