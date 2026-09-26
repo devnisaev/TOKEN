@@ -43,7 +43,11 @@ Vite proxies `/api` → `http://localhost:8080`. Production: set `VITE_API_BASE_
 | `/compliance` | KYC queue + approve | `GET /v1/compliance`, `PATCH /v1/compliance/{id}/verify` |
 | `/document-reviews` | Data room doc queue | `GET /v1/compliance/document-reviews/pending`, `PATCH …/verify` |
 | `/buildings/new` | Register building | `POST /v1/buildings` |
+| `/buildings/:id` | Building detail + flats | `GET /v1/bff/buildings/{id}` |
 | `/buildings/:id/edit` | Edit building | `GET /v1/buildings/{id}`, `PUT /v1/buildings/{id}` |
+| `/buildings/:id/flats/new` | Add flat | `POST /v1/buildings/{id}/flats` |
+| `/buildings/:id/flats/:flatId/edit` | Edit flat | `GET /v1/flats/{id}`, `PUT /v1/flats/{id}` |
+| `/orders` | Order monitoring | `GET /v1/orders?size=50` |
 
 Protected routes require JWT and role `ADMIN`, `COMPLIANCE`, or `PROPERTY_MANAGER` (`AdminRoute`).
 
@@ -63,7 +67,8 @@ Gateway CORS allows `http://localhost:5174` (`tokenrealty.gateway.cors.allowed-o
 ## Conventions
 
 - **Never** call service ports directly from the browser — always gateway `:8080/api`
-- Types in `src/types/api.ts` — update when backend DTOs change
+- Shared fetch + types: `@tokenrealty/shared-api-client` (`frontend/shared-api-client/`)
+- App-specific types in `src/types/api.ts` — extend openapi types with required fields
 - Errors: parse RFC 7807 `detail` from ProblemDetail responses
 - No secrets in frontend env — JWT from login only
 
@@ -71,6 +76,7 @@ Gateway CORS allows `http://localhost:5174` (`tokenrealty.gateway.cors.allowed-o
 
 ## Pending / future
 
-- [ ] Flat create/edit within building detail
-- [ ] Order/trade monitoring for ops
+- [x] Flat create/edit within building detail
+- [x] Order monitoring for ops
+- [ ] Trade detail drill-down per order
 - [ ] E2E tests (Playwright)

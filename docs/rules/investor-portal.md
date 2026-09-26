@@ -125,7 +125,7 @@ Gateway CORS allows `http://localhost:5173` (`tokenrealty.gateway.cors.allowed-o
 ## Conventions
 
 - **Never** call service ports directly from the browser — always gateway `:8080/api`
-- Types in `src/types/api.ts` — update when backend DTOs change; openapi-typescript planned
+- Shared fetch + types: `@tokenrealty/shared-api-client`; app types in `src/types/api.ts`
 - Errors: parse RFC 7807 `detail` from ProblemDetail responses
 - No secrets in frontend env — JWT from login only
 - Prefer BFF endpoints over N+1 calls to Registry + Marketplace + Issuance
@@ -134,9 +134,8 @@ Gateway CORS allows `http://localhost:5173` (`tokenrealty.gateway.cors.allowed-o
 
 ## Pending / future
 
-- [ ] Tenant portal (rent pay)
 - [ ] WebSocket push for order status (replace polling)
 - [ ] Refresh token rotation before access expiry
-- [ ] openapi-typescript codegen from springdoc
+- [x] openapi-typescript codegen (`frontend/shared-api-types/`)
 - [ ] Dividend history page
 - [ ] E2E tests (Playwright against docker-compose)

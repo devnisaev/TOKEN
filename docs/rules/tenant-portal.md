@@ -29,6 +29,8 @@ Demo: `tenant@tokenrealty.com` / `tenant123` (user id `22222222-2222-2222-2222-2
 
 Session key: `tokenrealty.tenant.auth` (separate from investor/admin portals).
 
+Shared fetch + types: `@tokenrealty/shared-api-client` (`frontend/shared-api-client/`).
+
 Gateway CORS allows `http://localhost:5175`.
 
 ---
