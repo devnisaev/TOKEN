@@ -1,1 +1,2 @@
 com.tokenrealty.kafka.config.TokenRealtyKafkaAutoConfiguration
+com.tokenrealty.kafka.config.KafkaDlqAutoConfiguration
