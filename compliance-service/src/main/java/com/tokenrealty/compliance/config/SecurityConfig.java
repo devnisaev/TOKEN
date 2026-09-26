@@ -33,7 +33,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(ActuatorSecurityPaths.PUBLIC).permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/v1/compliance/webhooks/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/compliance/check/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/v1/compliance/check-investment").authenticated()
                         .requestMatchers(HttpMethod.GET, "/v1/**").hasAnyRole("ADMIN", "COMPLIANCE")
                         .requestMatchers(HttpMethod.POST, "/v1/**")
                         .hasAnyRole("ADMIN", "COMPLIANCE")

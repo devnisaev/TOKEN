@@ -55,6 +55,12 @@ public class ComplianceController {
         return service.checkWallet(walletAddress);
     }
 
+    @PostMapping("/check-investment")
+    @Operation(summary = "Validate investment amount against jurisdiction policy")
+    public InvestmentCheckResponse checkInvestment(@Valid @RequestBody InvestmentCheckRequest request) {
+        return service.checkInvestment(request.investorId(), request.countryCode(), request.amountUsd());
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPLIANCE')")

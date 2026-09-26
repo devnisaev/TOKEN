@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -24,6 +25,7 @@ public class ComplianceService {
 
     private final ComplianceRecordRepository repository;
     private final KycEventPublisher kycEventPublisher;
+    private final InvestmentPolicyService investmentPolicyService;
 
     public Page<ComplianceRecordResponse> findAll(Pageable pageable) {
         return repository.findAll(pageable).map(this::toResponse);
@@ -55,6 +57,10 @@ public class ComplianceService {
                         record.getKycExpiresAt()))
                 .orElseGet(() -> new ComplianceCheckResponse(
                         walletAddress, false, null, null, null, null));
+    }
+
+    public InvestmentCheckResponse checkInvestment(UUID investorId, String countryCode, BigDecimal amountUsd) {
+        return investmentPolicyService.checkInvestment(investorId, countryCode, amountUsd);
     }
 
     @Transactional

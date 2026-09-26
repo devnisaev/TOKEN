@@ -15,6 +15,7 @@ import com.tokenrealty.marketplace.mapper.MarketplaceMapper;
 import com.tokenrealty.marketplace.repository.ListingRepository;
 import com.tokenrealty.marketplace.repository.MarketOrderRepository;
 import com.tokenrealty.marketplace.repository.TradeRepository;
+import com.tokenrealty.web.exception.ComplianceBlockedException;
 import com.tokenrealty.web.exception.ResourceNotFoundException;
 import com.tokenrealty.web.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
@@ -279,7 +280,7 @@ public class OrderService {
 
     private void assertWalletApproved(String wallet, String role) {
         if (!complianceClient.isWalletApproved(wallet)) {
-            throw new ValidationException(role + " wallet is not KYC approved");
+            throw new ComplianceBlockedException(role + " wallet is not KYC approved");
         }
     }
 

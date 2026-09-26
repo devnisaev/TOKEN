@@ -2,11 +2,14 @@ package com.tokenrealty.compliance.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tokenrealty.compliance.entity.ComplianceRecord;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public final class ComplianceDtos {
@@ -51,6 +54,37 @@ public final class ComplianceDtos {
             UUID investorId,
             String countryCode,
             Instant expiresAt
+    ) {
+    }
+
+    public record InvestmentCheckResponse(
+            UUID investorId,
+            String jurisdiction,
+            BigDecimal amountUsd,
+            @JsonProperty("isAllowed") boolean allowed,
+            BigDecimal minInvestmentUsd
+    ) {
+    }
+
+    public record InvestmentCheckRequest(
+            @NotNull UUID investorId,
+            @NotBlank @Size(min = 2, max = 2) String countryCode,
+            @NotNull @DecimalMin("0.01") BigDecimal amountUsd
+    ) {
+    }
+
+    public record KycWebhookPayload(
+            String applicantId,
+            String externalUserId,
+            String reviewStatus,
+            Instant kycExpiresAt,
+            KycReviewResult reviewResult
+    ) {
+    }
+
+    public record KycReviewResult(
+            String reviewAnswer,
+            List<String> rejectLabels
     ) {
     }
 

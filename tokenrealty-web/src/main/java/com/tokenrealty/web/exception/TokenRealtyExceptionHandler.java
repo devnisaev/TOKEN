@@ -32,7 +32,7 @@ public class TokenRealtyExceptionHandler {
         return ProblemDetails.of(HttpStatus.CONFLICT, "/errors/conflict", ex.getMessage());
     }
 
-    @ExceptionHandler({ValidationException.class, InsufficientFundsException.class})
+    @ExceptionHandler({ValidationException.class, InsufficientFundsException.class, ComplianceBlockedException.class})
     public ProblemDetail handleValidation(RuntimeException ex) {
         return ProblemDetails.of(HttpStatus.UNPROCESSABLE_ENTITY, "/errors/business-rule", ex.getMessage());
     }

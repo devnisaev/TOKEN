@@ -29,6 +29,7 @@ class ComplianceServiceTest {
 
     @Mock ComplianceRecordRepository repository;
     @Mock KycEventPublisher kycEventPublisher;
+    @Mock InvestmentPolicyService investmentPolicyService;
     @InjectMocks ComplianceService service;
 
     private UUID investorId;

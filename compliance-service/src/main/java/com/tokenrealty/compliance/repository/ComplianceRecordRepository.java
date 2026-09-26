@@ -17,6 +17,8 @@ public interface ComplianceRecordRepository extends JpaRepository<ComplianceReco
 
     Optional<ComplianceRecord> findByInvestorId(UUID investorId);
 
+    Optional<ComplianceRecord> findByKycReferenceId(String kycReferenceId);
+
     boolean existsByWalletAddress(String walletAddress);
 
     boolean existsByInvestorId(UUID investorId);
