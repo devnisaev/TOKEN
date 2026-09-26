@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # TokenRealty demo seed helper — verifies dev data and prints next Hardhat demo steps.
-# Prerequisites: Postgres + Auth (:8083) + Registry (:8081) + Payment (:8085) running with dev seeds.
+# Prerequisites: Postgres + Auth (:8083) + Registry (:8081) + Payment (:8085) + Rental (:8086) running with dev seeds.
 
 set -euo pipefail
 
@@ -10,6 +10,8 @@ PAYMENT_URL="${PAYMENT_URL:-http://localhost:8085/api}"
 GATEWAY_URL="${GATEWAY_URL:-http://localhost:8080/api}"
 
 DEMO_INVESTOR_ID="11111111-1111-1111-1111-111111111111"
+DEMO_TENANT_ID="22222222-2222-2222-2222-222222222222"
+DEMO_FLAT_ID="33333333-3333-3333-3333-333333333333"
 
 echo "==> Logging in as admin..."
 TOKEN=$(curl -sf "${AUTH_URL}/v1/auth/login" \
@@ -54,13 +56,30 @@ else
   echo "(Skip BFF — no demo flat yet)"
 fi
 
+echo "==> Logging in as demo tenant..."
+TENANT_TOKEN=$(curl -sf "${AUTH_URL}/v1/auth/login" \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"tenant@tokenrealty.com","password":"tenant123"}' \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['accessToken'])")
+
+echo "==> Demo tenant leases (via API Gateway)..."
+curl -sf "${GATEWAY_URL}/v1/leases?tenantId=${DEMO_TENANT_ID}" \
+  -H "Authorization: Bearer ${TENANT_TOKEN}" \
+  | python3 -m json.tool || echo "(Rental skipped — start rental-service :8086 + gateway :8080)"
+
+echo "==> Pending document reviews (Compliance)..."
+curl -sf "${GATEWAY_URL}/v1/compliance/document-reviews/pending" \
+  -H "Authorization: Bearer ${TOKEN}" \
+  | python3 -m json.tool || echo "(Compliance skipped — start compliance-service :8087 + gateway :8080)"
+
 cat <<'EOF'
 
 Demo seed (on service startup):
-  - Registry: Sunrise Tower, flat 101, SPV, valuation
+  - Registry: Sunrise Tower, flat 101 (33333333-3333-3333-3333-333333333333), SPV, valuation
   - Compliance: investor 11111111-1111-1111-1111-111111111111 (Hardhat account #1)
   - Payment: demo investor seeded with 10,000 USDC (custodial balance)
-  - Auth: admin@tokenrealty.com / admin123, investor@tokenrealty.com / investor123
+  - Rental: active lease for tenant 22222222-2222-2222-2222-222222222222 on demo flat ($650/mo)
+  - Auth: admin@tokenrealty.com / admin123, investor@tokenrealty.com / investor123, tenant@tokenrealty.com / tenant123
 
 Next — full on-chain demo:
   1. docker compose up -d postgres

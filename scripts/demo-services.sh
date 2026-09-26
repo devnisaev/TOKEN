@@ -2,7 +2,7 @@
 # Start the minimum TokenRealty buy-flow backend stack in background.
 #
 # Usage:
-#   ./scripts/demo-services.sh              # start auth → registry → payment → marketplace → compliance → issuance → gateway
+#   ./scripts/demo-services.sh              # start auth → … → document → wallet → indexer → gateway
 #   ./scripts/demo-services.sh --stop       # stop background Spring Boot processes started by this script
 #
 # Prerequisites:
@@ -67,12 +67,17 @@ start_one "payment" "payment-service"
 start_one "marketplace" "marketplace-service"
 start_one "compliance" "compliance-service"
 start_one "issuance" "token-issuance-service"
+start_one "rental" "rental-service"
+start_one "notification" "notification-service"
+start_one "document" "document-service"
+start_one "wallet" "wallet-service"
+start_one "indexer" "blockchain-indexer-service"
 sleep 2
 start_one "gateway" "api-gateway"
 
 echo ""
 echo "Services starting in background. Wait for health checks:"
-echo "  SERVICES=\"8080 8083 8081 8084 8085\" ${ROOT}/scripts/wait-for-services.sh"
+echo "  ${ROOT}/scripts/wait-for-services.sh"
 echo ""
 echo "Then seed demo data:"
 echo "  ${ROOT}/scripts/seed-demo.sh"

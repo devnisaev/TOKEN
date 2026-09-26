@@ -26,6 +26,9 @@ done
 echo "==> Starting PostgreSQL..."
 docker compose up -d postgres
 
+echo "==> Starting Redis..."
+docker compose up -d redis
+
 echo "==> Starting Kafka..."
 docker compose --profile kafka up -d
 
@@ -45,16 +48,16 @@ cat <<'EOF'
 
 Demo infrastructure is up.
 
-Minimum backend stack for buy-flow E2E (separate terminals, local profile):
+Minimum backend stack for buy + rent E2E (local profile):
   1. cd token-issuance-service/hardhat && npm run node && npm run deploy:local
-  2. Start services (order matters for first boot):
-       auth (:8083) → registry (:8081) → payment (:8085) → marketplace (:8084)
-       → compliance (:8087) → issuance (:8082) → gateway (:8080)
-     Each: ../token-realty-app/mvnw spring-boot:run -Dspring-boot.run.profiles=local
-  3. ./scripts/seed-demo.sh
-  4. Frontends:
+  2. ./scripts/demo-services.sh   # auth → registry → payment → marketplace → compliance
+     → issuance → rental → notification → gateway
+  3. ./scripts/wait-for-services.sh
+  4. ./scripts/seed-demo.sh
+  5. Frontends:
        cd frontend/investor-portal && npm run dev    # :5173
        cd frontend/admin-dashboard && npm run dev    # :5174
+       cd frontend/tenant-portal && npm run dev      # :5175
 
 OpenTelemetry (gateway + any service with OTEL_ENABLED=true):
   OTEL_ENABLED=true OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
