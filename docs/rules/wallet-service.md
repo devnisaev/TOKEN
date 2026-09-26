@@ -112,4 +112,4 @@ Returns `AggregateBalanceResponse`: primary wallet address, fiat balances, token
 - [ ] Key rotation and re-encryption migration
 - [ ] HSM / KMS-backed encryption (replace env symmetric key)
 - [x] Payment Service syncs `WalletBalance` on initiate/confirm/payout (see [payment-ledger.md](payment-ledger.md))
-- [ ] Rate limits on `/sign` endpoint
+- [x] Rate limits on `/sign` endpoint (per-investor in-memory, 10/min default)

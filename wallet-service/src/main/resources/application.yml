@@ -36,6 +36,9 @@ tokenrealty:
     client-secret: ${SERVICE_ACCOUNT_SECRET:wallet-secret}
   wallet:
     encryption-key: ${WALLET_ENCRYPTION_KEY:dev-wallet-encryption-key-32b!!}
+    sign-rate-limit:
+      enabled: ${WALLET_SIGN_RATE_LIMIT_ENABLED:true}
+      requests-per-minute: ${WALLET_SIGN_RATE_LIMIT_RPM:10}
     blockchain:
       rpc-url: ${BLOCKCHAIN_RPC_URL:http://localhost:8545}
       chain-id: ${BLOCKCHAIN_CHAIN_ID:31337}

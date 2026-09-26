@@ -448,7 +448,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 
 - [x] Tier-1 business invariants doc ([docs/BUSINESS_RULES.md](BUSINESS_RULES.md) + `.cursor/rules/business-rules.mdc`)
 - [x] Create root `README.md` with platform overview and startup order
-- [ ] Sync API tables in service READMEs with actual controllers (marketplace + notification synced — see [rules/service-readmes.md](rules/service-readmes.md))
+- [x] Sync API tables in service READMEs with actual controllers (see [rules/service-readmes.md](rules/service-readmes.md))
 - [x] Update Property Registry "Next Steps" (Issuance token-info callback + Kafka + JWT done)
 
 ---
@@ -570,12 +570,12 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 
 - [x] `POST /v1/documents/upload` → IPFS → register `PropertyDocument` with CID
 - [x] Verify workflow links documents to building/flat/SPV (Compliance review queue + Registry verify)
-- [ ] Optional S3/MinIO for private KYC/legal docs (`storageUrl`)
+- [x] Optional S3/MinIO for private KYC/legal docs (`storageUrl`) — Document Service routes `KYC_DOCUMENT` / `INSURANCE_POLICY` to MinIO
 
 #### Phase 4b-3 — Deferred
 
-- [ ] `energyEfficiencyRating`, `zoningCode` on `Building`
-- [ ] `lastRenovationYear` on `Building`
+- [x] `energyEfficiencyRating`, `zoningCode` on `Building`
+- [x] `lastRenovationYear` on `Building`
 - [ ] Non-equity token structures (`PART_DEBT_INSTRUMENT`, `PROFIT_SHARING_AGREEMENT`) in Issuance/Marketplace
 
 ### 10.8 Document Service (Phase 4)
@@ -584,7 +584,7 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] POST `/v1/documents/upload` — multipart upload → IPFS
 - [x] GET `/v1/documents/{documentId}` — retrieve metadata from Registry
 - [x] IPFS client (simulated dev mode + optional Pinata API)
-- [ ] Optional S3/MinIO for private documents
+- [x] Optional S3/MinIO for private documents (`storageUrl` on KYC / insurance uploads)
 - [x] Callback to Property Registry with CID
 - [x] Publish `DocumentUploaded` event (outbox)
 - [x] Unit + context tests
@@ -596,7 +596,8 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] Kafka consumers for key notification events (KYC, trade settled, dividend, rent)
 - [x] Simple email templates per event type
 - [x] POST `/v1/notifications/send` — manual trigger (admin)
-- [x] Notification preferences per user (in-memory stub GET/PATCH `/v1/notifications/preferences/{userId}`)
+- [x] Notification preferences per user (JPA GET/PATCH `/v1/notifications/preferences/{userId}`)
+- [x] Kafka integration test — `trade.settled` ingest + preference gate + eventId dedupe
 
 ### 10.10 Wallet Service (Phase 5)
 
