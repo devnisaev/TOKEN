@@ -84,6 +84,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/bff/tenants/{tenantId}/maintenance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["getBffTenantMaintenance"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/bff/orders/{orderId}/status-stream": {
     parameters: {
       query?: never;
@@ -216,6 +232,27 @@ export interface components {
       flat?: components["schemas"]["TenantFlatSummary"];
       rentDue?: boolean;
     };
+    MaintenanceTicketView: {
+      /** Format: uuid */
+      id?: string;
+      /** Format: uuid */
+      leaseId?: string;
+      /** Format: uuid */
+      flatId?: string;
+      /** Format: uuid */
+      tenantId?: string;
+      title?: string;
+      description?: string;
+      /** @enum {string} */
+      status?: "OPEN" | "RESOLVED";
+      /** Format: date-time */
+      createdAt?: string;
+    };
+    TenantMaintenanceBffResponse: {
+      lease?: components["schemas"]["TenantLeaseView"];
+      flat?: components["schemas"]["TenantFlatSummary"];
+      openTickets?: components["schemas"]["MaintenanceTicketView"][];
+    };
   };
   responses: never;
   parameters: never;
@@ -326,6 +363,27 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["TenantLeaseBffResponse"][];
+        };
+      };
+    };
+  };
+  getBffTenantMaintenance: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        tenantId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TenantMaintenanceBffResponse"][];
         };
       };
     };

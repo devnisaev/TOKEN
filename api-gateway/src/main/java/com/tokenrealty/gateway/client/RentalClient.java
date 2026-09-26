@@ -37,6 +37,32 @@ public class RentalClient extends DownstreamRestClientSupport {
         return body == null ? List.of() : List.of(body);
     }
 
+    public List<MaintenanceTicketView> listMaintenanceTicketsByTenantId(UUID tenantId) {
+        MaintenanceTicketView[] body = get(
+                "/v1/maintenance-tickets?tenantId={tenantId}",
+                MaintenanceTicketView[].class,
+                DownstreamServices.RENTAL,
+                tenantId);
+        return body == null ? List.of() : List.of(body);
+    }
+
+    public List<MaintenanceTicketView> listMaintenanceTicketsByLeaseId(UUID leaseId) {
+        MaintenanceTicketView[] body = get(
+                "/v1/maintenance-tickets?leaseId={leaseId}",
+                MaintenanceTicketView[].class,
+                DownstreamServices.RENTAL,
+                leaseId);
+        return body == null ? List.of() : List.of(body);
+    }
+
+    public List<MaintenanceTicketView> listAllMaintenanceTickets() {
+        MaintenanceTicketView[] body = get(
+                "/v1/maintenance-tickets",
+                MaintenanceTicketView[].class,
+                DownstreamServices.RENTAL);
+        return body == null ? List.of() : List.of(body);
+    }
+
     public record LeaseView(
             UUID id,
             UUID flatId,
@@ -61,6 +87,18 @@ public class RentalClient extends DownstreamRestClientSupport {
             UUID payoutId,
             String status,
             Instant paidAt
+    ) {
+    }
+
+    public record MaintenanceTicketView(
+            UUID id,
+            UUID leaseId,
+            UUID flatId,
+            UUID tenantId,
+            String title,
+            String description,
+            String status,
+            Instant createdAt
     ) {
     }
 }

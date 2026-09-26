@@ -75,6 +75,22 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TenantLeaseBffResponse'
+  /v1/bff/tenants/{tenantId}/maintenance:
+    get:
+      operationId: getBffTenantMaintenance
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TenantMaintenanceBffResponse'
   /v1/bff/orders/{orderId}/status-stream:
     get:
       operationId: streamOrderStatus
@@ -203,3 +219,27 @@ components:
         flat:
           $ref: '#/components/schemas/TenantFlatSummary'
         rentDue: { type: boolean }
+    MaintenanceTicketView:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        leaseId: { type: string, format: uuid }
+        flatId: { type: string, format: uuid }
+        tenantId: { type: string, format: uuid }
+        title: { type: string }
+        description: { type: string }
+        status:
+          type: string
+          enum: [OPEN, RESOLVED]
+        createdAt: { type: string, format: date-time }
+    TenantMaintenanceBffResponse:
+      type: object
+      properties:
+        lease:
+          $ref: '#/components/schemas/TenantLeaseView'
+        flat:
+          $ref: '#/components/schemas/TenantFlatSummary'
+        openTickets:
+          type: array
+          items:
+            $ref: '#/components/schemas/MaintenanceTicketView'

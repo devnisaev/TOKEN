@@ -63,6 +63,71 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentPayment'
+  /v1/maintenance-tickets:
+    get:
+      operationId: listMaintenanceTickets
+      parameters:
+        - name: tenantId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: leaseId
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MaintenanceTicket'
+    post:
+      operationId: createMaintenanceTicket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMaintenanceTicketRequest'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintenanceTicket'
+  /v1/maintenance-tickets/{id}:
+    get:
+      operationId: getMaintenanceTicket
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintenanceTicket'
+    patch:
+      operationId: updateMaintenanceTicket
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMaintenanceTicketRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintenanceTicket'
 components:
   schemas:
     Lease:
@@ -92,3 +157,30 @@ components:
         amount: { type: number }
         status: { type: string }
         paidAt: { type: string, format: date-time }
+    CreateMaintenanceTicketRequest:
+      type: object
+      required: [leaseId, title, description]
+      properties:
+        leaseId: { type: string, format: uuid }
+        title: { type: string, maxLength: 200 }
+        description: { type: string, maxLength: 2000 }
+    UpdateMaintenanceTicketRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [OPEN, RESOLVED]
+    MaintenanceTicket:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        leaseId: { type: string, format: uuid }
+        flatId: { type: string, format: uuid }
+        tenantId: { type: string, format: uuid }
+        title: { type: string }
+        description: { type: string }
+        status:
+          type: string
+          enum: [OPEN, RESOLVED]
+        createdAt: { type: string, format: date-time }

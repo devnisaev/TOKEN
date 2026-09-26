@@ -18,6 +18,7 @@ const specs = [
   ['notification', 'specs/notification.yaml'],
   ['document', 'specs/document.yaml'],
   ['rental', 'specs/rental.yaml'],
+  ['indexer', 'specs/indexer.yaml'],
   ['gateway', 'specs/gateway.yaml'],
 ];
 

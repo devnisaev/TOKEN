@@ -121,4 +121,12 @@ public final class BffDtos {
             boolean rentDue
     ) {
     }
+
+    @Builder
+    public record TenantMaintenanceBffResponse(
+            RentalClient.LeaseView lease,
+            TenantFlatSummary flat,
+            List<RentalClient.MaintenanceTicketView> openTickets
+    ) {
+    }
 }

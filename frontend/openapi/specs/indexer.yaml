@@ -1,0 +1,95 @@
+openapi: 3.0.3
+info:
+  title: TokenRealty Blockchain Indexer API
+  version: 1.0.0
+paths:
+  /v1/indexer/status:
+    get:
+      operationId: getIndexerStatus
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndexerStatusResponse'
+  /v1/indexer/events:
+    get:
+      operationId: listIndexedEvents
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 0 }
+        - name: size
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndexedEventPage'
+  /v1/indexer/reconciliation:
+    get:
+      operationId: listReconciliationMismatches
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReconciliationMismatch'
+  /v1/indexer/reconciliation/{mismatchId}/remediate:
+    post:
+      operationId: remediateReconciliationMismatch
+      parameters:
+        - name: mismatchId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReconciliationMismatch'
+components:
+  schemas:
+    IndexerStatusResponse:
+      type: object
+      properties:
+        cursorId: { type: string }
+        lastBlockNumber: { type: integer, format: int64 }
+    IndexedEvent:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        eventType: { type: string }
+        contractAddress: { type: string }
+        txHash: { type: string }
+        logIndex: { type: integer }
+        blockNumber: { type: integer, format: int64 }
+        payload: { type: string }
+        createdAt: { type: string, format: date-time }
+    IndexedEventPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/IndexedEvent'
+        totalElements: { type: integer, format: int64 }
+        totalPages: { type: integer }
+        size: { type: integer }
+        number: { type: integer }
+    ReconciliationMismatch:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        contractId: { type: string, format: uuid }
+        contractAddress: { type: string }
+        walletAddress: { type: string }
+        dbBalance: { type: integer, format: int64 }
+        chainBalance: { type: integer, format: int64 }
+        resolved: { type: boolean }
+        createdAt: { type: string, format: date-time }
