@@ -59,6 +59,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PortfolioBffResponse'
+  /v1/bff/tenants/{tenantId}/lease:
+    get:
+      operationId: getBffTenantLeases
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TenantLeaseBffResponse'
   /v1/bff/orders/{orderId}/status-stream:
     get:
       operationId: streamOrderStatus
@@ -155,3 +171,35 @@ components:
         orderId: { type: string, format: uuid }
         orderStatus: { type: string }
         tradeStatus: { type: string }
+    TenantLeaseView:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        flatId: { type: string, format: uuid }
+        tenantId: { type: string, format: uuid }
+        tenantWallet: { type: string }
+        spvRecipientId: { type: string, format: uuid }
+        spvWallet: { type: string }
+        monthlyRentUsd: { type: number }
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date }
+        status: { type: string }
+        createdAt: { type: string, format: date-time }
+    TenantFlatSummary:
+      type: object
+      properties:
+        flatId: { type: string, format: uuid }
+        buildingId: { type: string, format: uuid }
+        buildingName: { type: string }
+        flatNumber: { type: string }
+        floor: { type: integer }
+        areaSqm: { type: number }
+        status: { type: string }
+    TenantLeaseBffResponse:
+      type: object
+      properties:
+        lease:
+          $ref: '#/components/schemas/TenantLeaseView'
+        flat:
+          $ref: '#/components/schemas/TenantFlatSummary'
+        rentDue: { type: boolean }

@@ -68,6 +68,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/bff/tenants/{tenantId}/lease": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["getBffTenantLeases"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/bff/orders/{orderId}/status-stream": {
     parameters: {
       query?: never;
@@ -164,6 +180,42 @@ export interface components {
       orderStatus?: string;
       tradeStatus?: string;
     };
+    TenantLeaseView: {
+      /** Format: uuid */
+      id?: string;
+      /** Format: uuid */
+      flatId?: string;
+      /** Format: uuid */
+      tenantId?: string;
+      tenantWallet?: string;
+      /** Format: uuid */
+      spvRecipientId?: string;
+      spvWallet?: string;
+      monthlyRentUsd?: number;
+      /** Format: date */
+      startDate?: string;
+      /** Format: date */
+      endDate?: string;
+      status?: string;
+      /** Format: date-time */
+      createdAt?: string;
+    };
+    TenantFlatSummary: {
+      /** Format: uuid */
+      flatId?: string;
+      /** Format: uuid */
+      buildingId?: string;
+      buildingName?: string;
+      flatNumber?: string;
+      floor?: number;
+      areaSqm?: number;
+      status?: string;
+    };
+    TenantLeaseBffResponse: {
+      lease?: components["schemas"]["TenantLeaseView"];
+      flat?: components["schemas"]["TenantFlatSummary"];
+      rentDue?: boolean;
+    };
   };
   responses: never;
   parameters: never;
@@ -253,6 +305,27 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["PortfolioBffResponse"];
+        };
+      };
+    };
+  };
+  getBffTenantLeases: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        tenantId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TenantLeaseBffResponse"][];
         };
       };
     };

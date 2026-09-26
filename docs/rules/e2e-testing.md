@@ -24,7 +24,9 @@ Requires a live gateway and seeded demo data:
 
 ```bash
 ./scripts/demo-all.sh              # one command: infra → services → wait → seed
-./scripts/demo-all.sh --e2e          # same + Playwright full tests
+./scripts/demo-all.sh --tokenize   # also tokenize demo flat + wait for listing
+./scripts/demo-all.sh --buy        # after seed, place demo buy order via gateway
+./scripts/demo-all.sh --e2e        # same + Playwright full tests
 
 # Or step-by-step:
 ./scripts/demo-start.sh          # Postgres + Kafka + Jaeger

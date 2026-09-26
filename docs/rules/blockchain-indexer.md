@@ -145,7 +145,7 @@ Relay: `OutboxRelayWorker` (same pattern as Payment Service).
 
 ## Pending / future
 
-- [ ] WebSocket / eth_subscribe instead of polling
-- [ ] Auto-remediation workflow (Issuance holder balance sync with approval)
-- [ ] DividendPaid / custom PropertyToken events
+- [x] WebSocket / eth_subscribe instead of polling — `WebSocketLogSubscriber` (opt-in via `tokenrealty.indexer.websocket.enabled`)
+- [x] Auto-remediation workflow — `POST /v1/indexer/reconciliation/{mismatchId}/remediate`
+- [x] DividendDeposited / DividendClaimed event topics in `EventTopics`
 - [x] Metrics: lag blocks, mismatch count (Micrometer) — `indexer.block.lag`, `indexer.events.indexed.total`, `indexer.balance.mismatches.open`

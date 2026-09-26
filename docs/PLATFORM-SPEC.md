@@ -408,7 +408,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 
 - [x] Implement `PropertyToken.sol` (ERC-1400 or ERC-20 + compliance hook)
 - [x] Implement `ComplianceRegistry.sol` (whitelist add/remove/check)
-- [ ] Implement `DividendDistributor.sol` (optional; or dividend logic in PropertyToken)
+- [x] Implement `DividendDistributor.sol` (optional; or dividend logic in PropertyToken)
 - [x] Fix file naming: `Propertytoken.sol` → `PropertyToken.sol`, `Complianceregistry.sol` → `ComplianceRegistry.sol`
 - [x] Create `hardhat/scripts/deployFlat.js` (called by `ContractDeployer`)
 - [x] Run `npm run compile` and verify artifacts generated
@@ -496,12 +496,13 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 - [x] POST `/v1/orders` — place buy order (primary market)
 - [x] Simple order match on buy (reserve tokens, status MATCHED)
 - [x] KYC check via Compliance Service `GET /v1/compliance/check/{wallet}` (`ComplianceClient`)
+- [x] Investment policy gate via `POST /v1/compliance/check-investment` before order match
 - [x] Outbox publisher for `listing.created`, `order.matched`, `trade.settled`
 - [x] Admin PATCH `/v1/orders/{id}/settle` (fallback; automated flow via Kafka when enabled)
 - [x] Unit + context tests (`./mvnw test`)
 - [x] Secondary market sell orders (`POST /v1/listings/secondary`, `POST /v1/orders/sell`)
 - [x] Kafka relay (outbox → broker via `OutboxRelayWorker`)
-- [x] Consumer: auto-create listing on `flat.tokenized`
+- [x] Consumer: auto-create listing on `flat.tokenized` (requires `building.approved` gate)
 - [x] Integrate with Payment Service (escrow on match via `PaymentClient`)
 - [x] Integrate with Token Issuance (transfer on payment confirmed via Kafka)
 
@@ -540,7 +541,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 - [x] Entity: `ComplianceRecord` (register / verify / revoke)
 - [x] POST `/v1/compliance` — register investor for KYC
 - [x] PATCH `/v1/compliance/{id}/verify` and `/revoke` — approve/reject
-- [ ] Webhook endpoint for Sumsub/Onfido (optional)
+- [x] Webhook endpoint for Sumsub/Onfido (optional) — `POST /v1/compliance/webhooks/kyc/{provider}`
 - [x] Sync on-chain whitelist via Kafka → Issuance `KycApprovedListener` / `KycRevokedListener`
 - [x] Periodic expiry check (@Scheduled)
 - [x] Publish `kyc-approved`, `kyc-revoked` events (outbox)
@@ -640,6 +641,7 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 
 - [x] Structured logging (JSON) with `traceId` via `tokenrealty-web` (`TraceIdFilter`, logback-spring.xml)
 - [x] Micrometer + Prometheus metrics (`/actuator/prometheus` on all services)
+- [x] Prometheus alert rules (service down, indexer balance mismatch — `docker/observability/prometheus/alerts/`)
 - [x] Distributed tracing (OpenTelemetry OTLP export; Jaeger in compose `otel` profile)
 - [x] Health checks: `/actuator/health` on all services
 
@@ -661,6 +663,17 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] Payment custodial balance guard on escrow initiate
 - [x] Shared Kafka DLQ handler (`tokenrealty-kafka`, opt-in)
 - [x] Gateway Redis-backed rate limiting (compose Redis :6379)
+- [x] Liquibase migrations: marketplace, compliance, rental (tracks 114–116)
+- [x] Marketplace `building.approved` Kafka consumer + approved-building gate on auto-listing
+- [x] OpenAPI specs + codegen for payment, wallet, issuance, notification, compliance (tracks 103–107)
+- [x] E2E full specs: buy-settled, notification-prefs, admin-tokenize, dividend-history (tracks 108–110)
+- [x] `demo-all.sh --buy` one-command buy-flow demo (track 111)
+- [x] Indexer balance remediation, dividend event indexing, WebSocket log subscriber (tracks 118–120)
+- [x] WalletConnect session API + KMS prod encryption config (tracks 121–122)
+- [x] Kafka/outbox CI: `OutboxRelayIntegrationTest`, `DocumentUploadedOutboxIntegrationTest`, `KafkaDlqIntegrationTest`
+- [x] Kafka ITs: `BuildingApprovedKafkaIntegrationTest`, `RentScheduleKafkaIntegrationTest`, `TransferCompletedKafkaIntegrationTest`
+- [x] Service ITs: `BalanceRemediationIntegrationTest` (indexer remediation)
+- [x] `BuyFlowKafkaContainersIntegrationTest` (Testcontainers Kafka buy-flow)
 
 ### 11.5 Frontend
 

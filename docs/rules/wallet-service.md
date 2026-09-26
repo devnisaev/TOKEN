@@ -28,6 +28,7 @@ Related: [web3j-blockchain-integration SKILL](../../.cursor/skills/web3j-blockch
 |--------|------|------|-------------|
 | `POST` | `/v1/wallets` | `INVESTOR`, `ADMIN` | Create custodial wallet (one per investor) |
 | `POST` | `/v1/wallets/link` | `INVESTOR`, `ADMIN` | Link external wallet address |
+| `POST` | `/v1/wallets/connect-session` | `INVESTOR`, `ADMIN` | WalletConnect v2 session stub (relay topic + URI) |
 | `GET` | `/v1/wallets/{investorId}` | `INVESTOR`, `ADMIN`, `SERVICE` | List wallets |
 | `GET` | `/v1/wallets/{investorId}/balance` | `INVESTOR`, `ADMIN`, `SERVICE` | Aggregate Payment + Issuance balances |
 | `POST` | `/v1/wallets/{investorId}/sign` | `INVESTOR`, `ADMIN` | Sign raw transaction (custodial only) |
