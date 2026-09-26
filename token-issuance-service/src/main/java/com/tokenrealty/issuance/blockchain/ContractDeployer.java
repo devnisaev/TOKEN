@@ -8,18 +8,11 @@ import org.springframework.stereotype.Component;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 /**
- * ContractDeployer — deploys PropertyToken contracts by invoking
- * the Hardhat deployFlat.js script as a subprocess.
- *
- * This approach keeps the Java code clean — no need to manually
- * encode contract bytecode + constructor args in Java.
- * The script outputs a single JSON line that we parse.
+ * Deploys PropertyToken contracts by invoking hardhat/scripts/deployFlat.js.
  */
 @Component
 @Slf4j
@@ -42,68 +35,51 @@ public class ContractDeployer {
             Long chainId
     ) {}
 
-    /**
-     * Deploys a PropertyToken contract for a flat.
-     * Calls hardhat/scripts/deployFlat.js as a subprocess.
-     *
-     * @param flatId       UUID of the flat in Property Registry
-     * @param buildingId   UUID of the building
-     * @param tokenName    e.g. "Bishkek City Plaza — Flat 101"
-     * @param tokenSymbol  e.g. "BKCP-101"
-     * @param totalSupply  e.g. 1000
-     * @param tokenPriceUsd e.g. 45.00
-     */
     public DeploymentResult deployPropertyToken(
             UUID flatId,
             UUID buildingId,
             String tokenName,
             String tokenSymbol,
             Long totalSupply,
-            BigDecimal tokenPriceUsd
+            BigDecimal tokenPriceUsd,
+            String spvWalletAddress
     ) throws Exception {
 
-        // Convert price to cents (integer) for Solidity
         long priceInCents = tokenPriceUsd.multiply(BigDecimal.valueOf(100)).longValue();
-
         String network = resolveHardhatNetwork();
         String hardhatDir = resolveHardhatDir();
 
-        List<String> command = List.of(
-                "npx", "hardhat", "run", "scripts/deployFlat.js",
-                "--network", network,
-                "--flat-id", flatId.toString(),
-                "--building-id", buildingId.toString(),
-                "--name", tokenName,
-                "--symbol", tokenSymbol,
-                "--supply", String.valueOf(totalSupply),
-                "--price-usd", String.valueOf(priceInCents)
-        );
-
-        log.info("Deploying PropertyToken: flat={} network={}", flatId, network);
-        log.debug("Command: {}", String.join(" ", command));
-
-        ProcessBuilder pb = new ProcessBuilder(command);
+        ProcessBuilder pb = new ProcessBuilder(
+                "npx", "hardhat", "run", "scripts/deployFlat.js", "--network", network);
         pb.directory(new java.io.File(hardhatDir));
+        pb.environment().put("FLAT_ID", flatId.toString());
+        pb.environment().put("BUILDING_ID", buildingId.toString());
+        pb.environment().put("TOKEN_NAME", tokenName);
+        pb.environment().put("TOKEN_SYMBOL", tokenSymbol);
+        pb.environment().put("TOTAL_SUPPLY", String.valueOf(totalSupply));
+        pb.environment().put("PRICE_USD_CENTS", String.valueOf(priceInCents));
+        pb.environment().put("SPV_WALLET", spvWalletAddress);
         pb.environment().put("COMPLIANCE_REGISTRY_ADDRESS", props.getComplianceRegistryAddress());
         pb.environment().put("OPERATOR_PRIVATE_KEY", props.getOperatorPrivateKey());
         pb.redirectErrorStream(false);
 
+        log.info("Deploying PropertyToken: flat={} network={}", flatId, network);
+
         Process process = pb.start();
 
-        // Read stdout (JSON result line)
         StringBuilder stdout = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(process.getInputStream()))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (line.startsWith("{")) stdout.append(line);
-                else log.debug("[hardhat] {}", line);
+                if (line.startsWith("{")) {
+                    stdout.append(line);
+                } else {
+                    log.debug("[hardhat] {}", line);
+                }
             }
         }
 
-        // Read stderr (logs)
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(process.getErrorStream()))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 log.debug("[hardhat stderr] {}", line);
@@ -149,11 +125,10 @@ public class ContractDeployer {
     }
 
     private String resolveHardhatDir() {
-        // Resolve relative to working directory
-        // In dev: project root/hardhat
-        // Override with HARDHAT_DIR env var if needed
         String envDir = System.getenv("HARDHAT_DIR");
-        if (envDir != null && !envDir.isBlank()) return envDir;
+        if (envDir != null && !envDir.isBlank()) {
+            return envDir;
+        }
         return "hardhat";
     }
 }

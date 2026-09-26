@@ -15,16 +15,16 @@ Adapted from Titan `ledger-accounting.mdc`. Cursor rule: [`.cursor/rules/payment
 | Idempotency | `POST /v1/payments` + `Idempotency-Key` header + unique constraint |
 | Ledger entries | `LedgerService` — debit/credit pairs on hold and release |
 | Outbox events | `PaymentConfirmedEvent`, `RentCollectedEvent` (typed records) |
-| Simulated on-chain | Payout `txHash = 0xSIMULATED_...`; confirm accepts external `txHash` |
+| On-chain payouts | `PaymentBlockchainService.sendTokenTransfer()` when `PAYMENT_BLOCKCHAIN_ENABLED=true` + `USDC_CONTRACT_ADDRESS`; else `0xSIMULATED_...` |
 | Marketplace escrow | `PaymentClient` initiates on order match; `releaseEscrow` on `transfer.completed` |
-| Optional tx verify | `PaymentBlockchainService` — set `PAYMENT_BLOCKCHAIN_ENABLED=true` + `blockchain.rpc-url` |
+| Tx verify on confirm | `PaymentBlockchainService.findReceipt()` — rejects unconfirmed tx when blockchain enabled |
 | Kafka consumer | `OrderMatchedListener` — reconciliation when escrow missing for order |
 | Dev auto-confirm | `PaymentAutoConfirmWorker` — `PAYMENT_AUTO_CONFIRM=true` or `local` profile |
 
 ## Pending
 
-- Real Web3j USDC/MATIC outbound transfers from Payment Service
 - On-chain deposit auto-detection for production (dev uses `PaymentAutoConfirmWorker`)
+- Polygon mainnet USDC contract address (local dev uses `MockUSDC` from `npm run deploy:local`)
 - On-chain reconciliation job (`WalletBalance` vs chain)
 - DLQ for failed consumer retries
 

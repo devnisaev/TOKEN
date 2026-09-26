@@ -1,5 +1,6 @@
 package com.tokenrealty.payment.service;
 
+import com.tokenrealty.payment.blockchain.PaymentBlockchainService;
 import com.tokenrealty.payment.dto.PaymentDtos.*;
 import com.tokenrealty.payment.entity.*;
 import com.tokenrealty.payment.kafka.port.RentCollectedPublisher;
@@ -26,6 +27,7 @@ class PayoutServiceTest {
     @Mock PayoutRepository payoutRepository;
     @Mock PaymentMapper mapper;
     @Mock RentCollectedPublisher rentCollectedPublisher;
+    @Mock PaymentBlockchainService paymentBlockchainService;
     @InjectMocks PayoutService payoutService;
 
     @Test
@@ -52,6 +54,7 @@ class PayoutServiceTest {
                 .build();
         saved.setId(UUID.randomUUID());
 
+        when(paymentBlockchainService.isEnabled()).thenReturn(false);
         when(payoutRepository.save(any())).thenReturn(saved);
         when(mapper.toPayoutResponse(saved)).thenReturn(
                 PayoutResponse.builder().id(saved.getId()).status(Payout.PayoutStatus.COMPLETED).build());

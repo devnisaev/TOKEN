@@ -69,13 +69,13 @@ TokenRealty tokenizes real estate assets (buildings, flats, and other property t
 
 ### What is stubbed or missing
 
-- [ ] **Smart contracts** — `Propertytoken.sol`, `Complianceregistry.sol` are empty (0 bytes)
-- [ ] **Per-flat deploy script** — `deployFlat.js` referenced but missing
-- [ ] **On-chain dividends** — simulated (`txHash = "0xSIMULATED_..."`)
+- [x] **Smart contracts** — `PropertyToken.sol`, `ComplianceRegistry.sol`, `MockUSDC.sol` in `hardhat/contracts/` (compliance-gated ERC-20 MVP)
+- [x] **Per-flat deploy script** — `hardhat/scripts/deployFlat.js` wired to `ContractDeployer`
+- [ ] **On-chain dividends** — simulated (`txHash = "0xSIMULATED_..."`) in Issuance; Payment payouts use Web3j when `PAYMENT_BLOCKCHAIN_ENABLED=true`
 - [x] **Inter-service auth** — JWT via `tokenrealty-security`; service tokens on RestClient
 - [ ] **Liquibase** — disabled; Hibernate `ddl-auto: update` used instead
 - [ ] **Issuance Liquibase** — referenced in config but no migration files exist
-- [ ] **Kafka** — mentioned in README, not implemented
+- [x] **Kafka** — outbox relay + consumers in Marketplace, Payment, Issuance, Compliance, Rental
 - [x] **Auth service** — JWT MVP; registry/issuance/marketplace validate Bearer tokens
 - [ ] **IPFS upload** — `ipfsCid` field stored, no upload client
 - [x] **Payment** — MVP (escrow, confirm, release, payouts, outbox stub)
@@ -93,7 +93,7 @@ TokenRealty tokenizes real estate assets (buildings, flats, and other property t
 | Issuance entities | `token-issuance-service/src/main/java/com/tokenrealty/issuance/entity/` |
 | Inter-service client | `token-issuance-service/src/main/java/com/tokenrealty/issuance/client/PropertyRegistryClient.java` |
 | Blockchain layer | `token-issuance-service/src/main/java/com/tokenrealty/issuance/blockchain/` |
-| Contract stubs | `token-issuance-service/contracts/` |
+| Smart contracts | `token-issuance-service/hardhat/contracts/` |
 | Hardhat | `token-issuance-service/hardhat/` |
 | Registry Liquibase | `token-realty-app/src/main/resources/db/changelog/` |
 | Marketplace entities | `marketplace-service/src/main/java/com/tokenrealty/marketplace/entity/` |
@@ -178,7 +178,7 @@ Notification Service         Polygon / Hardhat + IPFS
 |----------------|---------|
 | Primary market | List tokenized flats with price, availability, min investment |
 | Secondary market | Sell orders, buy orders, order matching |
-| Compliance gate | Call Token Issuance `/v1/compliance/check/{wallet}` before trade |
+| Compliance gate | Call Compliance Service `/v1/compliance/check/{wallet}` before trade |
 | Checkout | Reserve tokens during payment (integrate with Payment Service) |
 
 **Key entities:** `Listing`, `Order`, `Trade`
@@ -482,11 +482,11 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 - [x] GET `/v1/listings` — search/filter listings
 - [x] POST `/v1/orders` — place buy order (primary market)
 - [x] Simple order match on buy (reserve tokens, status MATCHED)
-- [x] KYC check via Token Issuance `GET /v1/compliance/check/{wallet}`
+- [x] KYC check via Compliance Service `GET /v1/compliance/check/{wallet}` (`ComplianceClient`)
 - [x] Outbox publisher for `listing.created`, `order.matched`, `trade.settled`
-- [x] Admin PATCH `/v1/orders/{id}/settle` (interim until Payment Service)
+- [x] Admin PATCH `/v1/orders/{id}/settle` (fallback; automated flow via Kafka when enabled)
 - [x] Unit + context tests (`./mvnw test`)
-- [ ] Secondary market sell orders
+- [x] Secondary market sell orders (`POST /v1/listings/secondary`, `POST /v1/orders/sell`)
 - [x] Kafka relay (outbox → broker via `OutboxRelayWorker`)
 - [x] Consumer: auto-create listing on `flat.tokenized`
 - [x] Integrate with Payment Service (escrow on match via `PaymentClient`)
@@ -500,7 +500,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 - [x] POST `/v1/payments/{id}/confirm` — webhook/callback on chain confirmation
 - [x] Escrow hold/release/refund logic
 - [x] POST `/v1/payouts` — dividend/rent payout to holder wallets
-- [ ] Web3j integration for real USDC/MATIC transfers (simulated txHash for now)
+- [x] Web3j integration for USDC payouts (`PaymentBlockchainService`; MockUSDC on local Hardhat; simulated when disabled)
 - [x] Transaction ledger entries (double-entry stub)
 - [ ] On-chain reconciliation job
 - [x] Publish `PaymentConfirmed`, `RentCollected` events (outbox stub)
@@ -522,16 +522,16 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 
 ### 10.7 Compliance Service (Phase 4)
 
-- [ ] Extract compliance logic from Token Issuance
-- [ ] Scaffold project (`compliance-service/`)
-- [ ] Entities: ComplianceApplication, ComplianceReview, AuditLog
-- [ ] POST `/v1/applications` — submit KYC application
-- [ ] PATCH `/v1/applications/{id}/review` — approve/reject
+- [x] Extract compliance logic from Token Issuance
+- [x] Scaffold project (`compliance-service/`, port 8087)
+- [x] Entity: `ComplianceRecord` (register / verify / revoke)
+- [x] POST `/v1/compliance` — register investor for KYC
+- [x] PATCH `/v1/compliance/{id}/verify` and `/revoke` — approve/reject
 - [ ] Webhook endpoint for Sumsub/Onfido (optional)
-- [ ] Sync whitelist to Token Issuance on approval
+- [x] Sync on-chain whitelist via Kafka → Issuance `KycApprovedListener` / `KycRevokedListener`
 - [ ] Periodic expiry check (@Scheduled)
-- [ ] Publish `InvestorKycApproved`, `InvestorKycRevoked` events
-- [ ] Unit + integration tests
+- [x] Publish `kyc-approved`, `kyc-revoked` events (outbox)
+- [x] Unit + context tests
 
 ### 10.8 Document Service (Phase 4)
 

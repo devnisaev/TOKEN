@@ -1,5 +1,6 @@
 package com.tokenrealty.payment.service;
 
+import com.tokenrealty.payment.blockchain.PaymentBlockchainService;
 import com.tokenrealty.payment.dto.PaymentDtos.*;
 import com.tokenrealty.payment.entity.Payout;
 import com.tokenrealty.payment.kafka.events.RentCollectedEvent;
@@ -23,6 +24,7 @@ public class PayoutService {
     private final PayoutRepository payoutRepository;
     private final PaymentMapper mapper;
     private final RentCollectedPublisher rentCollectedPublisher;
+    private final PaymentBlockchainService paymentBlockchainService;
 
     public Page<PayoutResponse> findAll(UUID recipientInvestorId, Pageable pageable) {
         if (recipientInvestorId != null) {
@@ -67,6 +69,11 @@ public class PayoutService {
     private void completePayout(Payout payout) {
         payout.setStatus(Payout.PayoutStatus.COMPLETED);
         payout.setCompletedAt(Instant.now());
-        payout.setTxHash("0xSIMULATED_" + payout.getId().toString().replace("-", "").substring(0, 16));
+        if (paymentBlockchainService.isEnabled()) {
+            payout.setTxHash(paymentBlockchainService.sendTokenTransfer(
+                    payout.getRecipientWallet(), payout.getAmount(), payout.getCurrency()));
+        } else {
+            payout.setTxHash("0xSIMULATED_" + payout.getId().toString().replace("-", "").substring(0, 16));
+        }
     }
 }

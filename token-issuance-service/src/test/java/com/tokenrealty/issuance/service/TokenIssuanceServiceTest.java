@@ -84,7 +84,7 @@ class TokenIssuanceServiceTest {
             TokenContract c = inv.getArgument(0);
             return c;
         });
-        when(deployer.deployPropertyToken(any(), any(), any(), any(), any(), any()))
+        when(deployer.deployPropertyToken(any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(deployResult);
 
         var result = service.issueTokens(request);
@@ -93,7 +93,7 @@ class TokenIssuanceServiceTest {
         assertThat(result.tokenSymbol()).isEqualTo("BKCP-101");
         verify(deployer).deployPropertyToken(flatId, buildingId,
                 "Bishkek City Plaza — Flat 101", "BKCP-101",
-                1000L, BigDecimal.valueOf(45.00));
+                1000L, BigDecimal.valueOf(45.00), "0xSPVWallet123");
         verify(holderRepository).save(any());
     }
 
@@ -106,7 +106,7 @@ class TokenIssuanceServiceTest {
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("already issued");
 
-        verify(deployer, never()).deployPropertyToken(any(), any(), any(), any(), any(), any());
+        verify(deployer, never()).deployPropertyToken(any(), any(), any(), any(), any(), any(), any());
     }
 
     @Test

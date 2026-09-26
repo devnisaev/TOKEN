@@ -31,7 +31,7 @@ module.exports = {
 
     // ─── Contract sources location ──────────────────────────────────────────
     paths: {
-        sources: "../contracts",   // .sol files live at project root /contracts/
+        sources: "./contracts",
         tests: "./test",
         cache: "./cache",
         artifacts: "./artifacts",

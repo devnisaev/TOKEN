@@ -34,9 +34,6 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
-blockchain:
-  rpc-url: ${BLOCKCHAIN_RPC_URL:http://localhost:8545}
-
 server:
   port: 8085
   servlet:
@@ -60,6 +57,11 @@ tokenrealty:
   payment:
     blockchain:
       enabled: ${PAYMENT_BLOCKCHAIN_ENABLED:false}
+      rpc-url: ${BLOCKCHAIN_RPC_URL:http://localhost:8545}
+      chain-id: ${BLOCKCHAIN_CHAIN_ID:31337}
+      operator-private-key: ${OPERATOR_PRIVATE_KEY:}
+      usdc-contract-address: ${USDC_CONTRACT_ADDRESS:}
+      gas-limit: 200000
     escrow-wallet-address: ${ESCROW_WALLET_ADDRESS:0xEscrowDevWallet0000000000000000000001}
     auto-confirm:
       enabled: ${PAYMENT_AUTO_CONFIRM:false}

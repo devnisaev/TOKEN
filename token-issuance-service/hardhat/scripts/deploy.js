@@ -29,7 +29,15 @@ async function main() {
     const complianceAddress = await complianceRegistry.getAddress();
     console.log(`✅ ComplianceRegistry deployed at: ${complianceAddress}`);
 
-    // ─── 2. Deploy a sample PropertyToken (Flat 101 demo) ──────────────────
+    // ─── 2. Deploy MockUSDC for Payment Service dev ─────────────────────────
+    console.log("💵 Deploying MockUSDC...");
+    const MockUSDC = await ethers.getContractFactory("MockUSDC");
+    const mockUsdc = await MockUSDC.deploy(operator.address);
+    await mockUsdc.waitForDeployment();
+    const usdcAddress = await mockUsdc.getAddress();
+    console.log(`✅ MockUSDC deployed at: ${usdcAddress}`);
+
+    // ─── 3. Deploy a sample PropertyToken (Flat 101 demo) ──────────────────
     console.log("\n🏠 Deploying PropertyToken (demo — Flat 101)...");
     const PropertyToken = await ethers.getContractFactory("PropertyToken");
 
@@ -52,13 +60,14 @@ async function main() {
         tokenArgs.operator,
         tokenArgs.complianceRegistry,
         tokenArgs.flatId,
-        tokenArgs.buildingId
+        tokenArgs.buildingId,
+        operator.address
     );
     await propertyToken.waitForDeployment();
     const tokenAddress = await propertyToken.getAddress();
     console.log(`✅ PropertyToken deployed at: ${tokenAddress}`);
 
-    // ─── 3. Whitelist operator in ComplianceRegistry ───────────────────────
+    // ─── 4. Whitelist operator in ComplianceRegistry ───────────────────────
     console.log("\n🔐 Whitelisting operator in ComplianceRegistry...");
     const oneYearFromNow = Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60;
     const whitelistTx = await complianceRegistry.addToWhitelist(
@@ -69,30 +78,36 @@ async function main() {
     await whitelistTx.wait();
     console.log(`✅ Operator ${operator.address} whitelisted`);
 
-    // ─── 4. Verify deployment ───────────────────────────────────────────────
+    // ─── 5. Verify deployment ───────────────────────────────────────────────
     const operatorBalance = await propertyToken.balanceOf(operator.address);
+    const spvBalance = await propertyToken.balanceOf(operator.address);
     const totalSupply = await propertyToken.totalSupply();
     console.log(`\n📊 PropertyToken verification:`);
     console.log(`   Name:          ${await propertyToken.name()}`);
     console.log(`   Symbol:        ${await propertyToken.symbol()}`);
     console.log(`   Total supply:  ${totalSupply}`);
-    console.log(`   Operator bal:  ${operatorBalance}`);
+    console.log(`   SPV bal:       ${spvBalance}`);
     console.log(`   Flat ID:       ${await propertyToken.flatId()}`);
 
-    // ─── 5. Print deployment summary ───────────────────────────────────────
+    // ─── 6. Print deployment summary ───────────────────────────────────────
     console.log("\n" + "─".repeat(60));
     console.log("📝 DEPLOYMENT SUMMARY — add these to your config files:");
     console.log("─".repeat(60));
     console.log(`Network:                  ${network.name}`);
     console.log(`Chain ID:                 ${network.config.chainId}`);
     console.log(`ComplianceRegistry:       ${complianceAddress}`);
+    console.log(`MockUSDC:                 ${usdcAddress}`);
     console.log(`PropertyToken (Flat 101): ${tokenAddress}`);
     console.log(`Operator wallet:          ${operator.address}`);
     console.log("─".repeat(60));
     console.log("\n📋 Copy to application.yml:");
     console.log(`blockchain.compliance-registry-address: ${complianceAddress}`);
+    console.log("\n📋 Copy to payment-service application.yml / .env:");
+    console.log(`USDC_CONTRACT_ADDRESS=${usdcAddress}`);
+    console.log(`PAYMENT_BLOCKCHAIN_ENABLED=true`);
     console.log("\n📋 Copy to .env:");
     console.log(`COMPLIANCE_REGISTRY_ADDRESS=${complianceAddress}`);
+    console.log(`USDC_CONTRACT_ADDRESS=${usdcAddress}`);
 
     if (network.name !== "localhost" && network.name !== "hardhat") {
         console.log("\n🔍 Verify on Polygonscan (wait ~30s for indexing):");

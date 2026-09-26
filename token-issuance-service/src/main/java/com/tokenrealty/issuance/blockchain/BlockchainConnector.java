@@ -159,16 +159,14 @@ public class BlockchainConnector {
      * Encodes: enableTransfers()
      */
     public static String encodeEnableTransfers() {
-        // keccak256("enableTransfers()") first 4 bytes = 0x538ba4f9
-        return "0x538ba4f9";
+        return "0xaf35c6c7";
     }
 
     /**
      * Encodes: suspendTransfers()
      */
     public static String encodeSuspendTransfers() {
-        // keccak256("suspendTransfers()") first 4 bytes = 0x1e0bdb9a
-        return "0x1e0bdb9a";
+        return "0xf7f33ff4";
     }
 
     /**
@@ -184,8 +182,7 @@ public class BlockchainConnector {
      * Encodes: transfersEnabled()
      */
     public static String encodeTransfersEnabled() {
-        // keccak256("transfersEnabled()") first 4 bytes = 0x94b6de91
-        return "0x94b6de91";
+        return "0xbef97c87";
     }
 
     /**

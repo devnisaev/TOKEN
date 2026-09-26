@@ -5,9 +5,16 @@ import com.tokenrealty.issuance.config.BlockchainProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.web3j.abi.FunctionEncoder;
+import org.web3j.abi.datatypes.Utf8String;
+import org.web3j.abi.datatypes.generated.Uint256;
+import org.web3j.abi.datatypes.Address;
+import org.web3j.abi.datatypes.Function;
 
 import java.math.BigInteger;
 import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -37,22 +44,28 @@ public class OnChainWhitelistService {
             return;
         }
         try {
-            String encodedData = encodeRemoveFromWhitelist(walletAddress, reason);
+            String encodedData = encodeRemoveFromWhitelist(walletAddress);
             blockchain.sendContractTransaction(registryAddress, encodedData, BigInteger.ZERO);
+            log.info("On-chain whitelist removed for {} reason={}", walletAddress, reason);
         } catch (Exception ex) {
             throw new IllegalStateException("On-chain revoke failed", ex);
         }
     }
 
     private static String encodeAddToWhitelist(String address, String country, long expiresAt) {
-        String paddedAddress = padLeft(address.replace("0x", ""), 64);
-        String paddedExpiry = padLeft(Long.toHexString(expiresAt), 64);
-        return "0x4bb278f3" + paddedAddress + paddedExpiry;
+        Function function = new Function(
+                "addToWhitelist",
+                List.of(
+                        new Address(address),
+                        new Utf8String(country != null ? country : ""),
+                        new Uint256(BigInteger.valueOf(expiresAt))),
+                Collections.emptyList());
+        return FunctionEncoder.encode(function);
     }
 
-    private static String encodeRemoveFromWhitelist(String address, String reason) {
+    private static String encodeRemoveFromWhitelist(String address) {
         String paddedAddress = padLeft(address.replace("0x", ""), 64);
-        return "0x2e1a7d4d" + paddedAddress;
+        return "0x8ab1d681" + paddedAddress;
     }
 
     private static String padLeft(String value, int length) {

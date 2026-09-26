@@ -126,7 +126,8 @@ public class TokenIssuanceService {
                     request.tokenName(),
                     request.tokenSymbol(),
                     request.totalSupply(),
-                    request.tokenPriceUsd()
+                    request.tokenPriceUsd(),
+                    request.spvWalletAddress()
             );
 
             // 6. Update contract with on-chain details
