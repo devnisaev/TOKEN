@@ -187,7 +187,7 @@
 | | |
 |---|---|
 | **Publisher** | Marketplace |
-| **Consumers** | Payment, Token Issuance |
+| **Consumers** | Payment, Token Issuance, Reporting, Settlement |
 | **Partition key** | `orderId` |
 
 **Payload:**
@@ -212,7 +212,7 @@
 | | |
 |---|---|
 | **Publisher** | Marketplace |
-| **Consumers** | Notification |
+| **Consumers** | Notification, Reporting, Settlement |
 | **Partition key** | `tradeId` |
 | **When** | Admin settle or Payment Service confirms payment + transfer |
 

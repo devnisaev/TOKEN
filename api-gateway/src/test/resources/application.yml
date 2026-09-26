@@ -19,6 +19,10 @@ services:
     url: http://localhost:8090/api
   rental:
     url: http://localhost:8086/api
+  reporting:
+    url: http://localhost:8093/api
+  settlement:
+    url: http://localhost:8094/api
 
 tokenrealty:
   jwt:

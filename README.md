@@ -6,7 +6,7 @@ Real-estate tokenization platform — fractional property ownership, crypto paym
 
 | Layer | Count | Notes |
 |-------|-------|-------|
-| Backend microservices | **12** | Spring Boot 4 / Java 21 |
+| Backend microservices | **14** | Spring Boot 4 / Java 21 |
 | Frontend apps | **3** | React 19 + Vite (investor, admin, tenant) |
 | Shared Maven libraries | **6** | security, web, jpa, kafka, events, outbox |
 
@@ -26,10 +26,12 @@ Real-estate tokenization platform — fractional property ownership, crypto paym
 | Notification | `notification-service/` | 8089 | Implemented (email + Kafka) |
 | Wallet | `wallet-service/` | 8090 | Implemented (custodial + aggregate balance) |
 | Blockchain Indexer | `blockchain-indexer-service/` | 8091 | Implemented (on-chain sync) |
+| Reporting / Analytics | `reporting-service/` | 8093 | Implemented (Kafka projections) |
+| Settlement / Saga Tracker | `settlement-service/` | 8094 | Implemented (buy-flow saga tracker) |
 
-### Phase 6 — planned
+### Phase 6 — in progress
 
-Phases 0–5 are complete. Next services (ports 8093–8099): Reporting, Settlement Saga, Valuation/NAV, Audit Ledger, Corporate Actions, Search, Integration Hub. See [docs/PLATFORM-SPEC.md §12](docs/PLATFORM-SPEC.md#12-phase-6--planned-services).
+Tier 1 complete (Reporting + Settlement). Remaining: Valuation/NAV, Audit Ledger, Corporate Actions, Search, Integration Hub. See [docs/PLATFORM-SPEC.md §12](docs/PLATFORM-SPEC.md#12-phase-6--planned-services).
 
 ## Shared libraries
 

@@ -45,4 +45,11 @@ public class ServiceClientConfig {
             ObjectProvider<ServiceTokenProvider> serviceTokenProvider) {
         return ServiceRestClientBuilder.build(baseUrl, serviceTokenProvider);
     }
+
+    @Bean("reportingRestClient")
+    RestClient reportingRestClient(
+            @Value("${services.reporting.url}") String baseUrl,
+            ObjectProvider<ServiceTokenProvider> serviceTokenProvider) {
+        return ServiceRestClientBuilder.build(baseUrl, serviceTokenProvider);
+    }
 }

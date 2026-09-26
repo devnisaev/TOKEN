@@ -36,6 +36,10 @@ services:
     url: ${WALLET_SERVICE_URL:http://localhost:8090/api}
   rental:
     url: ${RENTAL_SERVICE_URL:http://localhost:8086/api}
+  reporting:
+    url: ${REPORTING_SERVICE_URL:http://localhost:8093/api}
+  settlement:
+    url: ${SETTLEMENT_SERVICE_URL:http://localhost:8094/api}
 
 tokenrealty:
   jwt:
@@ -112,6 +116,14 @@ tokenrealty:
         target: http://localhost:8091
         paths:
           - /api/v1/indexer
+      - id: reporting
+        target: http://localhost:8093
+        paths:
+          - /api/v1/reports
+      - id: settlement
+        target: http://localhost:8094
+        paths:
+          - /api/v1/settlements
 
 management:
   tracing:

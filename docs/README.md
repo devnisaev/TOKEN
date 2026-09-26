@@ -81,22 +81,20 @@ Additional Cursor rules (no separate human doc yet):
 | Notification | [notification-service/README.md](../notification-service/README.md) | 8089 | Implemented |
 | Wallet | [wallet-service/README.md](../wallet-service/README.md) | 8090 | Implemented |
 | Blockchain Indexer | [blockchain-indexer-service/README.md](../blockchain-indexer-service/README.md) | 8091 | Implemented |
+| Reporting / Analytics | [reporting-service/README.md](../reporting-service/README.md) | 8093 | Implemented |
+| Settlement / Saga Tracker | [settlement-service/README.md](../settlement-service/README.md) | 8094 | Implemented |
 
-### Phase 6 — planned services
+### Phase 6 — remaining planned services
 
 Full descriptions: [PLATFORM-SPEC.md §12](PLATFORM-SPEC.md#12-phase-6--planned-services).
 
 | Service | Port | Priority | Status |
 |---------|------|----------|--------|
-| Reporting / Analytics | 8093 | P1 | Planned |
-| Settlement / Saga Tracker | 8094 | P1 | Planned |
 | Valuation / NAV | 8095 | P2 | Planned |
 | Audit Ledger | 8096 | P2 | Planned |
 | Corporate Actions | 8097 | P2 | Planned |
 | Search | 8098 | P3 | Planned |
 | Integration Hub | 8099 | P3 | Planned |
-
-Track backlog starts at **278**.
 
 ## Frontend
 
@@ -106,7 +104,7 @@ Track backlog starts at **278**.
 | Admin Dashboard | [frontend/admin-dashboard/](../frontend/admin-dashboard/) | http://localhost:5174 |
 | Tenant Portal | [frontend/tenant-portal/](../frontend/tenant-portal/) | http://localhost:5175 |
 
-**12 backend services** · **3 frontend apps** · **6 shared libraries** — see [../README.md](../README.md).
+**14 backend services** · **3 frontend apps** · **6 shared libraries** — see [../README.md](../README.md).
 
 See [rules/investor-portal.md](rules/investor-portal.md), [rules/admin-dashboard.md](rules/admin-dashboard.md), [rules/tenant-portal.md](rules/tenant-portal.md).
 

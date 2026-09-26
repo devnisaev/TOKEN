@@ -10,3 +10,5 @@ CREATE DATABASE document_service;
 CREATE DATABASE notification_service;
 CREATE DATABASE wallet_service;
 CREATE DATABASE blockchain_indexer;
+CREATE DATABASE reporting_service;
+CREATE DATABASE settlement_service;

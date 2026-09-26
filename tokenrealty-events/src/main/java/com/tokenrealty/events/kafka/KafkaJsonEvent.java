@@ -46,6 +46,12 @@ public final class KafkaJsonEvent {
         return envelope.get("eventType").asText();
     }
 
+    public Instant occurredAt() {
+        return envelope.hasNonNull("occurredAt")
+                ? Instant.parse(envelope.get("occurredAt").asText())
+                : Instant.now();
+    }
+
     public JsonNode payload() {
         return payload;
     }

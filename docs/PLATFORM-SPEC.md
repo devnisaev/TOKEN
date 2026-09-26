@@ -47,7 +47,7 @@ TokenRealty tokenizes real estate assets (buildings, flats, and other property t
 
 ## 2. Current State
 
-### Existing services (12 backend microservices)
+### Existing services (14 backend microservices)
 
 | Service | Folder | Port | Database | Status |
 |---------|--------|------|----------|--------|
@@ -63,6 +63,8 @@ TokenRealty tokenizes real estate assets (buildings, flats, and other property t
 | Notification | `notification-service/` | 8089 | `notification_service` | Implemented |
 | Wallet | `wallet-service/` | 8090 | `wallet_service` | Implemented |
 | Blockchain Indexer | `blockchain-indexer-service/` | 8091 | `blockchain_indexer` | Implemented |
+| Reporting / Analytics | `reporting-service/` | 8093 | `reporting_service` | Implemented |
+| Settlement / Saga Tracker | `settlement-service/` | 8094 | `settlement_service` | Implemented |
 
 ### What works today
 
@@ -279,8 +281,8 @@ Phases 0–5 delivered all 12 backend microservices. Phase 6 adds **read-side, o
 
 | Service | Port | Folder (proposed) | Priority |
 |---------|------|-------------------|----------|
-| Reporting / Analytics | 8093 | `reporting-service/` | **P1** — start here |
-| Settlement / Saga Tracker | 8094 | `settlement-service/` | **P1** |
+| Reporting / Analytics | 8093 | `reporting-service/` | **P1** — implemented |
+| Settlement / Saga Tracker | 8094 | `settlement-service/` | **P1** — implemented |
 | Valuation / NAV | 8095 | `valuation-service/` | **P2** |
 | Audit Ledger | 8096 | `audit-ledger-service/` | **P2** |
 | Corporate Actions | 8097 | `corporate-actions-service/` | **P2** |
@@ -655,25 +657,25 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] Reconciliation job: on-chain balance vs DB holder balance
 - [x] Alert on mismatch (logged + `GET /v1/indexer/reconciliation`)
 
-### 10.12 Reporting / Analytics Service (Phase 6 — planned)
+### 10.12 Reporting / Analytics Service (Phase 6)
 
-- [ ] Scaffold project (`reporting-service/`, port 8093)
-- [ ] Kafka consumers: `trade.settled`, `dividend.distributed`, `rent.collected`, `order.matched`, `flat.tokenized`
-- [ ] Materialized read models: trading volume, occupancy, dividend aggregates, SPV P&L snapshots
-- [ ] GET `/v1/reports/trading-summary`, `/v1/reports/occupancy`, `/v1/reports/dividends`
-- [ ] Regulatory export: investor holdings + transaction history (CSV/JSON)
-- [ ] Gateway BFF aggregate for admin dashboard charts
-- [ ] Unit + Kafka integration tests; link in docs/README.md
+- [x] Scaffold project (`reporting-service/`, port 8093)
+- [x] Kafka consumers: `trade.settled`, `dividend.distributed`, `rent.collected`, `order.matched`, `flat.tokenized`
+- [x] Materialized read models: trading volume, occupancy, dividend aggregates
+- [x] GET `/v1/reports/trading-summary`, `/v1/reports/occupancy`, `/v1/reports/dividends`
+- [x] Regulatory export: transaction history (JSON via `/v1/reports/export`)
+- [x] Gateway BFF aggregate `GET /v1/bff/admin/reports/summary`
+- [x] Kafka integration tests; README + docs/README.md
 
-### 10.13 Settlement / Saga Tracker Service (Phase 6 — planned)
+### 10.13 Settlement / Saga Tracker Service (Phase 6)
 
-- [ ] Scaffold project (`settlement-service/`, port 8094)
-- [ ] Saga state machine: primary/secondary buy flow steps (match → escrow → transfer → release → settled)
-- [ ] Kafka consumers: `order.matched`, `payment.confirmed`, `transfer.completed`, `trade.settled`
-- [ ] GET `/v1/settlements/{orderId}` — step timeline + current status
-- [ ] Admin retry/compensation hooks for stuck sagas (does **not** move escrow out of Payment)
-- [ ] Alert on sagas exceeding SLA threshold
-- [ ] Unit + Kafka integration tests
+- [x] Scaffold project (`settlement-service/`, port 8094)
+- [x] Saga state machine: primary/secondary buy flow steps (match → payment → transfer → settled)
+- [x] Kafka consumers: `order.matched`, `payment.confirmed`, `transfer.completed`, `trade.settled`
+- [x] GET `/v1/settlements/{orderId}` — step timeline + current status
+- [x] Admin retry hook `POST /v1/settlements/{orderId}/retry` (STUCK → IN_PROGRESS)
+- [x] Scheduled stuck detection (`tokenrealty.settlement.stuck-sla-minutes`)
+- [x] Kafka integration tests
 
 ### 10.14 Valuation / NAV Service (Phase 6 — planned)
 

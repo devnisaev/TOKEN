@@ -1,6 +1,7 @@
 package com.tokenrealty.gateway.bff;
 
 import com.tokenrealty.gateway.client.RentalClient;
+import com.tokenrealty.gateway.dto.BffDtos.AdminReportsSummaryResponse;
 import com.tokenrealty.gateway.dto.BffDtos.BuildingBffDetailResponse;
 import com.tokenrealty.gateway.dto.BffDtos.FlatDetailResponse;
 import com.tokenrealty.gateway.dto.BffDtos.ListingDetailResponse;
@@ -28,6 +29,7 @@ public class BffController {
     private final BffTenantLeaseService tenantLeaseService;
     private final BffTenantMaintenanceService tenantMaintenanceService;
     private final BffAdminMaintenanceService adminMaintenanceService;
+    private final BffAdminReportingService adminReportingService;
 
     @GetMapping("/flats/{flatId}")
     public FlatDetailResponse flatDetail(@PathVariable UUID flatId) {
@@ -62,5 +64,10 @@ public class BffController {
     @GetMapping("/admin/maintenance-tickets")
     public List<RentalClient.MaintenanceTicketView> adminMaintenanceQueue() {
         return adminMaintenanceService.getMaintenanceQueue();
+    }
+
+    @GetMapping("/admin/reports/summary")
+    public AdminReportsSummaryResponse adminReportsSummary() {
+        return adminReportingService.getAdminReportsSummary();
     }
 }

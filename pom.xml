@@ -30,6 +30,8 @@
         <module>document-service</module>
         <module>wallet-service</module>
         <module>blockchain-indexer-service</module>
+        <module>reporting-service</module>
+        <module>settlement-service</module>
     </modules>
 
     <properties>

@@ -72,6 +72,8 @@ start_one "notification" "notification-service"
 start_one "document" "document-service"
 start_one "wallet" "wallet-service"
 start_one "indexer" "blockchain-indexer-service"
+start_one "reporting" "reporting-service"
+start_one "settlement" "settlement-service"
 sleep 2
 start_one "gateway" "api-gateway"
 

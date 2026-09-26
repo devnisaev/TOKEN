@@ -129,4 +129,18 @@ public final class BffDtos {
             List<RentalClient.MaintenanceTicketView> openTickets
     ) {
     }
+
+    @Builder
+    public record AdminReportsSummaryResponse(
+            long settledTradeCount,
+            long matchedOrderCount,
+            BigDecimal matchedVolumeUsd,
+            long tokenizedFlatCount,
+            long occupiedFlatCount,
+            BigDecimal occupancyRate,
+            BigDecimal totalDistributedUsd,
+            int recentDividendCount,
+            java.time.Instant generatedAt
+    ) {
+    }
 }

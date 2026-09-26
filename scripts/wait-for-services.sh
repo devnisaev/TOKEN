@@ -32,6 +32,8 @@ DEFAULT_SERVICES=(
   "8089:/api/actuator/health"
   "8090:/api/actuator/health"
   "8091:/api/actuator/health"
+  "8093:/api/actuator/health"
+  "8094:/api/actuator/health"
 )
 
 if [[ -n "${SERVICES:-}" ]]; then

@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: reporting-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/reporting_service
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: reporting-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+server:
+  port: 8093
+  servlet:
+    context-path: /api
+
+tokenrealty:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-change-in-production-min-32-chars!!}
+    issuer: tokenrealty-auth
+  kafka:
+    enabled: ${KAFKA_ENABLED:false}
+    dlq:
+      enabled: ${KAFKA_DLQ_ENABLED:false}
+      max-retries: 3
+      backoff-ms: 1000
+    topic:
+      trade-settled: tokenrealty.marketplace.trade.settled.v1
+      order-matched: tokenrealty.marketplace.order.matched.v1
+      dividend-distributed: tokenrealty.issuance.dividend.distributed.v1
+      rent-collected: tokenrealty.payment.rent.collected.v1
+      flat-tokenized: tokenrealty.registry.flat.tokenized.v1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    com.tokenrealty: DEBUG

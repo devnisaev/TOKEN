@@ -185,6 +185,8 @@ jobs:
           ./token-realty-app/mvnw -f token-realty-app/pom.xml test -Dtest=DocumentUploadedKafkaIntegrationTest,TransferCompletedKafkaIntegrationTest -q
           ./token-realty-app/mvnw -f compliance-service/pom.xml test -Dtest=DocumentUploadedKafkaIntegrationTest,KycWebhookIntegrationTest -q
           ./token-realty-app/mvnw -f rental-service/pom.xml test -Dtest=RentScheduleKafkaIntegrationTest -q
+          ./token-realty-app/mvnw -f reporting-service/pom.xml test -Dtest=ReportingKafkaIntegrationTest -q
+          ./token-realty-app/mvnw -f settlement-service/pom.xml test -Dtest=SettlementKafkaIntegrationTest -q
 
   kafka-outbox-tests:
     runs-on: ubuntu-latest
@@ -323,6 +325,10 @@ jobs:
             port: 8090
           - service: blockchain-indexer-service
             port: 8091
+          - service: reporting-service
+            port: 8093
+          - service: settlement-service
+            port: 8094
     steps:
       - uses: actions/checkout@v4
 
