@@ -109,7 +109,7 @@ class KycWebhookIntegrationTest {
     @Test
     void sumsubWebhook_rejectsInvalidSignatureWhenSecretConfigured() throws Exception {
         org.springframework.test.util.ReflectionTestUtils.setField(
-                signatureVerifier, "webhookSecret", "test-webhook-secret");
+                signatureVerifier, "sumsubWebhookSecret", "test-webhook-secret");
         KycWebhookPayload payload = new KycWebhookPayload(
                 "applicant-" + investorId.toString().substring(0, 8),
                 investorId.toString(),
@@ -128,7 +128,7 @@ class KycWebhookIntegrationTest {
     @Test
     void sumsubWebhook_acceptsValidHmacSignature() throws Exception {
         org.springframework.test.util.ReflectionTestUtils.setField(
-                signatureVerifier, "webhookSecret", "test-webhook-secret");
+                signatureVerifier, "sumsubWebhookSecret", "test-webhook-secret");
         KycWebhookPayload payload = new KycWebhookPayload(
                 "applicant-" + investorId.toString().substring(0, 8),
                 investorId.toString(),
@@ -136,7 +136,7 @@ class KycWebhookIntegrationTest {
                 Instant.parse("2027-01-01T00:00:00Z"),
                 new KycReviewResult("GREEN", List.of()));
         String rawBody = objectMapper.writeValueAsString(payload);
-        String digest = signatureVerifier.computeHmacSha256Hex(rawBody);
+        String digest = signatureVerifier.computeHmacSha256Hex("sumsub", rawBody);
 
         mockMvc.perform(post("/v1/compliance/webhooks/kyc/sumsub")
                         .contentType(MediaType.APPLICATION_JSON)

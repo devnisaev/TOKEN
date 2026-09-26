@@ -1,5 +1,6 @@
 package com.tokenrealty.marketplace.integration;
 
+import com.tokenrealty.kafka.testsupport.OutboxKafkaListenerTestConfiguration;
 import com.tokenrealty.marketplace.kafka.MarketplaceKafkaEventTypes;
 import com.tokenrealty.marketplace.kafka.outbox.OutboxEvent;
 import com.tokenrealty.marketplace.kafka.outbox.OutboxEventRepository;
@@ -8,20 +9,10 @@ import com.tokenrealty.outbox.OutboxStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
-import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
-
-import java.util.HashMap;
-import java.util.Map;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -38,8 +29,11 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Import(OutboxRelayIntegrationTest.KafkaListenerTestConfig.class)
-@TestPropertySource(properties = "tokenrealty.kafka.enabled=true")
+@Import(OutboxKafkaListenerTestConfiguration.class)
+@TestPropertySource(properties = {
+        "tokenrealty.kafka.enabled=true",
+        "tokenrealty.kafka.test.consumer-group=marketplace-outbox-it"
+})
 @DisplayName("Marketplace outbox relay integration test")
 class OutboxRelayIntegrationTest {
 
@@ -78,29 +72,5 @@ class OutboxRelayIntegrationTest {
         OutboxEvent published = outboxEventRepository.findAll().getFirst();
         assertThat(published.getStatus()).isEqualTo(OutboxStatus.PUBLISHED);
         assertThat(published.getPublishedAt()).isNotNull();
-    }
-
-    @TestConfiguration
-    static class KafkaListenerTestConfig {
-
-        @Bean
-        ConsumerFactory<Object, Object> consumerFactory() {
-            Map<String, Object> props = new HashMap<>();
-            props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-            props.put(ConsumerConfig.GROUP_ID_CONFIG, "marketplace-outbox-it");
-            props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-            props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-            props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-            return new DefaultKafkaConsumerFactory<>(props);
-        }
-
-        @Bean
-        ConcurrentKafkaListenerContainerFactory<Object, Object> kafkaListenerContainerFactory(
-                ConsumerFactory<Object, Object> consumerFactory) {
-            var factory = new ConcurrentKafkaListenerContainerFactory<>();
-            factory.setConsumerFactory(consumerFactory);
-            factory.setAutoStartup(false);
-            return factory;
-        }
     }
 }

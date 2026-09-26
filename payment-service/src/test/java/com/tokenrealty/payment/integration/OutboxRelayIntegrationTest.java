@@ -1,11 +1,11 @@
-package com.tokenrealty.compliance.integration;
+package com.tokenrealty.payment.integration;
 
-import com.tokenrealty.compliance.kafka.ComplianceKafkaEventTypes;
-import com.tokenrealty.compliance.kafka.outbox.OutboxEvent;
-import com.tokenrealty.compliance.kafka.outbox.OutboxEventRepository;
-import com.tokenrealty.compliance.kafka.outbox.OutboxRelayWorker;
 import com.tokenrealty.kafka.testsupport.OutboxKafkaListenerTestConfiguration;
 import com.tokenrealty.outbox.OutboxStatus;
+import com.tokenrealty.payment.kafka.PaymentKafkaEventTypes;
+import com.tokenrealty.payment.kafka.outbox.OutboxEvent;
+import com.tokenrealty.payment.kafka.outbox.OutboxEventRepository;
+import com.tokenrealty.payment.kafka.outbox.OutboxRelayWorker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,9 +32,9 @@ import static org.mockito.Mockito.when;
 @Import(OutboxKafkaListenerTestConfiguration.class)
 @TestPropertySource(properties = {
         "tokenrealty.kafka.enabled=true",
-        "tokenrealty.kafka.test.consumer-group=compliance-outbox-it"
+        "tokenrealty.kafka.test.consumer-group=payment-outbox-it"
 })
-@DisplayName("Compliance outbox relay integration test")
+@DisplayName("Payment outbox relay integration test")
 class OutboxRelayIntegrationTest {
 
     @Autowired OutboxRelayWorker outboxRelayWorker;
@@ -49,11 +49,11 @@ class OutboxRelayIntegrationTest {
 
     @Test
     void relayPending_marksPublished() {
-        UUID investorId = UUID.randomUUID();
+        UUID paymentId = UUID.randomUUID();
         outboxEventRepository.save(OutboxEvent.builder()
-                .aggregateType("compliance")
-                .aggregateId(investorId)
-                .eventType(ComplianceKafkaEventTypes.KYC_APPROVED)
+                .aggregateType("payment")
+                .aggregateId(paymentId)
+                .eventType(PaymentKafkaEventTypes.PAYMENT_CONFIRMED)
                 .payload("{\"eventId\":\"" + UUID.randomUUID() + "\"}")
                 .status(OutboxStatus.PENDING)
                 .createdAt(Instant.now())
@@ -61,8 +61,8 @@ class OutboxRelayIntegrationTest {
                 .build());
 
         when(kafkaTemplate.send(
-                eq(ComplianceKafkaEventTypes.KYC_APPROVED),
-                eq(investorId.toString()),
+                eq(PaymentKafkaEventTypes.PAYMENT_CONFIRMED),
+                eq(paymentId.toString()),
                 anyString()))
                 .thenReturn(CompletableFuture.completedFuture(new SendResult<>(null, null)));
 

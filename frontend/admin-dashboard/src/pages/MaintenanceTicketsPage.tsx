@@ -2,15 +2,24 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { EmptyState, StatusBadge } from '@tokenrealty/shared-ui';
 import { api } from '@/lib/api';
+import { fetchMaintenanceQueueViaGraphql } from '@/lib/graphql';
+import { loadStoredAuth } from '@tokenrealty/shared-api-client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export function MaintenanceTicketsPage() {
   const queryClient = useQueryClient();
 
+  const useGraphql = import.meta.env.VITE_USE_GRAPHQL_BFF === 'true';
+
   const { data, isLoading, error } = useQuery({
-    queryKey: ['maintenance-tickets'],
-    queryFn: () => api.listMaintenanceTickets(),
+    queryKey: ['maintenance-tickets', useGraphql ? 'graphql' : 'bff'],
+    queryFn: () =>
+      useGraphql
+        ? fetchMaintenanceQueueViaGraphql(
+            loadStoredAuth('tokenrealty.auth')?.accessToken ?? null,
+          )
+        : api.listMaintenanceTickets(),
   });
 
   const resolveMutation = useMutation({

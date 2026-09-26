@@ -431,3 +431,22 @@ When `tokenrealty.kafka.serialization=avro` is set on a publishing service (Mark
 | Apicurio (`schema-registry:8080` in compose kafka profile) | Schema Registry compatible with Confluent API |
 
 Consumers remain JSON by default. Enable Avro consumer deserialization only after dual-read validation in staging.
+
+---
+
+## Outbox relay coverage
+
+Publishing services with `OutboxRelayWorker` + integration tests (tracks 253–260):
+
+| Service | Outbox events | IT |
+|---------|---------------|-----|
+| Marketplace | `listing.created`, `order.matched`, `trade.settled` | `OutboxRelayIntegrationTest` |
+| Payment | `payment.confirmed`, `rent.collected`, `payout.completed` | `OutboxRelayIntegrationTest` |
+| Compliance | `kyc-approved`, `kyc-revoked` | `OutboxRelayIntegrationTest` |
+| Token Issuance | `transfer.completed`, `dividend.distributed` | `OutboxRelayIntegrationTest` |
+| Property Registry | `building.approved`, `flat.tokenized` | `OutboxRelayIntegrationTest` |
+| Rental | `rent.due`, `lease.expired` | `OutboxRelayIntegrationTest` |
+| Document | `document.uploaded` | `OutboxRelayIntegrationTest` + upload IT |
+| Blockchain Indexer | `transfer.indexed`, `balance.mismatch` | `OutboxRelayIntegrationTest` |
+
+Shared test helper: `OutboxKafkaListenerTestConfiguration` in `tokenrealty-kafka` (for services with `@KafkaListener` beans).

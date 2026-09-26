@@ -203,8 +203,15 @@ jobs:
 
       - name: Run outbox relay, document outbox, and DLQ integration tests
         run: |
+          ./token-realty-app/mvnw -f tokenrealty-outbox/pom.xml test -Dtest=OutboxRelayTest,OutboxRelayAvroTransformTest -q
           ./token-realty-app/mvnw -f marketplace-service/pom.xml test -Dtest=OutboxRelayIntegrationTest -q
-          ./token-realty-app/mvnw -f document-service/pom.xml test -Dtest=DocumentUploadedOutboxIntegrationTest -q
+          ./token-realty-app/mvnw -f payment-service/pom.xml test -Dtest=OutboxRelayIntegrationTest -q
+          ./token-realty-app/mvnw -f compliance-service/pom.xml test -Dtest=OutboxRelayIntegrationTest -q
+          ./token-realty-app/mvnw -f token-issuance-service/pom.xml test -Dtest=OutboxRelayIntegrationTest -q
+          ./token-realty-app/mvnw -f token-realty-app/pom.xml test -Dtest=OutboxRelayIntegrationTest -q
+          ./token-realty-app/mvnw -f rental-service/pom.xml test -Dtest=OutboxRelayIntegrationTest -q
+          ./token-realty-app/mvnw -f blockchain-indexer-service/pom.xml test -Dtest=OutboxRelayIntegrationTest -q
+          ./token-realty-app/mvnw -f document-service/pom.xml test -Dtest=OutboxRelayIntegrationTest,DocumentUploadedOutboxIntegrationTest -q
           ./token-realty-app/mvnw -f tokenrealty-kafka/pom.xml test -Dtest=KafkaDlqIntegrationTest -q
 
   marketplace-kafka-containers:

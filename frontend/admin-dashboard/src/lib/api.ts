@@ -151,7 +151,7 @@ export const api = {
   },
 
   listMaintenanceTickets() {
-    return request<MaintenanceTicket[]>('/v1/maintenance-tickets');
+    return request<MaintenanceTicket[]>('/v1/bff/admin/maintenance-tickets');
   },
 
   updateMaintenanceTicket(id: string, body: UpdateMaintenanceTicketRequest) {

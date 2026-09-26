@@ -101,7 +101,8 @@ GraphQL BFF (local profile):
 
 Full Playwright E2E:
   ./scripts/e2e-run.sh --no-wait
-  ./scripts/e2e-run.sh --compose-subset --no-wait   # CI compose subset (16 specs)
+  ./scripts/e2e-run.sh --compose-subset --no-wait        # CI compose subset (16 specs)
+  ./scripts/e2e-run.sh --compose-subset --hardhat --no-wait  # + Hardhat tokenize seed
 EOF
 
 if [[ "${RUN_MAINTENANCE}" == "true" ]]; then

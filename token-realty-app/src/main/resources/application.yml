@@ -51,6 +51,10 @@ tokenrealty:
   kafka:
     enabled: ${KAFKA_ENABLED:false}
     serialization: ${KAFKA_SERIALIZATION:json}
+    dlq:
+      enabled: ${KAFKA_DLQ_ENABLED:false}
+      max-retries: 3
+      backoff-ms: 1000
     relay:
       poll-ms: 1000
       publish-timeout-ms: 10000

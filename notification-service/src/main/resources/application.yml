@@ -46,6 +46,10 @@ tokenrealty:
     issuer: tokenrealty-auth
   kafka:
     enabled: ${KAFKA_ENABLED:false}
+    dlq:
+      enabled: ${KAFKA_DLQ_ENABLED:false}
+      max-retries: 3
+      backoff-ms: 1000
     topic:
       building-approved: tokenrealty.registry.building.approved.v1
       flat-tokenized: tokenrealty.registry.flat.tokenized.v1

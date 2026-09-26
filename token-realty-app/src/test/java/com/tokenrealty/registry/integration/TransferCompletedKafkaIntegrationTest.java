@@ -65,11 +65,11 @@ class TransferCompletedKafkaIntegrationTest {
                 .name("Test Tower")
                 .address("1 Test Ave")
                 .city("Bishkek")
-                .countryCode("KG")
+                .country("KG")
                 .postalCode("720001")
                 .totalFloors(10)
-                .totalUnits(40)
-                .yearBuilt(2020)
+                .totalFlats(40)
+                .constructionYear(2020)
                 .status(Building.BuildingStatus.TOKENIZED)
                 .build());
 

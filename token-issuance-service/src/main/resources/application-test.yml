@@ -39,10 +39,17 @@ services:
   property-registry:
     url: http://127.0.0.1:9999/api
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    listener:
+      auto-startup: false
+
 tokenrealty:
   jwt:
     secret: test-jwt-secret-min-32-characters-long!!
     issuer: tokenrealty-auth
+  kafka:
+    enabled: false
 
 logging:
   level:

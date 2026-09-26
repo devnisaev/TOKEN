@@ -745,6 +745,18 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] Demo stack GraphiQL URL hint in `demo-all.sh` (track 248)
 - [x] Gateway OpenAPI codegen for admin maintenance BFF path (track 251)
 - [x] Tracks 228–251 synced in PLATFORM-SPEC §11.4 (track 252)
+- [x] Shared `OutboxKafkaListenerTestConfiguration` in tokenrealty-kafka (track 253)
+- [x] Outbox relay ITs: payment, issuance, registry, rental, indexer, document (tracks 254–260)
+- [x] CI `kafka-outbox-tests` covers all eight publishing services (track 261)
+- [x] Kafka DLQ config keys on document, rental, indexer, registry, notification (tracks 262–266)
+- [x] Payment/issuance/registry test profiles: Kafka bootstrap for outbox ITs (track 267)
+- [x] Provider-aware Onfido + Sumsub webhook HMAC verification (tracks 268–269)
+- [x] Admin dashboard BFF maintenance path + optional GraphQL client (tracks 270–271)
+- [x] `OutboxRelayTest` unit test in tokenrealty-outbox (track 272)
+- [x] ADRs 007–008: distributed tracing, E2E testing strategy (tracks 273–274)
+- [x] EVENTS.md outbox relay coverage table (track 275)
+- [x] `e2e-run.sh --hardhat` + demo-all compose/hardhat hints (tracks 276–277)
+- [x] Tracks 253–276 synced in PLATFORM-SPEC §11.4 (track 277)
 
 ### 11.5 Frontend
 

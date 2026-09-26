@@ -32,7 +32,7 @@ public class KycWebhookController {
                                  @RequestHeader(value = "X-Payload-Digest", required = false) String payloadDigest,
                                  @RequestHeader(value = "X-Signature", required = false) String signature)
             throws IOException {
-        signatureVerifier.verifyIfConfigured(rawBody, payloadDigest, signature);
+        signatureVerifier.verifyIfConfigured(provider, rawBody, payloadDigest, signature);
         KycWebhookPayload payload = objectMapper.readValue(rawBody, KycWebhookPayload.class);
         validatePayload(payload);
         kycWebhookService.handleWebhook(provider, payload);

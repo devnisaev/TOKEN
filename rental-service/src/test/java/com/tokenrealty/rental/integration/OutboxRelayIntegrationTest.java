@@ -1,17 +1,15 @@
-package com.tokenrealty.compliance.integration;
+package com.tokenrealty.rental.integration;
 
-import com.tokenrealty.compliance.kafka.ComplianceKafkaEventTypes;
-import com.tokenrealty.compliance.kafka.outbox.OutboxEvent;
-import com.tokenrealty.compliance.kafka.outbox.OutboxEventRepository;
-import com.tokenrealty.compliance.kafka.outbox.OutboxRelayWorker;
-import com.tokenrealty.kafka.testsupport.OutboxKafkaListenerTestConfiguration;
 import com.tokenrealty.outbox.OutboxStatus;
+import com.tokenrealty.rental.kafka.RentalKafkaEventTypes;
+import com.tokenrealty.rental.kafka.outbox.OutboxEvent;
+import com.tokenrealty.rental.kafka.outbox.OutboxEventRepository;
+import com.tokenrealty.rental.kafka.outbox.OutboxRelayWorker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.test.context.ActiveProfiles;
@@ -29,12 +27,8 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Import(OutboxKafkaListenerTestConfiguration.class)
-@TestPropertySource(properties = {
-        "tokenrealty.kafka.enabled=true",
-        "tokenrealty.kafka.test.consumer-group=compliance-outbox-it"
-})
-@DisplayName("Compliance outbox relay integration test")
+@TestPropertySource(properties = "tokenrealty.kafka.enabled=true")
+@DisplayName("Rental outbox relay integration test")
 class OutboxRelayIntegrationTest {
 
     @Autowired OutboxRelayWorker outboxRelayWorker;
@@ -49,11 +43,11 @@ class OutboxRelayIntegrationTest {
 
     @Test
     void relayPending_marksPublished() {
-        UUID investorId = UUID.randomUUID();
+        UUID leaseId = UUID.randomUUID();
         outboxEventRepository.save(OutboxEvent.builder()
-                .aggregateType("compliance")
-                .aggregateId(investorId)
-                .eventType(ComplianceKafkaEventTypes.KYC_APPROVED)
+                .aggregateType("rental")
+                .aggregateId(leaseId)
+                .eventType(RentalKafkaEventTypes.RENT_DUE)
                 .payload("{\"eventId\":\"" + UUID.randomUUID() + "\"}")
                 .status(OutboxStatus.PENDING)
                 .createdAt(Instant.now())
@@ -61,8 +55,8 @@ class OutboxRelayIntegrationTest {
                 .build());
 
         when(kafkaTemplate.send(
-                eq(ComplianceKafkaEventTypes.KYC_APPROVED),
-                eq(investorId.toString()),
+                eq(RentalKafkaEventTypes.RENT_DUE),
+                eq(leaseId.toString()),
                 anyString()))
                 .thenReturn(CompletableFuture.completedFuture(new SendResult<>(null, null)));
 
