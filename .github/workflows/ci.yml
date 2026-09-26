@@ -151,6 +151,15 @@ jobs:
         run: |
           ./token-realty-app/mvnw -f token-realty-app/pom.xml test -Dtest=LiquibaseMigrationIntegrationTest -Dsurefire.excludedGroups= -q
           ./token-realty-app/mvnw -f token-issuance-service/pom.xml test -Dtest=LiquibaseMigrationIntegrationTest -Dsurefire.excludedGroups= -q
+          ./token-realty-app/mvnw -f payment-service/pom.xml test -Dtest=LiquibaseMigrationIntegrationTest -Dsurefire.excludedGroups= -q
+          ./token-realty-app/mvnw -f auth-service/pom.xml test -Dtest=LiquibaseMigrationIntegrationTest -Dsurefire.excludedGroups= -q
+          ./token-realty-app/mvnw -f document-service/pom.xml test -Dtest=LiquibaseMigrationIntegrationTest -Dsurefire.excludedGroups= -q
+          ./token-realty-app/mvnw -f notification-service/pom.xml test -Dtest=LiquibaseMigrationIntegrationTest -Dsurefire.excludedGroups= -q
+          ./token-realty-app/mvnw -f wallet-service/pom.xml test -Dtest=LiquibaseMigrationIntegrationTest -Dsurefire.excludedGroups= -q
+          ./token-realty-app/mvnw -f blockchain-indexer-service/pom.xml test -Dtest=LiquibaseMigrationIntegrationTest -Dsurefire.excludedGroups= -q
+          ./token-realty-app/mvnw -f compliance-service/pom.xml test -Dtest=LiquibaseMigrationIntegrationTest -Dsurefire.excludedGroups= -q
+          ./token-realty-app/mvnw -f marketplace-service/pom.xml test -Dtest=LiquibaseMigrationIntegrationTest -Dsurefire.excludedGroups= -q
+          ./token-realty-app/mvnw -f rental-service/pom.xml test -Dtest=LiquibaseMigrationIntegrationTest -Dsurefire.excludedGroups= -q
 
   kafka-integration-tests:
     runs-on: ubuntu-latest
