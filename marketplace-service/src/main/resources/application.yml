@@ -61,6 +61,8 @@ tokenrealty:
     client-secret: ${SERVICE_ACCOUNT_SECRET:marketplace-secret}
   kafka:
     enabled: ${KAFKA_ENABLED:false}
+    serialization: ${KAFKA_SERIALIZATION:json}
+    schema-registry-url: ${SCHEMA_REGISTRY_URL:http://localhost:8092}
     dlq:
       enabled: ${KAFKA_DLQ_ENABLED:false}
       max-retries: 3

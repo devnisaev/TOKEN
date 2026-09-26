@@ -1,5 +1,7 @@
 package com.tokenrealty.marketplace.kafka.outbox;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tokenrealty.events.avro.AvroOutboxPayloadEncoder;
 import com.tokenrealty.outbox.OutboxStatus;
 import com.tokenrealty.outbox.relay.OutboxRelay;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ public class OutboxRelayWorker {
 
     private final OutboxEventRepository repository;
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final ObjectMapper objectMapper;
 
     @Value("${tokenrealty.kafka.relay.publish-timeout-ms:10000}")
     private long publishTimeoutMs;
@@ -25,9 +28,24 @@ public class OutboxRelayWorker {
     @Value("${tokenrealty.kafka.relay.max-retries:5}")
     private int maxRetries;
 
+    @Value("${tokenrealty.kafka.serialization:json}")
+    private String serializationFormat;
+
     @Scheduled(fixedDelayString = "${tokenrealty.kafka.relay.poll-ms:1000}")
     public void relayPending() {
         var pending = repository.findTop50ByStatusOrderByCreatedAtAsc(OutboxStatus.PENDING);
+        if ("avro".equalsIgnoreCase(serializationFormat)) {
+            log.info("Outbox relay: Avro serialization enabled — encoding payloads before publish");
+            OutboxRelay.relay(
+                    pending,
+                    kafkaTemplate,
+                    publishTimeoutMs,
+                    maxRetries,
+                    repository::save,
+                    log,
+                    payload -> AvroOutboxPayloadEncoder.encodeEnvelope(payload, objectMapper));
+            return;
+        }
         OutboxRelay.relay(pending, kafkaTemplate, publishTimeoutMs, maxRetries, repository::save, log);
     }
 }
