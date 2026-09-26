@@ -7,7 +7,7 @@ import com.tokenrealty.wallet.client.PaymentClient;
 import com.tokenrealty.wallet.dto.WalletDtos.*;
 import com.tokenrealty.wallet.entity.InvestorWallet;
 import com.tokenrealty.wallet.entity.InvestorWallet.WalletType;
-import com.tokenrealty.wallet.crypto.WalletEncryptionService;
+import com.tokenrealty.wallet.crypto.KmsWalletEncryptionService;
 import com.tokenrealty.wallet.repository.InvestorWalletRepository;
 import com.tokenrealty.web.exception.ConflictException;
 import com.tokenrealty.web.exception.ResourceNotFoundException;
@@ -29,7 +29,7 @@ import java.util.UUID;
 public class WalletService {
 
     private final InvestorWalletRepository repository;
-    private final WalletEncryptionService encryptionService;
+    private final KmsWalletEncryptionService encryptionService;
     private final PaymentClient paymentClient;
     private final IssuanceClient issuanceClient;
     private final WalletAccessGuard accessGuard;
