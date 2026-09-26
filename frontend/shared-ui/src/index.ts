@@ -21,3 +21,9 @@ export {
   type OrderTimelineProps,
   type OrderTimelineTrade,
 } from './components/OrderStatusTimeline';
+export {
+  SettlementAuditTrail,
+  type SettlementAuditOrder,
+  type SettlementAuditTrade,
+  type SettlementAuditTrailProps,
+} from './components/SettlementAuditTrail';

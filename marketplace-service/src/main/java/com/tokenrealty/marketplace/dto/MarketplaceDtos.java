@@ -122,7 +122,8 @@ public final class MarketplaceDtos {
             Trade.TradeStatus status,
             UUID paymentId,
             UUID transferId,
-            Instant createdAt
+            Instant createdAt,
+            Instant updatedAt
     ) {
     }
 

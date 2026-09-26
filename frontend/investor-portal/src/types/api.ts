@@ -87,4 +87,5 @@ export interface Trade {
   paymentId?: string;
   transferId?: string;
   createdAt?: string;
+  updatedAt?: string;
 }

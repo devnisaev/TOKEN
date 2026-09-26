@@ -5,7 +5,7 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { OrderStatusTimeline } from '@tokenrealty/shared-ui';
+import { OrderStatusTimeline, SettlementAuditTrail } from '@tokenrealty/shared-ui';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -140,6 +140,8 @@ export function OrderDetailPage() {
           {!trade && (
             <p className="text-sm text-muted-foreground">No trade record yet.</p>
           )}
+
+          <SettlementAuditTrail order={order} trade={trade} />
 
           {canSettle && (
             <form onSubmit={onSettle} className="space-y-3 border-t pt-4">

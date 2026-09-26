@@ -71,6 +71,7 @@ public class MarketplaceMapper {
                 .paymentId(trade.getPaymentId())
                 .transferId(trade.getTransferId())
                 .createdAt(trade.getCreatedAt())
+                .updatedAt(trade.getUpdatedAt())
                 .build();
     }
 }
