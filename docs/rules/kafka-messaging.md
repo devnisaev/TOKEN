@@ -424,6 +424,8 @@ No outbox — Notification is consume-only.
 
 **Rent → dividend (Corporate Actions path):** disable Issuance `RentCollectedListener` in local/prod when Hub path active (`tokenrealty.dividend.rent-collected-listener-enabled: false`).
 
+**Phase 7 event mesh (implemented):** Registry ← `valuation.updated`; Notification/Reporting/Audit ← `settlement.stuck`, `settlement.recovered`, `valuation.approved`. See [phase-7-services.md](phase-7-services.md).
+
 Email config:
 
 ```yaml

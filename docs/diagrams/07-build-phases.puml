@@ -83,12 +83,21 @@ Project starts 2025-09-25
 [P6e] -> [P6f]
 [P6f] -> [P6g]
 
+-- Phase 7: Event mesh & integrations (in progress) --
+[Settlement/valuation consumers] as [P7a] lasts 1 week
+[Integration Hub payment webhooks] as [P7b] lasts 1 week
+[OpenSearch / KMS (optional)] as [P7c] lasts 2 weeks
+
+[P6g] -> [P7a]
+[P7a] -> [P7b]
+[P7b] -> [P7c]
+
 @endgantt
 
 note bottom
   **Phases:** 0 Foundation | 1 Platform | 2 Commerce
   | 3 Rental | 4 Compliance & Docs | 5 Scale & UX
-  | 6 Ops visibility & RWA depth (planned)
+  | 6 Ops visibility & RWA depth | 7 Event mesh (in progress)
 end note
 
 @enduml

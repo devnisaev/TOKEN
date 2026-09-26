@@ -16,6 +16,9 @@ public final class NotificationKafkaEventTypes {
     public static final String RENT_DUE = "tokenrealty.rental.rent.due.v1";
     public static final String LEASE_EXPIRED = "tokenrealty.rental.lease.expired.v1";
     public static final String DOCUMENT_UPLOADED = "tokenrealty.document.document.uploaded.v1";
+    public static final String SETTLEMENT_STUCK = "tokenrealty.settlement.stuck.v1";
+    public static final String SETTLEMENT_RECOVERED = "tokenrealty.settlement.recovered.v1";
+    public static final String VALUATION_APPROVED = "tokenrealty.valuation.approved.v1";
 
     private NotificationKafkaEventTypes() {
     }

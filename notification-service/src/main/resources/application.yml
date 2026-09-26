@@ -65,6 +65,9 @@ tokenrealty:
       dividend-distributed: tokenrealty.issuance.dividend.distributed.v1
       rent-collected: tokenrealty.payment.rent.collected.v1
       document-uploaded: tokenrealty.document.document.uploaded.v1
+      settlement-stuck: tokenrealty.settlement.stuck.v1
+      settlement-recovered: tokenrealty.settlement.recovered.v1
+      valuation-approved: tokenrealty.valuation.approved.v1
   notification:
     email:
       enabled: ${NOTIFICATION_EMAIL_ENABLED:true}

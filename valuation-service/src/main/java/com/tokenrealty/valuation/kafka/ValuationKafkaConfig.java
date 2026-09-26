@@ -16,4 +16,9 @@ public class ValuationKafkaConfig {
     NewTopic valuationUpdatedTopic(@Value("${tokenrealty.kafka.topic.valuation-updated}") String topic) {
         return new NewTopic(topic, 3, (short) 1);
     }
+
+    @Bean
+    NewTopic valuationApprovedTopic(@Value("${tokenrealty.kafka.topic.valuation-approved}") String topic) {
+        return new NewTopic(topic, 3, (short) 1);
+    }
 }

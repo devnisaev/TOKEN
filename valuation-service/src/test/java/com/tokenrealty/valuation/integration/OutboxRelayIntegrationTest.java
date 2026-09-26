@@ -67,4 +67,31 @@ class OutboxRelayIntegrationTest {
                 .extracting(OutboxEvent::getStatus)
                 .isEqualTo(OutboxStatus.PUBLISHED);
     }
+
+    @Test
+    void relayPending_valuationApproved_marksPublished() {
+        UUID flatId = UUID.randomUUID();
+        outboxEventRepository.save(OutboxEvent.builder()
+                .aggregateType("valuation")
+                .aggregateId(flatId)
+                .eventType(ValuationKafkaEventTypes.VALUATION_APPROVED)
+                .payload("{\"eventId\":\"" + UUID.randomUUID() + "\"}")
+                .status(OutboxStatus.PENDING)
+                .createdAt(Instant.now())
+                .retryCount(0)
+                .build());
+
+        when(kafkaTemplate.send(
+                eq(ValuationKafkaEventTypes.VALUATION_APPROVED),
+                eq(flatId.toString()),
+                anyString()))
+                .thenReturn(CompletableFuture.completedFuture(new SendResult<>(null, null)));
+
+        outboxRelayWorker.relayPending();
+
+        assertThat(outboxEventRepository.findAll())
+                .singleElement()
+                .extracting(OutboxEvent::getStatus)
+                .isEqualTo(OutboxStatus.PUBLISHED);
+    }
 }

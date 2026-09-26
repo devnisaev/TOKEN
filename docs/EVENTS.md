@@ -488,14 +488,20 @@ See [PLATFORM-SPEC.md §12](PLATFORM-SPEC.md#12-phase-6--planned-services).
 |-------|-----------|-----------|--------|
 | `tokenrealty.valuation.updated.v1` | Valuation Service | Registry, Search, Reporting | Implemented (outbox) |
 | `tokenrealty.corporateactions.dividend.distribution-requested.v1` | Corporate Actions | Token Issuance | Implemented (outbox) |
-| `tokenrealty.settlement.stuck.v1` | Settlement Service | Notification, Reporting | Implemented (outbox) |
-| `tokenrealty.settlement.recovered.v1` | Settlement Service | Audit Ledger, Notification | Implemented (outbox) |
+| `tokenrealty.settlement.stuck.v1` | Settlement Service | Notification, Reporting | Implemented (outbox + consumers) |
+| `tokenrealty.settlement.recovered.v1` | Settlement Service | Audit Ledger, Notification | Implemented (outbox + consumers) |
+| `tokenrealty.valuation.approved.v1` | Valuation Service | Audit Ledger, Notification | Implemented (outbox + consumers) |
+
+**Phase 7 consumer wiring (Registry):**
+
+| Topic | Consumer | Action |
+|-------|----------|--------|
+| `tokenrealty.valuation.updated.v1` | Property Registry | Sync flat valuation metadata |
 
 **Still planned:**
 
 | Topic (proposed) | Publisher | Consumers | Purpose |
 |------------------|-----------|-----------|---------|
-| `tokenrealty.valuation.approved.v1` | Valuation Service | Audit Ledger, Notification | Appraisal workflow completion |
 | `tokenrealty.audit.entry-recorded.v1` | Audit Ledger | Reporting (optional) | Cross-service audit fan-in |
 
 **Existing topics consumed by Phase 6 services (read-only projections):**

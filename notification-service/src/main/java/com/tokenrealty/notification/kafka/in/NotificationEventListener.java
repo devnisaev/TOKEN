@@ -85,6 +85,21 @@ public class NotificationEventListener {
         ingest(message, NotificationKafkaEventTypes.DOCUMENT_UPLOADED);
     }
 
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.settlement-stuck}")
+    public void onSettlementStuck(String message) {
+        ingest(message, NotificationKafkaEventTypes.SETTLEMENT_STUCK);
+    }
+
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.settlement-recovered}")
+    public void onSettlementRecovered(String message) {
+        ingest(message, NotificationKafkaEventTypes.SETTLEMENT_RECOVERED);
+    }
+
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.valuation-approved}")
+    public void onValuationApproved(String message) {
+        ingest(message, NotificationKafkaEventTypes.VALUATION_APPROVED);
+    }
+
     private void ingest(String message, String eventType) {
         eventConsumer.consume(message, eventType, "Notification processing failed",
                 event -> notificationLogService.logEvent(eventType, event));

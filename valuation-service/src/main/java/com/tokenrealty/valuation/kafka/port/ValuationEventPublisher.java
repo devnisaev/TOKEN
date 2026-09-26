@@ -17,5 +17,19 @@ public interface ValuationEventPublisher {
     ) {
     }
 
+    record ValuationApprovedEvent(
+            UUID flatId,
+            UUID buildingId,
+            UUID valuationRequestId,
+            BigDecimal valueUsd,
+            long totalTokens,
+            BigDecimal navPerTokenUsd,
+            Instant approvedAt,
+            UUID reviewedBy
+    ) {
+    }
+
     void publishValuationUpdated(ValuationUpdatedEvent event);
+
+    void publishValuationApproved(ValuationApprovedEvent event);
 }

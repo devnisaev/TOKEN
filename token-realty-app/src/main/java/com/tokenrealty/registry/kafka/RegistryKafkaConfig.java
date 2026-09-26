@@ -34,4 +34,10 @@ public class RegistryKafkaConfig {
             @Value("${tokenrealty.kafka.topic.transfer-completed}") String topic) {
         return new NewTopic(topic, PARTITIONS, REPLICAS);
     }
+
+    @Bean
+    NewTopic valuationUpdatedTopic(
+            @Value("${tokenrealty.kafka.topic.valuation-updated}") String topic) {
+        return new NewTopic(topic, PARTITIONS, REPLICAS);
+    }
 }

@@ -190,6 +190,8 @@ jobs:
           ./token-realty-app/mvnw -f audit-ledger-service/pom.xml test -Dtest=AuditKafkaIntegrationTest -q
           ./token-realty-app/mvnw -f corporate-actions-service/pom.xml test -Dtest=CorporateActionsKafkaIntegrationTest -q
           ./token-realty-app/mvnw -f search-service/pom.xml test -Dtest=SearchKafkaIntegrationTest -q
+          ./token-realty-app/mvnw -f token-realty-app/pom.xml test -Dtest=ValuationUpdatedKafkaIntegrationTest -q
+          ./token-realty-app/mvnw -f reporting-service/pom.xml test -Dtest=SettlementStuckReportingIntegrationTest -q
 
   kafka-outbox-tests:
     runs-on: ubuntu-latest

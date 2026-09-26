@@ -3,6 +3,7 @@ package com.tokenrealty.registry.service;
 import com.tokenrealty.registry.dto.PropertyDtos.*;
 import com.tokenrealty.registry.entity.Flat;
 import com.tokenrealty.registry.entity.Valuation;
+import com.tokenrealty.registry.kafka.command.ValuationUpdatedCommand;
 import com.tokenrealty.web.exception.ResourceNotFoundException;
 import com.tokenrealty.registry.mapper.PropertyMapper;
 import com.tokenrealty.registry.repository.FlatRepository;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,6 +47,18 @@ public class ValuationService {
 
     public ValuationResponse findById(UUID id) {
         return mapper.toValuationResponse(getOrThrow(id));
+    }
+
+    @Transactional
+    public void syncFromValuationUpdated(ValuationUpdatedCommand command) {
+        CreateValuationRequest request = CreateValuationRequest.builder()
+                .valuationDate(command.approvedAt().atZone(ZoneOffset.UTC).toLocalDate())
+                .valueUsd(command.valueUsd())
+                .appraiserName("Valuation Service")
+                .method(Valuation.ValuationMethod.AUTOMATED)
+                .notes("Synced from valuation request " + command.valuationRequestId())
+                .build();
+        create(command.flatId(), request);
     }
 
     @Transactional

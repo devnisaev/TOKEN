@@ -16,6 +16,9 @@ public class OutboxValuationEventPublisher implements ValuationEventPublisher {
     @Value("${tokenrealty.kafka.topic.valuation-updated:" + ValuationKafkaEventTypes.VALUATION_UPDATED + "}")
     private String valuationUpdatedTopic;
 
+    @Value("${tokenrealty.kafka.topic.valuation-approved:" + ValuationKafkaEventTypes.VALUATION_APPROVED + "}")
+    private String valuationApprovedTopic;
+
     @Override
     public void publishValuationUpdated(ValuationUpdatedEvent event) {
         OutboxPayload.start()
@@ -27,5 +30,19 @@ public class OutboxValuationEventPublisher implements ValuationEventPublisher {
                 .put("navPerTokenUsd", event.navPerTokenUsd().toPlainString())
                 .put("approvedAt", event.approvedAt().toString())
                 .enqueue(outboxWriter, valuationUpdatedTopic, event.flatId().toString());
+    }
+
+    @Override
+    public void publishValuationApproved(ValuationApprovedEvent event) {
+        OutboxPayload.start()
+                .put("flatId", event.flatId())
+                .put("buildingId", event.buildingId())
+                .put("valuationRequestId", event.valuationRequestId())
+                .put("valueUsd", event.valueUsd().toPlainString())
+                .put("totalTokens", event.totalTokens())
+                .put("navPerTokenUsd", event.navPerTokenUsd().toPlainString())
+                .put("approvedAt", event.approvedAt().toString())
+                .put("reviewedBy", event.reviewedBy())
+                .enqueue(outboxWriter, valuationApprovedTopic, event.flatId().toString());
     }
 }

@@ -2,7 +2,7 @@
 
 > **Version:** 1.3  
 > **Date:** 2026-09-26  
-> **Status:** Phases 0–5 complete (tracks 1–277); Phase 6 complete (tracks 278–402)  
+> **Status:** Phases 0–6 complete (tracks 1–402); Phase 7 in progress (tracks 403+)  
 > **Purpose:** Master specification and implementation backlog for the TokenRealty real-estate tokenization platform (buy, sell, rent with cryptocurrency).
 
 ---
@@ -21,9 +21,10 @@
 10. [Per-Service TODO Checklists](#10-per-service-todo-checklists)
 11. [Cross-Cutting Concerns](#11-cross-cutting-concerns)
 12. [Phase 6 — Planned Services](#12-phase-6--planned-services)
-13. [Diagram Index](#13-diagram-index)
-14. [Open Questions & Decisions](#14-open-questions--decisions)
-15. [Cursor Rules & Coding Standards](#15-cursor-rules--coding-standards)
+13. [Phase 7 — Event Mesh & Production Integrations](#13-phase-7--event-mesh--production-integrations)
+14. [Diagram Index](#14-diagram-index)
+15. [Open Questions & Decisions](#15-open-questions--decisions)
+16. [Cursor Rules & Coding Standards](#16-cursor-rules--coding-standards)
 
 ---
 
@@ -437,9 +438,10 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 | **Phase 3** | Rental | Rental Service + rent → dividend pipeline |
 | **Phase 4** | Compliance & docs | KYC Service, Document/IPFS Service |
 | **Phase 5** | Scale & UX | Wallet, Notification, Blockchain Indexer, frontend |
-| **Phase 6** | Ops visibility & RWA depth | Reporting, Settlement Saga, Valuation/NAV, Audit Ledger, Corporate Actions; Search + Integration Hub when scaling |
+| **Phase 6** | Ops visibility & RWA depth | Reporting, Settlement Saga, Valuation/NAV, Audit Ledger, Corporate Actions; Search + Integration Hub |
+| **Phase 7** | Event mesh & production integrations | Wire Phase 6 publishers to consumers; Hub payment webhooks; OpenSearch (optional) |
 
-See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml) (Phase 6 block added).
+See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml).
 
 **Recommended Phase 6 build order:** Reporting → Settlement Saga → Valuation/NAV → Audit Ledger → Corporate Actions → Search → Integration Hub.
 
@@ -1083,7 +1085,44 @@ Cross-service follow-ups after all seven Phase 6 services scaffolded:
 
 ---
 
-## 13. Diagram Index
+## 13. Phase 7 — Event Mesh & Production Integrations
+
+Phases 0–6 delivered 19 backend microservices. Phase 7 **does not add new services** — it completes the Kafka event mesh and production integration paths deferred from Phase 6.
+
+Human-readable guide: [rules/phase-7-services.md](rules/phase-7-services.md).
+
+### 13.1 Tier 1 — Event mesh (implemented)
+
+- [x] Registry consumes `valuation.updated` → syncs flat `Valuation` + token price
+- [x] Valuation publishes `valuation.approved` on approve (outbox, same TX as `valuation.updated`)
+- [x] Notification consumes `settlement.stuck`, `settlement.recovered`, `valuation.approved`
+- [x] Reporting consumes `settlement.stuck` → `StuckSagaRecord` projection
+- [x] Audit Ledger consumes `settlement.recovered`, `valuation.approved`
+- [x] Kafka integration tests per consumer
+
+### 13.2 Tier 2 — Integrations (planned)
+
+- [ ] Integration Hub payment webhook relay
+- [ ] Search index enrichment from Property Registry (building name, city)
+- [ ] Document storage webhook processing (beyond ack stub)
+
+### 13.3 Tier 3 — Scale (planned)
+
+- [ ] OpenSearch backend for Search service (profile-gated)
+- [ ] Integration Hub KMS credential rotation
+- [ ] Corporate Actions stock split implementation
+
+### 13.4 Track backlog (starting 403)
+
+| Track range | Focus |
+|-------------|-------|
+| 403–427 | Event mesh — settlement + valuation consumers |
+| 428–452 | Integration Hub payment; Search enrichment |
+| 453–477 | OpenSearch; KMS; corporate action splits |
+
+---
+
+## 14. Diagram Index
 
 | File | Description |
 |------|-------------|
@@ -1099,7 +1138,7 @@ Cross-service follow-ups after all seven Phase 6 services scaffolded:
 
 ---
 
-## 14. Open Questions & Decisions
+## 15. Open Questions & Decisions
 
 | # | Question | Options | Decision |
 |---|----------|---------|----------|
@@ -1119,7 +1158,7 @@ Cross-service follow-ups after all seven Phase 6 services scaffolded:
 
 ---
 
-## 15. Cursor Rules & Coding Standards
+## 16. Cursor Rules & Coding Standards
 
 Agent and IDE conventions live in `.cursor/rules/` (adapted from Titan fintech rules).
 

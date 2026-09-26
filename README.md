@@ -38,6 +38,10 @@ Real-estate tokenization platform — fractional property ownership, crypto paym
 
 All Phase 6 services implemented. See [docs/PLATFORM-SPEC.md §12](docs/PLATFORM-SPEC.md#12-phase-6--planned-services).
 
+### Phase 7 — in progress
+
+Event mesh wiring and production integrations. See [docs/PLATFORM-SPEC.md §13](docs/PLATFORM-SPEC.md#13-phase-7--event-mesh--production-integrations).
+
 ## Shared libraries
 
 | Library | Purpose |

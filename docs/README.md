@@ -41,6 +41,7 @@ Central documentation for the TokenRealty real-estate tokenization platform.
 | [rules/tenant-portal.md](rules/tenant-portal.md) | [tenant-portal.mdc](../.cursor/rules/tenant-portal.mdc) |
 | [rules/api-gateway-bff.md](rules/api-gateway-bff.md) | — (BFF aggregates on API Gateway) |
 | [rules/phase-6-services.md](rules/phase-6-services.md) | — (Phase 6 ports 8093–8099, tiers, Kafka) |
+| [rules/phase-7-services.md](rules/phase-7-services.md) | — (Phase 7 event mesh, tracks 403+) |
 | [rules/observability.md](rules/observability.md) | — (traceId, JSON logs, Prometheus) |
 | [rules/commit-messages.md](rules/commit-messages.md) | [commit-messages.mdc](../.cursor/rules/commit-messages.mdc) |
 | [rules/e2e-testing.md](rules/e2e-testing.md) | — (Playwright smoke + full flow, demo-start) |
@@ -93,6 +94,10 @@ Additional Cursor rules (no separate human doc yet):
 ### Phase 6 — complete
 
 Full descriptions: [PLATFORM-SPEC.md §12](PLATFORM-SPEC.md#12-phase-6--planned-services).
+
+### Phase 7 — in progress
+
+Event mesh & production integrations: [PLATFORM-SPEC.md §13](PLATFORM-SPEC.md#13-phase-7--event-mesh--production-integrations) · [phase-7-services.md](rules/phase-7-services.md).
 
 ## Frontend
 

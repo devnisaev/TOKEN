@@ -6,11 +6,13 @@ import com.tokenrealty.reporting.entity.DividendRecord;
 import com.tokenrealty.reporting.entity.FlatTokenizedRecord;
 import com.tokenrealty.reporting.entity.OrderMatchedRecord;
 import com.tokenrealty.reporting.entity.RentCollectedRecord;
+import com.tokenrealty.reporting.entity.StuckSagaRecord;
 import com.tokenrealty.reporting.entity.TradeSettledRecord;
 import com.tokenrealty.reporting.repository.DividendRecordRepository;
 import com.tokenrealty.reporting.repository.FlatTokenizedRecordRepository;
 import com.tokenrealty.reporting.repository.OrderMatchedRecordRepository;
 import com.tokenrealty.reporting.repository.RentCollectedRecordRepository;
+import com.tokenrealty.reporting.repository.StuckSagaRecordRepository;
 import com.tokenrealty.reporting.repository.TradeSettledRecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class ReportingProjectionService {
     private final DividendRecordRepository dividendRecordRepository;
     private final RentCollectedRecordRepository rentCollectedRecordRepository;
     private final FlatTokenizedRecordRepository flatTokenizedRecordRepository;
+    private final StuckSagaRecordRepository stuckSagaRecordRepository;
 
     @Transactional
     public void onTradeSettled(KafkaJsonEvent event) {
@@ -112,6 +115,18 @@ public class ReportingProjectionService {
                 .totalTokens(longValue(payload, "totalTokens"))
                 .tokenPriceUsd(decimal(payload, "tokenPriceUsd"))
                 .tokenizedAt(event.occurredAt())
+                .build());
+    }
+
+    @Transactional
+    public void onSettlementStuck(KafkaJsonEvent event) {
+        JsonNode payload = event.payload();
+        stuckSagaRecordRepository.save(StuckSagaRecord.builder()
+                .sourceEventId(event.eventId())
+                .sagaId(uuid(payload, "sagaId"))
+                .orderId(uuid(payload, "orderId"))
+                .currentStep(text(payload, "currentStep"))
+                .stuckAt(parseInstant(payload, "stuckAt", event.occurredAt()))
                 .build());
     }
 

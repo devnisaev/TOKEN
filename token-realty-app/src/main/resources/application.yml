@@ -64,6 +64,7 @@ tokenrealty:
       flat-tokenized: tokenrealty.registry.flat.tokenized.v1
       document-uploaded: tokenrealty.document.document.uploaded.v1
       transfer-completed: tokenrealty.issuance.transfer.completed.v1
+      valuation-updated: tokenrealty.valuation.updated.v1
 
 jackson2:
   serialization:

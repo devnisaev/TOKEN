@@ -85,6 +85,17 @@ public class ValuationService {
                         navPerTokenUsd,
                         approvedAt));
 
+        valuationEventPublisher.publishValuationApproved(
+                new ValuationEventPublisher.ValuationApprovedEvent(
+                        request.getFlatId(),
+                        request.getBuildingId(),
+                        request.getId(),
+                        request.getValueUsd(),
+                        request.getTotalTokens(),
+                        navPerTokenUsd,
+                        approvedAt,
+                        reviewedBy));
+
         return toResponse(request);
     }
 

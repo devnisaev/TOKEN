@@ -88,6 +88,9 @@ public class NotificationEmailService {
             case "tokenrealty.payment.payment.confirmed.v1" -> "Payment confirmed";
             case "tokenrealty.issuance.transfer.completed.v1" -> "Token transfer completed";
             case "tokenrealty.document.document.uploaded.v1" -> "New data room document uploaded";
+            case "tokenrealty.settlement.stuck.v1" -> "Settlement saga stuck — action required";
+            case "tokenrealty.settlement.recovered.v1" -> "Settlement saga recovered";
+            case "tokenrealty.valuation.approved.v1" -> "Property valuation approved";
             default -> "TokenRealty notification: " + eventType;
         };
     }
@@ -175,6 +178,56 @@ public class NotificationEmailService {
                     textOr(payload, "listingId", "n/a"),
                     textOr(payload, "tokenAmount", "n/a"),
                     textOr(payload, "totalPriceUsd", "n/a"));
+            case "tokenrealty.settlement.stuck.v1" -> """
+                    Hello,
+
+                    A settlement saga has exceeded its SLA and requires attention.
+
+                    Saga ID: %s
+                    Order ID: %s
+                    Current step: %s
+                    Stuck at: %s
+
+                    — TokenRealty Ops
+                    """.formatted(
+                    textOr(payload, "sagaId", "n/a"),
+                    textOr(payload, "orderId", "n/a"),
+                    textOr(payload, "currentStep", "n/a"),
+                    textOr(payload, "stuckAt", "n/a"));
+            case "tokenrealty.settlement.recovered.v1" -> """
+                    Hello,
+
+                    A previously stuck settlement saga has recovered.
+
+                    Saga ID: %s
+                    Order ID: %s
+                    Current step: %s
+                    Recovered at: %s
+
+                    — TokenRealty Ops
+                    """.formatted(
+                    textOr(payload, "sagaId", "n/a"),
+                    textOr(payload, "orderId", "n/a"),
+                    textOr(payload, "currentStep", "n/a"),
+                    textOr(payload, "recoveredAt", "n/a"));
+            case "tokenrealty.valuation.approved.v1" -> """
+                    Hello,
+
+                    A property valuation has been approved.
+
+                    Flat ID: %s
+                    Building ID: %s
+                    Value (USD): %s
+                    NAV per token: %s
+                    Approved at: %s
+
+                    — TokenRealty
+                    """.formatted(
+                    textOr(payload, "flatId", "n/a"),
+                    textOr(payload, "buildingId", "n/a"),
+                    textOr(payload, "valueUsd", "n/a"),
+                    textOr(payload, "navPerTokenUsd", "n/a"),
+                    textOr(payload, "approvedAt", "n/a"));
             default -> "Event: " + eventType + "\n\nDetails:\n" + payload;
         };
     }

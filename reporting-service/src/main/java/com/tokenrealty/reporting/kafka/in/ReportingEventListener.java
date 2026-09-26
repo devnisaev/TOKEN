@@ -46,6 +46,12 @@ public class ReportingEventListener {
                 projectionService::onFlatTokenized);
     }
 
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.settlement-stuck}")
+    public void onSettlementStuck(String message) {
+        ingest(message, ReportingKafkaEventTypes.SETTLEMENT_STUCK,
+                projectionService::onSettlementStuck);
+    }
+
     private void ingest(String message, String eventType,
                         java.util.function.Consumer<com.tokenrealty.events.kafka.KafkaJsonEvent> handler) {
         eventConsumer.consume(message, eventType, "Reporting projection failed", handler);

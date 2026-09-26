@@ -63,6 +63,41 @@ class AuditKafkaIntegrationTest {
         assertThat(repository.count()).isEqualTo(1);
     }
 
+    @Test
+    @DisplayName("settlement.recovered creates ORDER audit entry")
+    void settlementRecovered_recorded() throws Exception {
+        UUID orderId = UUID.randomUUID();
+        publish(AuditKafkaEventTypes.SETTLEMENT_RECOVERED, UUID.randomUUID(), Map.of(
+                "sagaId", UUID.randomUUID().toString(),
+                "orderId", orderId.toString(),
+                "currentStep", "AWAITING_TRANSFER",
+                "recoveredAt", "2025-09-25T17:00:00Z"
+        ), auditLedgerService::onSettlementRecovered);
+
+        assertThat(repository.count()).isEqualTo(1);
+        assertThat(repository.findAll().getFirst().getSubjectId()).isEqualTo(orderId);
+    }
+
+    @Test
+    @DisplayName("valuation.approved creates FLAT audit entry")
+    void valuationApproved_recorded() throws Exception {
+        UUID flatId = UUID.randomUUID();
+        publish(AuditKafkaEventTypes.VALUATION_APPROVED, UUID.randomUUID(), Map.of(
+                "flatId", flatId.toString(),
+                "buildingId", UUID.randomUUID().toString(),
+                "valuationRequestId", UUID.randomUUID().toString(),
+                "valueUsd", "1000000.00",
+                "totalTokens", 1000,
+                "navPerTokenUsd", "1000.00000000",
+                "approvedAt", "2025-09-25T18:00:00Z",
+                "reviewedBy", UUID.randomUUID().toString()
+        ), auditLedgerService::onValuationApproved);
+
+        assertThat(repository.count()).isEqualTo(1);
+        assertThat(auditLedgerService.findByFlat(flatId, org.springframework.data.domain.Pageable.unpaged())
+                .getTotalElements()).isEqualTo(1);
+    }
+
     private void publish(String eventType, UUID eventId, Map<String, Object> payload,
                          java.util.function.Consumer<com.tokenrealty.events.kafka.KafkaJsonEvent> handler) throws Exception {
         EventEnvelope<Map<String, Object>> envelope = new EventEnvelope<>(

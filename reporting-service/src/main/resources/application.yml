@@ -43,6 +43,7 @@ tokenrealty:
       dividend-distributed: tokenrealty.issuance.dividend.distributed.v1
       rent-collected: tokenrealty.payment.rent.collected.v1
       flat-tokenized: tokenrealty.registry.flat.tokenized.v1
+      settlement-stuck: tokenrealty.settlement.stuck.v1
 
 management:
   endpoints:

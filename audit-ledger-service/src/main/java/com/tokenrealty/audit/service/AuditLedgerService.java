@@ -69,6 +69,22 @@ public class AuditLedgerService {
                 "Order matched flatId=" + text(payload, "flatId"));
     }
 
+    @Transactional
+    public void onSettlementRecovered(KafkaJsonEvent event) {
+        JsonNode payload = event.payload();
+        record(event, AuditSubjectType.ORDER, uuid(payload, "orderId"), null,
+                "Settlement recovered sagaId=" + text(payload, "sagaId")
+                        + " step=" + text(payload, "currentStep"));
+    }
+
+    @Transactional
+    public void onValuationApproved(KafkaJsonEvent event) {
+        JsonNode payload = event.payload();
+        record(event, AuditSubjectType.FLAT, uuid(payload, "flatId"), uuidOrNull(payload, "reviewedBy"),
+                "Valuation approved valueUsd=" + text(payload, "valueUsd")
+                        + " requestId=" + text(payload, "valuationRequestId"));
+    }
+
     @Transactional(readOnly = true)
     public Page<AuditEntry> findByInvestor(UUID investorId, Pageable pageable) {
         return repository.findBySubjectTypeAndSubjectIdOrderByOccurredAtDesc(
@@ -88,6 +104,11 @@ public class AuditLedgerService {
 
     private static UUID uuid(JsonNode node, String field) {
         return UUID.fromString(node.path(field).asText());
+    }
+
+    private static UUID uuidOrNull(JsonNode node, String field) {
+        String value = text(node, field);
+        return value == null ? null : UUID.fromString(value);
     }
 
     private static String text(JsonNode node, String field) {

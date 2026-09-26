@@ -35,6 +35,8 @@ tokenrealty:
       trade-settled: tokenrealty.marketplace.trade.settled.v1
       document-uploaded: tokenrealty.document.document.uploaded.v1
       order-matched: tokenrealty.marketplace.order.matched.v1
+      settlement-recovered: tokenrealty.settlement.recovered.v1
+      valuation-approved: tokenrealty.valuation.approved.v1
 
 management:
   endpoints:

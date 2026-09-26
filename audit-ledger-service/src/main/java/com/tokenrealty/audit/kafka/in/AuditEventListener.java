@@ -41,6 +41,16 @@ public class AuditEventListener {
         ingest(message, AuditKafkaEventTypes.ORDER_MATCHED, auditLedgerService::onOrderMatched);
     }
 
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.settlement-recovered}")
+    public void onSettlementRecovered(String message) {
+        ingest(message, AuditKafkaEventTypes.SETTLEMENT_RECOVERED, auditLedgerService::onSettlementRecovered);
+    }
+
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.valuation-approved}")
+    public void onValuationApproved(String message) {
+        ingest(message, AuditKafkaEventTypes.VALUATION_APPROVED, auditLedgerService::onValuationApproved);
+    }
+
     private void ingest(String message, String eventType,
                         java.util.function.Consumer<com.tokenrealty.events.kafka.KafkaJsonEvent> handler) {
         eventConsumer.consume(message, eventType, "Audit ledger ingest failed", handler);
