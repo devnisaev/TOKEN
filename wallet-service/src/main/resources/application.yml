@@ -35,6 +35,7 @@ tokenrealty:
     client-id: wallet
     client-secret: ${SERVICE_ACCOUNT_SECRET:wallet-secret}
   wallet:
+    seed-dev-wallets: ${SEED_DEV_WALLETS:true}
     encryption-key: ${WALLET_ENCRYPTION_KEY:dev-wallet-encryption-key-32b!!}
     sign-rate-limit:
       enabled: ${WALLET_SIGN_RATE_LIMIT_ENABLED:true}

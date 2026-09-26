@@ -19,6 +19,10 @@ import java.util.UUID;
 @Slf4j
 public class DevDataInitializer implements ApplicationRunner {
 
+    /** Matches DevComplianceDataInitializer and Payment demo balance seed. */
+    public static final UUID DEMO_INVESTOR_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    public static final String DEMO_INVESTOR_WALLET = "0x70997970c51812dc3a010c724d1afe6fc599aa84";
+
     public static final UUID DEMO_TENANT_ID = UUID.fromString("22222222-2222-2222-2222-222222222222");
     private static final String DEMO_TENANT_WALLET = "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC";
 
@@ -38,7 +42,8 @@ public class DevDataInitializer implements ApplicationRunner {
         seedUser("manager@tokenrealty.com", "manager123", User.UserRole.PROPERTY_MANAGER);
         seedUser("appraiser@tokenrealty.com", "appraiser123", User.UserRole.APPRAISER);
         seedUser("compliance@tokenrealty.com", "compliance123", User.UserRole.COMPLIANCE);
-        seedUser("investor@tokenrealty.com", "investor123", User.UserRole.INVESTOR);
+        seedUser("investor@tokenrealty.com", "investor123", User.UserRole.INVESTOR,
+                DEMO_INVESTOR_ID, DEMO_INVESTOR_WALLET);
         seedUser("tenant@tokenrealty.com", "tenant123", User.UserRole.TENANT, DEMO_TENANT_ID, DEMO_TENANT_WALLET);
         seedServiceAccount("token-issuance", "issuance-secret", User.UserRole.ADMIN);
         seedServiceAccount("marketplace", "marketplace-secret", User.UserRole.ADMIN);

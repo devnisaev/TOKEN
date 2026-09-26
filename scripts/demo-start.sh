@@ -2,6 +2,7 @@
 # Start TokenRealty demo infrastructure and print the service startup checklist.
 #
 # Usage:
+#   ./scripts/demo-all.sh                # Full demo: infra → services → wait → seed (recommended)
 #   ./scripts/demo-start.sh              # Postgres + Kafka + Jaeger (demo profile)
 #   ./scripts/demo-start.sh --infra-only # Postgres + Kafka only
 #   ./scripts/demo-start.sh --seed       # Also run seed-demo.sh when gateway is up

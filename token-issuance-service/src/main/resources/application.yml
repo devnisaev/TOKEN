@@ -72,6 +72,8 @@ services:
     url: ${RENTAL_SERVICE_URL:http://localhost:8086/api}
 
 tokenrealty:
+  issuance:
+    seed-dev-token-contract: ${SEED_DEV_TOKEN_CONTRACT:true}
   jwt:
     secret: ${JWT_SECRET:dev-secret-change-in-production-min-32-chars!!}
     issuer: tokenrealty-auth
@@ -80,6 +82,10 @@ tokenrealty:
     client-secret: ${SERVICE_ACCOUNT_SECRET:issuance-secret}
   kafka:
     enabled: ${KAFKA_ENABLED:false}
+    dlq:
+      enabled: ${KAFKA_DLQ_ENABLED:false}
+      max-retries: 3
+      backoff-ms: 1000
     relay:
       poll-ms: 1000
       publish-timeout-ms: 10000

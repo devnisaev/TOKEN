@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# One-command TokenRealty demo: infra → services → wait → seed [→ E2E].
+#
+# Usage:
+#   ./scripts/demo-all.sh              # full demo stack (no E2E)
+#   ./scripts/demo-all.sh --e2e        # also run Playwright full tests
+#   ./scripts/demo-all.sh --infra-only # Postgres + Kafka only (via demo-start)
+#   ./scripts/demo-all.sh --stop       # stop background Spring Boot processes
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${ROOT}"
+
+RUN_E2E=false
+RUN_TOKENIZE=false
+INFRA_ONLY=false
+STOP=false
+
+for arg in "$@"; do
+  case "${arg}" in
+    --e2e) RUN_E2E=true ;;
+    --tokenize) RUN_TOKENIZE=true ;;
+    --infra-only) INFRA_ONLY=true ;;
+    --stop) STOP=true ;;
+    *)
+      echo "Unknown option: ${arg}" >&2
+      echo "Usage: $0 [--e2e] [--tokenize] [--infra-only] [--stop]" >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [[ "${STOP}" == "true" ]]; then
+  exec "${ROOT}/scripts/demo-services.sh" --stop
+fi
+
+if [[ "${INFRA_ONLY}" == "true" ]]; then
+  exec "${ROOT}/scripts/demo-start.sh" --infra-only
+fi
+
+echo "==> Step 1/4: Starting demo infrastructure..."
+"${ROOT}/scripts/demo-start.sh" --infra-only
+
+echo ""
+echo "==> Step 2/4: Starting backend services..."
+"${ROOT}/scripts/demo-services.sh"
+
+echo ""
+echo "==> Step 3/4: Waiting for gateway health..."
+SERVICES="8080" TIMEOUT="${DEMO_WAIT_TIMEOUT:-180}" "${ROOT}/scripts/wait-for-services.sh"
+
+echo ""
+echo "==> Step 4/4: Seeding demo data..."
+"${ROOT}/scripts/seed-demo.sh"
+
+if [[ "${RUN_TOKENIZE}" == "true" ]]; then
+  echo ""
+  echo "==> Optional: tokenize demo flat + wait for listing..."
+  "${ROOT}/scripts/seed-tokenize-demo.sh"
+fi
+
+cat <<'EOF'
+
+Demo stack is ready.
+
+Hardhat (required for buy / on-chain flows):
+  cd token-issuance-service/hardhat && npm run node && npm run deploy:local
+
+Frontends:
+  cd frontend/investor-portal && npm run dev    # :5173
+  cd frontend/admin-dashboard && npm run dev    # :5174
+  cd frontend/tenant-portal && npm run dev      # :5175
+
+Full Playwright E2E:
+  ./scripts/e2e-run.sh --no-wait
+EOF
+
+if [[ "${RUN_E2E}" == "true" ]]; then
+  echo ""
+  echo "==> Running Playwright full E2E..."
+  "${ROOT}/scripts/e2e-run.sh" --no-wait
+fi

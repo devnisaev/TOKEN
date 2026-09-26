@@ -75,8 +75,11 @@ curl -sf "${GATEWAY_URL}/v1/compliance/document-reviews/pending" \
 cat <<'EOF'
 
 Demo seed (on service startup):
+  - Auth: investor@tokenrealty.com → id 11111111-1111-1111-1111-111111111111, Hardhat wallet #1
   - Registry: Sunrise Tower, flat 101 (33333333-3333-3333-3333-333333333333), SPV, valuation
   - Compliance: investor 11111111-1111-1111-1111-111111111111 (Hardhat account #1)
+  - Issuance: optional DevTokenContractInitializer (simulated contract when enabled)
+  - Wallet: linked demo wallet for investor 11111111-…
   - Payment: demo investor seeded with 10,000 USDC (custodial balance)
   - Rental: active lease for tenant 22222222-2222-2222-2222-222222222222 on demo flat ($650/mo)
   - Auth: admin@tokenrealty.com / admin123, investor@tokenrealty.com / investor123, tenant@tokenrealty.com / tenant123
@@ -86,8 +89,9 @@ Next — full on-chain demo:
   2. docker compose --profile kafka up -d   # optional, for event-driven settlement
   3. cd token-issuance-service/hardhat && npm run node && npm run deploy:local
   4. Start services with --spring.profiles.active=local
-  5. See docs/hardhat-demo.md for tokenize → list → buy flow
-  6. BFF: GET /api/v1/bff/flats/{flatId} via gateway :8080
+  5. ./scripts/seed-tokenize-demo.sh   # on-chain tokenize + wait for listing (Hardhat required)
+  6. See docs/hardhat-demo.md for tokenize → list → buy flow
+  7. BFF: GET /api/v1/bff/flats/{flatId} via gateway :8080
 
 Disable dev seeds in production:
   SEED_DEV_PROPERTIES=false SEED_DEV_COMPLIANCE=false tokenrealty.auth.seed-dev-users=false

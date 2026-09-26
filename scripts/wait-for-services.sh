@@ -21,6 +21,7 @@ fi
 # port:health-path (gateway has no /api prefix on actuator)
 DEFAULT_SERVICES=(
   "8080:/actuator/platform-health"
+  "8082:/api/actuator/health"
   "8083:/api/actuator/health"
   "8081:/api/actuator/health"
   "8084:/api/actuator/health"

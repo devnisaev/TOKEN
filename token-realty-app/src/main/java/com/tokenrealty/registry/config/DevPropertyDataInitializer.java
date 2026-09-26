@@ -4,11 +4,13 @@ import com.tokenrealty.registry.dto.PropertyDtos.CreateSpvRequest;
 import com.tokenrealty.registry.entity.Building;
 import com.tokenrealty.registry.entity.Building.BuildingStatus;
 import com.tokenrealty.registry.entity.Flat;
+import com.tokenrealty.registry.entity.PropertyDocument;
 import com.tokenrealty.registry.entity.SpvEntity;
 import com.tokenrealty.registry.entity.Valuation;
 import com.tokenrealty.registry.mapper.PropertyMapper;
 import com.tokenrealty.registry.repository.BuildingRepository;
 import com.tokenrealty.registry.repository.FlatRepository;
+import com.tokenrealty.registry.repository.PropertyDocumentRepository;
 import com.tokenrealty.registry.repository.SpvRepository;
 import com.tokenrealty.registry.repository.ValuationRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +30,10 @@ import java.util.UUID;
 @Slf4j
 public class DevPropertyDataInitializer implements ApplicationRunner {
 
+    public static final UUID DEMO_BUILDING_ID = UUID.fromString("55555555-5555-5555-5555-555555555555");
     public static final UUID DEMO_FLAT_ID = UUID.fromString("33333333-3333-3333-3333-333333333333");
     public static final UUID DEMO_SPV_ID = UUID.fromString("44444444-4444-4444-4444-444444444444");
+    public static final UUID DEMO_DOCUMENT_ID = UUID.fromString("66666666-6666-6666-6666-666666666666");
 
     private static final String DEMO_ADDRESS = "1 Chui Ave";
     private static final String DEMO_CITY = "Bishkek";
@@ -39,6 +43,7 @@ public class DevPropertyDataInitializer implements ApplicationRunner {
     private final FlatRepository flatRepository;
     private final ValuationRepository valuationRepository;
     private final SpvRepository spvRepository;
+    private final PropertyDocumentRepository documentRepository;
     private final PropertyMapper mapper;
 
     @Value("${tokenrealty.registry.seed-dev-properties:true}")
@@ -55,7 +60,7 @@ public class DevPropertyDataInitializer implements ApplicationRunner {
             return;
         }
 
-        Building building = buildingRepository.save(Building.builder()
+        Building building = Building.builder()
                 .name("Sunrise Tower")
                 .address(DEMO_ADDRESS)
                 .city(DEMO_CITY)
@@ -68,7 +73,9 @@ public class DevPropertyDataInitializer implements ApplicationRunner {
                 .latitude(42.8746)
                 .longitude(74.5698)
                 .status(BuildingStatus.PENDING_REVIEW)
-                .build());
+                .build();
+        building.setId(DEMO_BUILDING_ID);
+        building = buildingRepository.save(building);
 
         Flat flat = Flat.builder()
                 .building(building)
@@ -110,6 +117,21 @@ public class DevPropertyDataInitializer implements ApplicationRunner {
         building.setStatus(BuildingStatus.APPROVED);
         buildingRepository.save(building);
 
-        log.info("Seeded demo property building={} flat={} (Sunrise Tower / 101)", building.getId(), flat.getId());
+        if (!documentRepository.existsById(DEMO_DOCUMENT_ID)) {
+            PropertyDocument document = PropertyDocument.builder()
+                    .building(building)
+                    .flat(flat)
+                    .documentName("Sunrise Tower Title Deed")
+                    .documentType(PropertyDocument.DocumentType.TITLE_DEED)
+                    .ipfsCid("QmDemoTitleDeedCid")
+                    .uploadedBy("dev-seed")
+                    .isVerified(false)
+                    .build();
+            document.setId(DEMO_DOCUMENT_ID);
+            documentRepository.save(document);
+        }
+
+        log.info("Seeded demo property building={} flat={} document={} (Sunrise Tower / 101)",
+                building.getId(), flat.getId(), DEMO_DOCUMENT_ID);
     }
 }
