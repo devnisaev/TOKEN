@@ -25,6 +25,7 @@ Read and follow rules in `.cursor/rules/`:
 | [payment-ledger.mdc](.cursor/rules/payment-ledger.mdc) | Payment Service — escrow, ledger, idempotency |
 | [investment-limits.mdc](.cursor/rules/investment-limits.mdc) | KYC gates, min investment, compliance order |
 | [business-rules.mdc](.cursor/rules/business-rules.mdc) | Tier-1 invariants — read before money/Kafka features |
+| [investor-portal.mdc](.cursor/rules/investor-portal.mdc) | React investor portal — Vite, gateway BFF, wagmi |
 
 Human-readable expansions: [docs/rules/](docs/rules/) — tier-1 invariants in [BUSINESS_RULES.md](docs/BUSINESS_RULES.md); cross-service modules in [shared-libraries.md](docs/rules/shared-libraries.md)
 
@@ -60,6 +61,21 @@ Human-readable expansions: [docs/rules/](docs/rules/) — tier-1 invariants in [
 | Blockchain Indexer | 8091 | `com.tokenrealty.indexer` |
 
 New services: copy structure from `marketplace-service/` or `auth-service/`.
+
+## Frontend
+
+| App | Folder | Dev URL |
+|-----|--------|---------|
+| Investor Portal | `frontend/investor-portal/` | http://localhost:5173 |
+
+Stack: React 19, TypeScript, Vite, TanStack Query, wagmi, Tailwind. All API via gateway `:8080`.
+
+Docs: [docs/rules/investor-portal.md](docs/rules/investor-portal.md), [docs/rules/api-gateway-bff.md](docs/rules/api-gateway-bff.md).  
+Cursor rule: [investor-portal.mdc](.cursor/rules/investor-portal.mdc).
+
+```bash
+cd frontend/investor-portal && npm install && npm run dev
+```
 
 ## Run tests
 

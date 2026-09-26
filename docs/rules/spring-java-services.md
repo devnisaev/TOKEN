@@ -22,6 +22,8 @@ Cursor rule: [`.cursor/rules/spring-java-services.mdc`](../../.cursor/rules/spri
 | [shared-libraries.md](shared-libraries.md) | Cross-service Maven modules (web, jpa, kafka, outbox, security) |
 | [wallet-service.md](wallet-service.md) | Custodial wallets, encryption, aggregate balance |
 | [blockchain-indexer.md](blockchain-indexer.md) | On-chain event poll, balance reconciliation |
+| [investor-portal.md](investor-portal.md) | React investor UI (Vite, TanStack Query, wagmi) |
+| [api-gateway-bff.md](api-gateway-bff.md) | Gateway BFF aggregate endpoints |
 
 ---
 
@@ -123,6 +125,17 @@ Routes in `application.yml` under `tokenrealty.gateway.routes`. Downstream servi
 **Route order matters** — more specific prefixes first. Example: `/api/v1/documents/upload` → Document Service (:8088) before `/api/v1/documents` → Property Registry (:8081).
 
 Clients should call `http://localhost:8080/api/v1/...` instead of individual service ports.
+
+**BFF aggregates** (local handlers, not proxied) — see [api-gateway-bff.md](api-gateway-bff.md):
+
+```
+bff/BffController.java          ← GET /v1/bff/flats/{id}, /v1/bff/listings/{id}
+bff/BffFlatService.java         ← Registry + Issuance + Marketplace compose
+client/PropertyRegistryClient.java, MarketplaceClient.java, TokenIssuanceClient.java
+config/ServiceClientConfig.java ← service account api-gateway / gateway-secret
+```
+
+CORS: `http://localhost:5173` for Investor Portal dev server.
 
 ### Property Registry — document.uploaded consumer
 

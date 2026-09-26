@@ -249,11 +249,12 @@ Notification Service         Polygon / Hardhat + IPFS
 - Email / push / SMS
 - Subscribes to Kafka: KYC approved, dividend paid, rent due, transfer confirmed
 
-#### 4.9 API Gateway / BFF (`api-gateway`, :8080)
+#### 4.9 API Gateway / BFF (`api-gateway`, :8080) — **MVP implemented**
 
 - Single entry point for web/mobile clients
 - Route to backend services
-- Aggregate responses (flat + token price + listing in one call)
+- Aggregate responses (flat + token price + listing in one call) — `GET /v1/bff/flats/{id}`, `/v1/bff/listings/{id}`
+- Investor Portal consumes BFF on `:5173` → gateway `:8080`
 
 #### 4.10 Blockchain Indexer (optional, high value)
 
@@ -638,11 +639,15 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [ ] Docker image build per service
 - [ ] Integration test suite with Testcontainers (PostgreSQL, Kafka)
 
-### 11.5 Frontend (out of scope for backend spec, noted for completeness)
+### 11.5 Frontend
 
-- [ ] Investor portal (browse listings, buy tokens, view portfolio, dividends)
+- [x] Investor portal MVP (`frontend/investor-portal/`, `:5173`) — login, listings, BFF detail, buy order, portfolio
 - [ ] Admin dashboard (manage properties, KYC review, token issuance)
 - [ ] Tenant portal (pay rent, view lease)
+- [ ] Order status UI after buy (poll trade / payment state)
+- [ ] openapi-typescript codegen from springdoc
+
+See [docs/rules/investor-portal.md](rules/investor-portal.md), [docs/rules/api-gateway-bff.md](rules/api-gateway-bff.md).
 
 ---
 

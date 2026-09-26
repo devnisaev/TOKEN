@@ -66,7 +66,7 @@ com.tokenrealty.<service>/
 
 **Registry reference:** `token-realty-app` — publishes `flat.tokenized` from `FlatService.setTokenInfo()` via outbox.
 
-**API Gateway reference:** `api-gateway` — servlet reverse proxy + JWT; routes in `tokenrealty.gateway.routes`; no DB. Spring Cloud Gateway deferred (Boot 4).
+**API Gateway reference:** `api-gateway` — servlet reverse proxy + JWT + BFF (`/v1/bff/**`); routes in `tokenrealty.gateway.routes`; no DB. See [docs/rules/api-gateway-bff.md](../../docs/rules/api-gateway-bff.md). Spring Cloud Gateway deferred (Boot 4).
 
 **Notification reference:** `notification-service` — Kafka consumer stub only; `NotificationLogService` until email provider.
 

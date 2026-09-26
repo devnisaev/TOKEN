@@ -1,0 +1,37 @@
+---
+description: TokenRealty React investor portal — Vite, TanStack Query, wagmi, gateway BFF
+globs: "frontend/**/*.{ts,tsx,css,html,json}"
+alwaysApply: false
+---
+
+# Investor Portal — TokenRealty Frontend
+
+Human docs: [docs/rules/investor-portal.md](../../docs/rules/investor-portal.md), [docs/rules/api-gateway-bff.md](../../docs/rules/api-gateway-bff.md).
+
+## Stack
+
+React 19 + TypeScript, Vite, TanStack Query, React Router, wagmi/viem, Tailwind.
+
+## Rules
+
+- All API calls through gateway — `VITE_API_BASE_URL` or Vite proxy `/api` → `:8080`
+- JWT in `AuthProvider` / sessionStorage; attach `Authorization: Bearer` in `lib/api.ts`
+- Prefer BFF: `/v1/bff/flats/{id}`, `/v1/bff/listings/{id}` over multi-service fetches
+- Types in `src/types/api.ts` — keep aligned with Java DTOs / BffDtos
+- No private keys or secrets in frontend code or env
+- Buy flow: `POST /v1/orders` requires `buyerWallet` — wagmi address or profile wallet
+- Match shadcn-style components in `components/ui/`; use `cn()` from `lib/utils.ts`
+
+## Do not
+
+- Call microservice ports (8081–8091) directly from browser code
+- Store JWT in localStorage for production without threat review (sessionStorage OK for dev MVP)
+- Add Redux — TanStack Query + Auth context is enough
+
+## Run
+
+```bash
+cd frontend/investor-portal && npm install && npm run dev
+```
+
+Gateway `:8080` must be up. Demo login: `investor@tokenrealty.com` / `investor123`.
