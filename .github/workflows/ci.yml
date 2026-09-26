@@ -153,8 +153,49 @@ jobs:
           ./token-realty-app/mvnw -f marketplace-service/pom.xml test -Dtest=FlatTokenizedKafkaIntegrationTest,BuyFlowKafkaIntegrationTest -q
           ./token-realty-app/mvnw -f token-issuance-service/pom.xml test -Dtest=KycApprovedKafkaIntegrationTest,KycRevokedKafkaIntegrationTest,RentCollectedKafkaIntegrationTest,PaymentConfirmedKafkaIntegrationTest,PayoutCompletedKafkaIntegrationTest,RentDividendIntegrationTest -q
           ./token-realty-app/mvnw -f payment-service/pom.xml test -Dtest=OrderMatchedKafkaIntegrationTest,DividendDistributedKafkaIntegrationTest -q
-          ./token-realty-app/mvnw -f token-realty-app/pom.xml test -Dtest=DocumentUploadedKafkaIntegrationTest -q
-          ./token-realty-app/mvnw -f compliance-service/pom.xml test -Dtest=DocumentUploadedKafkaIntegrationTest -q
+          ./token-realty-app/mvnw -f token-realty-app/pom.xml test -Dtest=DocumentUploadedKafkaIntegrationTest,TransferCompletedKafkaIntegrationTest -q
+          ./token-realty-app/mvnw -f compliance-service/pom.xml test -Dtest=DocumentUploadedKafkaIntegrationTest,KycWebhookIntegrationTest -q
+          ./token-realty-app/mvnw -f rental-service/pom.xml test -Dtest=RentScheduleKafkaIntegrationTest -q
+
+  kafka-outbox-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Install shared libraries
+        run: ./token-realty-app/mvnw -f pom.xml -pl tokenrealty-security,tokenrealty-web,tokenrealty-jpa,tokenrealty-kafka,tokenrealty-events,tokenrealty-outbox install -q
+
+      - name: Run outbox relay, document outbox, and DLQ integration tests
+        run: |
+          ./token-realty-app/mvnw -f marketplace-service/pom.xml test -Dtest=OutboxRelayIntegrationTest -q
+          ./token-realty-app/mvnw -f document-service/pom.xml test -Dtest=DocumentUploadedOutboxIntegrationTest -q
+          ./token-realty-app/mvnw -f tokenrealty-kafka/pom.xml test -Dtest=KafkaDlqIntegrationTest -q
+
+  marketplace-kafka-containers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Install shared libraries
+        run: ./token-realty-app/mvnw -f pom.xml -pl tokenrealty-security,tokenrealty-web,tokenrealty-jpa,tokenrealty-kafka,tokenrealty-events,tokenrealty-outbox install -q
+
+      - name: Run Testcontainers Kafka buy-flow test
+        working-directory: marketplace-service
+        run: ../token-realty-app/mvnw test -Dtest=BuyFlowKafkaContainersIntegrationTest -q
 
   registry-integration-test:
     runs-on: ubuntu-latest
@@ -275,6 +316,26 @@ jobs:
           npm ci
           npm run codegen
           git diff --exit-code ../shared-api-types/
+
+  compose-demo-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start Postgres via Docker Compose
+        run: docker compose up -d postgres
+
+      - name: Validate demo scripts are executable
+        run: |
+          test -x scripts/demo-all.sh
+          test -x scripts/demo-buy-flow.sh
+          test -x scripts/seed-demo.sh
+          bash -n scripts/demo-all.sh
+          bash -n scripts/demo-buy-flow.sh
+
+      - name: Tear down compose
+        if: always()
+        run: docker compose down -v
 
   frontend-e2e-full:
     runs-on: ubuntu-latest
