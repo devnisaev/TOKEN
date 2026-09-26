@@ -1,0 +1,24 @@
+{
+  "type": "record",
+  "name": "PaymentConfirmed",
+  "namespace": "com.tokenrealty.events.avro",
+  "doc": "tokenrealty.payment.payment.confirmed.v1 payload",
+  "fields": [
+    { "name": "paymentId", "type": "string" },
+    { "name": "orderId", "type": "string" },
+    { "name": "payerId", "type": "string" },
+    {
+      "name": "amount",
+      "type": {
+        "type": "record",
+        "name": "Amount",
+        "fields": [
+          { "name": "value", "type": "string" },
+          { "name": "currency", "type": "string" }
+        ]
+      }
+    },
+    { "name": "txHash", "type": ["null", "string"], "default": null },
+    { "name": "confirmedAt", "type": "string" }
+  ]
+}

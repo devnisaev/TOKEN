@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "name": "TradeSettled",
+  "namespace": "com.tokenrealty.events.avro",
+  "doc": "tokenrealty.marketplace.trade.settled.v1 payload",
+  "fields": [
+    { "name": "tradeId", "type": "string" },
+    { "name": "orderId", "type": "string" },
+    { "name": "listingId", "type": "string" },
+    { "name": "paymentId", "type": "string" },
+    { "name": "transferId", "type": "string" }
+  ]
+}

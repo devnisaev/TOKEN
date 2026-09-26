@@ -685,10 +685,10 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] DividendDistributor on-chain deposit when configured (track 159)
 - [x] WalletConnect session with relay URL + TTL; key rotation endpoint (tracks 160, 176)
 - [x] Investor listing PRIMARY/SECONDARY filters (track 177)
-- [ ] Full compose stack E2E on every PR (track 157 — workflow_dispatch + spec check only)
-- [ ] GraphQL BFF layer (track 163 deferred)
-- [ ] Avro Schema Registry (track 164 deferred)
-- [ ] Real AWS/GCP KMS adapter (track 161 deferred)
+- [x] Full compose stack E2E on pull_request (`compose-e2e-pr` CI job + `scripts/ci-compose-e2e.sh`)
+- [x] GraphQL BFF layer (`POST /graphql` aggregating REST BFF queries — track 163)
+- [x] Avro Schema Registry (Apicurio in compose + `AvroEventCodec` — track 164)
+- [x] Real AWS/GCP KMS wallet encryption adapters (track 161)
 
 ### 11.5 Frontend
 

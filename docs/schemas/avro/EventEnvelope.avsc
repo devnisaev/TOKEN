@@ -1,0 +1,12 @@
+{
+  "type": "record",
+  "name": "EventEnvelope",
+  "namespace": "com.tokenrealty.events.avro",
+  "fields": [
+    { "name": "eventId", "type": "string" },
+    { "name": "eventType", "type": "string" },
+    { "name": "occurredAt", "type": "string" },
+    { "name": "traceId", "type": "string" },
+    { "name": "payloadJson", "type": "string" }
+  ]
+}

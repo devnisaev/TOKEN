@@ -28,7 +28,7 @@ Spring conventions: [spring-java-services.md](spring-java-services.md)
 |-------|-------------|
 | Full hexagonal `adapter/in/kafka` mandatory | Layered `kafka/` OK for existing services |
 | `cardsystem-outbox` shared lib | `tokenrealty-outbox` (`OutboxWriter`, `OutboxRelay`, `OutboxPayload`); per-service `outbox_events` table + thin relay worker |
-| Avro + Schema Registry (implied) | JSON envelope first; Avro optional in Phase 5 |
+| Avro + Schema Registry | JSON default; Apicurio `:8092` + `AvroEventCodec` opt-in (`docs/schemas/avro/`) |
 | 20+ service-specific references | 12+ topics in [EVENTS.md](../EVENTS.md) |
 | PCI: never PAN/PIN | Never private keys, seeds, full KYC docs |
 

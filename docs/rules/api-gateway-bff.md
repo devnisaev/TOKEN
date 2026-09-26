@@ -161,4 +161,4 @@ CI job: `docker-build` matrix in `.github/workflows/ci.yml` (gateway, auth, regi
 - [x] Response caching (short TTL) for BFF listing and flat detail (`Caffeine`, 60s default)
 - [x] Redis-backed rate limiting for multi-instance gateway (`backend: redis`, compose Redis :6379)
 - [x] `GET /v1/bff/tenants/{tenantId}/lease` — lease + flat summary + rent-due flag
-- [ ] GraphQL layer (optional; REST BFF sufficient for MVP — track 151 deferred)
+- [x] GraphQL layer (`POST /graphql` — flat, listing, portfolio, tenant lease/maintenance queries)
