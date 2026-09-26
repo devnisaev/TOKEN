@@ -19,6 +19,11 @@ paths:
         - name: buyerId
           in: query
           schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [PENDING, MATCHED, SETTLED, CANCELLED]
       responses:
         '200':
           content:
@@ -141,6 +146,8 @@ components:
       properties:
         id: { type: string, format: uuid }
         listingId: { type: string, format: uuid }
+        orderType: { type: string, enum: [BUY, SELL] }
+        listingType: { type: string, enum: [PRIMARY, SECONDARY] }
         status: { type: string }
         buyerId: { type: string, format: uuid }
         tokenAmount: { type: integer }

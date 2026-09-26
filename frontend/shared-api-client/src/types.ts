@@ -1,12 +1,14 @@
 import type { ProblemDetail } from './client';
 import type { components as AuthComponents } from '../../shared-api-types/auth';
 import type { components as ComplianceComponents } from '../../shared-api-types/compliance';
+import type { components as GatewayComponents } from '../../shared-api-types/gateway';
 import type { components as MarketplaceComponents } from '../../shared-api-types/marketplace';
 import type { components as RegistryComponents } from '../../shared-api-types/registry';
 import type { components as RentalComponents } from '../../shared-api-types/rental';
 
 type Auth = AuthComponents['schemas'];
 type Compliance = ComplianceComponents['schemas'];
+type Gateway = GatewayComponents['schemas'];
 type Marketplace = MarketplaceComponents['schemas'];
 type Registry = RegistryComponents['schemas'];
 type Rental = RentalComponents['schemas'];
@@ -52,47 +54,15 @@ export type Lease = Rental['Lease'] & { id: string };
 export type RentPayment = Rental['RentPayment'] & { id: string };
 export type RecordRentPaymentRequest = Rental['RecordRentPaymentRequest'];
 
-/** BFF aggregates (gateway) — hand-maintained until gateway OpenAPI spec exists. */
-export interface TokenContractSummary {
-  contractId?: string;
-  contractAddress?: string;
-  tokenSymbol?: string;
-  totalSupply?: number;
-  tokenPriceUsd?: number;
-  status?: string;
-}
-
-export interface ListingSummary {
-  listingId: string;
-  listingType: string;
-  status: string;
-  priceUsd: number;
-  tokensAvailable: number;
-  tokensTotal: number;
-  minInvestmentTokens: number;
-  title: string;
-}
-
-export interface FlatDetailResponse {
-  flatId: string;
-  buildingId: string;
-  buildingName: string;
-  flatNumber: string;
-  floor?: number;
-  areaSqm?: number;
-  status: string;
-  tokenContract?: TokenContractSummary | null;
-  listing?: ListingSummary | null;
-}
-
-export interface ListingDetailResponse {
+/** BFF aggregates (gateway OpenAPI). */
+export type TokenContractSummary = Gateway['TokenContractSummary'];
+export type ListingSummary = Required<Pick<Gateway['ListingSummary'], 'listingId' | 'listingType' | 'status' | 'priceUsd' | 'tokensAvailable' | 'tokensTotal' | 'minInvestmentTokens' | 'title'>>;
+export type FlatDetailResponse = Required<Pick<Gateway['FlatDetailResponse'], 'flatId' | 'buildingId' | 'buildingName' | 'flatNumber' | 'status'>> & Gateway['FlatDetailResponse'];
+export type ListingDetailResponse = Required<Pick<Gateway['ListingDetailResponse'], 'flatId' | 'buildingName' | 'flatNumber' | 'flatStatus'>> & {
   listing: ListingSummary;
-  flatId: string;
-  buildingName: string;
-  flatNumber: string;
-  flatStatus: string;
   tokenContract?: TokenContractSummary | null;
-}
+};
+export type OrderStatusEvent = Required<Pick<Gateway['OrderStatusEvent'], 'orderId' | 'orderStatus'>> & Gateway['OrderStatusEvent'];
 
 export interface BuildingBffDetail {
   building: BuildingDetail;
@@ -106,14 +76,8 @@ export interface FiatBalance {
   held: number;
 }
 
-export interface TokenHolding {
-  contractId: string;
-  flatId?: string | null;
-  tokenSymbol: string;
-  walletAddress: string;
-  balance: number;
-  tokenPriceUsd?: number | null;
-}
+export type TokenHolding = Required<Pick<Gateway['EnrichedTokenHoldingView'], 'contractId' | 'tokenSymbol' | 'walletAddress' | 'balance'>> &
+  Gateway['EnrichedTokenHoldingView'];
 
 export interface AggregateBalance {
   investorId: string;

@@ -1,13 +1,24 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
 import { api } from '@/lib/api';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+const STATUS_TABS = [
+  { label: 'All', value: '' },
+  { label: 'Matched', value: 'MATCHED' },
+  { label: 'Settled', value: 'SETTLED' },
+  { label: 'Cancelled', value: 'CANCELLED' },
+] as const;
+
 export function OrdersPage() {
+  const [status, setStatus] = useState('');
+
   const { data, isLoading, error } = useQuery({
-    queryKey: ['admin-orders'],
-    queryFn: () => api.listOrders(),
+    queryKey: ['admin-orders', status],
+    queryFn: () => api.listOrders(status || undefined),
   });
 
   return (
@@ -15,6 +26,19 @@ export function OrdersPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Orders</h1>
         <p className="text-muted-foreground">Marketplace buy/sell order monitoring</p>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {STATUS_TABS.map((tab) => (
+          <Button
+            key={tab.label}
+            size="sm"
+            variant={status === tab.value ? 'default' : 'outline'}
+            onClick={() => setStatus(tab.value)}
+          >
+            {tab.label}
+          </Button>
+        ))}
       </div>
 
       {isLoading && (
@@ -37,6 +61,7 @@ export function OrdersPage() {
             <thead className="border-b bg-muted/50">
               <tr>
                 <th className="px-4 py-3 text-left font-medium">Order ID</th>
+                <th className="px-4 py-3 text-left font-medium">Type</th>
                 <th className="px-4 py-3 text-left font-medium">Buyer</th>
                 <th className="px-4 py-3 text-left font-medium">Tokens</th>
                 <th className="px-4 py-3 text-left font-medium">Total USD</th>
@@ -51,6 +76,7 @@ export function OrdersPage() {
                       {order.id?.slice(0, 8)}…
                     </Link>
                   </td>
+                  <td className="px-4 py-3 text-xs">{order.orderType ?? 'BUY'}</td>
                   <td className="px-4 py-3 font-mono text-xs">{order.buyerId?.slice(0, 8)}…</td>
                   <td className="px-4 py-3">{order.tokenAmount}</td>
                   <td className="px-4 py-3">${order.totalPriceUsd}</td>
@@ -61,7 +87,7 @@ export function OrdersPage() {
               ))}
               {data?.content.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
                     No orders yet.
                   </td>
                 </tr>

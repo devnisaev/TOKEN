@@ -119,8 +119,9 @@ export const api = {
     });
   },
 
-  listOrders() {
-    return request<SpringPage<Order>>('/v1/orders?size=50&sort=createdAt,desc');
+  listOrders(status?: string) {
+    const q = status ? `&status=${status}` : '';
+    return request<SpringPage<Order>>(`/v1/orders?size=50&sort=createdAt,desc${q}`);
   },
 
   getOrder(orderId: string) {

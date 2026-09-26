@@ -105,6 +105,7 @@ export interface Order {
   listingId: string;
   flatId?: string;
   contractId?: string;
+  orderType?: string;
   status: string;
   buyerId: string;
   sellerId?: string;

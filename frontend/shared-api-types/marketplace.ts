@@ -134,6 +134,10 @@ export interface components {
       id?: string;
       /** Format: uuid */
       listingId?: string;
+      /** @enum {string} */
+      orderType?: "BUY" | "SELL";
+      /** @enum {string} */
+      listingType?: "PRIMARY" | "SECONDARY";
       status?: string;
       /** Format: uuid */
       buyerId?: string;
@@ -202,6 +206,7 @@ export interface operations {
     parameters: {
       query?: {
         buyerId?: string;
+        status?: "PENDING" | "MATCHED" | "SETTLED" | "CANCELLED";
       };
       header?: never;
       path?: never;

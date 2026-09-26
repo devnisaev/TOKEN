@@ -1,5 +1,6 @@
 import { Building2, LogOut, Wallet } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
+import { ConnectWalletButton } from '@/components/ConnectWalletButton';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth';
 import { navLinkClass } from '@tokenrealty/shared-ui';
@@ -31,6 +32,7 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <ConnectWalletButton />
           {user && (
             <span className="hidden text-sm text-muted-foreground md:inline">{user.email}</span>
           )}
