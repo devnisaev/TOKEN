@@ -1,0 +1,7 @@
+tokenrealty:
+  auth:
+    seed-dev-users: false
+
+logging:
+  level:
+    com.tokenrealty: INFO

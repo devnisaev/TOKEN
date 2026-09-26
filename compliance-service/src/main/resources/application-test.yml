@@ -12,5 +12,7 @@ spring:
         default_schema: COMPLIANCE_TEST
 
 tokenrealty:
+  compliance:
+    seed-dev-records: false
   kafka:
     enabled: false

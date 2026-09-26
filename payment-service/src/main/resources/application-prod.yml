@@ -1,0 +1,13 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+tokenrealty:
+  payment:
+    auto-confirm:
+      enabled: false
+
+logging:
+  level:
+    com.tokenrealty: INFO

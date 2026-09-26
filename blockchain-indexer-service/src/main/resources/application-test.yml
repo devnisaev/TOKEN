@@ -1,0 +1,23 @@
+spring:
+  autoconfigure:
+    exclude:
+      - com.tokenrealty.security.config.ServiceTokenAutoConfiguration
+  datasource:
+    url: jdbc:h2:mem:indexer_test;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+tokenrealty:
+  jwt:
+    secret: test-jwt-secret-min-32-characters-long!!
+    issuer: tokenrealty-auth
+  indexer:
+    enabled: false
+
+services:
+  token-issuance:
+    url: http://localhost:8082/api

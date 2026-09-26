@@ -62,6 +62,14 @@ tokenrealty:
           - /api/v1/leases
           - /api/v1/rent-payments
           - /api/v1/occupancy
+      - id: wallet
+        target: http://localhost:8090
+        paths:
+          - /api/v1/wallets
+      - id: blockchain-indexer
+        target: http://localhost:8091
+        paths:
+          - /api/v1/indexer
 
 management:
   endpoints:

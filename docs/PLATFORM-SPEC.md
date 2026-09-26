@@ -506,7 +506,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 - [x] POST `/v1/payouts` — dividend/rent payout to holder wallets
 - [x] Web3j integration for USDC payouts (`PaymentBlockchainService`; MockUSDC on local Hardhat; simulated when disabled)
 - [x] Transaction ledger entries (double-entry stub)
-- [ ] On-chain reconciliation job
+- [x] On-chain reconciliation job
 - [x] Publish `PaymentConfirmed`, `RentCollected` events (outbox stub)
 - [x] Unit + context tests (`./mvnw test`)
 - [x] Integrate Marketplace order match → payment initiate
@@ -591,20 +591,20 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 
 ### 10.10 Wallet Service (Phase 5)
 
-- [ ] Scaffold project (`wallet-service/`)
-- [ ] Custodial wallet creation (generate keypair, encrypt at rest)
-- [ ] WalletConnect / MetaMask linking for non-custodial
-- [ ] GET `/v1/wallets/{investorId}/balance` — aggregate balances
-- [ ] POST `/v1/wallets/{investorId}/sign` — sign transaction (custodial)
-- [ ] Integration with Payment Service for payouts
+- [x] Scaffold project (`wallet-service/`, port 8090)
+- [x] Custodial wallet creation (generate keypair, encrypt at rest)
+- [x] WalletConnect / MetaMask linking for non-custodial (`POST /v1/wallets/link`)
+- [x] GET `/v1/wallets/{investorId}/balance` — aggregate balances
+- [x] POST `/v1/wallets/{investorId}/sign` — sign transaction (custodial)
+- [x] Integration with Payment Service for payouts (`GET /v1/wallet-balances/{investorId}`)
 
 ### 10.11 Blockchain Indexer (Phase 5)
 
-- [ ] Standalone service or module in Token Issuance
-- [ ] Subscribe to Polygon/Hardhat node for contract events
-- [ ] Sync Transfer, DividendPaid, WhitelistUpdated to DB
-- [ ] Reconciliation job: on-chain balance vs DB holder balance
-- [ ] Alert on mismatch
+- [x] Standalone service (`blockchain-indexer-service/`, port 8091)
+- [x] Subscribe to Polygon/Hardhat node for contract events
+- [x] Sync Transfer, WhitelistAdded, WhitelistRemoved to DB
+- [x] Reconciliation job: on-chain balance vs DB holder balance
+- [x] Alert on mismatch (logged + `GET /v1/indexer/reconciliation`)
 
 ---
 
@@ -622,7 +622,7 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 
 - [x] Root `docker-compose.yml`: PostgreSQL (all DBs), Kafka profile
 - [x] Profile-based startup: `docker compose up postgres` / `--profile kafka`
-- [ ] Seed data script for demo buildings + flats + test users
+- [x] Seed data script for demo buildings + flats + test users
 
 ### 11.3 Observability
 

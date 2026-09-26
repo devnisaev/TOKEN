@@ -33,6 +33,9 @@ Domain clients (`PaymentClient`, `TokenIssuanceClient`, …) stay per-service. S
 | `ComplianceClient` | Marketplace, Issuance → Compliance | KYC check (`isWhitelisted`, `investorId`) | Service token |
 | `TokenIssuanceClient` | Marketplace → Issuance | Contract by flat, holder balance by wallet, transfer | Service token |
 | `PaymentClient` | Marketplace, Rental → Payment | Initiate escrow, release escrow, payouts | Service token |
+| `PaymentClient` | Wallet → Payment | `GET /v1/wallet-balances/{investorId}` | Service token |
+| `IssuanceClient` | Wallet → Issuance | `GET /v1/investors/{investorId}/holdings` | Service token |
+| `IssuanceClient` | Blockchain Indexer → Issuance | `GET /v1/tokens`, `GET /v1/tokens/{id}/holders` | Service token |
 | `MarketplaceClient` | Token Issuance → Marketplace | GET trade by orderId (`listingType`, `sellerWallet`) | Service token |
 
 ## Service name prefixes
@@ -45,6 +48,8 @@ Domain clients (`PaymentClient`, `TokenIssuanceClient`, …) stay per-service. S
 | Payment | `payment_` |
 | Compliance | `compliance_` |
 | Document | `document_` |
+| Wallet | `wallet_` |
+| Blockchain Indexer | `blockchain_indexer_` |
 | Auth | `auth_` |
 
 ## Target behavior

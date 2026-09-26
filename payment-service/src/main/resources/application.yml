@@ -67,6 +67,8 @@ tokenrealty:
     auto-confirm:
       enabled: ${PAYMENT_AUTO_CONFIRM:false}
       poll-ms: 3000
+    reconciliation:
+      cron: ${PAYMENT_RECONCILIATION_CRON:0 0 */6 * * *}
 
 jackson2:
   serialization:

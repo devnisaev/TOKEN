@@ -4,3 +4,11 @@ spring:
       ddl-auto: validate
   liquibase:
     enabled: true
+
+tokenrealty:
+  registry:
+    seed-dev-properties: false
+
+logging:
+  level:
+    com.tokenrealty: INFO

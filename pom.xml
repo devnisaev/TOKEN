@@ -28,6 +28,8 @@
         <module>rental-service</module>
         <module>compliance-service</module>
         <module>document-service</module>
+        <module>wallet-service</module>
+        <module>blockchain-indexer-service</module>
     </modules>
 
     <properties>

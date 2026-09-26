@@ -20,4 +20,6 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
     boolean existsByOrderId(UUID orderId);
 
     List<Payment> findTop20ByStatusOrderByCreatedAtAsc(Payment.PaymentStatus status);
+
+    List<Payment> findTop50ByStatusAndTxHashIsNotNullOrderByCreatedAtAsc(Payment.PaymentStatus status);
 }

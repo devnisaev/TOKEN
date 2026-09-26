@@ -27,6 +27,8 @@ Central documentation for the TokenRealty real-estate tokenization platform.
 | [rules/payment-ledger.md](rules/payment-ledger.md) | [payment-ledger.mdc](../.cursor/rules/payment-ledger.mdc) |
 | [rules/investment-limits.md](rules/investment-limits.md) | [investment-limits.mdc](../.cursor/rules/investment-limits.mdc) |
 | [rules/business-rules.md](rules/business-rules.md) | [business-rules.mdc](../.cursor/rules/business-rules.mdc) |
+| [rules/wallet-service.md](rules/wallet-service.md) | — (custodial wallets, Web3j signing) |
+| [rules/blockchain-indexer.md](rules/blockchain-indexer.md) | — (on-chain event poll, reconciliation) |
 
 Cursor skills (workflows — see [AGENTS.md](../AGENTS.md)):
 
@@ -60,6 +62,10 @@ Additional Cursor rules (no separate human doc yet):
 | Payment | [payment-service/README.md](../payment-service/README.md) | 8085 |
 | Rental | [rental-service/README.md](../rental-service/README.md) | 8086 |
 | Compliance | — | 8087 |
+| Document | — | 8088 |
+| Notification | — | 8089 |
+| Wallet | — | 8090 |
+| Blockchain Indexer | — | 8091 |
 
 ## Diagrams (PlantUML)
 

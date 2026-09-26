@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: blockchain-indexer-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/blockchain_indexer
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+
+server:
+  port: 8091
+  servlet:
+    context-path: /api
+
+services:
+  auth:
+    url: ${AUTH_SERVICE_URL:http://localhost:8083/api}
+  token-issuance:
+    url: ${TOKEN_ISSUANCE_URL:http://localhost:8082/api}
+
+tokenrealty:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-change-in-production-min-32-chars!!}
+    issuer: tokenrealty-auth
+  service-account:
+    client-id: blockchain-indexer
+    client-secret: ${SERVICE_ACCOUNT_SECRET:indexer-secret}
+  indexer:
+    enabled: ${INDEXER_ENABLED:true}
+    poll-ms: ${INDEXER_POLL_MS:15000}
+    batch-blocks: ${INDEXER_BATCH_BLOCKS:500}
+    reconciliation:
+      cron: ${INDEXER_RECONCILIATION_CRON:0 30 */6 * * *}
+    blockchain:
+      rpc-url: ${BLOCKCHAIN_RPC_URL:http://localhost:8545}
+      compliance-registry-address: ${COMPLIANCE_REGISTRY_ADDRESS:}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    com.tokenrealty: DEBUG

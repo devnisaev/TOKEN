@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: wallet-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/wallet_service
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+
+server:
+  port: 8090
+  servlet:
+    context-path: /api
+
+services:
+  auth:
+    url: ${AUTH_SERVICE_URL:http://localhost:8083/api}
+  payment:
+    url: ${PAYMENT_SERVICE_URL:http://localhost:8085/api}
+  token-issuance:
+    url: ${TOKEN_ISSUANCE_URL:http://localhost:8082/api}
+
+tokenrealty:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-change-in-production-min-32-chars!!}
+    issuer: tokenrealty-auth
+  service-account:
+    client-id: wallet
+    client-secret: ${SERVICE_ACCOUNT_SECRET:wallet-secret}
+  wallet:
+    encryption-key: ${WALLET_ENCRYPTION_KEY:dev-wallet-encryption-key-32b!!}
+    blockchain:
+      rpc-url: ${BLOCKCHAIN_RPC_URL:http://localhost:8545}
+      chain-id: ${BLOCKCHAIN_CHAIN_ID:31337}
+      usdc-contract-address: ${USDC_CONTRACT_ADDRESS:}
+
+jackson2:
+  serialization:
+    write-dates-as-timestamps: false
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    com.tokenrealty: DEBUG

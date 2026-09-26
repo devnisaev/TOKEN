@@ -24,7 +24,7 @@ jobs:
 
       - name: Run Java tests (core services)
         run: |
-          ./token-realty-app/mvnw -f pom.xml -pl token-realty-app,token-issuance-service,payment-service,compliance-service,marketplace-service,rental-service,api-gateway test -q
+          ./token-realty-app/mvnw -f pom.xml -pl token-realty-app,token-issuance-service,payment-service,compliance-service,marketplace-service,rental-service,notification-service,document-service,wallet-service,blockchain-indexer-service,api-gateway test -q
 
   hardhat-tests:
     runs-on: ubuntu-latest

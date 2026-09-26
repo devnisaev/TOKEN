@@ -1,0 +1,12 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+tokenrealty:
+  compliance:
+    seed-dev-records: false
+
+logging:
+  level:
+    com.tokenrealty: INFO

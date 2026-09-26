@@ -8,3 +8,5 @@ CREATE DATABASE rental_service;
 CREATE DATABASE compliance_service;
 CREATE DATABASE document_service;
 CREATE DATABASE notification_service;
+CREATE DATABASE wallet_service;
+CREATE DATABASE blockchain_indexer;

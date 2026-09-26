@@ -20,6 +20,8 @@ Cursor rule: [`.cursor/rules/spring-java-services.mdc`](../../.cursor/rules/spri
 | [investment-limits.mdc](../../.cursor/rules/investment-limits.mdc) | KYC gates, min investment rules |
 | [business-rules.mdc](../../.cursor/rules/business-rules.mdc) | Tier-1 invariants (ledger, outbox, compliance order) |
 | [shared-libraries.md](shared-libraries.md) | Cross-service Maven modules (web, jpa, kafka, outbox, security) |
+| [wallet-service.md](wallet-service.md) | Custodial wallets, encryption, aggregate balance |
+| [blockchain-indexer.md](blockchain-indexer.md) | On-chain event poll, balance reconciliation |
 
 ---
 
@@ -103,6 +105,8 @@ adapter/in/web → application/service → adapter/out/{persistence,client,kafka
 | Rental | 8086 | `com.tokenrealty.rental` | Layered + Payment client |
 | Compliance | 8087 | `com.tokenrealty.compliance` | Layered + KYC outbox |
 | Document | 8088 | `com.tokenrealty.document` | Layered + IPFS upload + Registry callback + outbox |
+| Wallet | 8090 | `com.tokenrealty.wallet` | Layered + Web3j sign + Payment/Issuance clients |
+| Blockchain Indexer | 8091 | `com.tokenrealty.indexer` | Layered + Web3j poll + scheduled reconciliation |
 
 ### API Gateway (edge)
 
@@ -142,6 +146,30 @@ kafka/outbox/                          ← document.uploaded
 ```
 
 Service account: `document` / `document-secret` (ADMIN). Roles for upload: `ADMIN`, `PROPERTY_MANAGER`.
+
+### Wallet Service (custodial + linked wallets)
+
+See [wallet-service.md](wallet-service.md).
+
+```
+controller/WalletController.java
+service/WalletService.java, CustodialSignService.java
+crypto/WalletEncryptionService.java     ← AES-GCM; never log keys
+client/PaymentClient.java, IssuanceClient.java
+```
+
+### Blockchain Indexer (on-chain sync)
+
+See [blockchain-indexer.md](blockchain-indexer.md).
+
+```
+service/BlockchainLogIndexer.java       ← @Scheduled eth_getLogs poll
+service/BalanceReconciliationService.java
+blockchain/OnChainBalanceReader.java    ← balanceOf eth_call
+client/IssuanceClient.java              ← contract + holder lists
+```
+
+Token Issuance support endpoint: `GET /v1/investors/{investorId}/holdings`.
 
 ---
 

@@ -309,6 +309,9 @@ Inter-service REST (service JWT):
 | Marketplace → Issuance | `TokenIssuanceClient` | `GET /v1/tokens/by-flat/{flatId}`, `GET /v1/tokens/{contractId}/holders/by-wallet/{wallet}` |
 | Document → Registry | `PropertyRegistryClient` | `POST /v1/buildings/{id}/documents`, `POST /v1/flats/{id}/documents`, `GET /v1/documents/{id}` |
 | Issuance → Compliance | `ComplianceClient` | `GET /v1/compliance/check/{wallet}` (transfer KYC gate) |
+| Wallet → Payment | `PaymentClient` | `GET /v1/wallet-balances/{investorId}` |
+| Wallet → Issuance | `IssuanceClient` | `GET /v1/investors/{investorId}/holdings` |
+| Indexer → Issuance | `IssuanceClient` | `GET /v1/tokens`, `GET /v1/tokens/{id}/holders` |
 
 **Dev auto-confirm:** `PaymentAutoConfirmWorker` polls `PENDING` payments when `tokenrealty.payment.auto-confirm.enabled=true` (`PAYMENT_AUTO_CONFIRM` env or `local` profile). Uses `0xSIMULATED_{paymentId}` tx hash. Production still needs on-chain deposit detection.
 

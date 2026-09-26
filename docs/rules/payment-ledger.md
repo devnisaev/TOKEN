@@ -20,13 +20,17 @@ Adapted from Titan `ledger-accounting.mdc`. Cursor rule: [`.cursor/rules/payment
 | Tx verify on confirm | `PaymentBlockchainService.findReceipt()` — rejects unconfirmed tx when blockchain enabled |
 | Kafka consumer | `OrderMatchedListener` — reconciliation when escrow missing for order |
 | Dev auto-confirm | `PaymentAutoConfirmWorker` — `PAYMENT_AUTO_CONFIRM=true` or `local` profile |
+| Wallet balance API | `GET /v1/wallet-balances/{investorId}` — used by Wallet Service aggregate view |
+| On-chain tx reconciliation | `PaymentBlockchainReconciliationWorker` — CONFIRMED payments / COMPLETED payouts vs receipt |
 
 ## Pending
 
 - On-chain deposit auto-detection for production (dev uses `PaymentAutoConfirmWorker`)
 - Polygon mainnet USDC contract address (local dev uses `MockUSDC` from `npm run deploy:local`)
-- On-chain reconciliation job (`WalletBalance` vs chain)
+- Credit `WalletBalance` rows automatically on payment confirm (currently read-only API)
 - DLQ for failed consumer retries
+
+Token holder balance reconciliation lives in [blockchain-indexer.md](blockchain-indexer.md) (`BalanceReconciliationService`).
 
 ---
 

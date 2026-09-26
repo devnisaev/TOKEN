@@ -56,6 +56,8 @@ Human-readable expansions: [docs/rules/](docs/rules/) — tier-1 invariants in [
 | Rental | 8086 | `com.tokenrealty.rental` |
 | Compliance | 8087 | `com.tokenrealty.compliance` |
 | Document | 8088 | `com.tokenrealty.document` |
+| Wallet | 8090 | `com.tokenrealty.wallet` |
+| Blockchain Indexer | 8091 | `com.tokenrealty.indexer` |
 
 New services: copy structure from `marketplace-service/` or `auth-service/`.
 
