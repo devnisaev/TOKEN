@@ -187,6 +187,8 @@ jobs:
           ./token-realty-app/mvnw -f rental-service/pom.xml test -Dtest=RentScheduleKafkaIntegrationTest -q
           ./token-realty-app/mvnw -f reporting-service/pom.xml test -Dtest=ReportingKafkaIntegrationTest -q
           ./token-realty-app/mvnw -f settlement-service/pom.xml test -Dtest=SettlementKafkaIntegrationTest -q
+          ./token-realty-app/mvnw -f audit-ledger-service/pom.xml test -Dtest=AuditKafkaIntegrationTest -q
+          ./token-realty-app/mvnw -f corporate-actions-service/pom.xml test -Dtest=CorporateActionsKafkaIntegrationTest -q
 
   kafka-outbox-tests:
     runs-on: ubuntu-latest
@@ -329,6 +331,12 @@ jobs:
             port: 8093
           - service: settlement-service
             port: 8094
+          - service: valuation-service
+            port: 8095
+          - service: audit-ledger-service
+            port: 8096
+          - service: corporate-actions-service
+            port: 8097
     steps:
       - uses: actions/checkout@v4
 

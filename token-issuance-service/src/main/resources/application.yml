@@ -101,6 +101,9 @@ tokenrealty:
       kyc-approved: tokenrealty.compliance.investor.kyc-approved.v1
       kyc-revoked: tokenrealty.compliance.investor.kyc-revoked.v1
       payout-completed: tokenrealty.payment.payout.completed.v1
+      dividend-distribution-requested: tokenrealty.corporateactions.dividend.distribution-requested.v1
+  dividend:
+    rent-collected-listener-enabled: ${DIVIDEND_RENT_LISTENER_ENABLED:true}
 
 feign:
   client:

@@ -40,6 +40,12 @@ services:
     url: ${REPORTING_SERVICE_URL:http://localhost:8093/api}
   settlement:
     url: ${SETTLEMENT_SERVICE_URL:http://localhost:8094/api}
+  valuation:
+    url: ${VALUATION_SERVICE_URL:http://localhost:8095/api}
+  audit-ledger:
+    url: ${AUDIT_LEDGER_SERVICE_URL:http://localhost:8096/api}
+  corporate-actions:
+    url: ${CORPORATE_ACTIONS_SERVICE_URL:http://localhost:8097/api}
 
 tokenrealty:
   jwt:
@@ -78,7 +84,6 @@ tokenrealty:
           - /api/v1/buildings
           - /api/v1/flats
           - /api/v1/spv
-          - /api/v1/valuations
           - /api/v1/documents
       - id: token-issuance
         target: http://localhost:8082
@@ -124,6 +129,18 @@ tokenrealty:
         target: http://localhost:8094
         paths:
           - /api/v1/settlements
+      - id: valuation
+        target: http://localhost:8095
+        paths:
+          - /api/v1/valuations
+      - id: audit-ledger
+        target: http://localhost:8096
+        paths:
+          - /api/v1/audit
+      - id: corporate-actions
+        target: http://localhost:8097
+        paths:
+          - /api/v1/corporate-actions
 
 management:
   tracing:

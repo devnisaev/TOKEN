@@ -83,6 +83,9 @@ Additional Cursor rules (no separate human doc yet):
 | Blockchain Indexer | [blockchain-indexer-service/README.md](../blockchain-indexer-service/README.md) | 8091 | Implemented |
 | Reporting / Analytics | [reporting-service/README.md](../reporting-service/README.md) | 8093 | Implemented |
 | Settlement / Saga Tracker | [settlement-service/README.md](../settlement-service/README.md) | 8094 | Implemented |
+| Valuation / NAV | [valuation-service/README.md](../valuation-service/README.md) | 8095 | Implemented |
+| Audit Ledger | [audit-ledger-service/README.md](../audit-ledger-service/README.md) | 8096 | Implemented |
+| Corporate Actions | [corporate-actions-service/README.md](../corporate-actions-service/README.md) | 8097 | Implemented |
 
 ### Phase 6 — remaining planned services
 
@@ -90,9 +93,6 @@ Full descriptions: [PLATFORM-SPEC.md §12](PLATFORM-SPEC.md#12-phase-6--planned-
 
 | Service | Port | Priority | Status |
 |---------|------|----------|--------|
-| Valuation / NAV | 8095 | P2 | Planned |
-| Audit Ledger | 8096 | P2 | Planned |
-| Corporate Actions | 8097 | P2 | Planned |
 | Search | 8098 | P3 | Planned |
 | Integration Hub | 8099 | P3 | Planned |
 

@@ -46,4 +46,10 @@ public class IssuanceKafkaConfig {
             @Value("${tokenrealty.kafka.topic.payout-completed}") String topic) {
         return new NewTopic(topic, PARTITIONS, REPLICAS);
     }
+
+    @Bean
+    NewTopic dividendDistributionRequestedTopic(
+            @Value("${tokenrealty.kafka.topic.dividend-distribution-requested}") String topic) {
+        return new NewTopic(topic, PARTITIONS, REPLICAS);
+    }
 }

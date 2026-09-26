@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: audit-ledger-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/audit_ledger_service
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: audit-ledger-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+server:
+  port: 8096
+  servlet:
+    context-path: /api
+
+tokenrealty:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-change-in-production-min-32-chars!!}
+    issuer: tokenrealty-auth
+  kafka:
+    enabled: ${KAFKA_ENABLED:false}
+    topic:
+      kyc-approved: tokenrealty.compliance.investor.kyc-approved.v1
+      kyc-revoked: tokenrealty.compliance.investor.kyc-revoked.v1
+      trade-settled: tokenrealty.marketplace.trade.settled.v1
+      document-uploaded: tokenrealty.document.document.uploaded.v1
+      order-matched: tokenrealty.marketplace.order.matched.v1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    com.tokenrealty: DEBUG

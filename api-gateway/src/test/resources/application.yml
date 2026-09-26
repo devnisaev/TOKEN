@@ -23,6 +23,12 @@ services:
     url: http://localhost:8093/api
   settlement:
     url: http://localhost:8094/api
+  valuation:
+    url: http://localhost:8095/api
+  audit-ledger:
+    url: http://localhost:8096/api
+  corporate-actions:
+    url: http://localhost:8097/api
 
 tokenrealty:
   jwt:

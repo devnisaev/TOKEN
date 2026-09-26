@@ -28,10 +28,13 @@ Real-estate tokenization platform — fractional property ownership, crypto paym
 | Blockchain Indexer | `blockchain-indexer-service/` | 8091 | Implemented (on-chain sync) |
 | Reporting / Analytics | `reporting-service/` | 8093 | Implemented (Kafka projections) |
 | Settlement / Saga Tracker | `settlement-service/` | 8094 | Implemented (buy-flow saga tracker) |
+| Valuation / NAV | `valuation-service/` | 8095 | Implemented (appraisal workflow, NAV) |
+| Audit Ledger | `audit-ledger-service/` | 8096 | Implemented (immutable audit trail) |
+| Corporate Actions | `corporate-actions-service/` | 8097 | Implemented (dividend orchestration) |
 
 ### Phase 6 — in progress
 
-Tier 1 complete (Reporting + Settlement). Remaining: Valuation/NAV, Audit Ledger, Corporate Actions, Search, Integration Hub. See [docs/PLATFORM-SPEC.md §12](docs/PLATFORM-SPEC.md#12-phase-6--planned-services).
+Tiers 1–2 complete (Reporting, Settlement, Valuation, Audit Ledger, Corporate Actions). Remaining: Search, Integration Hub. See [docs/PLATFORM-SPEC.md §12](docs/PLATFORM-SPEC.md#12-phase-6--planned-services).
 
 ## Shared libraries
 

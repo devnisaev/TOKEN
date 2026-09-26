@@ -65,6 +65,9 @@ TokenRealty tokenizes real estate assets (buildings, flats, and other property t
 | Blockchain Indexer | `blockchain-indexer-service/` | 8091 | `blockchain_indexer` | Implemented |
 | Reporting / Analytics | `reporting-service/` | 8093 | `reporting_service` | Implemented |
 | Settlement / Saga Tracker | `settlement-service/` | 8094 | `settlement_service` | Implemented |
+| Valuation / NAV | `valuation-service/` | 8095 | `valuation_service` | Implemented |
+| Audit Ledger | `audit-ledger-service/` | 8096 | `audit_ledger_service` | Implemented |
+| Corporate Actions | `corporate-actions-service/` | 8097 | `corporate_actions_service` | Implemented |
 
 ### What works today
 
@@ -277,15 +280,15 @@ Notification Service         Polygon / Hardhat + IPFS
 
 ### Tier 4 — Phase 6: Scale, ops visibility & RWA depth (planned)
 
-Phases 0–5 delivered all 12 backend microservices. Phase 6 adds **read-side, ops, and compliance-depth** services without splitting cohesive write engines (Payment escrow, Issuance deploy/transfer, Compliance limits). See [§12 Phase 6 — Planned Services](#12-phase-6--planned-services) for full descriptions and build order.
+Phases 0–5 delivered 12 backend microservices; Phase 6 adds five more (17 total). Phase 6 adds **read-side, ops, and compliance-depth** services without splitting cohesive write engines (Payment escrow, Issuance deploy/transfer, Compliance limits). See [§12 Phase 6 — Planned Services](#12-phase-6--planned-services) for full descriptions and build order.
 
 | Service | Port | Folder (proposed) | Priority |
 |---------|------|-------------------|----------|
 | Reporting / Analytics | 8093 | `reporting-service/` | **P1** — implemented |
 | Settlement / Saga Tracker | 8094 | `settlement-service/` | **P1** — implemented |
-| Valuation / NAV | 8095 | `valuation-service/` | **P2** |
-| Audit Ledger | 8096 | `audit-ledger-service/` | **P2** |
-| Corporate Actions | 8097 | `corporate-actions-service/` | **P2** |
+| Valuation / NAV | 8095 | `valuation-service/` | **P2** — implemented |
+| Audit Ledger | 8096 | `audit-ledger-service/` | **P2** — implemented |
+| Corporate Actions | 8097 | `corporate-actions-service/` | **P2** — implemented |
 | Search | 8098 | `search-service/` | **P3** — when PostgreSQL filters are insufficient |
 | Integration Hub | 8099 | `integration-hub-service/` | **P3** — centralize third-party adapters |
 
@@ -677,34 +680,34 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] Scheduled stuck detection (`tokenrealty.settlement.stuck-sla-minutes`)
 - [x] Kafka integration tests
 
-### 10.14 Valuation / NAV Service (Phase 6 — planned)
+### 10.14 Valuation / NAV Service (Phase 6 — implemented)
 
-- [ ] Scaffold project (`valuation-service/`, port 8095)
-- [ ] Appraisal workflow for `APPRAISER` role (submit, review, approve)
+- [x] Scaffold project (`valuation-service/`, port 8095)
+- [x] Appraisal workflow for `APPRAISER` role (submit, review, approve/reject)
 - [ ] Periodic revaluation schedules per building/flat
-- [ ] Token NAV calculation from latest valuation + outstanding tokens
-- [ ] Outbox publish `valuation.updated` → Registry syncs metadata via consumer or REST callback
-- [ ] GET `/v1/valuations/building/{id}`, `/v1/valuations/flat/{id}/nav`
-- [ ] Unit + integration tests
+- [x] Token NAV calculation from latest valuation + outstanding tokens
+- [x] Outbox publish `valuation.updated` (Registry sync via future consumer)
+- [x] GET `/v1/valuations/building/{id}`, `/v1/valuations/flat/{id}/nav`
+- [x] Unit + integration tests
 
-### 10.15 Audit Ledger Service (Phase 6 — planned)
+### 10.15 Audit Ledger Service (Phase 6 — implemented)
 
-- [ ] Scaffold project (`audit-ledger-service/`, port 8096)
-- [ ] Append-only audit entries (no updates/deletes)
-- [ ] Kafka consumers: KYC approve/revoke, document verify/reject, admin overrides, settlement milestones
-- [ ] GET `/v1/audit/investor/{id}`, `/v1/audit/flat/{id}` — paginated immutable trail
-- [ ] Regulatory export endpoint
-- [ ] Unit + Kafka integration tests
+- [x] Scaffold project (`audit-ledger-service/`, port 8096)
+- [x] Append-only audit entries (no updates/deletes)
+- [x] Kafka consumers: KYC approve/revoke, trade.settled, document.uploaded, order.matched
+- [x] GET `/v1/audit/investor/{id}`, `/v1/audit/flat/{id}` — paginated immutable trail
+- [x] Regulatory export endpoint `GET /v1/audit/export`
+- [x] Unit + Kafka integration tests
 
-### 10.16 Corporate Actions Service (Phase 6 — planned)
+### 10.16 Corporate Actions Service (Phase 6 — implemented)
 
-- [ ] Scaffold project (`corporate-actions-service/`, port 8097)
-- [ ] Extract dividend distribution orchestration from Issuance (holder snapshots, pro-rata calc triggers)
-- [ ] Issuance keeps deploy/transfer/on-chain whitelist; this service owns recurring investor events
-- [ ] Kafka: consume `rent.collected`, publish `dividend.distribution-requested` (or delegate to Issuance API)
-- [ ] Future: stock splits, rights issues (schema only in v1)
-- [ ] GET `/v1/corporate-actions/dividends`, `/v1/corporate-actions/{actionId}`
-- [ ] Unit + integration tests
+- [x] Scaffold project (`corporate-actions-service/`, port 8097)
+- [x] Extract dividend distribution orchestration from Issuance (rent.collected → distribution-requested)
+- [x] Issuance keeps deploy/transfer/on-chain whitelist; listens to `dividend.distribution-requested`
+- [x] Kafka: consume `rent.collected`, publish `dividend.distribution-requested` via outbox
+- [x] Future: stock splits, rights issues (schema only in v1)
+- [x] GET `/v1/corporate-actions/dividends`, `/v1/corporate-actions/{actionId}`
+- [x] Unit + integration tests
 
 ### 10.17 Search Service (Phase 6 — planned, P3)
 

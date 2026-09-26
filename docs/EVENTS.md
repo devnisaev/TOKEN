@@ -314,12 +314,36 @@
 
 ---
 
+### `tokenrealty.corporateactions.dividend.distribution-requested.v1`
+
+| | |
+|---|---|
+| **Publisher** | Corporate Actions (outbox) |
+| **Consumers** | Token Issuance |
+| **Partition key** | `corporateActionId` |
+
+**Payload:**
+
+```json
+{
+  "corporateActionId": "uuid",
+  "flatId": "uuid",
+  "contractId": "uuid",
+  "period": "2025-09",
+  "grossAmountUsd": "1500.00"
+}
+```
+
+Issuance distributes pro-rata to token holders; `RentCollectedListener` is disabled when Corporate Actions owns the rent → dividend path.
+
+---
+
 ### `tokenrealty.issuance.dividend.distributed.v1`
 
 | | |
 |---|---|
 | **Publisher** | Token Issuance |
-| **Consumers** | Payment, Notification |
+| **Consumers** | Payment, Notification, Corporate Actions |
 | **Partition key** | `contractId` |
 
 **Payload:**
@@ -448,22 +472,29 @@ Publishing services with `OutboxRelayWorker` + integration tests (tracks 253–2
 | Rental | `rent.due`, `lease.expired` | `OutboxRelayIntegrationTest` |
 | Document | `document.uploaded` | `OutboxRelayIntegrationTest` + upload IT |
 | Blockchain Indexer | `transfer.indexed`, `balance.mismatch` | `OutboxRelayIntegrationTest` |
+| Valuation | `valuation.updated` | outbox relay worker (IT pending) |
+| Corporate Actions | `dividend.distribution-requested` | outbox relay worker (IT pending) |
 
 Shared test helper: `OutboxKafkaListenerTestConfiguration` in `tokenrealty-kafka` (for services with `@KafkaListener` beans).
 
 ---
 
-## Phase 6 — planned topics (not yet implemented)
+## Phase 6 — topics (Tier 2 implemented)
 
-See [PLATFORM-SPEC.md §12](PLATFORM-SPEC.md#12-phase-6--planned-services). Add schemas here when each service is scaffolded.
+See [PLATFORM-SPEC.md §12](PLATFORM-SPEC.md#12-phase-6--planned-services).
+
+| Topic | Publisher | Consumers | Status |
+|-------|-----------|-----------|--------|
+| `tokenrealty.valuation.updated.v1` | Valuation Service | Registry, Search, Reporting | Implemented (outbox) |
+| `tokenrealty.corporateactions.dividend.distribution-requested.v1` | Corporate Actions | Token Issuance | Implemented (outbox) |
+
+**Still planned:**
 
 | Topic (proposed) | Publisher | Consumers | Purpose |
 |------------------|-----------|-----------|---------|
-| `tokenrealty.valuation.updated.v1` | Valuation Service | Registry, Search, Reporting | Approved valuation + NAV snapshot |
 | `tokenrealty.valuation.approved.v1` | Valuation Service | Audit Ledger, Notification | Appraisal workflow completion |
 | `tokenrealty.settlement.stuck.v1` | Settlement Service | Notification, Reporting | Saga step exceeded SLA |
 | `tokenrealty.settlement.recovered.v1` | Settlement Service | Audit Ledger, Notification | Admin retry/compensation succeeded |
-| `tokenrealty.corporateactions.distribution-requested.v1` | Corporate Actions | Token Issuance, Payment | Dividend distribution trigger |
 | `tokenrealty.audit.entry-recorded.v1` | Audit Ledger | Reporting (optional) | Cross-service audit fan-in |
 
 **Existing topics consumed by Phase 6 services (read-only projections):**
@@ -472,5 +503,6 @@ See [PLATFORM-SPEC.md §12](PLATFORM-SPEC.md#12-phase-6--planned-services). Add 
 |------------------|--------|
 | Reporting | `trade.settled`, `dividend.distributed`, `rent.collected`, `order.matched`, `flat.tokenized`, `building.approved` |
 | Settlement Saga | `order.matched`, `payment.confirmed`, `transfer.completed`, `trade.settled`, `payout.completed` |
-| Audit Ledger | `investor.kyc-approved`, `investor.kyc-revoked`, `document.verified`, `trade.settled` |
+| Audit Ledger | `kyc-approved`, `kyc-revoked`, `trade.settled`, `document.uploaded`, `order.matched` |
+| Corporate Actions | `rent.collected`, `dividend.distributed` |
 | Search | `listing.created`, `flat.tokenized`, `building.approved`, `valuation.updated` |

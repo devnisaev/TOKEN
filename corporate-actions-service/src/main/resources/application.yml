@@ -1,0 +1,61 @@
+spring:
+  application:
+    name: corporate-actions-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/corporate_actions_service
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: corporate-actions-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+server:
+  port: 8097
+  servlet:
+    context-path: /api
+
+services:
+  token-issuance:
+    url: ${TOKEN_ISSUANCE_URL:http://localhost:8082/api}
+
+tokenrealty:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-change-in-production-min-32-chars!!}
+    issuer: tokenrealty-auth
+  kafka:
+    enabled: ${KAFKA_ENABLED:false}
+    dlq:
+      enabled: ${KAFKA_DLQ_ENABLED:false}
+      max-retries: 3
+      backoff-ms: 1000
+    relay:
+      poll-ms: ${KAFKA_RELAY_POLL_MS:1000}
+      publish-timeout-ms: ${KAFKA_RELAY_PUBLISH_TIMEOUT_MS:10000}
+      max-retries: ${KAFKA_RELAY_MAX_RETRIES:5}
+    topic:
+      rent-collected: tokenrealty.payment.rent.collected.v1
+      dividend-distributed: tokenrealty.issuance.dividend.distributed.v1
+      dividend-distribution-requested: tokenrealty.corporateactions.dividend.distribution-requested.v1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    com.tokenrealty: DEBUG

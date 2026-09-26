@@ -1,0 +1,3 @@
+tokenrealty:
+  kafka:
+    enabled: true

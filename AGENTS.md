@@ -64,6 +64,9 @@ Human-readable expansions: [docs/rules/](docs/rules/) — incl. [commit-messages
 | Blockchain Indexer | 8091 | `com.tokenrealty.indexer` |
 | Reporting / Analytics | 8093 | `com.tokenrealty.reporting` |
 | Settlement / Saga Tracker | 8094 | `com.tokenrealty.settlement` |
+| Valuation / NAV | 8095 | `com.tokenrealty.valuation` |
+| Audit Ledger | 8096 | `com.tokenrealty.audit` |
+| Corporate Actions | 8097 | `com.tokenrealty.corporateactions` |
 
 ### Phase 6 — remaining (planned)
 
@@ -71,9 +74,6 @@ See [docs/PLATFORM-SPEC.md §12](docs/PLATFORM-SPEC.md#12-phase-6--planned-servi
 
 | Service | Port | Package (proposed) | Status |
 |---------|------|-------------------|--------|
-| Valuation / NAV | 8095 | `com.tokenrealty.valuation` | Planned |
-| Audit Ledger | 8096 | `com.tokenrealty.audit` | Planned |
-| Corporate Actions | 8097 | `com.tokenrealty.corporateactions` | Planned |
 | Search | 8098 | `com.tokenrealty.search` | Planned |
 | Integration Hub | 8099 | `com.tokenrealty.integration` | Planned |
 

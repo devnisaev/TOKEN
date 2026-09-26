@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConditionalOnProperty(name = "tokenrealty.kafka.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "tokenrealty.dividend.rent-collected-listener-enabled", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
 public class RentCollectedListener {
 
