@@ -11,6 +11,7 @@ Central documentation for the TokenRealty real-estate tokenization platform.
 | [**EVENTS.md**](EVENTS.md) | Kafka topic catalog and payload schemas |
 | [**BUSINESS_RULES.md**](BUSINESS_RULES.md) | Tier-1 platform invariants (money, KYC, outbox, flows) |
 | [**hardhat-demo.md**](hardhat-demo.md) | Local on-chain demo: invest → token → dividend |
+| Demo infra script | [`../scripts/demo-start.sh`](../scripts/demo-start.sh) — Postgres + Kafka + Jaeger + startup checklist |
 | [**../README.md**](../README.md) | Root platform overview & startup order |
 | [**../AGENTS.md**](../AGENTS.md) | Cursor agent instructions |
 
@@ -35,7 +36,7 @@ Central documentation for the TokenRealty real-estate tokenization platform.
 | [rules/api-gateway-bff.md](rules/api-gateway-bff.md) | — (BFF aggregates on API Gateway) |
 | [rules/observability.md](rules/observability.md) | — (traceId, JSON logs, Prometheus) |
 | [rules/commit-messages.md](rules/commit-messages.md) | [commit-messages.mdc](../.cursor/rules/commit-messages.mdc) |
-| [rules/e2e-testing.md](rules/e2e-testing.md) | — (Playwright smoke + full flow) |
+| [rules/e2e-testing.md](rules/e2e-testing.md) | — (Playwright smoke + full flow, demo-start) |
 
 Cursor skills (workflows — see [AGENTS.md](../AGENTS.md)):
 

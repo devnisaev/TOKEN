@@ -204,6 +204,56 @@ Token Issuance support endpoint: `GET /v1/investors/{investorId}/holdings`.
 
 ---
 
+## Testcontainers integration tests
+
+PostgreSQL integration tests use `@Tag("testcontainers")` and are **excluded** from default `./mvnw test` (Surefire `excludedGroups`). Run explicitly in CI or locally with Docker:
+
+| Test | Service | CI job |
+|------|---------|--------|
+| `BuyFlowContainersIntegrationTest` | marketplace-service | `marketplace-testcontainers` |
+| `PaymentContainersIntegrationTest` | payment-service | `payment-testcontainers` |
+
+Pattern:
+
+```java
+@Testcontainers
+@SpringBootTest
+@ActiveProfiles("test")
+@Tag("testcontainers")
+class MyContainersIntegrationTest {
+
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
+
+    @DynamicPropertySource
+    static void registerDatasource(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
+        registry.add("spring.jpa.properties.hibernate.dialect",
+                () -> "org.hibernate.dialect.PostgreSQLDialect");
+    }
+}
+```
+
+Run one test: `./mvnw test -Dtest=BuyFlowContainersIntegrationTest` (requires Docker).
+
+---
+
+## Notification preferences (stub)
+
+Notification Service exposes in-memory preference storage (MVP):
+
+| Method | Path |
+|--------|------|
+| `GET` | `/v1/notifications/preferences/{userId}` |
+| `PATCH` | `/v1/notifications/preferences/{userId}` |
+
+Fields: `emailEnabled`, `tradeAlerts`, `dividendAlerts`, `rentReminders`. Replace with JPA entity when persisting per-user settings.
+
+---
+
 ## Key conventions (quick reference)
 
 ```java

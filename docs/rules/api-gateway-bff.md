@@ -29,9 +29,12 @@ Service account: `api-gateway` / `gateway-secret` (ADMIN) — used by BFF RestCl
 | `GET` | `/v1/bff/flats/{flatId}` | Registry flat + Issuance contract by flat + active Marketplace listing |
 | `GET` | `/v1/bff/listings/{listingId}` | Marketplace listing + Registry flat summary + Issuance contract |
 | `GET` | `/v1/bff/buildings/{buildingId}` | Registry building detail (flats + SPV) + tokenized/available counts |
-| `GET` | `/v1/bff/investors/{investorId}/portfolio` | Wallet aggregate balance + recent dividend payments (Issuance) |
+| `GET` | `/v1/bff/investors/{investorId}/portfolio` | Wallet balance + enriched token holdings (`flatId`, `tokenPriceUsd`) + recent dividends |
+| `GET` | `/v1/bff/orders/{orderId}/status-stream` | SSE poll of Marketplace order + trade status (heartbeat, 404 → error event) |
 
 Same JWT as other gateway routes — investor token required.
+
+OpenAPI: `frontend/openapi/specs/gateway.yaml` → `frontend/shared-api-types/gateway.ts`.
 
 ---
 
@@ -52,8 +55,12 @@ Same JWT as other gateway routes — investor token required.
 api-gateway/src/main/java/com/tokenrealty/gateway/
 ├── bff/
 │   ├── BffController.java
-│   ├── BffFlatService.java
-│   └── BffListingService.java
+│   ├── BffOrderStatusStreamController.java
+│   ├── BffOrderStatusStreamService.java
+│   ├── BffPortfolioService.java
+│   └── …
+├── filter/GatewayRateLimitFilter.java
+├── proxy/GatewayProxyController.java   ← StreamingResponseBody for Accept: text/event-stream
 ├── client/
 │   ├── PropertyRegistryClient.java
 │   ├── MarketplaceClient.java
@@ -92,7 +99,44 @@ tokenrealty:
   service-account:
     client-id: api-gateway
     client-secret: ${SERVICE_ACCOUNT_SECRET:gateway-secret}
+  gateway:
+    rate-limit:
+      enabled: ${GATEWAY_RATE_LIMIT_ENABLED:true}
+      requests-per-minute: ${GATEWAY_RATE_LIMIT_RPM:120}
+
+management:
+  tracing:
+    enabled: ${OTEL_ENABLED:false}
+  otlp:
+    tracing:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318}
 ```
+
+---
+
+## Rate limiting
+
+In-memory per-client-IP token bucket (`GatewayRateLimitFilter`). Returns **429** ProblemDetail-style JSON when exceeded. Actuator paths are exempt. Disabled via `tokenrealty.gateway.rate-limit.enabled=false`.
+
+---
+
+## SSE streaming
+
+BFF order status uses local `SseEmitter` (not proxied). Downstream SSE from other services uses `GatewayProxyController` with `StreamingResponseBody` when `Accept: text/event-stream` — avoids response buffering.
+
+Investor portal consumes BFF SSE via `subscribeSse` in `@tokenrealty/shared-api-client` (`OrderStatusPage`).
+
+---
+
+## Docker image
+
+Generic multi-service Dockerfile: `docker/Dockerfile.spring-service`.
+
+```bash
+./scripts/docker-build.sh api-gateway 8080
+```
+
+CI job: `docker-build-gateway` in `.github/workflows/ci.yml`.
 
 ---
 
@@ -110,5 +154,9 @@ tokenrealty:
 
 - [x] `GET /v1/bff/investors/{id}/portfolio` — wallet balance + recent dividends
 - [x] `GET /v1/bff/buildings/{id}` — building + SPV + tokenized/available flat counts
+- [x] `GET /v1/bff/orders/{id}/status-stream` — SSE order status for investor portal
+- [x] Per-IP rate limiting (in-memory MVP)
+- [x] OpenAPI spec for BFF (`gateway.yaml`)
 - [ ] Response caching (short TTL) for public listing pages
+- [ ] Redis-backed rate limiting for multi-instance gateway
 - [ ] GraphQL layer (optional; REST BFF sufficient for MVP)

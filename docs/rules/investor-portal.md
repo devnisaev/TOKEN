@@ -43,8 +43,9 @@ Vite proxies `/api` → `http://localhost:8080` (see `vite.config.ts`). Producti
 | `/` | Listings grid | `GET /v1/listings?status=ACTIVE` |
 | `/listings/:id` | Detail + buy | `GET /v1/bff/listings/{id}`, `POST /v1/orders` |
 | `/orders` | Order list | `GET /v1/orders?buyerId=…` |
-| `/orders/:id` | Order status (polls 3s) | `GET /v1/orders/{id}`, `GET /v1/orders/{id}/trade` |
-| `/portfolio` | Balances + holdings + recent dividends | `GET /v1/bff/investors/{id}/portfolio` |
+| `/orders/:id` | Order status (SSE + fallback poll) | `GET /v1/bff/orders/{id}/status-stream`, `GET /v1/orders/{id}`, `GET /v1/orders/{id}/trade` |
+| `/portfolio` | Balances + holdings + sell links | `GET /v1/bff/investors/{id}/portfolio` |
+| `/portfolio/sell/:contractId` | Secondary sell order | `POST /v1/orders/sell` |
 | `/dividends` | Dividend history | `GET /v1/investors/{id}/dividends` |
 
 Protected routes require JWT (`ProtectedRoute` + `AuthProvider`).
@@ -59,11 +60,11 @@ frontend/investor-portal/src/
 │   ├── api.ts           ← fetch wrapper; Bearer token injection
 │   ├── auth.tsx         ← AuthProvider, sessionStorage tokens
 │   └── wagmi.ts         ← Hardhat + Polygon Amoy chains
-├── types/api.ts         ← TypeScript mirrors of backend DTOs
-├── pages/               ← Login, Listings, ListingDetail, Orders, OrderStatus, Portfolio
+├── types/api.ts         ← Re-exports from @tokenrealty/shared-api-client + app-only types
+├── pages/               ← Login, Listings, ListingDetail, Orders, OrderStatus, Portfolio, SellTokens, Dividends
 ├── components/
-│   ├── ui/              ← Button, Card, Input, Label
-│   ├── layout/          ← Header, AppLayout
+│   ├── ui/              ← Re-exported from @tokenrealty/shared-ui
+│   ├── layout/          ← Header (ConnectWalletButton), AppShell via shared-ui
 │   └── ConnectWalletButton.tsx
 └── App.tsx              ← React Router routes
 ```
@@ -96,20 +97,22 @@ Hardhat demo investor: `11111111-1111-1111-1111-111111111111`, wallet `0x7099797
 1. User opens /listings/:id  → BFF aggregate (flat + token + listing)
 2. Connect MetaMask (optional) or use profile walletAddress
 3. POST /v1/orders { listingId, buyerId, buyerWallet, tokenAmount }
-4. Redirect to /orders/{id} — polls order + trade until SETTLED
+4. Redirect to /orders/{id} — SSE stream from BFF + fallback poll until SETTLED
 5. Marketplace → KYC check → escrow (Payment) → Kafka settlement (when enabled)
-6. Portfolio refreshes via GET /v1/wallets/{id}/balance
+6. Portfolio refreshes via GET /v1/bff/investors/{id}/portfolio
 ```
 
-KYC must pass before order match ([investment-limits.md](investment-limits.md)). Order status page polls every 3s until terminal state (SETTLED / CANCELLED / FAILED).
+KYC must pass before order match ([investment-limits.md](investment-limits.md)). Order status page uses `subscribeSse` on `/v1/bff/orders/{id}/status-stream` until terminal state (SETTLED / CANCELLED / FAILED).
+
+Secondary sell: `/portfolio` → **Sell** link → `/portfolio/sell/:contractId` → `POST /v1/orders/sell`.
 
 ---
 
 ## Web3 (wagmi)
 
 - Chains: Hardhat (`31337`, RPC `http://127.0.0.1:8545`), Polygon Amoy
-- `ConnectWalletButton` — connect → optional `PATCH /v1/users/me/wallet` + `POST /v1/wallets/link`
-- Buy order uses connected address or profile `walletAddress`
+- `ConnectWalletButton` in global header and listing buy card — connect → optional `PATCH /v1/users/me/wallet` + `POST /v1/wallets/link`
+- Buy/sell orders use connected address or profile `walletAddress`
 
 ---
 
@@ -126,7 +129,8 @@ Gateway CORS allows `http://localhost:5173` (`tokenrealty.gateway.cors.allowed-o
 ## Conventions
 
 - **Never** call service ports directly from the browser — always gateway `:8080/api`
-- Shared fetch + types: `@tokenrealty/shared-api-client`; app types in `src/types/api.ts`
+- Shared fetch + types: `@tokenrealty/shared-api-client` (BFF types from `shared-api-types/gateway.ts`); app re-exports in `src/types/api.ts`
+- Shared layout/components: `@tokenrealty/shared-ui` (`AppShell`, `ShellHeader`, shadcn primitives)
 - Errors: parse RFC 7807 `detail` from ProblemDetail responses
 - No secrets in frontend env — JWT from login only
 - Prefer BFF endpoints over N+1 calls to Registry + Marketplace + Issuance
@@ -135,8 +139,10 @@ Gateway CORS allows `http://localhost:5173` (`tokenrealty.gateway.cors.allowed-o
 
 ## Pending / future
 
-- [ ] WebSocket push for order status (replace polling)
+- [x] SSE order status stream (BFF + `subscribeSse`)
+- [x] Secondary sell flow (`/portfolio/sell/:contractId`)
+- [x] Connect wallet in global header
 - [x] Refresh token rotation before access expiry (`shared-api-client/auth-storage`)
-- [x] openapi-typescript codegen (`frontend/shared-api-types/`)
+- [x] openapi-typescript codegen (`frontend/shared-api-types/` incl. `gateway.yaml`)
 - [x] Dividend history page (`/dividends`)
-- [x] E2E smoke tests (`frontend/e2e/` — full flow requires live gateway)
+- [x] E2E full buy/sell flows (`frontend/e2e/tests/full/` — requires `E2E_GATEWAY_URL`)

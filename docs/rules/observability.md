@@ -87,7 +87,13 @@ Inbound: if the client sends `X-Trace-Id`, it is preserved; otherwise a UUID is 
 
 Outbound: only services using `ServiceRestClientBuilder` propagate the current MDC value. Legacy hand-rolled clients may omit the header until migrated — see [rest-client-errors.md](rest-client-errors.md).
 
+## Gateway rate limiting
+
+Per-IP request limits are configured on API Gateway only (`tokenrealty.gateway.rate-limit.*`). See [api-gateway-bff.md](api-gateway-bff.md).
+
 ## Related
 
 - [shared-libraries.md](shared-libraries.md) — `tokenrealty-web` observability + REST packages
+- [api-gateway-bff.md](api-gateway-bff.md) — BFF, SSE, rate limiting, Docker build
+- [e2e-testing.md](e2e-testing.md) — demo-start, full Playwright flows
 - [rest-client-errors.md](rest-client-errors.md) — outbound adapter pattern

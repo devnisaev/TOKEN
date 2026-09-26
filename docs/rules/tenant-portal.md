@@ -29,9 +29,11 @@ Demo: `tenant@tokenrealty.com` / `tenant123` (user id `22222222-2222-2222-2222-2
 
 Session key: `tokenrealty.tenant.auth` (separate from investor/admin portals).
 
-Shared fetch + types: `@tokenrealty/shared-api-client` (`frontend/shared-api-client/`).
+Shared fetch + types: `@tokenrealty/shared-api-client`. Layout via `@tokenrealty/shared-ui` (`AppShell`, `ShellHeader`).
 
-E2E smoke: `frontend/e2e/tests/smoke/tenant-login.spec.ts` — see [e2e-testing.md](e2e-testing.md).
+Lease page: multi-lease picker when tenant has several leases, payment success banner, full wallet addresses in history.
+
+E2E: smoke `tenant-login.spec.ts`; full `tenant-rent-flow.spec.ts` — see [e2e-testing.md](e2e-testing.md).
 
 Gateway CORS allows `http://localhost:5175`.
 

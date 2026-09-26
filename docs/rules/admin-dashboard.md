@@ -16,7 +16,7 @@ Related: [investor-portal.md](investor-portal.md) · [api-gateway-bff.md](api-ga
 | Build | Vite 6 (`:5174`) |
 | Routing | React Router 7 |
 | Server state | TanStack Query |
-| UI | Tailwind CSS + shadcn-style components |
+| UI | Tailwind CSS + `@tokenrealty/shared-ui` (AppShell, shadcn primitives) |
 | Auth | JWT via Auth Service (separate sessionStorage key) |
 
 ---
@@ -40,14 +40,15 @@ Vite proxies `/api` → `http://localhost:8080`. Production: set `VITE_API_BASE_
 | `/login` | Admin sign in | `POST /v1/auth/login` |
 | `/` | Dashboard | `GET /v1/buildings`, `GET /v1/compliance` |
 | `/buildings` | Building list | `GET /v1/buildings` |
-| `/compliance` | KYC queue + approve | `GET /v1/compliance`, `PATCH /v1/compliance/{id}/verify` |
-| `/document-reviews` | Data room doc queue | `GET /v1/compliance/document-reviews/pending`, `PATCH …/verify` |
+| `/compliance` | KYC queue + status tabs + approve | `GET /v1/compliance?status=`, `PATCH /v1/compliance/{id}/verify` |
+| `/document-reviews` | Data room doc queue + building drill-down | `GET /v1/compliance/document-reviews/pending`, `PATCH …/verify` |
 | `/buildings/new` | Register building | `POST /v1/buildings` |
 | `/buildings/:id` | Building detail + flats | `GET /v1/bff/buildings/{id}` |
 | `/buildings/:id/edit` | Edit building | `GET /v1/buildings/{id}`, `PUT /v1/buildings/{id}` |
 | `/buildings/:id/flats/new` | Add flat | `POST /v1/buildings/{id}/flats` |
 | `/buildings/:id/flats/:flatId/edit` | Edit flat | `GET /v1/flats/{id}`, `PUT /v1/flats/{id}` |
-| `/orders` | Order monitoring | `GET /v1/orders?size=50` |
+| `/orders` | Order monitoring + status filter tabs | `GET /v1/orders?status=&size=50` |
+| `/orders/:id` | Order detail + manual settle | `GET /v1/orders/{id}`, `GET /v1/orders/{id}/trade`, `PATCH /v1/orders/{id}/settle` |
 
 Protected routes require JWT and role `ADMIN`, `COMPLIANCE`, or `PROPERTY_MANAGER` (`AdminRoute`).
 
@@ -77,6 +78,9 @@ Gateway CORS allows `http://localhost:5174` (`tokenrealty.gateway.cors.allowed-o
 ## Pending / future
 
 - [x] Flat create/edit within building detail
-- [x] Order monitoring for ops
-- [ ] Trade detail drill-down per order
-- [x] E2E smoke tests (Playwright — `frontend/e2e/tests/smoke/admin-login.spec.ts`)
+- [x] Order monitoring with status filters (All / Matched / Settled / Cancelled)
+- [x] Order detail page with manual settle form (`SettleTradeRequest`)
+- [x] Compliance status filter tabs
+- [x] Document review drill-down (building link, metadata)
+- [ ] Trade timeline / event log per order
+- [x] E2E smoke + full KYC flow (`frontend/e2e/tests/full/admin-kyc-flow.spec.ts`)

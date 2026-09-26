@@ -54,12 +54,19 @@ throw new ResourceNotFoundException("Lease", leaseId);
 
 Auto-configured when `tokenrealty-web` is on the classpath. See [observability.md](observability.md).
 
-| Class | Role |
-|-------|------|
+| Class / resource | Role |
+|------------------|------|
 | `TraceIdFilter` | Reads or generates `X-Trace-Id`, puts `traceId` in MDC, echoes header on response |
 | `ObservabilityEnvironmentPostProcessor` | Enables JSON logback + Prometheus registry for `json-log` / `prod` profiles |
+| `application-otel.yml` | Optional OTLP export — activate with profile `otel` or `OTEL_ENABLED=true` |
+| Micrometer OTel bridge | Transitive via `tokenrealty-web` — exports spans to Jaeger when enabled |
 
 Constants live in `RestHeaders.TRACE_ID` and `RestHeaders.TRACE_ID_MDC`.
+
+```bash
+OTEL_ENABLED=true OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318 \
+  ./mvnw spring-boot:run -Dspring-boot.run.profiles=local,otel
+```
 
 ### Outbound REST (`com.tokenrealty.web.rest`)
 
