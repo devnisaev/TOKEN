@@ -434,6 +434,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 
 ### 9.6 Documentation
 
+- [x] Tier-1 business invariants doc ([docs/BUSINESS_RULES.md](BUSINESS_RULES.md) + `.cursor/rules/business-rules.mdc`)
 - [ ] Create root `README.md` with platform overview and startup order
 - [ ] Sync API tables in service READMEs with actual controllers
 - [ ] Update Property Registry "Next Steps" (mark Issuance integration partial)

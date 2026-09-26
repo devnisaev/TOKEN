@@ -24,8 +24,9 @@ Read and follow rules in `.cursor/rules/`:
 | [pagination.mdc](.cursor/rules/pagination.mdc) | List endpoints |
 | [payment-ledger.mdc](.cursor/rules/payment-ledger.mdc) | Payment Service — escrow, ledger, idempotency |
 | [investment-limits.mdc](.cursor/rules/investment-limits.mdc) | KYC gates, min investment, compliance order |
+| [business-rules.mdc](.cursor/rules/business-rules.mdc) | Tier-1 invariants — read before money/Kafka features |
 
-Human-readable expansions: [docs/rules/](docs/rules/) — start with [shared-libraries.md](docs/rules/shared-libraries.md) for cross-service modules
+Human-readable expansions: [docs/rules/](docs/rules/) — tier-1 invariants in [BUSINESS_RULES.md](docs/BUSINESS_RULES.md); cross-service modules in [shared-libraries.md](docs/rules/shared-libraries.md)
 
 ## Services
 

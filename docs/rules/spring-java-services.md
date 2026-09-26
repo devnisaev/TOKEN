@@ -18,6 +18,7 @@ Cursor rule: [`.cursor/rules/spring-java-services.mdc`](../../.cursor/rules/spri
 | [pagination.mdc](../../.cursor/rules/pagination.mdc) | List endpoint defaults |
 | [payment-ledger.mdc](../../.cursor/rules/payment-ledger.mdc) | Escrow, ledger, payment idempotency (Payment Service) |
 | [investment-limits.mdc](../../.cursor/rules/investment-limits.mdc) | KYC gates, min investment rules |
+| [business-rules.mdc](../../.cursor/rules/business-rules.mdc) | Tier-1 invariants (ledger, outbox, compliance order) |
 | [shared-libraries.md](shared-libraries.md) | Cross-service Maven modules (web, jpa, kafka, outbox, security) |
 
 ---

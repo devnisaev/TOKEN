@@ -1,0 +1,34 @@
+---
+description: Tier-1 platform invariants — ledger, idempotency, compliance order, outbox, never violate
+alwaysApply: true
+---
+
+# Business Rules (Invariants) — TokenRealty
+
+**Full spec:** [docs/BUSINESS_RULES.md](../../docs/BUSINESS_RULES.md) — read before money, marketplace, payment, or Kafka work.
+
+Detail by area: [payment-ledger.mdc](payment-ledger.mdc), [investment-limits.mdc](investment-limits.mdc), [kafka-messaging.mdc](kafka-messaging.mdc), [business-exception.mdc](business-exception.mdc).
+
+## Never violate
+
+- **Ledger:** immutable `LedgerEntry` rows; corrections = reversal/compensating entries — [payment-ledger.mdc](payment-ledger.mdc)
+- **Idempotency:** same `Idempotency-Key` → same payment result; different payload → 409
+- **Kafka consumers:** dedupe by `eventId` (`KafkaEventConsumer` + `processed_events`)
+- **Outbox:** enqueue in same TX as domain write; never `KafkaTemplate.send` inside open business TX — [kafka-messaging.mdc](kafka-messaging.mdc)
+- **KYC before match:** Compliance check before matched order / escrow — [investment-limits.mdc](investment-limits.mdc)
+- **Escrow before transfer release:** release only after `transfer.completed`
+- **Token stock:** never exceed `tokensAvailable`; PRIMARY sell-out → Registry `FULLY_SOLD`
+- **Registry authority:** flat/building/SPV/document metadata lives in Property Registry; Document Service pins IPFS then registers CID
+- **Secrets:** no private keys, seeds, or KYC doc bodies in logs or Kafka payloads
+- **Errors:** typed exceptions → ProblemDetail; not generic 500 for business rejections — [business-exception.mdc](business-exception.mdc)
+- **Status transitions:** via domain services (`updateStatus`, entity methods) — not raw enum assignment from controllers
+
+## Buy flow order (do not reorder)
+
+```text
+KYC → reserve tokens + match → escrow → payment.confirmed → transfer → transfer.completed → release escrow → trade.settled
+```
+
+## Trust nothing external
+
+Idempotent · auditable · reversible (where possible) · reconcilable

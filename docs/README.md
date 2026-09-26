@@ -9,6 +9,7 @@ Central documentation for the TokenRealty real-estate tokenization platform.
 | [**PLATFORM-SPEC.md**](PLATFORM-SPEC.md) | Master implementation spec & TODO backlog |
 | [**PLATFORM-SPEC.html**](PLATFORM-SPEC.html) | HTML version (browser-friendly) |
 | [**EVENTS.md**](EVENTS.md) | Kafka topic catalog and payload schemas |
+| [**BUSINESS_RULES.md**](BUSINESS_RULES.md) | Tier-1 platform invariants (money, KYC, outbox, flows) |
 | [**../README.md**](../README.md) | Root platform overview & startup order |
 | [**../AGENTS.md**](../AGENTS.md) | Cursor agent instructions |
 
@@ -24,6 +25,7 @@ Central documentation for the TokenRealty real-estate tokenization platform.
 | [rules/rest-client-errors.md](rules/rest-client-errors.md) | [rest-client-errors.mdc](../.cursor/rules/rest-client-errors.mdc) |
 | [rules/payment-ledger.md](rules/payment-ledger.md) | [payment-ledger.mdc](../.cursor/rules/payment-ledger.mdc) |
 | [rules/investment-limits.md](rules/investment-limits.md) | [investment-limits.mdc](../.cursor/rules/investment-limits.mdc) |
+| [rules/business-rules.md](rules/business-rules.md) | [business-rules.mdc](../.cursor/rules/business-rules.mdc) |
 
 Additional Cursor rules (no separate human doc yet):
 
