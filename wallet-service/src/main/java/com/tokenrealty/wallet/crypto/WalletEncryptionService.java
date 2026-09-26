@@ -2,6 +2,8 @@ package com.tokenrealty.wallet.crypto;
 
 import com.tokenrealty.web.exception.ValidationException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
@@ -14,6 +16,8 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 @Service
+@Primary
+@ConditionalOnProperty(name = "tokenrealty.wallet.encryption.mode", havingValue = "local", matchIfMissing = true)
 public class WalletEncryptionService implements KmsWalletEncryptionService {
 
     private static final String ALGORITHM = "AES/GCM/NoPadding";

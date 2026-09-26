@@ -9,7 +9,13 @@ tokenrealty:
   wallet:
     encryption:
       mode: kms
+      provider: ${WALLET_ENCRYPTION_PROVIDER:aws}
       kms-key-id: ${AWS_KMS_KEY_ID:alias/tokenrealty-wallet}
+      gcp:
+        project-id: ${GCP_KMS_PROJECT_ID:}
+        location: ${GCP_KMS_LOCATION:global}
+        key-ring: ${GCP_KMS_KEY_RING:tokenrealty}
+        crypto-key: ${GCP_KMS_CRYPTO_KEY:wallet}
 
 logging:
   level:

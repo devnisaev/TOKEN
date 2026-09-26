@@ -41,6 +41,15 @@ tokenrealty:
   wallet:
     seed-dev-wallets: ${SEED_DEV_WALLETS:true}
     encryption-key: ${WALLET_ENCRYPTION_KEY:dev-wallet-encryption-key-32b!!}
+    encryption:
+      mode: ${WALLET_ENCRYPTION_MODE:local}
+      provider: ${WALLET_ENCRYPTION_PROVIDER:stub}
+      kms-key-id: ${AWS_KMS_KEY_ID:}
+      gcp:
+        project-id: ${GCP_KMS_PROJECT_ID:}
+        location: ${GCP_KMS_LOCATION:global}
+        key-ring: ${GCP_KMS_KEY_RING:}
+        crypto-key: ${GCP_KMS_CRYPTO_KEY:}
     sign-rate-limit:
       enabled: ${WALLET_SIGN_RATE_LIMIT_ENABLED:true}
       requests-per-minute: ${WALLET_SIGN_RATE_LIMIT_RPM:10}

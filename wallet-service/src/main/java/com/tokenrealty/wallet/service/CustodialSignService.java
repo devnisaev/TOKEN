@@ -1,6 +1,6 @@
 package com.tokenrealty.wallet.service;
 
-import com.tokenrealty.wallet.crypto.WalletEncryptionService;
+import com.tokenrealty.wallet.crypto.KmsWalletEncryptionService;
 import com.tokenrealty.wallet.dto.WalletDtos.SignTransactionRequest;
 import com.tokenrealty.wallet.dto.WalletDtos.SignTransactionResponse;
 import com.tokenrealty.wallet.entity.InvestorWallet;
@@ -20,7 +20,7 @@ import java.util.UUID;
 public class CustodialSignService {
 
     private final WalletService walletService;
-    private final WalletEncryptionService encryptionService;
+    private final KmsWalletEncryptionService encryptionService;
 
     @Value("${tokenrealty.wallet.blockchain.chain-id:31337}")
     private long chainId;

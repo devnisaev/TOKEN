@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Primary
 @ConditionalOnProperty(name = "tokenrealty.wallet.encryption.mode", havingValue = "kms")
+@ConditionalOnProperty(name = "tokenrealty.wallet.encryption.provider", havingValue = "stub", matchIfMissing = true)
 @RequiredArgsConstructor
 @Slf4j
 public class KmsWalletEncryptionDelegate implements KmsWalletEncryptionService {
