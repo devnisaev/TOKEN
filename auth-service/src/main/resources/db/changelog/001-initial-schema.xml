@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="001-users" author="tokenrealty">
+        <createTable tableName="users">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)"><constraints nullable="false"/></column>
+            <column name="password_hash" type="varchar(255)"><constraints nullable="false"/></column>
+            <column name="role" type="varchar(30)"><constraints nullable="false"/></column>
+            <column name="wallet_address" type="varchar(66)"/>
+            <column name="enabled" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <createIndex tableName="users" indexName="idx_users_email" unique="true">
+            <column name="email"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="002-refresh-tokens" author="tokenrealty">
+        <createTable tableName="refresh_tokens">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="token_hash" type="varchar(64)"><constraints nullable="false"/></column>
+            <column name="expires_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="revoked" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <createIndex tableName="refresh_tokens" indexName="idx_refresh_token_hash" unique="true">
+            <column name="token_hash"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="003-service-accounts" author="tokenrealty">
+        <createTable tableName="service_accounts">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="client_id" type="varchar(100)"><constraints nullable="false"/></column>
+            <column name="secret_hash" type="varchar(255)"><constraints nullable="false"/></column>
+            <column name="description" type="varchar(255)"/>
+            <column name="role" type="varchar(30)"><constraints nullable="false"/></column>
+            <column name="enabled" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <createIndex tableName="service_accounts" indexName="idx_service_accounts_client_id" unique="true">
+            <column name="client_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

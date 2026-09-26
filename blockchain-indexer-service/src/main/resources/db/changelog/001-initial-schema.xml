@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="001-indexed-events" author="tokenrealty">
+        <createTable tableName="indexed_events">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="event_type" type="varchar(60)"><constraints nullable="false"/></column>
+            <column name="contract_address" type="varchar(66)"><constraints nullable="false"/></column>
+            <column name="tx_hash" type="varchar(66)"><constraints nullable="false"/></column>
+            <column name="log_index" type="int"><constraints nullable="false"/></column>
+            <column name="block_number" type="bigint"><constraints nullable="false"/></column>
+            <column name="payload" type="text"><constraints nullable="false"/></column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <createIndex tableName="indexed_events" indexName="uk_indexed_events_tx_log" unique="true">
+            <column name="tx_hash"/>
+            <column name="log_index"/>
+        </createIndex>
+        <createIndex tableName="indexed_events" indexName="idx_indexed_events_contract">
+            <column name="contract_address"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="002-indexer-cursors" author="tokenrealty">
+        <createTable tableName="indexer_cursors">
+            <column name="id" type="varchar(32)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="last_block_number" type="bigint"><constraints nullable="false"/></column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="003-reconciliation-mismatches" author="tokenrealty">
+        <createTable tableName="reconciliation_mismatches">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="contract_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="contract_address" type="varchar(66)"><constraints nullable="false"/></column>
+            <column name="wallet_address" type="varchar(66)"><constraints nullable="false"/></column>
+            <column name="db_balance" type="bigint"><constraints nullable="false"/></column>
+            <column name="chain_balance" type="bigint"><constraints nullable="false"/></column>
+            <column name="resolved" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="004-outbox-events" author="tokenrealty">
+        <createTable tableName="outbox_events">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="aggregate_type" type="varchar(50)"><constraints nullable="false"/></column>
+            <column name="aggregate_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="event_type" type="varchar(120)"><constraints nullable="false"/></column>
+            <column name="payload" type="text"><constraints nullable="false"/></column>
+            <column name="status" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="published_at" type="timestamptz"/>
+            <column name="retry_count" type="int" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="trace_id" type="varchar(64)"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

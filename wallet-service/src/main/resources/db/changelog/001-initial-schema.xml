@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="001-investor-wallets" author="tokenrealty">
+        <createTable tableName="investor_wallets">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="investor_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="wallet_address" type="varchar(66)"><constraints nullable="false"/></column>
+            <column name="wallet_type" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="encrypted_private_key" type="text"/>
+            <column name="label" type="varchar(120)"/>
+            <column name="is_primary" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <createIndex tableName="investor_wallets" indexName="idx_investor_wallets_investor">
+            <column name="investor_id"/>
+        </createIndex>
+        <createIndex tableName="investor_wallets" indexName="uk_investor_wallets_address" unique="true">
+            <column name="wallet_address"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

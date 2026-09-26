@@ -1,7 +1,9 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
+  liquibase:
+    enabled: true
 
 tokenrealty:
   wallet:

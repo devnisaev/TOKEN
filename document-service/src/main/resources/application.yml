@@ -14,6 +14,10 @@ spring:
     show-sql: false
     open-in-view: false
 
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: false
+
   servlet:
     multipart:
       max-file-size: 25MB

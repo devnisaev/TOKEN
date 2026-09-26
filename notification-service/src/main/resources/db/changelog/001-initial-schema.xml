@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="001-notification-preferences" author="tokenrealty">
+        <createTable tableName="notification_preferences">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="email_enabled" type="boolean"><constraints nullable="false"/></column>
+            <column name="trade_alerts" type="boolean"><constraints nullable="false"/></column>
+            <column name="dividend_alerts" type="boolean"><constraints nullable="false"/></column>
+            <column name="rent_reminders" type="boolean"><constraints nullable="false"/></column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <addUniqueConstraint tableName="notification_preferences" columnNames="user_id"
+                             constraintName="uk_notification_preferences_user_id"/>
+    </changeSet>
+
+    <changeSet id="002-processed-events" author="tokenrealty">
+        <createTable tableName="processed_events">
+            <column name="event_id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="event_type" type="varchar(120)"><constraints nullable="false"/></column>
+            <column name="processed_at" type="timestamptz"><constraints nullable="false"/></column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

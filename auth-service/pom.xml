@@ -49,6 +49,14 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-liquibase</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.tokenrealty</groupId>
             <artifactId>tokenrealty-security</artifactId>
             <version>0.0.1-SNAPSHOT</version>
