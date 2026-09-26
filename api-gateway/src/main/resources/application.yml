@@ -3,6 +3,9 @@ spring:
     name: api-gateway
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+  mvc:
+    async:
+      request-timeout: 300000
 
 server:
   port: 8080
@@ -89,10 +92,15 @@ tokenrealty:
           - /api/v1/indexer
 
 management:
+  tracing:
+    enabled: ${OTEL_ENABLED:false}
+  otlp:
+    tracing:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318}
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics,prometheus
 
 logging:
   level:

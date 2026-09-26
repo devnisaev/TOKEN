@@ -2,6 +2,8 @@ package com.tokenrealty.compliance.repository;
 
 import com.tokenrealty.compliance.entity.ComplianceRecord;
 import com.tokenrealty.compliance.entity.ComplianceRecord.ComplianceStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.Instant;
@@ -20,4 +22,6 @@ public interface ComplianceRecordRepository extends JpaRepository<ComplianceReco
     boolean existsByInvestorId(UUID investorId);
 
     List<ComplianceRecord> findByStatusAndKycExpiresAtBefore(ComplianceStatus status, Instant expiresBefore);
+
+    Page<ComplianceRecord> findByStatus(ComplianceStatus status, Pageable pageable);
 }

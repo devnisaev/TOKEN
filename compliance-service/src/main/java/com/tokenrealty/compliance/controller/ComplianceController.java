@@ -1,6 +1,7 @@
 package com.tokenrealty.compliance.controller;
 
 import com.tokenrealty.compliance.dto.ComplianceDtos.*;
+import com.tokenrealty.compliance.entity.ComplianceRecord;
 import com.tokenrealty.compliance.service.ComplianceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,8 +27,13 @@ public class ComplianceController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPLIANCE')")
     @Operation(summary = "List all compliance records")
-    public Page<ComplianceRecordResponse> listAll(@PageableDefault(size = 20) Pageable pageable) {
-        return service.findAll(pageable);
+    public Page<ComplianceRecordResponse> listAll(
+            @RequestParam(required = false) ComplianceRecord.ComplianceStatus status,
+            @PageableDefault(size = 20) Pageable pageable) {
+        if (status == null) {
+            return service.findAll(pageable);
+        }
+        return service.findAll(status, pageable);
     }
 
     @GetMapping("/{id}")

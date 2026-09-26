@@ -29,6 +29,10 @@ public class ComplianceService {
         return repository.findAll(pageable).map(this::toResponse);
     }
 
+    public Page<ComplianceRecordResponse> findAll(ComplianceRecord.ComplianceStatus status, Pageable pageable) {
+        return repository.findByStatus(status, pageable).map(this::toResponse);
+    }
+
     public ComplianceRecordResponse findById(UUID id) {
         return toResponse(getOrThrow(id));
     }

@@ -30,11 +30,15 @@ class BffPortfolioServiceTest {
     @DisplayName("getPortfolio aggregates wallet balance and recent dividends")
     void getPortfolio_aggregates() {
         UUID investorId = UUID.randomUUID();
+        UUID contractId = UUID.randomUUID();
+        UUID flatId = UUID.randomUUID();
         when(walletClient.getAggregateBalance(investorId)).thenReturn(new WalletClient.AggregateBalanceView(
                 investorId,
                 "0xabc",
                 List.of(new WalletClient.FiatBalanceView("USDC", BigDecimal.TEN, BigDecimal.ZERO)),
-                List.of(new WalletClient.TokenHoldingView(UUID.randomUUID(), "SUN-101", "0xabc", 100))));
+                List.of(new WalletClient.TokenHoldingView(contractId, "SUN-101", "0xabc", 100))));
+        when(issuanceClient.getContract(contractId)).thenReturn(new TokenIssuanceClient.TokenContractView(
+                contractId, flatId, "0xcontract", "SUN-101", 1000L, BigDecimal.ONE, "ACTIVE"));
         when(issuanceClient.listInvestorDividends(investorId)).thenReturn(List.of(
                 new TokenIssuanceClient.DividendPaymentView(
                         UUID.randomUUID(),

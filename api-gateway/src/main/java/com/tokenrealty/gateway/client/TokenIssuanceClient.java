@@ -28,6 +28,14 @@ public class TokenIssuanceClient extends DownstreamRestClientSupport {
         return body == null ? List.of() : List.of(body);
     }
 
+    public TokenContractView getContract(UUID contractId) {
+        return get(
+                "/v1/tokens/{id}",
+                TokenContractView.class,
+                DownstreamServices.TOKEN_ISSUANCE,
+                contractId);
+    }
+
     public TokenContractView getContractByFlatId(UUID flatId) {
         return getAllowNotFound(
                 "/v1/tokens/by-flat/{flatId}",

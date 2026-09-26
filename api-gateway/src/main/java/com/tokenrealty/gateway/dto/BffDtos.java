@@ -51,8 +51,28 @@ public final class BffDtos {
     }
 
     @Builder
+    public record EnrichedTokenHoldingView(
+            UUID contractId,
+            UUID flatId,
+            String tokenSymbol,
+            String walletAddress,
+            long balance,
+            BigDecimal tokenPriceUsd
+    ) {
+    }
+
+    @Builder
+    public record PortfolioBalanceView(
+            UUID investorId,
+            String primaryWalletAddress,
+            List<WalletClient.FiatBalanceView> fiatBalances,
+            List<EnrichedTokenHoldingView> tokenHoldings
+    ) {
+    }
+
+    @Builder
     public record PortfolioBffResponse(
-            WalletClient.AggregateBalanceView balance,
+            PortfolioBalanceView balance,
             List<TokenIssuanceClient.DividendPaymentView> recentDividends
     ) {
     }
