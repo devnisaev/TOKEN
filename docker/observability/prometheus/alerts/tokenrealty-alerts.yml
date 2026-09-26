@@ -1,0 +1,20 @@
+groups:
+  - name: tokenrealty-platform
+    rules:
+      - alert: TokenRealtyServiceDown
+        expr: up{job=~"tokenrealty-.*"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "TokenRealty service {{ $labels.job }} is down"
+          description: "Prometheus cannot scrape {{ $labels.instance }} (job {{ $labels.job }}) for more than 2 minutes."
+
+      - alert: TokenRealtyIndexerBalanceMismatch
+        expr: indexer_balance_mismatches_open > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "On-chain vs DB balance mismatch detected"
+          description: "Blockchain Indexer reports {{ $value }} unresolved balance mismatch(es). Review GET /v1/indexer/reconciliation."

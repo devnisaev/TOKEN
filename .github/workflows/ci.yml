@@ -150,7 +150,7 @@ jobs:
       - name: Run Kafka ingest integration tests
         run: |
           ./token-realty-app/mvnw -f notification-service/pom.xml test -Dtest=NotificationKafkaIntegrationTest -q
-          ./token-realty-app/mvnw -f marketplace-service/pom.xml test -Dtest=FlatTokenizedKafkaIntegrationTest,BuyFlowKafkaIntegrationTest -q
+          ./token-realty-app/mvnw -f marketplace-service/pom.xml test -Dtest=FlatTokenizedKafkaIntegrationTest,BuildingApprovedKafkaIntegrationTest,BuyFlowKafkaIntegrationTest -q
           ./token-realty-app/mvnw -f token-issuance-service/pom.xml test -Dtest=KycApprovedKafkaIntegrationTest,KycRevokedKafkaIntegrationTest,RentCollectedKafkaIntegrationTest,PaymentConfirmedKafkaIntegrationTest,PayoutCompletedKafkaIntegrationTest,RentDividendIntegrationTest -q
           ./token-realty-app/mvnw -f payment-service/pom.xml test -Dtest=OrderMatchedKafkaIntegrationTest,DividendDistributedKafkaIntegrationTest -q
           ./token-realty-app/mvnw -f token-realty-app/pom.xml test -Dtest=DocumentUploadedKafkaIntegrationTest,TransferCompletedKafkaIntegrationTest -q
@@ -235,7 +235,7 @@ jobs:
         run: |
           ./token-realty-app/mvnw -f rental-service/pom.xml test -Dtest=RentPaymentIntegrationTest -q
           ./token-realty-app/mvnw -f wallet-service/pom.xml test -Dtest=WalletAggregateBalanceIntegrationTest -q
-          ./token-realty-app/mvnw -f blockchain-indexer-service/pom.xml test -Dtest=ReconciliationIntegrationTest -q
+          ./token-realty-app/mvnw -f blockchain-indexer-service/pom.xml test -Dtest=ReconciliationIntegrationTest,BalanceRemediationIntegrationTest -q
 
   issuance-integration-test:
     runs-on: ubuntu-latest
@@ -322,8 +322,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Start Postgres via Docker Compose
-        run: docker compose up -d postgres
+      - name: Start Postgres + Kafka via Docker Compose
+        run: docker compose --profile kafka up -d postgres kafka
 
       - name: Validate demo scripts are executable
         run: |
@@ -335,7 +335,27 @@ jobs:
 
       - name: Tear down compose
         if: always()
-        run: docker compose down -v
+        run: docker compose --profile kafka down -v
+
+  frontend-e2e-spec-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build frontends and list full E2E specs
+        working-directory: frontend/e2e
+        run: |
+          cd ../shared-ui && npm ci
+          for app in investor-portal admin-dashboard tenant-portal; do
+            cd ../$app && npm ci && npm run build && cd ..
+          done
+          cd ../e2e && npm ci && npx playwright install --with-deps chromium
+          npx playwright test --list --project=full
 
   frontend-e2e-full:
     runs-on: ubuntu-latest
