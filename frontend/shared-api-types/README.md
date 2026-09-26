@@ -22,4 +22,4 @@ npm run codegen
 
 Hand-maintained YAML in `frontend/openapi/specs/` — update when backend DTOs change, or use `fetch-specs` from live services.
 
-Frontends may import generated types alongside hand-written `src/types/api.ts` during migration.
+Frontends import via `@tokenrealty/shared-api-client` (`frontend/shared-api-client/`), which re-exports these types. Each portal's `src/types/api.ts` adds required-field interfaces where openapi schemas are optional.

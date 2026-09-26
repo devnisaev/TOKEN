@@ -59,6 +59,72 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BuildingResponse'
+  /v1/buildings/{buildingId}/flats:
+    get:
+      operationId: listFlatsByBuilding
+      parameters:
+        - name: buildingId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlatPage'
+    post:
+      operationId: createFlat
+      parameters:
+        - name: buildingId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFlatRequest'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlatResponse'
+  /v1/flats/{id}:
+    get:
+      operationId: getFlat
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlatResponse'
+    put:
+      operationId: updateFlat
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFlatRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlatResponse'
 components:
   schemas:
     BuildingPage:
@@ -91,6 +157,12 @@ components:
             constructionYear: { type: integer }
             totalAreaSqm: { type: number }
             cadastralReference: { type: string }
+            flats:
+              type: array
+              items:
+                $ref: '#/components/schemas/FlatSummary'
+            spv:
+              $ref: '#/components/schemas/SpvSummary'
     CreateBuildingRequest:
       type: object
       required: [name, address, city, country]
@@ -118,3 +190,67 @@ components:
         totalAreaSqm: { type: number }
         propertyCategory: { type: string }
         cadastralReference: { type: string }
+    FlatPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlatResponse'
+        totalElements: { type: integer }
+    FlatSummary:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        flatNumber: { type: string }
+        floor: { type: integer }
+        areaSqm: { type: number }
+        status: { type: string }
+        tokenPriceUsd: { type: number }
+    FlatResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        buildingId: { type: string, format: uuid }
+        buildingName: { type: string }
+        flatNumber: { type: string }
+        floor: { type: integer }
+        areaSqm: { type: number }
+        netUsableAreaSqm: { type: number }
+        cadastralReference: { type: string }
+        numRooms: { type: integer }
+        numBathrooms: { type: integer }
+        status: { type: string }
+        tokenContractAddress: { type: string }
+        totalTokens: { type: integer }
+        tokenPriceUsd: { type: number }
+    CreateFlatRequest:
+      type: object
+      required: [flatNumber, floor, areaSqm, numRooms, numBathrooms]
+      properties:
+        flatNumber: { type: string }
+        floor: { type: integer }
+        areaSqm: { type: number }
+        numRooms: { type: integer }
+        numBathrooms: { type: integer }
+        cadastralReference: { type: string }
+        netUsableAreaSqm: { type: number }
+    UpdateFlatRequest:
+      type: object
+      properties:
+        flatNumber: { type: string }
+        floor: { type: integer }
+        areaSqm: { type: number }
+        numRooms: { type: integer }
+        numBathrooms: { type: integer }
+        cadastralReference: { type: string }
+        netUsableAreaSqm: { type: number }
+    SpvSummary:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        legalName: { type: string }
+        registrationNumber: { type: string }
+        kycVerified: { type: boolean }
+        status: { type: string }
+        walletAddress: { type: string }

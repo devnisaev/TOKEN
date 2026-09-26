@@ -36,6 +36,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/buildings/{buildingId}/flats": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["listFlatsByBuilding"];
+    put?: never;
+    post: operations["createFlat"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/flats/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["getFlat"];
+    put: operations["updateFlat"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -62,6 +94,8 @@ export interface components {
       constructionYear?: number;
       totalAreaSqm?: number;
       cadastralReference?: string;
+      flats?: components["schemas"]["FlatSummary"][];
+      spv?: components["schemas"]["SpvSummary"];
     };
     CreateBuildingRequest: {
       name: string;
@@ -86,6 +120,64 @@ export interface components {
       totalAreaSqm?: number;
       propertyCategory?: string;
       cadastralReference?: string;
+    };
+    FlatPage: {
+      content?: components["schemas"]["FlatResponse"][];
+      totalElements?: number;
+    };
+    FlatSummary: {
+      /** Format: uuid */
+      id?: string;
+      flatNumber?: string;
+      floor?: number;
+      areaSqm?: number;
+      status?: string;
+      tokenPriceUsd?: number;
+    };
+    FlatResponse: {
+      /** Format: uuid */
+      id?: string;
+      /** Format: uuid */
+      buildingId?: string;
+      buildingName?: string;
+      flatNumber?: string;
+      floor?: number;
+      areaSqm?: number;
+      netUsableAreaSqm?: number;
+      cadastralReference?: string;
+      numRooms?: number;
+      numBathrooms?: number;
+      status?: string;
+      tokenContractAddress?: string;
+      totalTokens?: number;
+      tokenPriceUsd?: number;
+    };
+    CreateFlatRequest: {
+      flatNumber: string;
+      floor: number;
+      areaSqm: number;
+      numRooms: number;
+      numBathrooms: number;
+      cadastralReference?: string;
+      netUsableAreaSqm?: number;
+    };
+    UpdateFlatRequest: {
+      flatNumber?: string;
+      floor?: number;
+      areaSqm?: number;
+      numRooms?: number;
+      numBathrooms?: number;
+      cadastralReference?: string;
+      netUsableAreaSqm?: number;
+    };
+    SpvSummary: {
+      /** Format: uuid */
+      id?: string;
+      legalName?: string;
+      registrationNumber?: string;
+      kycVerified?: boolean;
+      status?: string;
+      walletAddress?: string;
     };
   };
   responses: never;
@@ -180,6 +272,98 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["BuildingResponse"];
+        };
+      };
+    };
+  };
+  listFlatsByBuilding: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        buildingId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FlatPage"];
+        };
+      };
+    };
+  };
+  createFlat: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        buildingId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateFlatRequest"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FlatResponse"];
+        };
+      };
+    };
+  };
+  getFlat: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FlatResponse"];
+        };
+      };
+    };
+  };
+  updateFlat: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateFlatRequest"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FlatResponse"];
         };
       };
     };
