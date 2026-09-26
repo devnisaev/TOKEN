@@ -5,6 +5,7 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { OrderStatusTimeline } from '@tokenrealty/shared-ui';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -129,34 +130,15 @@ export function OrderDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Trade</CardTitle>
+          <CardTitle className="text-lg">Settlement</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {!trade ? (
+          <OrderStatusTimeline orderStatus={order.status} trade={trade} />
+          {trade && (
+            <p className="text-xs text-muted-foreground font-mono">Trade ID: {trade.id}</p>
+          )}
+          {!trade && (
             <p className="text-sm text-muted-foreground">No trade record yet.</p>
-          ) : (
-            <div className="grid gap-3 text-sm md:grid-cols-2">
-              <div>
-                <span className="text-muted-foreground">Trade status</span>
-                <p className="font-medium">{trade.status}</p>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Trade ID</span>
-                <p className="font-mono text-xs">{trade.id}</p>
-              </div>
-              {trade.paymentId && (
-                <div>
-                  <span className="text-muted-foreground">Payment ID</span>
-                  <p className="font-mono text-xs">{trade.paymentId}</p>
-                </div>
-              )}
-              {trade.transferId && (
-                <div>
-                  <span className="text-muted-foreground">Transfer ID</span>
-                  <p className="font-mono text-xs">{trade.transferId}</p>
-                </div>
-              )}
-            </div>
           )}
 
           {canSettle && (

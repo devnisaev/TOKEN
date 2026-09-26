@@ -16,3 +16,8 @@ export {
   type NavItem,
   type ShellHeaderProps,
 } from './components/layout/ShellHeader';
+export {
+  OrderStatusTimeline,
+  type OrderTimelineProps,
+  type OrderTimelineTrade,
+} from './components/OrderStatusTimeline';

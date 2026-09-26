@@ -1,27 +1,30 @@
-import type { Order, Trade } from '@/types/api';
-import { cn } from '@/lib/utils';
-import { CheckCircle2, Circle, Loader2 } from 'lucide-react';
+import { cn } from '../lib/utils';
 
 const STEPS = ['MATCHED', 'PAID', 'SETTLED'] as const;
 
-function stepIndex(order: Order, trade: Trade | null): number {
-  if (order.status === 'SETTLED' || trade?.status === 'SETTLED') return 3;
-  if (order.status === 'PAID' || trade?.status === 'PAID') return 2;
-  if (order.status === 'MATCHED' || trade?.status === 'PENDING') return 1;
-  if (order.status === 'CANCELLED' || trade?.status === 'FAILED') return -1;
+export interface OrderTimelineTrade {
+  status?: string;
+  paymentId?: string;
+  transferId?: string;
+}
+
+export interface OrderTimelineProps {
+  orderStatus: string;
+  trade?: OrderTimelineTrade | null;
+  polling?: boolean;
+}
+
+function stepIndex(orderStatus: string, trade: OrderTimelineTrade | null | undefined): number {
+  const tradeStatus = trade?.status;
+  if (orderStatus === 'SETTLED' || tradeStatus === 'SETTLED') return 3;
+  if (orderStatus === 'PAID' || tradeStatus === 'PAID') return 2;
+  if (orderStatus === 'MATCHED' || tradeStatus === 'PENDING') return 1;
+  if (orderStatus === 'CANCELLED' || tradeStatus === 'FAILED') return -1;
   return 0;
 }
 
-export function OrderStatusTimeline({
-  order,
-  trade,
-  polling,
-}: {
-  order: Order;
-  trade: Trade | null;
-  polling?: boolean;
-}) {
-  const current = stepIndex(order, trade);
+export function OrderStatusTimeline({ orderStatus, trade, polling }: OrderTimelineProps) {
+  const current = stepIndex(orderStatus, trade);
   const failed = current === -1;
 
   return (
@@ -30,7 +33,8 @@ export function OrderStatusTimeline({
         <h3 className="font-medium">Settlement progress</h3>
         {polling && (
           <span className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Loader2 className="h-3 w-3 animate-spin" /> Live
+            <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            Live
           </span>
         )}
       </div>
@@ -40,13 +44,16 @@ export function OrderStatusTimeline({
           const active = !failed && current === i + 1;
           return (
             <li key={step} className="flex items-center gap-3">
-              {done ? (
-                <CheckCircle2 className="h-5 w-5 text-primary" />
-              ) : (
-                <Circle
-                  className={cn('h-5 w-5', active ? 'text-primary' : 'text-muted-foreground/40')}
-                />
-              )}
+              <span
+                className={cn(
+                  'flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 text-[10px] font-bold',
+                  done && 'border-primary bg-primary text-primary-foreground',
+                  active && 'border-primary text-primary',
+                  !done && !active && 'border-muted-foreground/40 text-transparent',
+                )}
+              >
+                {done ? '✓' : ''}
+              </span>
               <div>
                 <p className={cn('text-sm font-medium', active && 'text-primary')}>
                   {step === 'MATCHED' && 'Order matched · escrow initiated'}
@@ -76,13 +83,13 @@ export function OrderStatusTimeline({
           {trade.paymentId && (
             <div className="flex justify-between">
               <dt>Payment</dt>
-              <dd className="font-mono truncate max-w-[200px]">{trade.paymentId}</dd>
+              <dd className="max-w-[200px] truncate font-mono">{trade.paymentId}</dd>
             </div>
           )}
           {trade.transferId && (
             <div className="flex justify-between">
               <dt>Transfer</dt>
-              <dd className="font-mono truncate max-w-[200px]">{trade.transferId}</dd>
+              <dd className="max-w-[200px] truncate font-mono">{trade.transferId}</dd>
             </div>
           )}
         </dl>

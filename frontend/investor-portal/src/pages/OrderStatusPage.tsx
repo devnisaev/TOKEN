@@ -5,8 +5,8 @@ import { loadStoredAuth, subscribeSse, resolveApiBaseUrl } from '@tokenrealty/sh
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { formatUsd } from '@/lib/utils';
-import { OrderStatusTimeline } from '@/components/OrderStatusTimeline';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { OrderStatusTimeline } from '@tokenrealty/shared-ui';
 import type { Order, OrderStatusEvent, Trade } from '@/types/api';
 
 async function fetchTrade(orderId: string) {
@@ -158,7 +158,7 @@ export function OrderStatusPage() {
             <span className="text-muted-foreground">Order status</span>
             <span className="font-medium">{order.status}</span>
           </div>
-          <OrderStatusTimeline order={order} trade={trade} polling={polling} />
+          <OrderStatusTimeline orderStatus={order.status} trade={trade} polling={polling} />
         </CardContent>
       </Card>
     </div>
