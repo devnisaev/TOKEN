@@ -270,6 +270,16 @@ Pattern: start `WireMockServer` on a fixed port, build `RestClient` with `JdkCli
 
 Run: `./mvnw test -Dtest=PropertyRegistryClientIntegrationTest` in `token-issuance-service/`. CI job: `issuance-integration-test`.
 
+Kafka ingest integration tests (Spring context + `KafkaEventConsumer`, no Testcontainers Kafka):
+
+| Test | Service | Verifies |
+|------|---------|----------|
+| `NotificationKafkaIntegrationTest` | notification-service | `trade.settled` + preference gate + eventId dedupe |
+| `DocumentUploadedKafkaIntegrationTest` | property-registry | `document.uploaded` CID/storageUrl backfill + dedupe |
+| `DocumentUploadedKafkaIntegrationTest` | compliance-service | Review queue ingest + dedupe |
+| `NotificationKafkaIntegrationTest` (rent.due) | notification-service | `rent.due` + rentReminders preference + dedupe |
+| `PropertyRegistryIntegrationTest` | property-registry | 17-step building → tokenize regression (H2) |
+
 ---
 
 ## Key conventions (quick reference)
