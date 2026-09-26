@@ -22,12 +22,12 @@ export default defineConfig({
     },
     {
       name: 'admin-dashboard',
-      testMatch: '**/smoke/admin*.spec.ts',
+      testMatch: ['**/smoke/admin*.spec.ts', '**/full/admin*.spec.ts'],
       use: { ...devices['Desktop Chrome'], baseURL: `http://127.0.0.1:${adminPort}` },
     },
     {
       name: 'tenant-portal',
-      testMatch: '**/smoke/tenant*.spec.ts',
+      testMatch: ['**/smoke/tenant*.spec.ts', '**/full/tenant*.spec.ts'],
       use: { ...devices['Desktop Chrome'], baseURL: `http://127.0.0.1:${tenantPort}` },
     },
   ],

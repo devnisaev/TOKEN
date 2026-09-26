@@ -2,7 +2,7 @@
 
 End-to-end on-chain flow on a local Hardhat node (chain ID 31337).
 
-**Prerequisites:** PostgreSQL, Java 21, Node.js, Kafka (`docker compose --profile kafka up -d` from repo root when using event-driven settlement).
+**Prerequisites:** PostgreSQL, Java 21, Node.js, Kafka (`./scripts/demo-up.sh` or `docker compose --profile kafka up -d` from repo root when using event-driven settlement).
 
 **Dev seed:** Registry and Compliance auto-seed demo property + investor KYC on startup. Verify with `./scripts/seed-demo.sh` after Auth and Registry are running.
 
