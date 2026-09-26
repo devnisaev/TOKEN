@@ -33,7 +33,7 @@ public class PayoutController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SERVICE')")
     @Operation(summary = "Create a payout to a holder wallet")
     public PayoutResponse create(@Valid @RequestBody CreatePayoutRequest request) {
         return payoutService.create(request);

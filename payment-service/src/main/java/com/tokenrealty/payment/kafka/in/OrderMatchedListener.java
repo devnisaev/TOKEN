@@ -13,12 +13,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class OrderMatchedListener {
 
-    private final PaymentKafkaIngestSupport ingestSupport;
+    private final com.tokenrealty.kafka.consume.KafkaEventConsumer eventConsumer;
     private final OrderEscrowService orderEscrowService;
 
     @KafkaListener(topics = "${tokenrealty.kafka.topic.order-matched}")
     public void onOrderMatched(String message) {
-        ingestSupport.consume(message, PaymentKafkaEventTypes.ORDER_MATCHED,
+        eventConsumer.consume(message, PaymentKafkaEventTypes.ORDER_MATCHED,
                 "Order matched reconciliation failed",
                 event -> orderEscrowService.ensureEscrowLinked(OrderMatchedCommand.from(event)));
     }

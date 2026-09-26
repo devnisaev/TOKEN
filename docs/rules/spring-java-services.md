@@ -18,6 +18,7 @@ Cursor rule: [`.cursor/rules/spring-java-services.mdc`](../../.cursor/rules/spri
 | [pagination.mdc](../../.cursor/rules/pagination.mdc) | List endpoint defaults |
 | [payment-ledger.mdc](../../.cursor/rules/payment-ledger.mdc) | Escrow, ledger, payment idempotency (Payment Service) |
 | [investment-limits.mdc](../../.cursor/rules/investment-limits.mdc) | KYC gates, min investment rules |
+| [shared-libraries.md](shared-libraries.md) | Cross-service Maven modules (web, jpa, kafka, outbox, security) |
 
 ---
 
@@ -31,7 +32,7 @@ Cursor rule: [`.cursor/rules/spring-java-services.mdc`](../../.cursor/rules/spri
 | Idempotency | Planned for Payment/transfers |
 | ProblemDetail errors | Same |
 | MapStruct + records | Same |
-| `@Version` optimistic locking | Same — `BaseEntity` |
+| `@Version` optimistic locking | Same — `BaseEntity` in `tokenrealty-jpa` |
 | Forward-only migrations | Liquibase (not Flyway) |
 | Controller → service only | Same |
 
@@ -62,22 +63,22 @@ controller → service → repository → entity
             kafka/in/                      ← Issuance: consumers
 ```
 
-### New services (Marketplace — template for Auth, Payment)
+### New services (Marketplace — template for Auth, Payment, Rental)
 
 ```
-controller → service → repository → entity
+controller → service → repository → entity (extends tokenrealty-jpa BaseEntity)
                 ↓
             client/*Client                 ← inter-service RestClient wrappers
-            entity/ProcessedEvent.java     ← if service consumes Kafka
-            service/ProcessedEventService.java
             kafka/command/*Command.java    ← from(KafkaJsonEvent)
-            kafka/in/*Listener.java        ← @KafkaListener + IngestSupport
+            kafka/in/*Listener.java        ← @KafkaListener + KafkaEventConsumer (tokenrealty-kafka)
             kafka/port/*Publisher.java     ← outbox port (typed event record)
             kafka/outbox/Outbox{Event}Publisher
             kafka/outbox/OutboxWriter        ← extends tokenrealty-outbox
-            kafka/outbox/OutboxRelayWorker
-            kafka/outbox/OutboxEvent
+            kafka/outbox/OutboxRelayWorker   ← thin wrapper → OutboxRelay.relay(...)
+            kafka/outbox/OutboxEvent         ← implements OutboxRelayTarget
 ```
+
+Shared libs replace per-service copies: exceptions/handler (`tokenrealty-web`), auditing (`tokenrealty-jpa`), idempotency (`tokenrealty-kafka`), RestClient auth (`ServiceRestClientBuilder`). See [shared-libraries.md](shared-libraries.md).
 
 Future extraction path:
 
@@ -98,6 +99,7 @@ adapter/in/web → application/service → adapter/out/{persistence,client,kafka
 | Marketplace | 8084 | `com.tokenrealty.marketplace` | Layered + kafka in/out |
 | Payment | 8085 | `com.tokenrealty.payment` | Layered + escrow + kafka in/out |
 | Notification | 8089 | `com.tokenrealty.notification` | Kafka consumer stub only |
+| Rental | 8086 | `com.tokenrealty.rental` | Layered + Payment client |
 
 ### API Gateway (edge)
 
@@ -120,7 +122,8 @@ Clients should call `http://localhost:8080/api/v1/...` instead of individual ser
 - [ ] Spring Boot 4 / Java 21 Maven module
 - [ ] Port + DB from [PLATFORM-SPEC.md](../PLATFORM-SPEC.md) §7
 - [ ] `SecurityConfig` + `tokenrealty-security` JWT filter
-- [ ] `GlobalExceptionHandler` with ProblemDetail
+- [ ] `tokenrealty-web` + `tokenrealty-jpa` dependencies (exceptions/handler + BaseEntity auto-config)
+- [ ] `tokenrealty-kafka` if consuming events; `tokenrealty-outbox` if publishing
 - [ ] `application.yml` + `application-test.yml` (H2)
 - [ ] springdoc OpenAPI
 - [ ] README with API table
@@ -137,9 +140,16 @@ Clients should call `http://localhost:8080/api/v1/...` instead of individual ser
 @Transactional
 public ListingResponse create(CreateListingRequest request) { ... }
 
-// RestClient with qualifier
+// RestClient with service token (shared builder)
 @Bean("tokenIssuanceRestClient")
-RestClient tokenIssuanceRestClient(@Value("${services.token-issuance.url}") String baseUrl)
+RestClient tokenIssuanceRestClient(
+        @Value("${services.token-issuance.url}") String baseUrl,
+        ObjectProvider<ServiceTokenProvider> serviceTokenProvider) {
+    return ServiceRestClientBuilder.build(baseUrl, serviceTokenProvider);
+}
+
+// Exceptions — import from tokenrealty-web, do not copy
+throw new ValidationException("Listing is not active");
 
 // Controller
 @PostMapping

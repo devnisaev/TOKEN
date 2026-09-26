@@ -4,8 +4,9 @@ import com.tokenrealty.issuance.dto.IssuanceDtos.*;
 import com.tokenrealty.issuance.entity.DividendPayment;
 import com.tokenrealty.issuance.entity.TokenContract;
 import com.tokenrealty.issuance.entity.TokenHolder;
-import com.tokenrealty.issuance.exception.ConflictException;
-import com.tokenrealty.issuance.exception.ResourceNotFoundException;
+import com.tokenrealty.web.exception.ConflictException;
+import com.tokenrealty.web.exception.ResourceNotFoundException;
+import com.tokenrealty.issuance.kafka.port.DividendDistributedPublisher;
 import com.tokenrealty.issuance.repository.DividendPaymentRepository;
 import com.tokenrealty.issuance.repository.TokenContractRepository;
 import com.tokenrealty.issuance.repository.TokenHolderRepository;
@@ -20,6 +21,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -35,13 +37,16 @@ public class DividendService {
     private final DividendPaymentRepository dividendRepository;
     private final TokenContractRepository contractRepository;
     private final TokenHolderRepository holderRepository;
+    private final DividendDistributedPublisher dividendDistributedPublisher;
 
     public DividendService(DividendPaymentRepository dividendRepository,
                            TokenContractRepository contractRepository,
-                           TokenHolderRepository holderRepository) {
+                           TokenHolderRepository holderRepository,
+                           DividendDistributedPublisher dividendDistributedPublisher) {
         this.dividendRepository = dividendRepository;
         this.contractRepository = contractRepository;
         this.holderRepository = holderRepository;
+        this.dividendDistributedPublisher = dividendDistributedPublisher;
     }
 
     public Page<DividendPaymentResponse> findByContract(UUID contractId, Pageable pageable) {
@@ -135,6 +140,22 @@ public class DividendService {
 
         log.info("Distributed ${} to {} holders for contract {}",
                 totalDistributed, payments.size(), contractId);
+
+        String period = request.periodStart().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        dividendDistributedPublisher.publishDividendDistributed(
+                new DividendDistributedPublisher.DividendDistributedEvent(
+                        contractId,
+                        contract.getFlatId(),
+                        period,
+                        totalDistributed,
+                        payments.stream()
+                                .map(payment -> new DividendDistributedPublisher.HolderPayout(
+                                        payment.getInvestorId(),
+                                        payment.getInvestorWallet(),
+                                        payment.getAmountUsd(),
+                                        payment.getOwnershipPct()))
+                                .toList(),
+                        Instant.now()));
 
         return new DividendSummaryResponse(
                 contractId,

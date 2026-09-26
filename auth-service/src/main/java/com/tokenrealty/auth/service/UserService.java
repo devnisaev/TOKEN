@@ -2,7 +2,7 @@ package com.tokenrealty.auth.service;
 
 import com.tokenrealty.auth.dto.AuthDtos.*;
 import com.tokenrealty.auth.entity.User;
-import com.tokenrealty.auth.exception.ResourceNotFoundException;
+import com.tokenrealty.web.exception.ResourceNotFoundException;
 import com.tokenrealty.auth.repository.UserRepository;
 import com.tokenrealty.security.TokenPrincipal;
 import lombok.RequiredArgsConstructor;

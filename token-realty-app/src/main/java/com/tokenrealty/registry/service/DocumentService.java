@@ -2,8 +2,8 @@ package com.tokenrealty.registry.service;
 
 import com.tokenrealty.registry.dto.PropertyDtos.*;
 import com.tokenrealty.registry.entity.PropertyDocument;
-import com.tokenrealty.registry.exception.ConflictException;
-import com.tokenrealty.registry.exception.ResourceNotFoundException;
+import com.tokenrealty.web.exception.ConflictException;
+import com.tokenrealty.web.exception.ResourceNotFoundException;
 import com.tokenrealty.registry.mapper.PropertyMapper;
 import com.tokenrealty.registry.repository.BuildingRepository;
 import com.tokenrealty.registry.repository.FlatRepository;

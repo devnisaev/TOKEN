@@ -5,8 +5,8 @@ import com.tokenrealty.issuance.blockchain.ContractDeployer;
 import com.tokenrealty.issuance.client.PropertyRegistryClient;
 import com.tokenrealty.issuance.dto.IssuanceDtos.*;
 import com.tokenrealty.issuance.entity.TokenContract;
-import com.tokenrealty.issuance.exception.ConflictException;
-import com.tokenrealty.issuance.exception.ValidationException;
+import com.tokenrealty.web.exception.ConflictException;
+import com.tokenrealty.web.exception.ValidationException;
 import com.tokenrealty.issuance.repository.TokenContractRepository;
 import com.tokenrealty.issuance.repository.TokenHolderRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -162,6 +162,6 @@ class TokenIssuanceServiceTest {
         when(contractRepository.findById(unknownId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.findById(unknownId))
-                .isInstanceOf(com.tokenrealty.issuance.exception.ResourceNotFoundException.class);
+                .isInstanceOf(com.tokenrealty.web.exception.ResourceNotFoundException.class);
     }
 }

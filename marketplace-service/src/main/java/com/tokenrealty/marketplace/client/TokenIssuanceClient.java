@@ -1,6 +1,6 @@
 package com.tokenrealty.marketplace.client;
 
-import com.tokenrealty.marketplace.exception.ValidationException;
+import com.tokenrealty.web.exception.ValidationException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;

@@ -25,7 +25,7 @@ Read and follow rules in `.cursor/rules/`:
 | [payment-ledger.mdc](.cursor/rules/payment-ledger.mdc) | Payment Service — escrow, ledger, idempotency |
 | [investment-limits.mdc](.cursor/rules/investment-limits.mdc) | KYC gates, min investment, compliance order |
 
-Human-readable expansions: [docs/rules/](docs/rules/)
+Human-readable expansions: [docs/rules/](docs/rules/) — start with [shared-libraries.md](docs/rules/shared-libraries.md) for cross-service modules
 
 ## Services
 
@@ -38,6 +38,7 @@ Human-readable expansions: [docs/rules/](docs/rules/)
 | Marketplace | 8084 | `com.tokenrealty.marketplace` |
 | Payment | 8085 | `com.tokenrealty.payment` |
 | Notification | 8089 | `com.tokenrealty.notification` |
+| Rental | 8086 | `com.tokenrealty.rental` |
 
 New services: copy structure from `marketplace-service/` or `auth-service/`.
 
@@ -48,7 +49,7 @@ New services: copy structure from `marketplace-service/` or `auth-service/`.
 ./mvnw test                    # inside each service folder (after security lib installed)
 ```
 
-Shared libs: `tokenrealty-security/` (JWT), `tokenrealty-events/` (envelope, `KafkaJsonEvent`), `tokenrealty-outbox/` (`OutboxWriter`, `OutboxPayload`) — `./token-realty-app/mvnw -pl tokenrealty-security,tokenrealty-events,tokenrealty-outbox install`
+Shared libs: `tokenrealty-security/` (JWT, `ServiceRestClientBuilder`), `tokenrealty-web/` (exceptions, RFC 7807 handler), `tokenrealty-jpa/` (`BaseEntity`, auditing), `tokenrealty-kafka/` (`KafkaEventConsumer`, processed-event idempotency), `tokenrealty-events/` (envelope, `KafkaJsonEvent`), `tokenrealty-outbox/` (`OutboxWriter`, `OutboxRelay`, `OutboxPayload`) — `./token-realty-app/mvnw -pl tokenrealty-security,tokenrealty-web,tokenrealty-jpa,tokenrealty-kafka,tokenrealty-events,tokenrealty-outbox install`
 
 ## Platform docs
 

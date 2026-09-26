@@ -71,6 +71,8 @@ public final class PaymentDtos {
             @NotNull PaymentCurrency currency,
             @NotNull Payout.PayoutPurpose purpose,
             UUID referenceId,
+            UUID flatId,
+            UUID tenantId,
             @Size(max = 20) String period
     ) {
     }

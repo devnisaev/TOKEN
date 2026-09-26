@@ -6,6 +6,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.tokenrealty.jpa.entity.BaseEntity;
 @Entity
 @Table(name = "buildings")
 @Getter

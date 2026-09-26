@@ -14,6 +14,9 @@
     <modules>
         <module>tokenrealty-events</module>
         <module>tokenrealty-outbox</module>
+        <module>tokenrealty-web</module>
+        <module>tokenrealty-jpa</module>
+        <module>tokenrealty-kafka</module>
         <module>tokenrealty-security</module>
         <module>token-realty-app</module>
         <module>token-issuance-service</module>
@@ -22,6 +25,7 @@
         <module>payment-service</module>
         <module>notification-service</module>
         <module>api-gateway</module>
+        <module>rental-service</module>
     </modules>
 
     <properties>

@@ -16,7 +16,7 @@ Spring conventions: [spring-java-services.md](spring-java-services.md)
 | Transactional outbox | Required for domain events; no `KafkaTemplate` in TX |
 | Idempotent consumers | `processed_event` table keyed by `eventId` |
 | Listener → one service call | Command/DTO mapping at Kafka boundary |
-| Shared parse helper | `KafkaJsonEvent.consume` in `tokenrealty-events` lib |
+| Shared parse helper | `KafkaJsonEvent.consume` in `tokenrealty-events`; ingest + idempotency in `tokenrealty-kafka` |
 | DLQ after retries | `<topic>.dlq` |
 | Schema evolution | Additive in v1; breaking → v2 topic |
 | Dedicated `*KafkaConfig` | `@EnableKafka` + `NewTopic` beans separated from app config |
@@ -26,7 +26,7 @@ Spring conventions: [spring-java-services.md](spring-java-services.md)
 | Titan | TokenRealty |
 |-------|-------------|
 | Full hexagonal `adapter/in/kafka` mandatory | Layered `kafka/` OK for existing services |
-| `cardsystem-outbox` shared lib | `tokenrealty-outbox` (`OutboxWriter`, `OutboxPayload`); per-service `outbox_events` table + relay |
+| `cardsystem-outbox` shared lib | `tokenrealty-outbox` (`OutboxWriter`, `OutboxRelay`, `OutboxPayload`); per-service `outbox_events` table + thin relay worker |
 | Avro + Schema Registry (implied) | JSON envelope first; Avro optional in Phase 5 |
 | 20+ service-specific references | 11 topics in [EVENTS.md](../EVENTS.md) |
 | PCI: never PAN/PIN | Never private keys, seeds, full KYC docs |
@@ -46,8 +46,9 @@ Spring conventions: [spring-java-services.md](spring-java-services.md)
 
 - [x] Add Kafka to root `docker-compose.yml` (`docker compose --profile kafka up`)
 - [x] Create `tokenrealty-events` Maven module (envelope record, `KafkaJsonEvent`)
-- [x] Create `tokenrealty-outbox` Maven module (`OutboxWriter`, `OutboxPayload`)
-- [x] Add `processed_event` table + repository per consuming service (Marketplace, Payment, Issuance, Notification)
+- [x] Create `tokenrealty-outbox` Maven module (`OutboxWriter`, `OutboxPayload`, `OutboxRelay`)
+- [x] Create `tokenrealty-kafka` module (`KafkaEventConsumer`, `ProcessedEventClaimService`, shared `ProcessedEvent` entity)
+- [x] Shared `processed_events` table via `tokenrealty-kafka` auto-config (no per-service copy)
 - [x] Add outbox table + relay job per publishing service (Marketplace, Payment, Issuance, Property Registry)
 
 ### Phase 1 — First producers (Property Registry)
@@ -70,9 +71,10 @@ Spring conventions: [spring-java-services.md](spring-java-services.md)
 - [x] Payment: outbox for `payment.confirmed`, `rent.collected` (typed payload records)
 - [x] Payment + Marketplace: Kafka relay (`OutboxRelayWorker`)
 - [x] Payment: consume `order.matched` (reconciliation)
-- [ ] Payment: consume `dividend.distributed`
+- [x] Payment: consume `dividend.distributed` → create `DIVIDEND` payouts per holder
 - [x] Token Issuance: publish `transfer.completed`; consume `payment.confirmed`
-- [ ] Token Issuance: publish `dividend.distributed`; consume `kyc-approved`, `rent.collected`
+- [x] Token Issuance: publish `dividend.distributed`; consume `rent.collected` (Kafka → `DividendService.distribute()`)
+- [ ] Token Issuance: consume `kyc-approved`
 
 ---
 
@@ -81,12 +83,16 @@ Spring conventions: [spring-java-services.md](spring-java-services.md)
 | Module | Package | Contents |
 |--------|---------|----------|
 | `tokenrealty-events` | `com.tokenrealty.events` | `EventEnvelope`, `KafkaJsonEvent` (consumer parse helper) |
-| `tokenrealty-outbox` | `com.tokenrealty.outbox` | `OutboxWriter` (base enqueue logic), `OutboxPayload` (fluent payload builder) |
+| `tokenrealty-kafka` | `com.tokenrealty.kafka` | `KafkaEventConsumer`, `ProcessedEventClaimService`, `ProcessedEvent` entity |
+| `tokenrealty-outbox` | `com.tokenrealty.outbox` | `OutboxWriter`, `OutboxPayload`, `OutboxRelay`, `OutboxStatus` |
+| `tokenrealty-web` | `com.tokenrealty.web` | Shared exceptions, `TokenRealtyExceptionHandler` (RFC 7807 auto-config) |
+| `tokenrealty-jpa` | `com.tokenrealty.jpa` | `BaseEntity`, `@EnableJpaAuditing` auto-config |
+| `tokenrealty-security` | `com.tokenrealty.security` | JWT, service tokens, `ServiceRestClientBuilder` |
 
 Install before service builds:
 
 ```bash
-./token-realty-app/mvnw -pl tokenrealty-events,tokenrealty-outbox install
+./token-realty-app/mvnw -pl tokenrealty-security,tokenrealty-web,tokenrealty-jpa,tokenrealty-kafka,tokenrealty-events,tokenrealty-outbox install
 ```
 
 Each publishing service adds a **concrete** `@Service OutboxWriter` in `kafka/outbox/` that extends `com.tokenrealty.outbox.OutboxWriter` and persists to its local `outbox_events` table.
@@ -180,11 +186,13 @@ When `tokenrealty.kafka.enabled=false` (default in dev/tests), the service `Outb
 
 ### Outbox relay
 
-`OutboxRelayWorker` (`@Scheduled`, `@ConditionalOnProperty tokenrealty.kafka.enabled=true`):
+Per-service `OutboxRelayWorker` delegates to shared `OutboxRelay.relay(...)` (`@Scheduled`, `@ConditionalOnProperty tokenrealty.kafka.enabled=true`):
 
-* Polls `PENDING` rows from `outbox_events`
+* Polls `PENDING` rows from local `outbox_events`
 * Publishes envelope JSON to Kafka (`topic = event_type`, key = `aggregate_id`)
 * Marks `PUBLISHED` on broker ack; increments `retry_count` / sets `FAILED` after max retries
+
+`OutboxEvent` implements `OutboxRelayTarget` and uses shared `OutboxStatus`.
 
 Config (`application.yml`):
 
@@ -206,57 +214,35 @@ Local Kafka: `docker compose --profile kafka up` from `token-realty-app/`.
 
 ## Consumer pattern (implemented)
 
-Every consuming service uses the same three-layer shape:
+Every consuming service uses the same two-layer shape (idempotency + ingest from `tokenrealty-kafka`):
 
-1. **`ProcessedEvent`** entity + `ProcessedEventService.tryClaim(eventId, eventType)` — idempotency before handler runs
-2. **`{Service}KafkaIngestSupport`** — wraps `KafkaJsonEvent.consume` + claim
-3. **`{Event}Listener`** in `kafka/in/` — `@KafkaListener` → parse command → one `@Service` call
+1. **`KafkaEventConsumer`** — wraps `KafkaJsonEvent.consume` + `ProcessedEventClaimService.tryClaim`
+2. **`{Event}Listener`** in `kafka/in/` — `@KafkaListener` → parse command → one `@Service` call
 
-### ProcessedEvent
+See [shared-libraries.md](shared-libraries.md) for module setup.
+
+### ProcessedEvent (shared)
 
 ```text
 processed_events (event_id PK, event_type, processed_at)
 ```
 
-```java
-@Transactional
-public boolean tryClaim(UUID eventId, String eventType) {
-    if (repository.existsByEventId(eventId)) return false;
-    try {
-        repository.save(new ProcessedEvent(eventId, eventType, Instant.now()));
-        return true;
-    } catch (DataIntegrityViolationException ex) {
-        return false; // concurrent duplicate
-    }
-}
-```
+Entity and `ProcessedEventClaimService` live in `tokenrealty-kafka`. Do **not** copy them into services.
 
-Do **not** inject `ProcessedEventRepository` into business services — only `ProcessedEventService`.
-
-### Ingest support + listener
+### Listener pattern
 
 ```java
-@Component
-@RequiredArgsConstructor
-public class MarketplaceKafkaIngestSupport {
-    private final ObjectMapper objectMapper;
-    private final ProcessedEventService processedEventService;
-
-    public void consume(String message, String eventType, String failure,
-                        Consumer<KafkaJsonEvent> handler) {
-        KafkaJsonEvent.consume(objectMapper, message, failure, event -> {
-            if (!processedEventService.tryClaim(event.eventId(), eventType)) return;
-            handler.accept(event);
-        });
-    }
-}
-
 @Component
 @ConditionalOnProperty(name = "tokenrealty.kafka.enabled", havingValue = "true")
+@RequiredArgsConstructor
 public class PaymentConfirmedListener {
+
+    private final KafkaEventConsumer eventConsumer;
+    private final OrderService orderService;
+
     @KafkaListener(topics = "${tokenrealty.kafka.topic.payment-confirmed}")
     public void onPaymentConfirmed(String message) {
-        ingestSupport.consume(message, MarketplaceKafkaEventTypes.PAYMENT_CONFIRMED,
+        eventConsumer.consume(message, MarketplaceKafkaEventTypes.PAYMENT_CONFIRMED,
                 "Payment confirmed processing failed",
                 event -> orderService.onPaymentConfirmed(PaymentConfirmedCommand.from(event)));
     }
@@ -332,20 +318,20 @@ com.tokenrealty.registry/
 
 ```text
 com.tokenrealty.marketplace/
-├── entity/ProcessedEvent.java
-├── service/ProcessedEventService.java
 ├── client/PaymentClient.java              ← initiate + releaseEscrow
 ├── kafka/
 │   ├── MarketplaceKafkaEventTypes.java
 │   ├── MarketplaceKafkaConfig.java
 │   ├── command/                           ← PaymentConfirmedCommand, FlatTokenizedCommand, …
-│   ├── in/                                ← *Listener, MarketplaceKafkaIngestSupport
+│   ├── in/                                ← *Listener (inject KafkaEventConsumer)
 │   ├── port/                              ← *Publisher interfaces
 │   └── outbox/                            ← OutboxWriter, Outbox*Publisher, OutboxRelayWorker
 └── service/
     ├── OrderService.java                  ← onPaymentConfirmed, settleFromTransfer
     └── ListingService.java                ← createFromFlatTokenized
 ```
+
+Idempotency: `tokenrealty-kafka` (`ProcessedEvent` + `ProcessedEventClaimService`).
 
 **Token Issuance (implemented):**
 
@@ -368,15 +354,11 @@ com.tokenrealty.issuance/
 
 ```text
 com.tokenrealty.notification/
-├── entity/ProcessedEvent.java
-├── service/ProcessedEventService.java
 ├── service/NotificationLogService.java    ← log-only until email provider
 ├── kafka/
 │   ├── NotificationKafkaEventTypes.java
 │   ├── NotificationKafkaConfig.java
-│   └── in/
-│       ├── NotificationKafkaIngestSupport.java
-│       └── NotificationEventListener.java   ← multi-topic @KafkaListener
+│   └── in/NotificationEventListener.java  ← multi-topic @KafkaListener + KafkaEventConsumer
 ```
 
 No outbox — Notification is consume-only for now.

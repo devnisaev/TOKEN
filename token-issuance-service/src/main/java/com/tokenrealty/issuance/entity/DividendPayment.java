@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import com.tokenrealty.jpa.entity.BaseEntity;
 @Entity
 @Table(name = "dividend_payments")
 @Getter

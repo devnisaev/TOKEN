@@ -13,12 +13,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PaymentConfirmedListener {
 
-    private final IssuanceKafkaIngestSupport ingestSupport;
+    private final com.tokenrealty.kafka.consume.KafkaEventConsumer eventConsumer;
     private final PaymentTransferService paymentTransferService;
 
     @KafkaListener(topics = "${tokenrealty.kafka.topic.payment-confirmed}")
     public void onPaymentConfirmed(String message) {
-        ingestSupport.consume(message, IssuanceKafkaEventTypes.PAYMENT_CONFIRMED,
+        eventConsumer.consume(message, IssuanceKafkaEventTypes.PAYMENT_CONFIRMED,
                 "Payment confirmed transfer failed",
                 event -> paymentTransferService.executeTransfer(PaymentConfirmedCommand.from(event)));
     }

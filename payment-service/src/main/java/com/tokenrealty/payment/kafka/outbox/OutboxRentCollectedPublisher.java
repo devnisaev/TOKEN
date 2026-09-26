@@ -31,6 +31,7 @@ public class OutboxRentCollectedPublisher implements RentCollectedPublisher {
                         "value", event.amount().value(),
                         "currency", event.amount().currency().name()))
                 .put("txHash", event.txHash())
-                .enqueue(outboxWriter, rentCollectedTopic, event.payoutId());
+                .enqueue(outboxWriter, rentCollectedTopic,
+                        event.leaseId() != null ? event.leaseId() : event.payoutId());
     }
 }

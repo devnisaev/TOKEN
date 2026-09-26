@@ -4,7 +4,7 @@ import com.tokenrealty.payment.blockchain.PaymentBlockchainService;
 import com.tokenrealty.payment.config.PaymentProperties;
 import com.tokenrealty.payment.dto.PaymentDtos.*;
 import com.tokenrealty.payment.entity.*;
-import com.tokenrealty.payment.exception.ValidationException;
+import com.tokenrealty.web.exception.ValidationException;
 import com.tokenrealty.payment.kafka.port.PaymentConfirmedPublisher;
 import com.tokenrealty.payment.mapper.PaymentMapper;
 import com.tokenrealty.payment.repository.EscrowRepository;

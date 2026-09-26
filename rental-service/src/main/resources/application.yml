@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: rental-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/rental_service
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+
+server:
+  port: 8086
+  servlet:
+    context-path: /api
+
+services:
+  auth:
+    url: ${AUTH_SERVICE_URL:http://localhost:8083/api}
+  payment:
+    url: ${PAYMENT_SERVICE_URL:http://localhost:8085/api}
+
+tokenrealty:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-change-in-production-min-32-chars!!}
+    issuer: tokenrealty-auth
+  service-account:
+    client-id: rental
+    client-secret: ${SERVICE_ACCOUNT_SECRET:rental-secret}
+
+jackson2:
+  serialization:
+    write-dates-as-timestamps: false
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    com.tokenrealty: DEBUG

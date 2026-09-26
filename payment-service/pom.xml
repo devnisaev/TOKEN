@@ -47,6 +47,21 @@
         </dependency>
         <dependency>
             <groupId>com.tokenrealty</groupId>
+            <artifactId>tokenrealty-web</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tokenrealty</groupId>
+            <artifactId>tokenrealty-jpa</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tokenrealty</groupId>
+            <artifactId>tokenrealty-kafka</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tokenrealty</groupId>
             <artifactId>tokenrealty-outbox</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>

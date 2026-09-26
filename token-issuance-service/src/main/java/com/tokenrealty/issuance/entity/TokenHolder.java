@@ -6,6 +6,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import com.tokenrealty.jpa.entity.BaseEntity;
 @Entity
 @Table(name = "token_holders",
         uniqueConstraints = @UniqueConstraint(columnNames = {"token_contract_id", "investor_id"}))

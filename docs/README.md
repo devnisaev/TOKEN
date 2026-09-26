@@ -20,6 +20,7 @@ Central documentation for the TokenRealty real-estate tokenization platform.
 | [rules/lombok.md](rules/lombok.md) | [lombok.mdc](../.cursor/rules/lombok.mdc) |
 | [rules/java-dtos.md](rules/java-dtos.md) | [java-dtos.mdc](../.cursor/rules/java-dtos.mdc) |
 | [rules/kafka-messaging.md](rules/kafka-messaging.md) | [kafka-messaging.mdc](../.cursor/rules/kafka-messaging.mdc) |
+| [rules/shared-libraries.md](rules/shared-libraries.md) | — (cross-service Maven modules) |
 | [rules/rest-client-errors.md](rules/rest-client-errors.md) | [rest-client-errors.mdc](../.cursor/rules/rest-client-errors.mdc) |
 | [rules/payment-ledger.md](rules/payment-ledger.md) | [payment-ledger.mdc](../.cursor/rules/payment-ledger.mdc) |
 | [rules/investment-limits.md](rules/investment-limits.md) | [investment-limits.mdc](../.cursor/rules/investment-limits.mdc) |

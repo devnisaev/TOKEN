@@ -6,6 +6,7 @@ import lombok.*;
 import java.time.Instant;
 import java.util.UUID;
 
+import com.tokenrealty.jpa.entity.BaseEntity;
 @Entity
 @Table(name = "refresh_tokens", indexes = {
         @Index(name = "idx_refresh_token_hash", columnList = "token_hash", unique = true)

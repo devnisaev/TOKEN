@@ -15,12 +15,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class PaymentConfirmedListener {
 
-    private final MarketplaceKafkaIngestSupport ingestSupport;
+    private final com.tokenrealty.kafka.consume.KafkaEventConsumer eventConsumer;
     private final OrderService orderService;
 
     @KafkaListener(topics = "${tokenrealty.kafka.topic.payment-confirmed}")
     public void onPaymentConfirmed(String message) {
-        ingestSupport.consume(message, MarketplaceKafkaEventTypes.PAYMENT_CONFIRMED,
+        eventConsumer.consume(message, MarketplaceKafkaEventTypes.PAYMENT_CONFIRMED,
                 "Payment confirmed processing failed",
                 event -> orderService.onPaymentConfirmed(PaymentConfirmedCommand.from(event)));
     }

@@ -5,9 +5,9 @@ import com.tokenrealty.registry.config.JacksonConfig;
 import com.tokenrealty.registry.config.SecurityConfig;
 import com.tokenrealty.registry.dto.PropertyDtos.*;
 import com.tokenrealty.registry.entity.Building;
-import com.tokenrealty.registry.exception.ConflictException;
-import com.tokenrealty.registry.exception.GlobalExceptionHandler;
-import com.tokenrealty.registry.exception.ResourceNotFoundException;
+import com.tokenrealty.web.exception.ConflictException;
+import com.tokenrealty.web.exception.TokenRealtyExceptionHandler;
+import com.tokenrealty.web.exception.ResourceNotFoundException;
 import com.tokenrealty.registry.service.BuildingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(BuildingController.class)
-@Import({GlobalExceptionHandler.class, JacksonConfig.class, SecurityConfig.class})
+@Import({TokenRealtyExceptionHandler.class, JacksonConfig.class, SecurityConfig.class})
 @DisplayName("BuildingController MockMvc tests")
 class BuildingControllerTest {
 

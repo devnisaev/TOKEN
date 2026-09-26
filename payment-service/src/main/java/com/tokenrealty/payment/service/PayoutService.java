@@ -41,6 +41,8 @@ public class PayoutService {
                 .currency(request.currency())
                 .purpose(request.purpose())
                 .referenceId(request.referenceId())
+                .flatId(request.flatId())
+                .tenantId(request.tenantId())
                 .period(request.period())
                 .status(Payout.PayoutStatus.PENDING)
                 .build();
@@ -48,11 +50,12 @@ public class PayoutService {
         Payout saved = payoutRepository.save(payout);
         completePayout(saved);
         if (saved.getPurpose() == Payout.PayoutPurpose.RENT) {
+            UUID tenantId = saved.getTenantId() != null ? saved.getTenantId() : saved.getRecipientInvestorId();
             rentCollectedPublisher.publishRentCollected(new RentCollectedEvent(
                     saved.getId(),
                     saved.getReferenceId(),
-                    null,
-                    saved.getRecipientInvestorId(),
+                    saved.getFlatId(),
+                    tenantId,
                     saved.getPeriod(),
                     new RentCollectedEvent.Amount(
                             saved.getAmount().toPlainString(), saved.getCurrency()),

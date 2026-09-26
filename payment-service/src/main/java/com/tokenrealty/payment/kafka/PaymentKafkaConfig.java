@@ -34,4 +34,10 @@ public class PaymentKafkaConfig {
             @Value("${tokenrealty.kafka.topic.order-matched}") String topic) {
         return new NewTopic(topic, PARTITIONS, REPLICAS);
     }
+
+    @Bean
+    NewTopic dividendDistributedTopic(
+            @Value("${tokenrealty.kafka.topic.dividend-distributed}") String topic) {
+        return new NewTopic(topic, PARTITIONS, REPLICAS);
+    }
 }

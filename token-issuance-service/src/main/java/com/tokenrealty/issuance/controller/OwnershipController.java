@@ -2,7 +2,7 @@ package com.tokenrealty.issuance.controller;
 
 import com.tokenrealty.issuance.dto.IssuanceDtos.*;
 import com.tokenrealty.issuance.entity.TokenHolder;
-import com.tokenrealty.issuance.exception.ResourceNotFoundException;
+import com.tokenrealty.web.exception.ResourceNotFoundException;
 import com.tokenrealty.issuance.repository.TokenContractRepository;
 import com.tokenrealty.issuance.repository.TokenHolderRepository;
 import io.swagger.v3.oas.annotations.Operation;

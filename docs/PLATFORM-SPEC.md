@@ -79,7 +79,8 @@ TokenRealty tokenizes real estate assets (buildings, flats, and other property t
 - [x] **Auth service** — JWT MVP; registry/issuance/marketplace validate Bearer tokens
 - [ ] **IPFS upload** — `ipfsCid` field stored, no upload client
 - [x] **Payment** — MVP (escrow, confirm, release, payouts, outbox stub)
-- [ ] **Rental, Wallet** — not started
+- [x] **Rental** — MVP (leases, rent-payments, occupancy; Kafka rent → dividend pipeline)
+- [ ] **Wallet** — not started
 - [x] **Marketplace** — MVP done; Payment integration and Kafka relay wired
 - [x] **Root README / platform docs** — [README.md](../README.md), [AGENTS.md](../AGENTS.md), Cursor rules
 - [ ] **`FULLY_SOLD` status** — enum exists, no service logic sets it
@@ -508,16 +509,16 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 
 ### 10.6 Rental Service (Phase 3)
 
-- [ ] Scaffold project (`rental-service/`)
-- [ ] Entities: Lease, Tenant, RentPayment, MaintenanceTicket
-- [ ] POST `/v1/leases` — create lease for flat
-- [ ] GET `/v1/leases/{id}` — lease details
+- [x] Scaffold project (`rental-service/`)
+- [x] Entities: Lease, RentPayment (Tenant, MaintenanceTicket deferred)
+- [x] POST `/v1/leases` — create lease for flat
+- [x] GET `/v1/leases/{id}` — lease details
 - [ ] Rent schedule generation (monthly due dates)
-- [ ] POST `/v1/rent-payments` — record rent payment (triggered by Payment Service)
-- [ ] Auto-trigger dividend distribution via Token Issuance API
-- [ ] GET `/v1/flats/{id}/occupancy` — occupancy status
+- [x] POST `/v1/rent-payments` — record rent payment → Payment `POST /v1/payouts` (RENT)
+- [x] Auto-trigger dividend distribution via Kafka (`rent.collected` → Issuance → `dividend.distributed` → Payment)
+- [x] GET `/v1/occupancy/flats/{flatId}` — occupancy status
 - [ ] Publish `RentDue`, `LeaseExpired` events
-- [ ] Unit + integration tests
+- [x] Unit + context tests (`./mvnw test`)
 
 ### 10.7 Compliance Service (Phase 4)
 

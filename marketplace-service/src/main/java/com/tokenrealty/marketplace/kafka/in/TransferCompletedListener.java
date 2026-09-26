@@ -18,13 +18,13 @@ import java.util.UUID;
 @Slf4j
 public class TransferCompletedListener {
 
-    private final MarketplaceKafkaIngestSupport ingestSupport;
+    private final com.tokenrealty.kafka.consume.KafkaEventConsumer eventConsumer;
     private final OrderService orderService;
     private final PaymentClient paymentClient;
 
     @KafkaListener(topics = "${tokenrealty.kafka.topic.transfer-completed}")
     public void onTransferCompleted(String message) {
-        ingestSupport.consume(message, MarketplaceKafkaEventTypes.TRANSFER_COMPLETED,
+        eventConsumer.consume(message, MarketplaceKafkaEventTypes.TRANSFER_COMPLETED,
                 "Transfer completed processing failed",
                 event -> {
                     TransferCompletedCommand command = TransferCompletedCommand.from(event);

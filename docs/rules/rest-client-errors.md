@@ -2,13 +2,34 @@
 
 Cursor rule: [`.cursor/rules/rest-client-errors.mdc`](../../.cursor/rules/rest-client-errors.mdc)
 
+## RestClient bean setup
+
+Use shared `ServiceRestClientBuilder` from `tokenrealty-security` — do not copy the Bearer interceptor boilerplate.
+
+```java
+import com.tokenrealty.security.client.ServiceRestClientBuilder;
+
+@Configuration
+public class PaymentClientConfig {
+
+    @Bean("paymentRestClient")
+    RestClient paymentRestClient(
+            @Value("${services.payment.url}") String baseUrl,
+            ObjectProvider<ServiceTokenProvider> serviceTokenProvider) {
+        return ServiceRestClientBuilder.build(baseUrl, serviceTokenProvider);
+    }
+}
+```
+
+Domain clients (`PaymentClient`, `TokenIssuanceClient`, …) stay per-service. See [shared-libraries.md](shared-libraries.md).
+
 ## Inter-service clients today
 
 | Client | Service | Calls | Auth |
 |--------|---------|-------|------|
 | `PropertyRegistryClient` | Token Issuance → Registry | GET flat, GET SPV, PATCH token-info | Service token |
 | `TokenIssuanceClient` | Marketplace → Issuance | Compliance check, contract by flat, transfer | Service token |
-| `PaymentClient` | Marketplace → Payment | Initiate escrow, release escrow | Service token |
+| `PaymentClient` | Marketplace, Rental → Payment | Initiate escrow, release escrow, payouts | Service token |
 | `MarketplaceClient` | Token Issuance → Marketplace | GET trade by orderId | Service token |
 
 ## Service name prefixes
@@ -24,7 +45,7 @@ Cursor rule: [`.cursor/rules/rest-client-errors.mdc`](../../.cursor/rules/rest-c
 ## Target behavior
 
 1. Configure timeout on every `RestClient.Builder`
-2. Map 5xx/timeout → `{service}_unavailable` → `ValidationException` or domain error
+2. Map 5xx/timeout → `{service}_unavailable` → `ValidationException` (from `tokenrealty-web`) or domain error
 3. Map 404 → `ResourceNotFoundException` where appropriate
 4. Propagate `X-Trace-Id` header
 5. Attach `Authorization: Bearer` via `ServiceTokenProvider` (`tokenrealty-security`)

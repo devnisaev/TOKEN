@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.UUID;
 
+import com.tokenrealty.outbox.OutboxStatus;
 @Service
 public class OutboxWriter extends com.tokenrealty.outbox.OutboxWriter {
 
@@ -50,7 +51,7 @@ public class OutboxWriter extends com.tokenrealty.outbox.OutboxWriter {
                 .aggregateId(UUID.fromString(partitionKey))
                 .eventType(eventType)
                 .payload(envelopeJson)
-                .status(OutboxEvent.OutboxStatus.PENDING)
+                .status(OutboxStatus.PENDING)
                 .createdAt(createdAt)
                 .retryCount(0)
                 .traceId(traceId)

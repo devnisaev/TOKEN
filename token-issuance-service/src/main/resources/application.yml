@@ -82,7 +82,9 @@ tokenrealty:
       max-retries: 5
     topic:
       payment-confirmed: tokenrealty.payment.payment.confirmed.v1
+      rent-collected: tokenrealty.payment.rent.collected.v1
       transfer-completed: tokenrealty.issuance.transfer.completed.v1
+      dividend-distributed: tokenrealty.issuance.dividend.distributed.v1
 
 feign:
   client:

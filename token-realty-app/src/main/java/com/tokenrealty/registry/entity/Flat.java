@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.tokenrealty.jpa.entity.BaseEntity;
 @Entity
 @Table(name = "flats",
         uniqueConstraints = @UniqueConstraint(columnNames = {"building_id", "flat_number"}))

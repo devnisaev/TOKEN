@@ -2,7 +2,7 @@ package com.tokenrealty.auth.service;
 
 import com.tokenrealty.auth.entity.RefreshToken;
 import com.tokenrealty.auth.entity.User;
-import com.tokenrealty.auth.exception.ValidationException;
+import com.tokenrealty.web.exception.ValidationException;
 import com.tokenrealty.auth.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

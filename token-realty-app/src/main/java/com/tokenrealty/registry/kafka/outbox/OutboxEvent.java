@@ -1,5 +1,7 @@
 package com.tokenrealty.registry.kafka.outbox;
 
+import com.tokenrealty.outbox.OutboxStatus;
+import com.tokenrealty.outbox.relay.OutboxRelayTarget;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,10 +12,10 @@ import java.util.UUID;
 @Table(name = "outbox_events")
 @Getter
 @Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class OutboxEvent {
+public class OutboxEvent implements OutboxRelayTarget {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -47,9 +49,14 @@ public class OutboxEvent {
     @Column(name = "trace_id", length = 64)
     private String traceId;
 
-    public enum OutboxStatus {
-        PENDING,
-        PUBLISHED,
-        FAILED
+    @Override
+    public void markPublished(Instant publishedAt) {
+        status = OutboxStatus.PUBLISHED;
+        this.publishedAt = publishedAt;
+    }
+
+    @Override
+    public void markFailed() {
+        status = OutboxStatus.FAILED;
     }
 }

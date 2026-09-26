@@ -3,6 +3,7 @@ package com.tokenrealty.auth.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import com.tokenrealty.jpa.entity.BaseEntity;
 @Entity
 @Table(name = "users", indexes = {
         @Index(name = "idx_users_email", columnList = "email", unique = true)

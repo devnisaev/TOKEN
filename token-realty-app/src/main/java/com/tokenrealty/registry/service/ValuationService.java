@@ -3,7 +3,7 @@ package com.tokenrealty.registry.service;
 import com.tokenrealty.registry.dto.PropertyDtos.*;
 import com.tokenrealty.registry.entity.Flat;
 import com.tokenrealty.registry.entity.Valuation;
-import com.tokenrealty.registry.exception.ResourceNotFoundException;
+import com.tokenrealty.web.exception.ResourceNotFoundException;
 import com.tokenrealty.registry.mapper.PropertyMapper;
 import com.tokenrealty.registry.repository.FlatRepository;
 import com.tokenrealty.registry.repository.ValuationRepository;

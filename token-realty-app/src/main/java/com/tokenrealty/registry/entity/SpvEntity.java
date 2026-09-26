@@ -3,6 +3,7 @@ package com.tokenrealty.registry.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import com.tokenrealty.jpa.entity.BaseEntity;
 @Entity
 @Table(name = "spv_entities")
 @Getter

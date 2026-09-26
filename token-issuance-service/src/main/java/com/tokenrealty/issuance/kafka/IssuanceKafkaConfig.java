@@ -28,4 +28,16 @@ public class IssuanceKafkaConfig {
             @Value("${tokenrealty.kafka.topic.transfer-completed}") String topic) {
         return new NewTopic(topic, PARTITIONS, REPLICAS);
     }
+
+    @Bean
+    NewTopic rentCollectedTopic(
+            @Value("${tokenrealty.kafka.topic.rent-collected}") String topic) {
+        return new NewTopic(topic, PARTITIONS, REPLICAS);
+    }
+
+    @Bean
+    NewTopic dividendDistributedTopic(
+            @Value("${tokenrealty.kafka.topic.dividend-distributed}") String topic) {
+        return new NewTopic(topic, PARTITIONS, REPLICAS);
+    }
 }

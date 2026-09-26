@@ -6,6 +6,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import com.tokenrealty.jpa.entity.BaseEntity;
 @Entity
 @Table(name = "listings", indexes = {
         @Index(name = "idx_listings_flat_id", columnList = "flat_id"),

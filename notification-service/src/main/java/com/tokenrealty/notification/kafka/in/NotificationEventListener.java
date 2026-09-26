@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class NotificationEventListener {
 
-    private final NotificationKafkaIngestSupport ingestSupport;
+    private final com.tokenrealty.kafka.consume.KafkaEventConsumer eventConsumer;
     private final NotificationLogService notificationLogService;
 
     @KafkaListener(topics = "${tokenrealty.kafka.topic.flat-tokenized}")
@@ -41,7 +41,7 @@ public class NotificationEventListener {
     }
 
     private void ingest(String message, String eventType) {
-        ingestSupport.consume(message, eventType, "Notification processing failed",
+        eventConsumer.consume(message, eventType, "Notification processing failed",
                 event -> notificationLogService.logEvent(eventType, event));
     }
 }

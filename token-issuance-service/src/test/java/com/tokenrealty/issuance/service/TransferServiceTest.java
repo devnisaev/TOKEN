@@ -4,7 +4,7 @@ import com.tokenrealty.issuance.blockchain.BlockchainConnector;
 import com.tokenrealty.issuance.dto.IssuanceDtos.*;
 import com.tokenrealty.issuance.entity.*;
 import com.tokenrealty.issuance.exception.ComplianceException;
-import com.tokenrealty.issuance.exception.ConflictException;
+import com.tokenrealty.web.exception.ConflictException;
 import com.tokenrealty.issuance.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

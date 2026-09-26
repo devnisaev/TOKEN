@@ -22,7 +22,7 @@ Adapted from Titan `lombok.mdc`. Cursor rule: [`.cursor/rules/lombok.mdc`](../..
 | Parent POM inherits Lombok | Per-service `pom.xml` |
 | Rich domain in `domain/model/` | Not yet — logic in `service/` + JPA |
 | `@Builder` discouraged on DTOs | Optional on records for tests (`AuthDtos`) |
-| `cardsystem-common` | `tokenrealty-security` uses plain Java, no Lombok |
+| `cardsystem-common` | `tokenrealty-security` uses plain Java, no Lombok; `BaseEntity` in `tokenrealty-jpa` uses Lombok |
 
 ## Migration note
 

@@ -13,12 +13,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FlatTokenizedListener {
 
-    private final MarketplaceKafkaIngestSupport ingestSupport;
+    private final com.tokenrealty.kafka.consume.KafkaEventConsumer eventConsumer;
     private final ListingService listingService;
 
     @KafkaListener(topics = "${tokenrealty.kafka.topic.flat-tokenized}")
     public void onFlatTokenized(String message) {
-        ingestSupport.consume(message, MarketplaceKafkaEventTypes.FLAT_TOKENIZED,
+        eventConsumer.consume(message, MarketplaceKafkaEventTypes.FLAT_TOKENIZED,
                 "Flat tokenized processing failed",
                 event -> listingService.createFromFlatTokenized(FlatTokenizedCommand.from(event)));
     }

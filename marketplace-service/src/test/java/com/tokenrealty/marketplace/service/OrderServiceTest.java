@@ -9,7 +9,7 @@ import com.tokenrealty.marketplace.kafka.command.TransferCompletedCommand;
 import com.tokenrealty.marketplace.entity.Listing;
 import com.tokenrealty.marketplace.entity.MarketOrder;
 import com.tokenrealty.marketplace.entity.Trade;
-import com.tokenrealty.marketplace.exception.ValidationException;
+import com.tokenrealty.web.exception.ValidationException;
 import com.tokenrealty.marketplace.kafka.port.OrderMatchedPublisher;
 import com.tokenrealty.marketplace.kafka.port.TradeSettledPublisher;
 import com.tokenrealty.marketplace.mapper.MarketplaceMapper;

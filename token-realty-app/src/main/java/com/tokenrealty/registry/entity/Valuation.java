@@ -6,6 +6,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.tokenrealty.jpa.entity.BaseEntity;
 @Entity
 @Table(name = "valuations")
 @Getter

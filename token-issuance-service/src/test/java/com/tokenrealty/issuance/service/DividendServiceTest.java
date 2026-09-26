@@ -4,8 +4,9 @@ import com.tokenrealty.issuance.dto.IssuanceDtos.*;
 import com.tokenrealty.issuance.entity.DividendPayment;
 import com.tokenrealty.issuance.entity.TokenContract;
 import com.tokenrealty.issuance.entity.TokenHolder;
-import com.tokenrealty.issuance.exception.ConflictException;
-import com.tokenrealty.issuance.exception.ResourceNotFoundException;
+import com.tokenrealty.web.exception.ConflictException;
+import com.tokenrealty.web.exception.ResourceNotFoundException;
+import com.tokenrealty.issuance.kafka.port.DividendDistributedPublisher;
 import com.tokenrealty.issuance.repository.DividendPaymentRepository;
 import com.tokenrealty.issuance.repository.TokenContractRepository;
 import com.tokenrealty.issuance.repository.TokenHolderRepository;
@@ -34,6 +35,7 @@ class DividendServiceTest {
     @Mock DividendPaymentRepository dividendRepository;
     @Mock TokenContractRepository contractRepository;
     @Mock TokenHolderRepository holderRepository;
+    @Mock DividendDistributedPublisher dividendDistributedPublisher;
 
     @InjectMocks DividendService service;
 
@@ -99,6 +101,7 @@ class DividendServiceTest {
         // Total distributed should equal gross income
         assertThat(result.totalDistributedUsd()).isEqualByComparingTo(BigDecimal.valueOf(1000));
         verify(dividendRepository, times(4)).save(any(DividendPayment.class));
+        verify(dividendDistributedPublisher).publishDividendDistributed(any());
     }
 
     @Test

@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
+import com.tokenrealty.jpa.entity.BaseEntity;
 @Entity
 @Table(name = "payouts", indexes = {
         @Index(name = "idx_payouts_recipient_id", columnList = "recipient_investor_id"),
@@ -38,6 +39,12 @@ public class Payout extends BaseEntity {
 
     @Column(name = "reference_id")
     private UUID referenceId;
+
+    @Column(name = "flat_id")
+    private UUID flatId;
+
+    @Column(name = "tenant_id")
+    private UUID tenantId;
 
     @Column(length = 20)
     private String period;

@@ -1,0 +1,31 @@
+package com.tokenrealty.rental.controller;
+
+import com.tokenrealty.rental.dto.RentalDtos.*;
+import com.tokenrealty.rental.service.LeaseService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/v1/leases")
+@RequiredArgsConstructor
+public class LeaseController {
+
+    private final LeaseService leaseService;
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROPERTY_MANAGER')")
+    public LeaseResponse create(@Valid @RequestBody CreateLeaseRequest request) {
+        return leaseService.create(request);
+    }
+
+    @GetMapping("/{id}")
+    public LeaseResponse findById(@PathVariable UUID id) {
+        return leaseService.findById(id);
+    }
+}

@@ -6,6 +6,7 @@ import lombok.*;
 import java.time.Instant;
 import java.util.UUID;
 
+import com.tokenrealty.jpa.entity.BaseEntity;
 @Entity
 @Table(name = "compliance_records",
         uniqueConstraints = @UniqueConstraint(columnNames = "wallet_address"))
