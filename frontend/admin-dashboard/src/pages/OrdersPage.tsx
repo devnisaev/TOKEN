@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -45,7 +46,11 @@ export function OrdersPage() {
             <tbody>
               {data?.content.map((order) => (
                 <tr key={order.id} className="border-b last:border-0">
-                  <td className="px-4 py-3 font-mono text-xs">{order.id?.slice(0, 8)}…</td>
+                  <td className="px-4 py-3 font-mono text-xs">
+                    <Link to={`/orders/${order.id}`} className="text-primary hover:underline">
+                      {order.id?.slice(0, 8)}…
+                    </Link>
+                  </td>
                   <td className="px-4 py-3 font-mono text-xs">{order.buyerId?.slice(0, 8)}…</td>
                   <td className="px-4 py-3">{order.tokenAmount}</td>
                   <td className="px-4 py-3">${order.totalPriceUsd}</td>

@@ -9,6 +9,7 @@ import { DashboardPage } from '@/pages/DashboardPage';
 import { DocumentReviewsPage } from '@/pages/DocumentReviewsPage';
 import { FlatFormPage } from '@/pages/FlatFormPage';
 import { LoginPage } from '@/pages/LoginPage';
+import { OrderDetailPage } from '@/pages/OrderDetailPage';
 import { OrdersPage } from '@/pages/OrdersPage';
 
 export function App() {
@@ -31,6 +32,7 @@ export function App() {
           <Route path="buildings/:buildingId/flats/:flatId/edit" element={<FlatFormPage />} />
           <Route path="buildings/:buildingId" element={<BuildingDetailPage />} />
           <Route path="orders" element={<OrdersPage />} />
+          <Route path="orders/:orderId" element={<OrderDetailPage />} />
           <Route path="compliance" element={<CompliancePage />} />
           <Route path="document-reviews" element={<DocumentReviewsPage />} />
         </Route>

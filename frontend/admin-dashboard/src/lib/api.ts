@@ -9,6 +9,7 @@ import type {
   DocumentReview,
   Flat,
   Order,
+  Trade,
   SpringPage,
   TokenResponse,
   UpdateBuildingRequest,
@@ -119,5 +120,13 @@ export const api = {
 
   listOrders() {
     return request<SpringPage<Order>>('/v1/orders?size=50&sort=createdAt,desc');
+  },
+
+  getOrder(orderId: string) {
+    return request<Order>(`/v1/orders/${orderId}`);
+  },
+
+  getOrderTrade(orderId: string) {
+    return request<Trade>(`/v1/orders/${orderId}/trade`);
   },
 };

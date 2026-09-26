@@ -64,6 +64,12 @@ export interface Order {
   updatedAt?: string;
 }
 
+export interface OrderStatusEvent {
+  orderId: string;
+  orderStatus: string;
+  tradeStatus: string | null;
+}
+
 export interface Trade {
   id: string;
   orderId: string;
