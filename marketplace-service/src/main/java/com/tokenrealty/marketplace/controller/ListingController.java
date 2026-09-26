@@ -47,6 +47,14 @@ public class ListingController {
         return listingService.create(request);
     }
 
+    @PostMapping("/secondary")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('INVESTOR') or hasRole('ADMIN')")
+    @Operation(summary = "Create a secondary listing from holder tokens")
+    public ListingResponse createSecondary(@Valid @RequestBody CreateSecondaryListingRequest request) {
+        return listingService.createSecondary(request);
+    }
+
     @PatchMapping("/{id}/cancel")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROPERTY_MANAGER')")
     @Operation(summary = "Cancel an active listing")

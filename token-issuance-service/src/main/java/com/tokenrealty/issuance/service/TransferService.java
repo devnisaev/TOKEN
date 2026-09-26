@@ -29,18 +29,18 @@ public class TransferService {
     private final TokenContractRepository contractRepository;
     private final TokenHolderRepository holderRepository;
     private final TokenTransferRepository transferRepository;
-    private final ComplianceRecordRepository complianceRepository;
+    private final com.tokenrealty.issuance.client.ComplianceClient complianceClient;
     private final BlockchainConnector blockchain;
 
     public TransferService(TokenContractRepository contractRepository,
                            TokenHolderRepository holderRepository,
                            TokenTransferRepository transferRepository,
-                           ComplianceRecordRepository complianceRepository,
+                           com.tokenrealty.issuance.client.ComplianceClient complianceClient,
                            BlockchainConnector blockchain) {
         this.contractRepository = contractRepository;
         this.holderRepository = holderRepository;
         this.transferRepository = transferRepository;
-        this.complianceRepository = complianceRepository;
+        this.complianceClient = complianceClient;
         this.blockchain = blockchain;
     }
 
@@ -156,14 +156,8 @@ public class TransferService {
     // ─── Helpers ─────────────────────────────────────────────────────────────
 
     private void checkCompliance(String walletAddress, String role) {
-        var record = complianceRepository.findByWalletAddress(walletAddress);
-        if (record.isEmpty()) {
-            throw new ComplianceException(role + " wallet " + walletAddress + " is not registered");
-        }
-        var status = record.get().getStatus();
-        if (status != com.tokenrealty.issuance.entity.ComplianceRecord.ComplianceStatus.APPROVED) {
-            throw new ComplianceException(role + " wallet " + walletAddress
-                    + " is not KYC approved — status: " + status);
+        if (!complianceClient.isWalletApproved(walletAddress)) {
+            throw new ComplianceException(role + " wallet " + walletAddress + " is not KYC approved");
         }
     }
 
@@ -191,9 +185,10 @@ public class TransferService {
                     .divide(BigDecimal.valueOf(contract.getTotalSupply()), 4, RoundingMode.HALF_UP)
                     .multiply(BigDecimal.valueOf(100));
 
-            // Try to find compliance record for this wallet
-            var compliance = complianceRepository.findByWalletAddress(toAddress);
-            UUID investorId = compliance.map(c -> c.getInvestorId()).orElse(UUID.randomUUID());
+            var compliance = complianceClient.checkWallet(toAddress);
+            UUID investorId = compliance != null && compliance.investorId() != null
+                    ? compliance.investorId()
+                    : UUID.randomUUID();
 
             TokenHolder newHolder = TokenHolder.builder()
                     .tokenContract(contract)
@@ -202,7 +197,7 @@ public class TransferService {
                     .balance(amount)
                     .balanceUsd(tokenPrice.multiply(BigDecimal.valueOf(amount)))
                     .ownershipPercentage(ownershipPct)
-                    .kycVerified(compliance.isPresent())
+                    .kycVerified(compliance != null && compliance.whitelisted())
                     .whitelistedOnChain(true)
                     .status(TokenHolder.HolderStatus.ACTIVE)
                     .build();

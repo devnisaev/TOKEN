@@ -44,6 +44,8 @@ services:
     url: ${AUTH_SERVICE_URL:http://localhost:8083/api}
   token-issuance:
     url: ${TOKEN_ISSUANCE_URL:http://localhost:8082/api}
+  compliance:
+    url: ${COMPLIANCE_SERVICE_URL:http://localhost:8087/api}
   payment:
     url: ${PAYMENT_SERVICE_URL:http://localhost:8085/api}
 

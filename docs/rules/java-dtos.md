@@ -9,8 +9,8 @@ Adapted from Titan `java-dtos.mdc`. Cursor rule: [`.cursor/rules/java-dtos.mdc`]
 | Area | TokenRealty |
 |------|-------------|
 | No `Map`/`Object` in controller signatures | Same |
-| Grouped `*Dtos.java` holder classes | `PropertyDtos`, `MarketplaceDtos`, `AuthDtos`, `PaymentDtos` |
-| Typed inter-service client responses | `TokenIssuanceClient`, `PropertyRegistryClient` |
+| Grouped `*Dtos.java` holder classes | `PropertyDtos`, `MarketplaceDtos`, `ComplianceDtos`, `AuthDtos`, `PaymentDtos` |
+| Typed inter-service client responses | `ComplianceClient`, `TokenIssuanceClient`, `PropertyRegistryClient` |
 | `@Valid` on requests | Same |
 | Map only at external/exception boundaries | Hardhat JSON, validation field errors |
 
@@ -31,6 +31,7 @@ Adapted from Titan `java-dtos.mdc`. Cursor rule: [`.cursor/rules/java-dtos.mdc`]
 | Payment | Typed records in `kafka/events/`; port methods take `PaymentConfirmedEvent`, `RentCollectedEvent` |
 | Marketplace | Typed records nested in `kafka/port/*Publisher` interfaces (e.g. `OrderMatchedPublisher.OrderMatchedEvent`) |
 | Issuance | `TransferCompletedPublisher.TransferCompletedEvent` includes `orderId`, `tradeId`, `paymentId` for settlement |
+| Compliance | `KycEventPublisher` port; verify/revoke payloads include `countryCode`, `kycExpiresAt` |
 
 **Consumers:** parse via `kafka/command/*Command.from(KafkaJsonEvent)` — not raw `Map` in listeners. Commands carry only fields the handler needs (e.g. `TransferCompletedCommand` omits wallet addresses).
 

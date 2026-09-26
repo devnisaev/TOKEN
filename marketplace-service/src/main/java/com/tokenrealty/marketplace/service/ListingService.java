@@ -5,6 +5,7 @@ import com.tokenrealty.marketplace.entity.Listing;
 import com.tokenrealty.web.exception.ConflictException;
 import com.tokenrealty.web.exception.ResourceNotFoundException;
 import com.tokenrealty.web.exception.ValidationException;
+import com.tokenrealty.marketplace.client.ComplianceClient;
 import com.tokenrealty.marketplace.client.TokenIssuanceClient;
 import com.tokenrealty.marketplace.kafka.command.FlatTokenizedCommand;
 import com.tokenrealty.marketplace.kafka.port.ListingCreatedPublisher;
@@ -27,6 +28,7 @@ public class ListingService {
     private final MarketplaceMapper mapper;
     private final ListingCreatedPublisher listingCreatedPublisher;
     private final TokenIssuanceClient tokenIssuanceClient;
+    private final ComplianceClient complianceClient;
 
     public Page<ListingResponse> findAll(Listing.ListingStatus status, UUID flatId, Pageable pageable) {
         if (flatId != null) {
@@ -45,10 +47,12 @@ public class ListingService {
     @Transactional
     public ListingResponse create(CreateListingRequest request) {
         validateCreateRequest(request);
-        listingRepository.findByFlatIdAndStatus(request.flatId(), Listing.ListingStatus.ACTIVE)
-                .ifPresent(existing -> {
-                    throw new ConflictException("Active listing already exists for flat " + request.flatId());
-                });
+        if (request.listingType() == Listing.ListingType.PRIMARY) {
+            listingRepository.findByFlatIdAndStatus(request.flatId(), Listing.ListingStatus.ACTIVE)
+                    .ifPresent(existing -> {
+                        throw new ConflictException("Active listing already exists for flat " + request.flatId());
+                    });
+        }
 
         Listing listing = Listing.builder()
                 .flatId(request.flatId())
@@ -62,6 +66,7 @@ public class ListingService {
                 .title(request.title())
                 .description(request.description())
                 .sellerInvestorId(request.sellerInvestorId())
+                .sellerWallet(request.sellerWallet())
                 .build();
 
         Listing saved = listingRepository.save(listing);
@@ -92,6 +97,31 @@ public class ListingService {
                 .description("Auto-created from flat.tokenized event")
                 .build();
         return create(request);
+    }
+
+    @Transactional
+    public ListingResponse createSecondary(CreateSecondaryListingRequest request) {
+        if (!complianceClient.isWalletApproved(request.sellerWallet())) {
+            throw new ValidationException("Seller wallet is not KYC approved");
+        }
+        long balance = tokenIssuanceClient.getHolderBalance(request.contractId(), request.sellerWallet());
+        if (balance < request.tokenAmount()) {
+            throw new ValidationException("Insufficient token balance for secondary listing");
+        }
+
+        CreateListingRequest listingRequest = CreateListingRequest.builder()
+                .flatId(request.flatId())
+                .contractId(request.contractId())
+                .listingType(Listing.ListingType.SECONDARY)
+                .priceUsd(request.priceUsd())
+                .tokensTotal(request.tokenAmount())
+                .minInvestmentTokens(1L)
+                .title(request.title() != null ? request.title() : "Secondary listing")
+                .description(request.description())
+                .sellerInvestorId(request.sellerInvestorId())
+                .sellerWallet(request.sellerWallet())
+                .build();
+        return create(listingRequest);
     }
 
     @Transactional

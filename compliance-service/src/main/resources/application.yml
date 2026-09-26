@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: compliance-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/compliance_service
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+
+server:
+  port: 8087
+  servlet:
+    context-path: /api
+
+tokenrealty:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-change-in-production-min-32-chars!!}
+    issuer: tokenrealty-auth
+  kafka:
+    enabled: ${KAFKA_ENABLED:false}
+    relay:
+      poll-ms: 1000
+      publish-timeout-ms: 10000
+      max-retries: 5
+    topic:
+      kyc-approved: tokenrealty.compliance.investor.kyc-approved.v1
+      kyc-revoked: tokenrealty.compliance.investor.kyc-revoked.v1
+
+jackson2:
+  serialization:
+    write-dates-as-timestamps: false
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    com.tokenrealty: DEBUG

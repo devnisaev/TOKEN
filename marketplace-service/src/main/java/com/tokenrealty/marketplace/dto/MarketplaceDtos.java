@@ -25,7 +25,8 @@ public final class MarketplaceDtos {
             @NotNull @Min(1) Long minInvestmentTokens,
             @Size(max = 500) String title,
             @Size(max = 2000) String description,
-            UUID sellerInvestorId
+            UUID sellerInvestorId,
+            String sellerWallet
     ) {
     }
 
@@ -43,8 +44,35 @@ public final class MarketplaceDtos {
             String title,
             String description,
             UUID sellerInvestorId,
+            String sellerWallet,
             Instant createdAt,
             Instant updatedAt
+    ) {
+    }
+
+    @Builder
+    public record CreateSecondaryListingRequest(
+            @NotNull UUID flatId,
+            @NotNull UUID contractId,
+            @NotNull UUID sellerInvestorId,
+            @NotBlank @Size(max = 66) String sellerWallet,
+            @NotNull @DecimalMin("0.01") BigDecimal priceUsd,
+            @NotNull @Min(1) Long tokenAmount,
+            @Size(max = 500) String title,
+            @Size(max = 2000) String description
+    ) {
+    }
+
+    @Builder
+    public record PlaceSellOrderRequest(
+            @NotNull UUID flatId,
+            @NotNull UUID contractId,
+            @NotNull UUID sellerInvestorId,
+            @NotBlank @Size(max = 66) String sellerWallet,
+            @NotNull @DecimalMin("0.01") BigDecimal priceUsd,
+            @NotNull @Min(1) Long tokenAmount,
+            @Size(max = 500) String title,
+            @Size(max = 2000) String description
     ) {
     }
 
@@ -68,6 +96,8 @@ public final class MarketplaceDtos {
             UUID buyerId,
             UUID sellerId,
             String buyerWallet,
+            String sellerWallet,
+            Listing.ListingType listingType,
             long tokenAmount,
             BigDecimal totalPriceUsd,
             Instant createdAt,
@@ -85,6 +115,8 @@ public final class MarketplaceDtos {
             UUID buyerId,
             UUID sellerId,
             String buyerWallet,
+            String sellerWallet,
+            Listing.ListingType listingType,
             long tokenAmount,
             BigDecimal totalPriceUsd,
             Trade.TradeStatus status,

@@ -30,9 +30,12 @@ tokenrealty:
         target: http://localhost:8082
         paths:
           - /api/v1/tokens
-          - /api/v1/compliance
           - /api/v1/transfers
           - /api/v1/dividends
+      - id: compliance
+        target: http://localhost:8087
+        paths:
+          - /api/v1/compliance
       - id: marketplace
         target: http://localhost:8084
         paths:

@@ -54,6 +54,9 @@ public class Listing extends BaseEntity {
     @Column(name = "seller_investor_id")
     private UUID sellerInvestorId;
 
+    @Column(name = "seller_wallet", length = 66)
+    private String sellerWallet;
+
     public enum ListingType {
         PRIMARY,
         SECONDARY

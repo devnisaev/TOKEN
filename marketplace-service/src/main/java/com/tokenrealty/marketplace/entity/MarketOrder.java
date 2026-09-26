@@ -37,14 +37,21 @@ public class MarketOrder extends BaseEntity {
     @Column(nullable = false, length = 20)
     private OrderStatus status;
 
-    @Column(name = "buyer_id", nullable = false)
+    @Column(name = "buyer_id")
     private UUID buyerId;
 
     @Column(name = "seller_id")
     private UUID sellerId;
 
-    @Column(name = "buyer_wallet", nullable = false, length = 66)
+    @Column(name = "buyer_wallet", length = 66)
     private String buyerWallet;
+
+    @Column(name = "seller_wallet", length = 66)
+    private String sellerWallet;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "listing_type", nullable = false, length = 20)
+    private Listing.ListingType listingType;
 
     @Column(name = "token_amount", nullable = false)
     private long tokenAmount;

@@ -26,6 +26,7 @@
         <module>notification-service</module>
         <module>api-gateway</module>
         <module>rental-service</module>
+        <module>compliance-service</module>
     </modules>
 
     <properties>

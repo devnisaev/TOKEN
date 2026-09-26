@@ -42,8 +42,16 @@ public class OrderController {
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('INVESTOR') or hasRole('ADMIN')")
     @Operation(summary = "Place a buy order on a listing")
-    public OrderResponse placeOrder(@Valid @RequestBody PlaceOrderRequest request) {
+    public OrderResponse placeBuyOrder(@Valid @RequestBody PlaceOrderRequest request) {
         return orderService.placeBuyOrder(request);
+    }
+
+    @PostMapping("/sell")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('INVESTOR') or hasRole('ADMIN')")
+    @Operation(summary = "Place a secondary sell order (creates listing)")
+    public OrderResponse placeSellOrder(@Valid @RequestBody PlaceSellOrderRequest request) {
+        return orderService.placeSellOrder(request);
     }
 
     @GetMapping("/{id}/trade")

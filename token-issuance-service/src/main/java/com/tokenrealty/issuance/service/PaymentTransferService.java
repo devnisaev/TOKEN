@@ -28,8 +28,11 @@ public class PaymentTransferService {
             return;
         }
         var contract = tokenIssuanceService.findByFlatId(trade.flatId());
+        String fromWallet = "SECONDARY".equals(trade.listingType())
+                ? trade.sellerWallet()
+                : contract.spvWalletAddress();
         TransferRequest request = new TransferRequest(
-                contract.spvWalletAddress(),
+                fromWallet,
                 trade.buyerWallet(),
                 trade.tokenAmount(),
                 contract.tokenPriceUsd());
@@ -41,7 +44,7 @@ public class PaymentTransferService {
                 trade.orderId(),
                 trade.id(),
                 command.paymentId(),
-                contract.spvWalletAddress(),
+                fromWallet,
                 trade.buyerWallet(),
                 trade.tokenAmount(),
                 transfer.txHash(),

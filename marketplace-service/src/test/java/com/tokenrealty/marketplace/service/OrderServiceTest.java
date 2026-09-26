@@ -1,7 +1,7 @@
 package com.tokenrealty.marketplace.service;
 
+import com.tokenrealty.marketplace.client.ComplianceClient;
 import com.tokenrealty.marketplace.client.PaymentClient;
-import com.tokenrealty.marketplace.client.TokenIssuanceClient;
 import com.tokenrealty.marketplace.dto.MarketplaceDtos.PlaceOrderRequest;
 import com.tokenrealty.marketplace.dto.MarketplaceDtos.OrderResponse;
 import com.tokenrealty.marketplace.kafka.command.PaymentConfirmedCommand;
@@ -40,8 +40,9 @@ class OrderServiceTest {
     @Mock MarketOrderRepository orderRepository;
     @Mock ListingRepository listingRepository;
     @Mock TradeRepository tradeRepository;
-    @Mock TokenIssuanceClient tokenIssuanceClient;
+    @Mock ComplianceClient complianceClient;
     @Mock PaymentClient paymentClient;
+    @Mock ListingService listingService;
     @Mock MarketplaceMapper mapper;
     @Mock OrderMatchedPublisher orderMatchedPublisher;
     @Mock TradeSettledPublisher tradeSettledPublisher;
@@ -76,8 +77,7 @@ class OrderServiceTest {
                 .build();
 
         when(listingRepository.findById(listingId)).thenReturn(Optional.of(listing));
-        when(tokenIssuanceClient.checkWallet("0xabc"))
-                .thenReturn(new TokenIssuanceClient.ComplianceCheckResponse("0xabc", false, "PENDING"));
+        when(complianceClient.isWalletApproved("0xabc")).thenReturn(false);
 
         assertThatThrownBy(() -> orderService.placeBuyOrder(request))
                 .isInstanceOf(ValidationException.class);
@@ -97,6 +97,7 @@ class OrderServiceTest {
         MarketOrder savedOrder = MarketOrder.builder()
                 .listingId(listingId)
                 .flatId(listing.getFlatId())
+                .listingType(Listing.ListingType.PRIMARY)
                 .orderType(MarketOrder.OrderType.BUY)
                 .status(MarketOrder.OrderStatus.MATCHED)
                 .buyerId(buyerId)
@@ -110,6 +111,7 @@ class OrderServiceTest {
                 .orderId(savedOrder.getId())
                 .listingId(listingId)
                 .flatId(listing.getFlatId())
+                .listingType(Listing.ListingType.PRIMARY)
                 .buyerId(buyerId)
                 .tokenAmount(10L)
                 .totalPriceUsd(new BigDecimal("100.00"))
@@ -118,8 +120,7 @@ class OrderServiceTest {
         trade.setId(UUID.randomUUID());
 
         when(listingRepository.findById(listingId)).thenReturn(Optional.of(listing));
-        when(tokenIssuanceClient.checkWallet("0xabc"))
-                .thenReturn(new TokenIssuanceClient.ComplianceCheckResponse("0xabc", true, "APPROVED"));
+        when(complianceClient.isWalletApproved("0xabc")).thenReturn(true);
         UUID paymentId = UUID.randomUUID();
         when(orderRepository.save(any(MarketOrder.class))).thenReturn(savedOrder);
         when(tradeRepository.save(any(Trade.class))).thenReturn(trade);

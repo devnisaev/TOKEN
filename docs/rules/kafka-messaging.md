@@ -74,7 +74,8 @@ Spring conventions: [spring-java-services.md](spring-java-services.md)
 - [x] Payment: consume `dividend.distributed` → create `DIVIDEND` payouts per holder
 - [x] Token Issuance: publish `transfer.completed`; consume `payment.confirmed`
 - [x] Token Issuance: publish `dividend.distributed`; consume `rent.collected` (Kafka → `DividendService.distribute()`)
-- [ ] Token Issuance: consume `kyc-approved`
+- [x] Compliance: publish `kyc-approved`, `kyc-revoked` via outbox
+- [x] Token Issuance: consume `kyc-approved`, `kyc-revoked` → on-chain whitelist sync
 
 ---
 
@@ -262,16 +263,26 @@ Rules:
 
 ## Automated buy flow (implemented)
 
-Event-driven primary-market settlement (replaces admin `PATCH /orders/{id}/settle` when Kafka enabled):
+Event-driven settlement for primary and secondary listings (replaces admin `PATCH /orders/{id}/settle` when Kafka enabled):
 
 ```text
-1. POST /v1/orders (BUY)     → match + PaymentClient escrow (sync)
+1. POST /v1/orders (BUY)     → KYC via Compliance; match + PaymentClient escrow (sync)
 2. POST /v1/payments/{id}/confirm → payment.confirmed (outbox → Kafka)
 3. Marketplace consumer    → trade.status = PAID
 4. Issuance consumer       → TransferService.transfer (on-chain)
+                             PRIMARY: SPV → buyer | SECONDARY: seller → buyer
                            → transfer.completed (outbox → Kafka)
 5. Marketplace consumer    → trade.status = SETTLED + PaymentClient.releaseEscrow
                            → trade.settled event
+```
+
+KYC verify/revoke (Compliance → Issuance):
+
+```text
+1. PATCH /v1/compliance/{id}/verify  → kyc-approved (outbox → Kafka)
+2. Issuance consumer                 → OnChainWhitelistService.whitelist(wallet)
+3. PATCH /v1/compliance/{id}/revoke  → kyc-revoked (outbox → Kafka)
+4. Issuance consumer                 → OnChainWhitelistService.revoke(wallet)
 ```
 
 | Step | Topic | Consumer service | Handler |
@@ -289,7 +300,9 @@ Inter-service REST (service JWT):
 |--------|--------|----------|
 | Issuance → Marketplace | `MarketplaceClient` | `GET /v1/orders/{id}/trade` |
 | Marketplace → Payment | `PaymentClient` | `POST /v1/payments`, `PATCH /v1/payments/{id}/release` |
-| Marketplace → Issuance | `TokenIssuanceClient` | `GET /v1/tokens/by-flat/{flatId}`, `GET /v1/compliance/check/{wallet}` |
+| Marketplace → Compliance | `ComplianceClient` | `GET /v1/compliance/check/{wallet}` |
+| Marketplace → Issuance | `TokenIssuanceClient` | `GET /v1/tokens/by-flat/{flatId}`, `GET /v1/tokens/{contractId}/holders/by-wallet/{wallet}` |
+| Issuance → Compliance | `ComplianceClient` | `GET /v1/compliance/check/{wallet}` (transfer KYC gate) |
 
 **Dev auto-confirm:** `PaymentAutoConfirmWorker` polls `PENDING` payments when `tokenrealty.payment.auto-confirm.enabled=true` (`PAYMENT_AUTO_CONFIRM` env or `local` profile). Uses `0xSIMULATED_{paymentId}` tx hash. Production still needs on-chain deposit detection.
 

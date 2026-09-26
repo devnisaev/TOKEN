@@ -1,12 +1,12 @@
-package com.tokenrealty.issuance.entity;
+package com.tokenrealty.compliance.entity;
 
+import com.tokenrealty.jpa.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
 import java.util.UUID;
 
-import com.tokenrealty.jpa.entity.BaseEntity;
 @Entity
 @Table(name = "compliance_records",
         uniqueConstraints = @UniqueConstraint(columnNames = "wallet_address"))
@@ -27,10 +27,10 @@ public class ComplianceRecord extends BaseEntity {
     private String fullName;
 
     @Column(name = "country_code", length = 2)
-    private String countryCode;   // ISO 3166-1 alpha-2
+    private String countryCode;
 
     @Column(name = "kyc_provider")
-    private String kycProvider;   // e.g. "Sumsub", "Onfido"
+    private String kycProvider;
 
     @Column(name = "kyc_reference_id")
     private String kycReferenceId;
@@ -41,17 +41,6 @@ public class ComplianceRecord extends BaseEntity {
     @Column(name = "kyc_expires_at")
     private Instant kycExpiresAt;
 
-    // Whether this wallet is whitelisted in the on-chain ComplianceRegistry contract
-    @Column(name = "on_chain_whitelisted", nullable = false)
-    @Builder.Default
-    private Boolean onChainWhitelisted = false;
-
-    @Column(name = "whitelist_tx_hash")
-    private String whitelistTxHash;
-
-    @Column(name = "whitelisted_at")
-    private Instant whitelistedAt;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
@@ -61,10 +50,10 @@ public class ComplianceRecord extends BaseEntity {
     private String rejectionReason;
 
     public enum ComplianceStatus {
-        PENDING,     // KYC submitted, not yet reviewed
-        APPROVED,    // KYC passed, wallet whitelisted
-        REJECTED,    // KYC failed
-        EXPIRED,     // KYC valid period elapsed — needs renewal
-        REVOKED      // Manually revoked by compliance team
+        PENDING,
+        APPROVED,
+        REJECTED,
+        EXPIRED,
+        REVOKED
     }
 }

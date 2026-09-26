@@ -54,6 +54,21 @@ public class OwnershipController {
                 .orElseThrow(() -> new ResourceNotFoundException("TokenHolder", holderId));
     }
 
+    @GetMapping("/by-wallet/{walletAddress}")
+    @Operation(summary = "Get holder balance by wallet address")
+    public HolderBalanceResponse getHolderByWallet(
+            @PathVariable UUID contractId,
+            @PathVariable String walletAddress) {
+        TokenHolder holder = holderRepository
+                .findByTokenContractIdAndWalletAddress(contractId, walletAddress)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Holder not found for wallet: " + walletAddress));
+        return new HolderBalanceResponse(contractId, holder.getWalletAddress(), holder.getBalance());
+    }
+
+    public record HolderBalanceResponse(UUID contractId, String walletAddress, long balance) {
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")

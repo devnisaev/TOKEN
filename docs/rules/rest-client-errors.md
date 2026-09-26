@@ -28,9 +28,10 @@ Domain clients (`PaymentClient`, `TokenIssuanceClient`, …) stay per-service. S
 | Client | Service | Calls | Auth |
 |--------|---------|-------|------|
 | `PropertyRegistryClient` | Token Issuance → Registry | GET flat, GET SPV, PATCH token-info | Service token |
-| `TokenIssuanceClient` | Marketplace → Issuance | Compliance check, contract by flat, transfer | Service token |
+| `ComplianceClient` | Marketplace, Issuance → Compliance | KYC check (`isWhitelisted`, `investorId`) | Service token |
+| `TokenIssuanceClient` | Marketplace → Issuance | Contract by flat, holder balance by wallet, transfer | Service token |
 | `PaymentClient` | Marketplace, Rental → Payment | Initiate escrow, release escrow, payouts | Service token |
-| `MarketplaceClient` | Token Issuance → Marketplace | GET trade by orderId | Service token |
+| `MarketplaceClient` | Token Issuance → Marketplace | GET trade by orderId (`listingType`, `sellerWallet`) | Service token |
 
 ## Service name prefixes
 
@@ -40,6 +41,7 @@ Domain clients (`PaymentClient`, `TokenIssuanceClient`, …) stay per-service. S
 | Token Issuance | `token_issuance_` |
 | Marketplace | `marketplace_` |
 | Payment | `payment_` |
+| Compliance | `compliance_` |
 | Auth | `auth_` |
 
 ## Target behavior

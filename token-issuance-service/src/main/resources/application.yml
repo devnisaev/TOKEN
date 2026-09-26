@@ -66,6 +66,8 @@ services:
     url: ${PROPERTY_REGISTRY_URL:http://localhost:8081/api}
   marketplace:
     url: ${MARKETPLACE_SERVICE_URL:http://localhost:8084/api}
+  compliance:
+    url: ${COMPLIANCE_SERVICE_URL:http://localhost:8087/api}
 
 tokenrealty:
   jwt:
@@ -85,6 +87,8 @@ tokenrealty:
       rent-collected: tokenrealty.payment.rent.collected.v1
       transfer-completed: tokenrealty.issuance.transfer.completed.v1
       dividend-distributed: tokenrealty.issuance.dividend.distributed.v1
+      kyc-approved: tokenrealty.compliance.investor.kyc-approved.v1
+      kyc-revoked: tokenrealty.compliance.investor.kyc-revoked.v1
 
 feign:
   client:

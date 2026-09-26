@@ -41,6 +41,8 @@ Additional Cursor rules (no separate human doc yet):
 | Auth | [auth-service/README.md](../auth-service/README.md) | 8083 |
 | Marketplace | [marketplace-service/README.md](../marketplace-service/README.md) | 8084 |
 | Payment | [payment-service/README.md](../payment-service/README.md) | 8085 |
+| Rental | [rental-service/README.md](../rental-service/README.md) | 8086 |
+| Compliance | — | 8087 |
 
 ## Diagrams (PlantUML)
 

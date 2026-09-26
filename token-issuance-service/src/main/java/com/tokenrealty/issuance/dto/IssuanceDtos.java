@@ -125,45 +125,4 @@ public class IssuanceDtos {
             String status
     ) {}
 
-    // ─── Compliance ──────────────────────────────────────────────────────────
-
-    public record RegisterComplianceRequest(
-            @NotNull UUID investorId,
-            @NotBlank String walletAddress,
-            String fullName,
-            @Size(min = 2, max = 2) String countryCode,
-            String kycProvider,
-            String kycReferenceId
-    ) {}
-
-    public record ComplianceVerifyRequest(
-            @NotNull UUID investorId,
-            @NotNull Instant kycExpiresAt
-    ) {}
-
-    public record ComplianceRecordResponse(
-            UUID id,
-            UUID investorId,
-            String walletAddress,
-            String fullName,
-            String countryCode,
-            String kycProvider,
-            Boolean onChainWhitelisted,
-            String whitelistTxHash,
-            Instant whitelistedAt,
-            Instant kycVerifiedAt,
-            Instant kycExpiresAt,
-            ComplianceRecord.ComplianceStatus status,
-            String rejectionReason,
-            Instant createdAt
-    ) {}
-
-    public record ComplianceCheckResponse(
-            String walletAddress,
-            boolean isWhitelisted,
-            boolean isOnChain,
-            ComplianceRecord.ComplianceStatus status,
-            String countryCode,
-            Instant expiresAt
-    ) {}
 }

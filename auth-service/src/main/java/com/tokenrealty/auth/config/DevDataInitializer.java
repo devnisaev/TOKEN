@@ -37,6 +37,7 @@ public class DevDataInitializer implements ApplicationRunner {
         seedServiceAccount("token-issuance", "issuance-secret", User.UserRole.ADMIN);
         seedServiceAccount("marketplace", "marketplace-secret", User.UserRole.ADMIN);
         seedServiceAccount("rental", "rental-secret", User.UserRole.ADMIN);
+        seedServiceAccount("compliance", "compliance-secret", User.UserRole.ADMIN);
     }
 
     private void seedUser(String email, String password, User.UserRole role) {

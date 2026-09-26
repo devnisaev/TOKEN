@@ -1,13 +1,11 @@
 package com.tokenrealty.marketplace.service;
 
+import com.tokenrealty.marketplace.client.ComplianceClient;
 import com.tokenrealty.marketplace.client.PaymentClient;
-import com.tokenrealty.marketplace.client.TokenIssuanceClient;
 import com.tokenrealty.marketplace.dto.MarketplaceDtos.*;
 import com.tokenrealty.marketplace.entity.Listing;
 import com.tokenrealty.marketplace.entity.MarketOrder;
 import com.tokenrealty.marketplace.entity.Trade;
-import com.tokenrealty.web.exception.ResourceNotFoundException;
-import com.tokenrealty.web.exception.ValidationException;
 import com.tokenrealty.marketplace.kafka.command.PaymentConfirmedCommand;
 import com.tokenrealty.marketplace.kafka.command.TransferCompletedCommand;
 import com.tokenrealty.marketplace.kafka.port.OrderMatchedPublisher;
@@ -16,6 +14,8 @@ import com.tokenrealty.marketplace.mapper.MarketplaceMapper;
 import com.tokenrealty.marketplace.repository.ListingRepository;
 import com.tokenrealty.marketplace.repository.MarketOrderRepository;
 import com.tokenrealty.marketplace.repository.TradeRepository;
+import com.tokenrealty.web.exception.ResourceNotFoundException;
+import com.tokenrealty.web.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,8 +34,9 @@ public class OrderService {
     private final MarketOrderRepository orderRepository;
     private final ListingRepository listingRepository;
     private final TradeRepository tradeRepository;
-    private final TokenIssuanceClient tokenIssuanceClient;
+    private final ComplianceClient complianceClient;
     private final PaymentClient paymentClient;
+    private final ListingService listingService;
     private final MarketplaceMapper mapper;
     private final OrderMatchedPublisher orderMatchedPublisher;
     private final TradeSettledPublisher tradeSettledPublisher;
@@ -58,7 +59,11 @@ public class OrderService {
     public OrderResponse placeBuyOrder(PlaceOrderRequest request) {
         Listing listing = getActiveListing(request.listingId());
         validateOrderRequest(request, listing);
-        assertBuyerWhitelisted(request.buyerWallet());
+        assertWalletApproved(request.buyerWallet(), "Buyer");
+        if (listing.getListingType() == Listing.ListingType.SECONDARY
+                && listing.getSellerWallet() != null) {
+            assertWalletApproved(listing.getSellerWallet(), "Seller");
+        }
 
         listing.setTokensAvailable(listing.getTokensAvailable() - request.tokenAmount());
         if (listing.getTokensAvailable() == 0) {
@@ -73,11 +78,13 @@ public class OrderService {
                 .listingId(listing.getId())
                 .flatId(listing.getFlatId())
                 .contractId(listing.getContractId())
+                .listingType(listing.getListingType())
                 .orderType(MarketOrder.OrderType.BUY)
                 .status(MarketOrder.OrderStatus.MATCHED)
                 .buyerId(request.buyerId())
                 .sellerId(listing.getSellerInvestorId())
                 .buyerWallet(request.buyerWallet())
+                .sellerWallet(listing.getSellerWallet())
                 .tokenAmount(request.tokenAmount())
                 .totalPriceUsd(totalPrice)
                 .build();
@@ -85,18 +92,45 @@ public class OrderService {
         MarketOrder savedOrder = orderRepository.save(order);
         Trade trade = createPendingTrade(savedOrder);
         linkEscrowPayment(savedOrder, trade);
-        orderMatchedPublisher.publishOrderMatched(new OrderMatchedPublisher.OrderMatchedEvent(
-                savedOrder.getId(),
-                trade.getId(),
-                savedOrder.getListingId(),
-                savedOrder.getFlatId(),
-                savedOrder.getContractId(),
-                savedOrder.getBuyerId(),
-                savedOrder.getSellerId(),
-                savedOrder.getTokenAmount(),
-                savedOrder.getTotalPriceUsd(),
-                trade.getPaymentId()));
+        publishOrderMatched(savedOrder, trade);
         return mapper.toOrderResponse(savedOrder);
+    }
+
+    @Transactional
+    public OrderResponse placeSellOrder(PlaceSellOrderRequest request) {
+        ListingResponse listingResponse = listingService.createSecondary(CreateSecondaryListingRequest.builder()
+                .flatId(request.flatId())
+                .contractId(request.contractId())
+                .sellerInvestorId(request.sellerInvestorId())
+                .sellerWallet(request.sellerWallet())
+                .priceUsd(request.priceUsd())
+                .tokenAmount(request.tokenAmount())
+                .title(request.title())
+                .description(request.description())
+                .build());
+
+        Listing listing = listingRepository.findById(listingResponse.id())
+                .orElseThrow(() -> new ResourceNotFoundException("Listing not found: " + listingResponse.id()));
+
+        BigDecimal totalPrice = listing.getPriceUsd()
+                .multiply(BigDecimal.valueOf(request.tokenAmount()))
+                .setScale(2, RoundingMode.HALF_UP);
+
+        MarketOrder order = MarketOrder.builder()
+                .listingId(listing.getId())
+                .flatId(listing.getFlatId())
+                .contractId(listing.getContractId())
+                .listingType(Listing.ListingType.SECONDARY)
+                .orderType(MarketOrder.OrderType.SELL)
+                .status(MarketOrder.OrderStatus.MATCHED)
+                .sellerId(request.sellerInvestorId())
+                .sellerWallet(request.sellerWallet())
+                .tokenAmount(request.tokenAmount())
+                .totalPriceUsd(totalPrice)
+                .build();
+
+        MarketOrder saved = orderRepository.save(order);
+        return mapper.toOrderResponse(saved);
     }
 
     @Transactional
@@ -187,13 +221,29 @@ public class OrderService {
                 .listingId(order.getListingId())
                 .flatId(order.getFlatId())
                 .contractId(order.getContractId())
+                .listingType(order.getListingType())
                 .buyerId(order.getBuyerId())
                 .sellerId(order.getSellerId())
+                .sellerWallet(order.getSellerWallet())
                 .tokenAmount(order.getTokenAmount())
                 .totalPriceUsd(order.getTotalPriceUsd())
                 .status(Trade.TradeStatus.PENDING)
                 .build();
         return tradeRepository.save(trade);
+    }
+
+    private void publishOrderMatched(MarketOrder savedOrder, Trade trade) {
+        orderMatchedPublisher.publishOrderMatched(new OrderMatchedPublisher.OrderMatchedEvent(
+                savedOrder.getId(),
+                trade.getId(),
+                savedOrder.getListingId(),
+                savedOrder.getFlatId(),
+                savedOrder.getContractId(),
+                savedOrder.getBuyerId(),
+                savedOrder.getSellerId(),
+                savedOrder.getTokenAmount(),
+                savedOrder.getTotalPriceUsd(),
+                trade.getPaymentId()));
     }
 
     private Listing getActiveListing(UUID listingId) {
@@ -214,10 +264,9 @@ public class OrderService {
         }
     }
 
-    private void assertBuyerWhitelisted(String wallet) {
-        TokenIssuanceClient.ComplianceCheckResponse check = tokenIssuanceClient.checkWallet(wallet);
-        if (check == null || !check.whitelisted()) {
-            throw new ValidationException("Buyer wallet is not KYC whitelisted");
+    private void assertWalletApproved(String wallet, String role) {
+        if (!complianceClient.isWalletApproved(wallet)) {
+            throw new ValidationException(role + " wallet is not KYC approved");
         }
     }
 

@@ -33,7 +33,7 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/v1/orders/**")
+                        .requestMatchers(HttpMethod.POST, "/v1/orders/**", "/v1/listings/secondary")
                         .hasAnyRole("INVESTOR", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/v1/**")
                         .hasAnyRole("ADMIN", "PROPERTY_MANAGER")

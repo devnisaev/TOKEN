@@ -30,6 +30,8 @@ public class MarketplaceClient {
             UUID contractId,
             UUID buyerId,
             String buyerWallet,
+            String sellerWallet,
+            String listingType,
             long tokenAmount,
             BigDecimal totalPriceUsd,
             String status,

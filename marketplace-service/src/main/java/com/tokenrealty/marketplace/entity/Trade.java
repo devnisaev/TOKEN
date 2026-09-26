@@ -37,6 +37,13 @@ public class Trade extends BaseEntity {
     @Column(name = "seller_id")
     private UUID sellerId;
 
+    @Column(name = "seller_wallet", length = 66)
+    private String sellerWallet;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "listing_type", nullable = false, length = 20)
+    private Listing.ListingType listingType;
+
     @Column(name = "token_amount", nullable = false)
     private long tokenAmount;
 

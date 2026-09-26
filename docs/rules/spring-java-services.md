@@ -100,6 +100,7 @@ adapter/in/web → application/service → adapter/out/{persistence,client,kafka
 | Payment | 8085 | `com.tokenrealty.payment` | Layered + escrow + kafka in/out |
 | Notification | 8089 | `com.tokenrealty.notification` | Kafka consumer stub only |
 | Rental | 8086 | `com.tokenrealty.rental` | Layered + Payment client |
+| Compliance | 8087 | `com.tokenrealty.compliance` | Layered + KYC outbox |
 
 ### API Gateway (edge)
 

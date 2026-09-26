@@ -19,11 +19,25 @@ public class TokenIssuanceClient {
         this.restClient = restClient;
     }
 
-    public ComplianceCheckResponse checkWallet(String walletAddress) {
-        return restClient.get()
-                .uri("/v1/compliance/check/{walletAddress}", walletAddress)
-                .retrieve()
-                .body(ComplianceCheckResponse.class);
+    public long getHolderBalance(UUID contractId, String walletAddress) {
+        try {
+            HolderBalanceResponse response = restClient.get()
+                    .uri("/v1/tokens/{contractId}/holders/by-wallet/{walletAddress}",
+                            contractId, walletAddress)
+                    .retrieve()
+                    .body(HolderBalanceResponse.class);
+            return response != null ? response.balance() : 0L;
+        } catch (RestClientResponseException ex) {
+            if (ex.getStatusCode().value() == 404) {
+                return 0L;
+            }
+            if (ex.getStatusCode().is5xxServerError()) {
+                throw new ValidationException("Token Issuance service unavailable");
+            }
+            throw new ValidationException("Holder lookup failed: " + ex.getStatusText());
+        } catch (ResourceAccessException ex) {
+            throw new ValidationException("Token Issuance service unavailable");
+        }
     }
 
     public TokenContractResponse getContractByFlatId(UUID flatId) {
@@ -59,10 +73,10 @@ public class TokenIssuanceClient {
         }
     }
 
-    public record ComplianceCheckResponse(
+    public record HolderBalanceResponse(
+            UUID contractId,
             String walletAddress,
-            boolean whitelisted,
-            String status
+            long balance
     ) {
     }
 
