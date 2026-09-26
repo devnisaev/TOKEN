@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tokenrealty.dev/schemas/payment.confirmed.schema.json",
+  "title": "PaymentConfirmed payload",
+  "description": "tokenrealty.payment.payment.confirmed.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["paymentId", "orderId", "payerId", "amount", "confirmedAt"],
+  "properties": {
+    "paymentId": { "type": "string", "format": "uuid" },
+    "orderId": { "type": "string", "format": "uuid" },
+    "payerId": { "type": "string", "format": "uuid" },
+    "amount": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "currency"],
+      "properties": {
+        "value": {
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d{1,2})?$"
+        },
+        "currency": {
+          "type": "string",
+          "enum": ["USDC"]
+        }
+      }
+    },
+    "txHash": {
+      "type": "string",
+      "pattern": "^0x[a-fA-F0-9]{64}$"
+    },
+    "confirmedAt": { "type": "string", "format": "date-time" }
+  }
+}

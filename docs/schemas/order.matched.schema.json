@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tokenrealty.dev/schemas/order.matched.schema.json",
+  "title": "OrderMatched payload",
+  "description": "tokenrealty.marketplace.order.matched.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "orderId",
+    "listingId",
+    "flatId",
+    "buyerId",
+    "tokenAmount",
+    "totalPriceUsd"
+  ],
+  "properties": {
+    "orderId": { "type": "string", "format": "uuid" },
+    "listingId": { "type": "string", "format": "uuid" },
+    "flatId": { "type": "string", "format": "uuid" },
+    "contractId": { "type": "string", "format": "uuid" },
+    "buyerId": { "type": "string", "format": "uuid" },
+    "sellerId": { "type": "string", "format": "uuid" },
+    "tokenAmount": { "type": "integer", "minimum": 1 },
+    "totalPriceUsd": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,2})?$"
+    }
+  }
+}

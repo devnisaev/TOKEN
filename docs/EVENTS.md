@@ -1,7 +1,8 @@
 # TokenRealty — Kafka Event Catalog
 
 > Canonical list of topics, publishers, consumers, and payload shapes.  
-> Conventions: [rules/kafka-messaging.md](rules/kafka-messaging.md) · Spec: [PLATFORM-SPEC.md](PLATFORM-SPEC.md) §6
+> Conventions: [rules/kafka-messaging.md](rules/kafka-messaging.md) · Spec: [PLATFORM-SPEC.md](PLATFORM-SPEC.md) §6  
+> JSON Schema (settlement flow): [schemas/](schemas/)
 
 ---
 

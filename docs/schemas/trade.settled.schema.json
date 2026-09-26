@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tokenrealty.dev/schemas/trade.settled.schema.json",
+  "title": "TradeSettled payload",
+  "description": "tokenrealty.marketplace.trade.settled.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tradeId", "orderId", "listingId", "paymentId", "transferId"],
+  "properties": {
+    "tradeId": { "type": "string", "format": "uuid" },
+    "orderId": { "type": "string", "format": "uuid" },
+    "listingId": { "type": "string", "format": "uuid" },
+    "paymentId": { "type": "string", "format": "uuid" },
+    "transferId": { "type": "string", "format": "uuid" }
+  }
+}

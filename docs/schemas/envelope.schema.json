@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tokenrealty.dev/schemas/envelope.schema.json",
+  "title": "TokenRealty Kafka Envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["eventId", "eventType", "occurredAt", "payload"],
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique idempotency key for consumers"
+    },
+    "eventType": {
+      "type": "string",
+      "pattern": "^tokenrealty\\.[a-z0-9-]+\\.[a-z0-9-]+\\.[a-z0-9-]+\\.v[0-9]+$"
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "traceId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "payload": {
+      "type": "object"
+    }
+  }
+}

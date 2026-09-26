@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tokenrealty.dev/schemas/transfer.completed.schema.json",
+  "title": "TransferCompleted payload",
+  "description": "tokenrealty.issuance.transfer.completed.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["transferId", "contractId", "from", "to", "amount"],
+  "properties": {
+    "transferId": { "type": "string", "format": "uuid" },
+    "contractId": { "type": "string", "format": "uuid" },
+    "orderId": { "type": "string", "format": "uuid" },
+    "from": {
+      "type": "string",
+      "pattern": "^0x[a-fA-F0-9]{40}$"
+    },
+    "to": {
+      "type": "string",
+      "pattern": "^0x[a-fA-F0-9]{40}$"
+    },
+    "amount": { "type": "integer", "minimum": 1 },
+    "txHash": {
+      "type": "string",
+      "pattern": "^0x[a-fA-F0-9]{64}$"
+    },
+    "completedAt": { "type": "string", "format": "date-time" }
+  }
+}
