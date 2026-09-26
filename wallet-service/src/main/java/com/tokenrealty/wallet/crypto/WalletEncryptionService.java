@@ -14,7 +14,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 @Service
-public class WalletEncryptionService {
+public class WalletEncryptionService implements KmsWalletEncryptionService {
 
     private static final String ALGORITHM = "AES/GCM/NoPadding";
     private static final int IV_LENGTH = 12;
