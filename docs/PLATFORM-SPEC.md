@@ -350,7 +350,7 @@ Examples: `tokenrealty.registry.flat-tokenized`, `tokenrealty.marketplace.order-
 ### 6.3 Kafka setup TODO
 
 - [x] Kafka (KRaft) in `docker-compose.yml` — `docker compose --profile kafka up -d` from repo root
-- [ ] Define shared event schema (Avro or JSON Schema in `docs/schemas/`)
+- [x] Define shared event schema (JSON Schema in `docs/schemas/` — settlement-flow payloads)
 - [x] Create `tokenrealty-events` shared library (Java records + serializers)
 - [x] Add `@KafkaListener` stubs in each service as they are built
 
@@ -483,7 +483,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 
 - [x] Root `docker-compose.yml` with Kafka profile (Schema Registry optional — not required for JSON events)
 - [x] Shared event library (`tokenrealty-events/`)
-- [ ] Define all event schemas (see Section 6.2)
+- [x] Define settlement-flow event schemas (see `docs/schemas/`; full catalog in Section 6.2 / EVENTS.md)
 - [x] Add Kafka producers to Property Registry (BuildingApproved, FlatTokenized)
 - [x] Add Kafka consumers in Notification Service (email + preference-aware delivery)
 

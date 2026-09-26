@@ -130,7 +130,7 @@ Gateway CORS allows `http://localhost:5173` (`tokenrealty.gateway.cors.allowed-o
 
 - **Never** call service ports directly from the browser — always gateway `:8080/api`
 - Shared fetch + types: `@tokenrealty/shared-api-client` (BFF types from `shared-api-types/gateway.ts`); app re-exports in `src/types/api.ts`
-- Shared layout/components: `@tokenrealty/shared-ui` (`AppShell`, `ShellHeader`, `OrderStatusTimeline`, shadcn primitives)
+- Shared layout/components: `@tokenrealty/shared-ui` (`AppShell`, `ShellHeader`, `OrderStatusTimeline`, `SettlementAuditTrail`, shadcn primitives)
 - Errors: parse RFC 7807 `detail` from ProblemDetail responses
 - No secrets in frontend env — JWT from login only
 - Prefer BFF endpoints over N+1 calls to Registry + Marketplace + Issuance

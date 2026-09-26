@@ -9,6 +9,7 @@ Central documentation for the TokenRealty real-estate tokenization platform.
 | [**PLATFORM-SPEC.md**](PLATFORM-SPEC.md) | Master implementation spec & TODO backlog |
 | [**PLATFORM-SPEC.html**](PLATFORM-SPEC.html) | HTML version (browser-friendly) |
 | [**EVENTS.md**](EVENTS.md) | Kafka topic catalog and payload schemas |
+| [**schemas/**](schemas/) | JSON Schema contracts for settlement-flow Kafka payloads |
 | [**BUSINESS_RULES.md**](BUSINESS_RULES.md) | Tier-1 platform invariants (money, KYC, outbox, flows) |
 | [**hardhat-demo.md**](hardhat-demo.md) | Local on-chain demo: invest → token → dividend |
 | Demo infra script | [`../scripts/demo-start.sh`](../scripts/demo-start.sh) — Postgres + Kafka + Jaeger + startup checklist |

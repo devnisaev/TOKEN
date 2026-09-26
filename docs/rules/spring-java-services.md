@@ -268,7 +268,7 @@ Lightweight integration tests for `RestClient` wrappers without a full Spring co
 
 Pattern: start `WireMockServer` on a fixed port, build `RestClient` with `JdkClientHttpRequestFactory` (PATCH support), stub `/api/v1/flats/.+/token-info` when base URL includes `/api`.
 
-Run: `./mvnw test -Dtest=PropertyRegistryClientIntegrationTest` in `token-issuance-service/`.
+Run: `./mvnw test -Dtest=PropertyRegistryClientIntegrationTest` in `token-issuance-service/`. CI job: `issuance-integration-test`.
 
 ---
 

@@ -19,6 +19,7 @@ Spring conventions: [spring-java-services.md](spring-java-services.md)
 | Shared parse helper | `KafkaJsonEvent.consume` in `tokenrealty-events`; ingest + idempotency in `tokenrealty-kafka` |
 | DLQ after retries | `<topic>.dlq` |
 | Schema evolution | Additive in v1; breaking → v2 topic |
+| JSON Schema contracts | Settlement-flow payloads in [docs/schemas/](../schemas/) |
 | Dedicated `*KafkaConfig` | `@EnableKafka` + `NewTopic` beans separated from app config |
 
 ## What we simplified
