@@ -69,6 +69,9 @@ public class PropertyRegistryClient extends DownstreamRestClientSupport {
             String status,
             String propertyCategory,
             String cadastralReference,
+            String energyEfficiencyRating,
+            String zoningCode,
+            Integer lastRenovationYear,
             int flatCount,
             List<FlatSummaryView> flats,
             SpvSummaryView spv

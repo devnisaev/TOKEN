@@ -1,7 +1,5 @@
 export type {
   ApiError,
-  BuildingBffDetail,
-  CreateBuildingRequest,
   CreateFlatRequest,
   SettleTradeRequest,
   SpringPage,
@@ -10,9 +8,16 @@ export type {
   UpdateFlatRequest,
 } from '@tokenrealty/shared-api-client';
 
-import type { UserRole } from '@tokenrealty/shared-api-client';
+import type { CreateBuildingRequest as BaseCreateBuildingRequest, UserRole } from '@tokenrealty/shared-api-client';
 
 export type { UserRole };
+
+/** Registry create/update payload including Phase 4b-3 metadata fields. */
+export interface CreateBuildingRequest extends BaseCreateBuildingRequest {
+  energyEfficiencyRating?: string;
+  zoningCode?: string;
+  lastRenovationYear?: number;
+}
 
 export interface UserProfile {
   id: string;
@@ -34,12 +39,21 @@ export interface Building {
   propertyCategory?: string;
 }
 
+export interface BuildingBffDetail {
+  building: BuildingDetail;
+  tokenizedFlatCount: number;
+  availableFlatCount: number;
+}
+
 export interface BuildingDetail extends Building {
   postalCode?: string;
   totalFloors?: number;
   constructionYear?: number;
   totalAreaSqm?: number;
   cadastralReference?: string;
+  energyEfficiencyRating?: string;
+  zoningCode?: string;
+  lastRenovationYear?: number;
   flats?: FlatSummary[];
   spv?: SpvSummary | null;
 }

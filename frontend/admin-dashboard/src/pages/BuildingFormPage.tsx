@@ -19,7 +19,20 @@ const emptyForm: CreateBuildingRequest = {
   totalFlats: undefined,
   constructionYear: undefined,
   totalAreaSqm: undefined,
+  propertyCategory: undefined,
+  cadastralReference: '',
+  energyEfficiencyRating: '',
+  zoningCode: '',
+  lastRenovationYear: undefined,
 };
+
+const PROPERTY_CATEGORIES = [
+  'RESIDENTIAL_FLAT',
+  'COMMERCIAL_BUILDING',
+  'SINGLE_FAMILY_HOUSE',
+  'LAND_PARCEL',
+  'INDUSTRIAL_WAREHOUSE',
+] as const;
 
 export function BuildingFormPage() {
   const { buildingId } = useParams<{ buildingId: string }>();
@@ -47,7 +60,10 @@ export function BuildingFormPage() {
         constructionYear: b.constructionYear,
         totalAreaSqm: b.totalAreaSqm,
         propertyCategory: b.propertyCategory,
-        cadastralReference: b.cadastralReference,
+        cadastralReference: b.cadastralReference ?? '',
+        energyEfficiencyRating: b.energyEfficiencyRating ?? '',
+        zoningCode: b.zoningCode ?? '',
+        lastRenovationYear: b.lastRenovationYear,
       });
     }
   }, [buildingQuery.data]);
@@ -133,6 +149,92 @@ export function BuildingFormPage() {
                   />
                 </div>
               )}
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="constructionYear">Construction year</Label>
+                <Input
+                  id="constructionYear"
+                  type="number"
+                  min={1800}
+                  max={2100}
+                  value={form.constructionYear ?? ''}
+                  onChange={(e) =>
+                    setField('constructionYear', e.target.value ? Number(e.target.value) : undefined)
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="totalAreaSqm">Total area m²</Label>
+                <Input
+                  id="totalAreaSqm"
+                  type="number"
+                  min={0}
+                  step="0.1"
+                  value={form.totalAreaSqm ?? ''}
+                  onChange={(e) =>
+                    setField('totalAreaSqm', e.target.value ? Number(e.target.value) : undefined)
+                  }
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="propertyCategory">Property category</Label>
+              <select
+                id="propertyCategory"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={form.propertyCategory ?? ''}
+                onChange={(e) =>
+                  setField('propertyCategory', e.target.value || undefined)
+                }
+              >
+                <option value="">Select category</option>
+                {PROPERTY_CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat.replace(/_/g, ' ')}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cadastralReference">Cadastral reference</Label>
+              <Input
+                id="cadastralReference"
+                value={form.cadastralReference ?? ''}
+                onChange={(e) => setField('cadastralReference', e.target.value)}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="energyEfficiencyRating">Energy rating</Label>
+                <Input
+                  id="energyEfficiencyRating"
+                  placeholder="e.g. A+"
+                  value={form.energyEfficiencyRating ?? ''}
+                  onChange={(e) => setField('energyEfficiencyRating', e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="zoningCode">Zoning code</Label>
+                <Input
+                  id="zoningCode"
+                  value={form.zoningCode ?? ''}
+                  onChange={(e) => setField('zoningCode', e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastRenovationYear">Last renovation year</Label>
+              <Input
+                id="lastRenovationYear"
+                type="number"
+                min={1800}
+                max={2100}
+                value={form.lastRenovationYear ?? ''}
+                onChange={(e) =>
+                  setField('lastRenovationYear', e.target.value ? Number(e.target.value) : undefined)
+                }
+              />
             </div>
             {saveMutation.error && (
               <p className="text-sm text-destructive">

@@ -75,6 +75,42 @@ export function BuildingDetailPage() {
         </Card>
       </div>
 
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Property metadata</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-2 text-sm sm:grid-cols-2">
+          <p>
+            <span className="text-muted-foreground">Category:</span>{' '}
+            {building.propertyCategory ?? '—'}
+          </p>
+          <p>
+            <span className="text-muted-foreground">Cadastral ref:</span>{' '}
+            {building.cadastralReference ?? '—'}
+          </p>
+          <p>
+            <span className="text-muted-foreground">Construction year:</span>{' '}
+            {building.constructionYear ?? '—'}
+          </p>
+          <p>
+            <span className="text-muted-foreground">Last renovation:</span>{' '}
+            {building.lastRenovationYear ?? '—'}
+          </p>
+          <p>
+            <span className="text-muted-foreground">Energy rating:</span>{' '}
+            {building.energyEfficiencyRating ?? '—'}
+          </p>
+          <p>
+            <span className="text-muted-foreground">Zoning code:</span>{' '}
+            {building.zoningCode ?? '—'}
+          </p>
+          <p>
+            <span className="text-muted-foreground">Total area:</span>{' '}
+            {building.totalAreaSqm != null ? `${building.totalAreaSqm} m²` : '—'}
+          </p>
+        </CardContent>
+      </Card>
+
       {building.spv && (
         <Card>
           <CardHeader>

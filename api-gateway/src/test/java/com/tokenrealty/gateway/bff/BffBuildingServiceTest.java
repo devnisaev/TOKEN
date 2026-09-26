@@ -40,6 +40,9 @@ class BffBuildingServiceTest {
                 "ACTIVE",
                 "RESIDENTIAL",
                 "CAD-1",
+                "A+",
+                "C-2",
+                2022,
                 2,
                 List.of(
                         new PropertyRegistryClient.FlatSummaryView(
