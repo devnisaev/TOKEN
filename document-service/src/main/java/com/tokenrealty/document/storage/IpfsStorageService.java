@@ -27,12 +27,18 @@ public class IpfsStorageService {
     @Value("${tokenrealty.document.ipfs.pinata.jwt:}")
     private String pinataJwt;
 
+    @Value("${tokenrealty.document.ipfs.kubo.api-url:http://localhost:5001}")
+    private String kuboApiUrl;
+
     public String pin(byte[] content, String filename) {
         if (content == null || content.length == 0) {
             throw new ValidationException("File content is empty");
         }
         if ("pinata".equalsIgnoreCase(mode) && pinataJwt != null && !pinataJwt.isBlank()) {
             return pinViaPinata(content, filename);
+        }
+        if ("kubo".equalsIgnoreCase(mode) || "self-hosted".equalsIgnoreCase(mode)) {
+            return pinViaKubo(content, filename);
         }
         return simulatedCid(content);
     }
@@ -72,5 +78,30 @@ public class IpfsStorageService {
             throw new ValidationException("Pinata did not return IpfsHash");
         }
         return response.get("IpfsHash").toString();
+    }
+
+    @SuppressWarnings("unchecked")
+    private String pinViaKubo(byte[] content, String filename) {
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("file", new ByteArrayResource(content) {
+            @Override
+            public String getFilename() {
+                return filename;
+            }
+        }).filename(filename);
+
+        Map<String, Object> response = restClient.post()
+                .uri(kuboApiUrl + "/api/v0/add?pin=true")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(builder.build())
+                .retrieve()
+                .body(Map.class);
+
+        if (response == null || response.get("Hash") == null) {
+            throw new ValidationException("Kubo IPFS did not return Hash");
+        }
+        String cid = response.get("Hash").toString();
+        log.info("Pinned {} via Kubo IPFS → {}", filename, cid);
+        return cid;
     }
 }

@@ -8,8 +8,10 @@ spring:
 tokenrealty:
   document:
     ipfs:
-      # Production: set IPFS_MODE=pinata and PINATA_JWT from secrets manager.
+      # Production: IPFS_MODE=pinata (PINATA_JWT) or kubo (IPFS_KUBO_API_URL).
       mode: ${IPFS_MODE:pinata}
+      kubo:
+        api-url: ${IPFS_KUBO_API_URL:http://ipfs:5001}
       pinata:
         jwt: ${PINATA_JWT}
 
