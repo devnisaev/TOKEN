@@ -109,8 +109,8 @@ Returns `AggregateBalanceResponse`: primary wallet address, fiat balances, token
 
 ## Pending / future
 
-- [ ] WalletConnect session handshake (currently address-only link)
-- [ ] Key rotation and re-encryption migration
+- [x] WalletConnect session handshake (`POST /v1/wallets/connect-session` — relay URL + TTL)
+- [x] Key rotation and re-encryption migration (`POST /v1/wallets/{investorId}/rotate-encryption`)
 - [ ] HSM / KMS-backed encryption (replace env symmetric key)
 - [x] Payment Service syncs `WalletBalance` on initiate/confirm/payout (see [payment-ledger.md](payment-ledger.md))
 - [x] Rate limits on `/sign` endpoint (per-investor in-memory, 10/min default)

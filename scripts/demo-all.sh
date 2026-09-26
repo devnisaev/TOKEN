@@ -6,6 +6,7 @@
 #   ./scripts/demo-all.sh --e2e        # also run Playwright full tests
 #   ./scripts/demo-all.sh --tokenize   # also run seed-tokenize-demo.sh (Hardhat)
 #   ./scripts/demo-all.sh --tokenize --buy  # tokenize then demo-buy-flow.sh
+#   ./scripts/demo-all.sh --maintenance     # print tenant maintenance portal hint after seed
 #   ./scripts/demo-all.sh --infra-only # Postgres + Kafka only (via demo-start)
 #   ./scripts/demo-all.sh --stop       # stop background Spring Boot processes
 
@@ -17,6 +18,7 @@ cd "${ROOT}"
 RUN_E2E=false
 RUN_TOKENIZE=false
 RUN_BUY=false
+RUN_MAINTENANCE=false
 INFRA_ONLY=false
 STOP=false
 
@@ -25,11 +27,12 @@ for arg in "$@"; do
     --e2e) RUN_E2E=true ;;
     --tokenize) RUN_TOKENIZE=true ;;
     --buy) RUN_BUY=true ;;
+    --maintenance) RUN_MAINTENANCE=true ;;
     --infra-only) INFRA_ONLY=true ;;
     --stop) STOP=true ;;
     *)
       echo "Unknown option: ${arg}" >&2
-      echo "Usage: $0 [--e2e] [--tokenize] [--buy] [--infra-only] [--stop]" >&2
+      echo "Usage: $0 [--e2e] [--tokenize] [--buy] [--maintenance] [--infra-only] [--stop]" >&2
       exit 1
       ;;
   esac
@@ -87,9 +90,20 @@ Frontends:
   cd frontend/admin-dashboard && npm run dev    # :5174
   cd frontend/tenant-portal && npm run dev      # :5175
 
+Tenant maintenance tickets:
+  http://localhost:5175/maintenance  (tenant@demo.com / tenant123)
+
+Admin maintenance queue:
+  http://localhost:5174/maintenance
+
 Full Playwright E2E:
   ./scripts/e2e-run.sh --no-wait
 EOF
+
+if [[ "${RUN_MAINTENANCE}" == "true" ]]; then
+  echo ""
+  echo "==> Maintenance demo: tenant portal /maintenance, admin /maintenance"
+fi
 
 if [[ "${RUN_E2E}" == "true" ]]; then
   echo ""

@@ -130,7 +130,27 @@ jobs:
 
       - name: Run payment Testcontainers integration tests
         working-directory: payment-service
-        run: ../token-realty-app/mvnw test -Dtest=PaymentContainersIntegrationTest,BuyFlowPaymentIntegrationTest -q
+        run: ../token-realty-app/mvnw test -Dtest=PaymentContainersIntegrationTest,BuyFlowPaymentIntegrationTest,LiquibaseMigrationIntegrationTest -Dsurefire.excludedGroups= -q
+
+  liquibase-migration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Install shared libraries
+        run: ./token-realty-app/mvnw -f pom.xml -pl tokenrealty-security,tokenrealty-web,tokenrealty-jpa,tokenrealty-kafka,tokenrealty-events,tokenrealty-outbox install -q
+
+      - name: Run Liquibase prod-profile migration tests
+        run: |
+          ./token-realty-app/mvnw -f token-realty-app/pom.xml test -Dtest=LiquibaseMigrationIntegrationTest -Dsurefire.excludedGroups= -q
+          ./token-realty-app/mvnw -f token-issuance-service/pom.xml test -Dtest=LiquibaseMigrationIntegrationTest -Dsurefire.excludedGroups= -q
 
   kafka-integration-tests:
     runs-on: ubuntu-latest
@@ -233,9 +253,11 @@ jobs:
 
       - name: Run rental, wallet, and indexer integration tests
         run: |
-          ./token-realty-app/mvnw -f rental-service/pom.xml test -Dtest=RentPaymentIntegrationTest -q
+          ./token-realty-app/mvnw -f rental-service/pom.xml test -Dtest=RentPaymentIntegrationTest,MaintenanceTicketIntegrationTest -q
           ./token-realty-app/mvnw -f wallet-service/pom.xml test -Dtest=WalletAggregateBalanceIntegrationTest -q
           ./token-realty-app/mvnw -f blockchain-indexer-service/pom.xml test -Dtest=ReconciliationIntegrationTest,BalanceRemediationIntegrationTest -q
+          ./token-realty-app/mvnw -f marketplace-service/pom.xml test -Dtest=BuyFlowIntegrationTest -q
+          ./token-realty-app/mvnw -f compliance-service/pom.xml test -Dtest=DataRoomLoopIntegrationTest -q
 
   issuance-integration-test:
     runs-on: ubuntu-latest
@@ -332,6 +354,7 @@ jobs:
           test -x scripts/seed-demo.sh
           bash -n scripts/demo-all.sh
           bash -n scripts/demo-buy-flow.sh
+          grep -q '\-\-maintenance' scripts/demo-all.sh
 
       - name: Tear down compose
         if: always()

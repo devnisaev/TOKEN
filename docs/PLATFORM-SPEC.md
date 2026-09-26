@@ -577,7 +577,7 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 
 - [x] `energyEfficiencyRating`, `zoningCode` on `Building`
 - [x] `lastRenovationYear` on `Building`
-- [ ] Non-equity token structures (`PART_DEBT_INSTRUMENT`, `PROFIT_SHARING_AGREEMENT`) in Issuance/Marketplace
+- [x] Non-equity token structures (`PART_DEBT_INSTRUMENT`, `PROFIT_SHARING_AGREEMENT`) — PRIMARY listings with `instrumentType`; secondary blocked (tracks 153)
 
 ### 10.8 Document Service (Phase 4)
 
@@ -674,6 +674,21 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] Kafka ITs: `BuildingApprovedKafkaIntegrationTest`, `RentScheduleKafkaIntegrationTest`, `TransferCompletedKafkaIntegrationTest`
 - [x] Service ITs: `BalanceRemediationIntegrationTest` (indexer remediation)
 - [x] `BuyFlowKafkaContainersIntegrationTest` (Testcontainers Kafka buy-flow)
+- [x] Liquibase prod-profile CI validation: payment, registry, issuance (tracks 154–156)
+- [x] Payment escrow deposit address watcher via `eth_getLogs` (track 167)
+- [x] Secondary sell orders create `PENDING` listing intent (track 168)
+- [x] OpenAPI indexer + maintenance tickets; shared-api-types wiring (tracks 158, 171)
+- [x] Tenant/admin maintenance UI + gateway BFF (tracks 165, 172, 173)
+- [x] Grafana alert + indexer mismatch panels (track 166)
+- [x] Notification readable email templates (track 169)
+- [x] CI: `MaintenanceTicketIntegrationTest`, `BuyFlowIntegrationTest`, `DataRoomLoopIntegrationTest` (track 170)
+- [x] DividendDistributor on-chain deposit when configured (track 159)
+- [x] WalletConnect session with relay URL + TTL; key rotation endpoint (tracks 160, 176)
+- [x] Investor listing PRIMARY/SECONDARY filters (track 177)
+- [ ] Full compose stack E2E on every PR (track 157 — workflow_dispatch + spec check only)
+- [ ] GraphQL BFF layer (track 163 deferred)
+- [ ] Avro Schema Registry (track 164 deferred)
+- [ ] Real AWS/GCP KMS adapter (track 161 deferred)
 
 ### 11.5 Frontend
 
