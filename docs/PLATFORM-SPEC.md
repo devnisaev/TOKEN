@@ -729,6 +729,22 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] GraphQL controller tests for building + admin maintenance (track 221)
 - [x] Prometheus alert documents Micrometer → Prometheus metric mapping (track 226)
 - [x] Tracks 203–226 synced in PLATFORM-SPEC §11.4 (track 227)
+- [x] Compose E2E expanded to all 16 full specs + optional Hardhat profile (`CI_E2E_HARDHAT`, track 228)
+- [x] Nightly E2E workflow runs with `CI_E2E_HARDHAT=true` (track 229)
+- [x] `e2e-run.sh --compose-subset` mirrors CI compose spec list (track 242)
+- [x] Fix KMS stub wallet encryption without requiring local-mode bean (track 230)
+- [x] `OutboxRelay.resolvePayloadTransform` shared Avro helper in tokenrealty-outbox (track 231)
+- [x] Avro opt-in outbox relay on compliance, document, rental, issuance, registry, indexer (tracks 232–237)
+- [x] Marketplace + payment outbox relays refactored to shared `resolvePayloadTransform` (tracks 238–239)
+- [x] Onfido outbound applicant client wired on compliance register (track 240)
+- [x] Compliance `OutboxRelayIntegrationTest` (track 249)
+- [x] KMS stub wallet encryption integration test (track 250)
+- [x] Gateway OpenAPI admin maintenance BFF path (track 241)
+- [x] ADRs 003–006: USDC, hybrid wallet, servlet gateway, monorepo (tracks 243–246)
+- [x] `OutboxRelayAvroTransformTest` in tokenrealty-outbox (track 247)
+- [x] Demo stack GraphiQL URL hint in `demo-all.sh` (track 248)
+- [x] Gateway OpenAPI codegen for admin maintenance BFF path (track 251)
+- [x] Tracks 228–251 synced in PLATFORM-SPEC §11.4 (track 252)
 
 ### 11.5 Frontend
 
@@ -765,15 +781,15 @@ See [docs/rules/investor-portal.md](rules/investor-portal.md), [docs/rules/admin
 
 | # | Question | Options | Decision |
 |---|----------|---------|----------|
-| 1 | Token standard | ERC-1400 (partitioned) vs ERC-20 + compliance hook | TBD — ERC-1400 described in README |
-| 2 | Primary payment currency | USDC only vs multi-token (USDC, MATIC, ETH) | TBD — recommend USDC for stability |
-| 3 | Wallet model | Custodial vs non-custodial vs hybrid | TBD — hybrid recommended |
-| 4 | KYC provider | Sumsub, Onfido, manual, or combination | TBD |
-| 5 | IPFS pinning | Pinata (hosted) vs self-hosted IPFS node | TBD |
-| 6 | Event schema format | Avro + Schema Registry vs plain JSON | TBD |
-| 7 | API Gateway tech | Spring Cloud Gateway vs Kong vs nginx | TBD |
-| 8 | Folder rename | Keep `token-realty-app` vs rename to `property-registry-service` | TBD |
-| 9 | Monorepo vs polyrepo | Single repo (current) vs separate repos per service | TBD — monorepo fine for now |
+| 1 | Token standard | ERC-1400 (partitioned) vs ERC-20 + compliance hook | **ERC-1400** — [ADR 001](adr/001-erc1400-token-standard.md) |
+| 2 | Primary payment currency | USDC only vs multi-token (USDC, MATIC, ETH) | **USDC** — [ADR 003](adr/003-usdc-primary-currency.md) |
+| 3 | Wallet model | Custodial vs non-custodial vs hybrid | **Hybrid** — [ADR 004](adr/004-hybrid-wallet-model.md) |
+| 4 | KYC provider | Sumsub, Onfido, manual, or combination | **Sumsub + Onfido** webhooks/clients; manual dev seed |
+| 5 | IPFS pinning | Pinata (hosted) vs self-hosted IPFS node | **Pinata prod; kubo/self-hosted opt-in** |
+| 6 | Event schema format | Avro + Schema Registry vs plain JSON | **JSON default; Avro opt-in** — [ADR 002](adr/002-kafka-avro-opt-in.md) |
+| 7 | API Gateway tech | Spring Cloud Gateway vs Kong vs nginx | **Servlet proxy (defer SCG)** — [ADR 005](adr/005-servlet-gateway-proxy.md) |
+| 8 | Folder rename | Keep `token-realty-app` vs rename to `property-registry-service` | **Deferred** — keep current folder name |
+| 9 | Monorepo vs polyrepo | Single repo (current) vs separate repos per service | **Monorepo** — [ADR 006](adr/006-monorepo-layout.md) |
 | 10 | Target chain | Polygon mainnet vs Amoy testnet for MVP | Amoy for staging (already configured) |
 
 ---

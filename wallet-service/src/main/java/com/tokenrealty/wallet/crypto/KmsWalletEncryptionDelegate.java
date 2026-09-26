@@ -1,7 +1,6 @@
 package com.tokenrealty.wallet.crypto;
 
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -12,14 +11,17 @@ import org.springframework.stereotype.Service;
 @Primary
 @ConditionalOnProperty(name = "tokenrealty.wallet.encryption.mode", havingValue = "kms")
 @ConditionalOnProperty(name = "tokenrealty.wallet.encryption.provider", havingValue = "stub", matchIfMissing = true)
-@RequiredArgsConstructor
 @Slf4j
 public class KmsWalletEncryptionDelegate implements KmsWalletEncryptionService {
 
-    private final WalletEncryptionService localDelegate;
+    private final AesGcmWalletCryptoEngine engine;
 
     @Value("${tokenrealty.wallet.encryption.kms-key-id:}")
     private String kmsKeyId;
+
+    public KmsWalletEncryptionDelegate(@Value("${tokenrealty.wallet.encryption-key}") String encryptionKey) {
+        this.engine = new AesGcmWalletCryptoEngine(encryptionKey);
+    }
 
     @PostConstruct
     void logMode() {
@@ -29,12 +31,12 @@ public class KmsWalletEncryptionDelegate implements KmsWalletEncryptionService {
     @Override
     public String encrypt(String plainText) {
         log.debug("KMS encryption mode selected — delegating to local AES-GCM (KMS stub)");
-        return localDelegate.encrypt(plainText);
+        return engine.encrypt(plainText);
     }
 
     @Override
     public String decrypt(String encryptedBase64) {
         log.debug("KMS decryption mode selected — delegating to local AES-GCM (KMS stub)");
-        return localDelegate.decrypt(encryptedBase64);
+        return engine.decrypt(encryptedBase64);
     }
 }

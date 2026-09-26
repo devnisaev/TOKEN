@@ -44,6 +44,7 @@ tokenrealty:
     client-secret: ${SERVICE_ACCOUNT_SECRET:indexer-secret}
   kafka:
     enabled: ${KAFKA_ENABLED:false}
+    serialization: ${KAFKA_SERIALIZATION:json}
     relay:
       poll-ms: 1000
       publish-timeout-ms: 10000

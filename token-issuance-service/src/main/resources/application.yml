@@ -84,6 +84,7 @@ tokenrealty:
     client-secret: ${SERVICE_ACCOUNT_SECRET:issuance-secret}
   kafka:
     enabled: ${KAFKA_ENABLED:false}
+    serialization: ${KAFKA_SERIALIZATION:json}
     dlq:
       enabled: ${KAFKA_DLQ_ENABLED:false}
       max-retries: 3

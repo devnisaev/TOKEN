@@ -18,10 +18,19 @@ Optional body when the why is not obvious.
 ## Rules
 
 * Prefix is **required** on every commit the agent creates
-* One logical change per commit; new index for each commit
 * Before committing, run `git log --oneline -20` and use the next free number (max existing + 1). This batch starts at `TOKEN-001` if none exist yet
 * Summary: imperative mood, ≤72 chars after the prefix
 * Do not squash unrelated work under one TOKEN id
+
+### Track batches (one merge → one commit)
+
+When committing a **PLATFORM-SPEC track batch** (e.g. “next 25 tracks”, tracks 228–252, one PR/merge):
+
+* **One commit only** — do **not** split into one commit (or TOKEN id) per track
+* **One TOKEN-NNN** for the whole batch; body may list track ranges or major areas
+* Default unless the user explicitly asks for multiple commits
+
+Outside track batches: one logical change per commit; new TOKEN id for each commit.
 
 ## Examples
 
@@ -35,8 +44,8 @@ TOKEN-003: Migrate marketplace PaymentClient to DownstreamRestClientSupport.
 
 ## When committing for the user
 
-1. Split staged work into logical commits
-2. Assign sequential TOKEN-NNN ids
+1. **Track batch?** → single commit, single TOKEN-NNN (see above)
+2. **Otherwise** → split into logical commits; sequential TOKEN-NNN ids
 3. Push only when explicitly asked (user may ask commit + push together)
 
 Human doc: [docs/rules/commit-messages.md](../../docs/rules/commit-messages.md).

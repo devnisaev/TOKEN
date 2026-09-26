@@ -16,8 +16,18 @@ TOKEN-NNN: Short imperative description.
 
 1. Check recent commits: `git log --oneline -20`
 2. Pick the next unused `TOKEN-NNN` number
-3. One logical slice per commit; sequential ids within a batch
-4. Commit only when the user asks; push only when explicitly requested
+3. **Track batch** (e.g. tracks 228–252, one merge): **one commit**, **one TOKEN id** — not one commit per track
+4. **Otherwise:** one logical slice per commit; sequential ids
+5. Commit only when the user asks; push only when explicitly requested
+
+### Track batch example (preferred)
+
+```text
+TOKEN-111: Implement PLATFORM-SPEC tracks 228–252.
+
+Avro outbox on six services, CI E2E 16 specs + nightly Hardhat, Onfido
+client, KMS stub fix, ADRs 003–006, gateway OpenAPI, integration tests.
+```
 
 ## Example log
 

@@ -1,5 +1,6 @@
 package com.tokenrealty.compliance.service;
 
+import com.tokenrealty.compliance.client.OnfidoClient;
 import com.tokenrealty.compliance.client.SumsubClient;
 import com.tokenrealty.compliance.dto.ComplianceDtos.*;
 import com.tokenrealty.compliance.entity.ComplianceRecord;
@@ -26,11 +27,13 @@ import java.util.UUID;
 public class ComplianceService {
 
     private static final String SUMSUB_PROVIDER = "sumsub";
+    private static final String ONFIDO_PROVIDER = "onfido";
 
     private final ComplianceRecordRepository repository;
     private final KycEventPublisher kycEventPublisher;
     private final InvestmentPolicyService investmentPolicyService;
     private final ObjectProvider<SumsubClient> sumsubClient;
+    private final ObjectProvider<OnfidoClient> onfidoClient;
 
     public Page<ComplianceRecordResponse> findAll(Pageable pageable) {
         return repository.findAll(pageable).map(this::toResponse);
@@ -131,17 +134,27 @@ public class ComplianceService {
         if (request.kycReferenceId() != null && !request.kycReferenceId().isBlank()) {
             return request.kycReferenceId();
         }
-        if (!SUMSUB_PROVIDER.equalsIgnoreCase(request.kycProvider())) {
-            return null;
+        if (SUMSUB_PROVIDER.equalsIgnoreCase(request.kycProvider())) {
+            SumsubClient client = sumsubClient.getIfAvailable();
+            if (client != null) {
+                return client.createApplicant(
+                        request.investorId(),
+                        request.fullName() != null ? request.fullName() : "Investor",
+                        request.countryCode() != null ? request.countryCode() : "US");
+            }
+            return "sumsub-local-" + request.investorId();
         }
-        SumsubClient client = sumsubClient.getIfAvailable();
-        if (client != null) {
-            return client.createApplicant(
-                    request.investorId(),
-                    request.fullName() != null ? request.fullName() : "Investor",
-                    request.countryCode() != null ? request.countryCode() : "US");
+        if (ONFIDO_PROVIDER.equalsIgnoreCase(request.kycProvider())) {
+            OnfidoClient client = onfidoClient.getIfAvailable();
+            if (client != null) {
+                return client.createApplicant(
+                        request.investorId(),
+                        request.fullName() != null ? request.fullName() : "Investor",
+                        request.countryCode() != null ? request.countryCode() : "US");
+            }
+            return "onfido-local-" + request.investorId();
         }
-        return "sumsub-local-" + request.investorId();
+        return null;
     }
 
     private ComplianceRecord getOrThrow(UUID id) {

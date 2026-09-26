@@ -96,8 +96,12 @@ Tenant maintenance tickets:
 Admin maintenance queue:
   http://localhost:5174/maintenance
 
+GraphQL BFF (local profile):
+  http://localhost:8080/graphiql
+
 Full Playwright E2E:
   ./scripts/e2e-run.sh --no-wait
+  ./scripts/e2e-run.sh --compose-subset --no-wait   # CI compose subset (16 specs)
 EOF
 
 if [[ "${RUN_MAINTENANCE}" == "true" ]]; then

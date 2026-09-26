@@ -1,7 +1,6 @@
 package com.tokenrealty.marketplace.kafka.outbox;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tokenrealty.events.avro.AvroOutboxPayloadEncoder;
 import com.tokenrealty.outbox.OutboxStatus;
 import com.tokenrealty.outbox.relay.OutboxRelay;
 import lombok.RequiredArgsConstructor;
@@ -34,18 +33,13 @@ public class OutboxRelayWorker {
     @Scheduled(fixedDelayString = "${tokenrealty.kafka.relay.poll-ms:1000}")
     public void relayPending() {
         var pending = repository.findTop50ByStatusOrderByCreatedAtAsc(OutboxStatus.PENDING);
-        if ("avro".equalsIgnoreCase(serializationFormat)) {
-            log.info("Outbox relay: Avro serialization enabled — encoding payloads before publish");
-            OutboxRelay.relay(
-                    pending,
-                    kafkaTemplate,
-                    publishTimeoutMs,
-                    maxRetries,
-                    repository::save,
-                    log,
-                    payload -> AvroOutboxPayloadEncoder.encodeEnvelope(payload, objectMapper));
-            return;
-        }
-        OutboxRelay.relay(pending, kafkaTemplate, publishTimeoutMs, maxRetries, repository::save, log);
+        OutboxRelay.relay(
+                pending,
+                kafkaTemplate,
+                publishTimeoutMs,
+                maxRetries,
+                repository::save,
+                log,
+                OutboxRelay.resolvePayloadTransform(serializationFormat, objectMapper));
     }
 }

@@ -1,5 +1,7 @@
 package com.tokenrealty.outbox.relay;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tokenrealty.events.avro.AvroOutboxPayloadEncoder;
 import org.slf4j.Logger;
 import org.springframework.kafka.core.KafkaTemplate;
 
@@ -12,6 +14,16 @@ import java.util.function.UnaryOperator;
 public final class OutboxRelay {
 
     private OutboxRelay() {
+    }
+
+    public static UnaryOperator<String> resolvePayloadTransform(
+            String serializationFormat,
+            ObjectMapper objectMapper
+    ) {
+        if (objectMapper != null && "avro".equalsIgnoreCase(serializationFormat)) {
+            return payload -> AvroOutboxPayloadEncoder.encodeEnvelope(payload, objectMapper);
+        }
+        return null;
     }
 
     public static <E extends OutboxRelayTarget> void relay(

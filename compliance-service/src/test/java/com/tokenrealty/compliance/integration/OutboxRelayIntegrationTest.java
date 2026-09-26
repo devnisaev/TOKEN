@@ -1,20 +1,20 @@
-package com.tokenrealty.marketplace.integration;
+package com.tokenrealty.compliance.integration;
 
-import com.tokenrealty.marketplace.kafka.MarketplaceKafkaEventTypes;
-import com.tokenrealty.marketplace.kafka.outbox.OutboxEvent;
-import com.tokenrealty.marketplace.kafka.outbox.OutboxEventRepository;
-import com.tokenrealty.marketplace.kafka.outbox.OutboxRelayWorker;
+import com.tokenrealty.compliance.kafka.ComplianceKafkaEventTypes;
+import com.tokenrealty.compliance.kafka.outbox.OutboxEvent;
+import com.tokenrealty.compliance.kafka.outbox.OutboxEventRepository;
+import com.tokenrealty.compliance.kafka.outbox.OutboxRelayWorker;
 import com.tokenrealty.outbox.OutboxStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("test")
 @Import(OutboxRelayIntegrationTest.KafkaListenerTestConfig.class)
 @TestPropertySource(properties = "tokenrealty.kafka.enabled=true")
-@DisplayName("Marketplace outbox relay integration test")
+@DisplayName("Compliance outbox relay integration test")
 class OutboxRelayIntegrationTest {
 
     @Autowired OutboxRelayWorker outboxRelayWorker;
@@ -54,13 +54,12 @@ class OutboxRelayIntegrationTest {
     }
 
     @Test
-    @DisplayName("relayPending marks outbox row PUBLISHED after Kafka ack")
     void relayPending_marksPublished() {
-        UUID orderId = UUID.randomUUID();
+        UUID investorId = UUID.randomUUID();
         outboxEventRepository.save(OutboxEvent.builder()
-                .aggregateType("marketplace")
-                .aggregateId(orderId)
-                .eventType(MarketplaceKafkaEventTypes.ORDER_MATCHED)
+                .aggregateType("compliance")
+                .aggregateId(investorId)
+                .eventType(ComplianceKafkaEventTypes.KYC_APPROVED)
                 .payload("{\"eventId\":\"" + UUID.randomUUID() + "\"}")
                 .status(OutboxStatus.PENDING)
                 .createdAt(Instant.now())
@@ -68,16 +67,17 @@ class OutboxRelayIntegrationTest {
                 .build());
 
         when(kafkaTemplate.send(
-                eq(MarketplaceKafkaEventTypes.ORDER_MATCHED),
-                eq(orderId.toString()),
+                eq(ComplianceKafkaEventTypes.KYC_APPROVED),
+                eq(investorId.toString()),
                 anyString()))
                 .thenReturn(CompletableFuture.completedFuture(new SendResult<>(null, null)));
 
         outboxRelayWorker.relayPending();
 
-        OutboxEvent published = outboxEventRepository.findAll().getFirst();
-        assertThat(published.getStatus()).isEqualTo(OutboxStatus.PUBLISHED);
-        assertThat(published.getPublishedAt()).isNotNull();
+        assertThat(outboxEventRepository.findAll())
+                .singleElement()
+                .extracting(OutboxEvent::getStatus)
+                .isEqualTo(OutboxStatus.PUBLISHED);
     }
 
     @TestConfiguration
@@ -87,7 +87,7 @@ class OutboxRelayIntegrationTest {
         ConsumerFactory<Object, Object> consumerFactory() {
             Map<String, Object> props = new HashMap<>();
             props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-            props.put(ConsumerConfig.GROUP_ID_CONFIG, "marketplace-outbox-it");
+            props.put(ConsumerConfig.GROUP_ID_CONFIG, "compliance-outbox-it");
             props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
             props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
             props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);

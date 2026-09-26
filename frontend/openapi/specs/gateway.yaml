@@ -75,6 +75,17 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TenantLeaseBffResponse'
+  /v1/bff/admin/maintenance-tickets:
+    get:
+      operationId: getBffAdminMaintenanceQueue
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MaintenanceTicketView'
   /v1/bff/tenants/{tenantId}/maintenance:
     get:
       operationId: getBffTenantMaintenance
