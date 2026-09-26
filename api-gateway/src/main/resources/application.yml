@@ -12,6 +12,8 @@ tokenrealty:
     secret: ${JWT_SECRET:dev-secret-change-in-production-min-32-chars!!}
     issuer: tokenrealty-auth
   gateway:
+    cors:
+      allowed-origins: ${GATEWAY_CORS_ORIGINS:http://localhost:3000,http://localhost:5173}
     routes:
       - id: auth
         target: http://localhost:8083
@@ -21,7 +23,11 @@ tokenrealty:
       - id: document-service
         target: http://localhost:8088
         paths:
-          - /api/v1/documents/upload
+          - /api/v1/documents
+      - id: notification
+        target: http://localhost:8089
+        paths:
+          - /api/v1/notifications
       - id: property-registry
         target: http://localhost:8081
         paths:

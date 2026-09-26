@@ -73,8 +73,8 @@ TokenRealty tokenizes real estate assets (buildings, flats, and other property t
 - [x] **Per-flat deploy script** — `hardhat/scripts/deployFlat.js` wired to `ContractDeployer`
 - [x] **On-chain dividends** — Issuance `dividend.distributed` → Payment USDC → `payout.completed` → Issuance `DividendPayment` PAID
 - [x] **Inter-service auth** — JWT via `tokenrealty-security`; service tokens on RestClient
-- [ ] **Liquibase** — disabled; Hibernate `ddl-auto: update` used instead
-- [ ] **Issuance Liquibase** — referenced in config but no migration files exist
+- [x] **Liquibase** — Registry changelogs exist; enable via `--spring.profiles.active=prod`
+- [x] **Issuance Liquibase** — `db/changelog/001-initial-schema.xml`; enable via `prod` profile
 - [x] **Kafka** — outbox relay + consumers in Marketplace, Payment, Issuance, Compliance, Rental
 - [x] **Auth service** — JWT MVP; registry/issuance/marketplace validate Bearer tokens
 - [x] **IPFS upload** — Document Service multipart → IPFS → Registry CID
@@ -415,10 +415,10 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 
 ### 9.3 Database schema management
 
-- [ ] Enable Liquibase in Property Registry (`spring.liquibase.enabled: true`)
-- [ ] Create Liquibase migrations for Token Issuance (`db/changelog/`)
-- [ ] Disable Hibernate `ddl-auto: update` in production profiles
-- [ ] Add `token_issuance` database creation to setup docs / docker-compose
+- [x] Enable Liquibase in Property Registry (`application-prod.yml`)
+- [x] Create Liquibase migrations for Token Issuance (`db/changelog/`)
+- [x] Disable Hibernate `ddl-auto: update` in production profiles (`ddl-auto: validate`)
+- [x] Add service databases to docker-compose init (`docker/postgres/init-databases.sql`)
 
 ### 9.4 Dividend implementation
 
@@ -463,12 +463,12 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 
 ### 10.2 API Gateway (Phase 1)
 
-- [ ] Scaffold Spring Cloud Gateway or similar (`api-gateway/`)
-- [ ] Route definitions for all services
-- [ ] JWT validation at gateway level
-- [ ] CORS configuration
+- [x] Scaffold Spring Cloud Gateway or similar (`api-gateway/`)
+- [x] Route definitions for all services (incl. notification, document)
+- [x] JWT validation at gateway level
+- [x] CORS configuration
 - [ ] Rate limiting (optional)
-- [ ] Health check aggregation endpoint
+- [x] Health check aggregation endpoint (`GET /actuator/platform-health`)
 
 ### 10.3 Kafka infrastructure (Phase 1)
 
@@ -620,8 +620,8 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 
 ### 11.2 Docker / local dev
 
-- [ ] Root `docker-compose.yml`: PostgreSQL, Kafka, Redis, Hardhat, IPFS, all services
-- [ ] Profile-based startup: `docker compose up postgres kafka` (infra only)
+- [x] Root `docker-compose.yml`: PostgreSQL (all DBs), Kafka profile
+- [x] Profile-based startup: `docker compose up postgres` / `--profile kafka`
 - [ ] Seed data script for demo buildings + flats + test users
 
 ### 11.3 Observability
