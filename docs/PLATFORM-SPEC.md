@@ -632,7 +632,7 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 
 - [x] Root `docker-compose.yml`: PostgreSQL (all DBs), Kafka profile
 - [x] Profile-based startup: `docker compose up postgres` / `--profile kafka`
-- [x] Seed data script for demo buildings + flats + test users
+- [x] Seed data script for demo buildings + flats + test users + tenant lease (`scripts/seed-demo.sh`, `scripts/demo-services.sh` includes rental + notification)
 
 ### 11.3 Observability
 
@@ -647,6 +647,11 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] Contract compile + test in CI (Hardhat job)
 - [x] Docker image build per service (generic `docker/Dockerfile.spring-service` + CI gateway job)
 - [x] Integration test suite with Testcontainers (PostgreSQL — marketplace buy-flow, payment escrow)
+- [x] Property Registry H2 integration test in CI (`PropertyRegistryIntegrationTest`)
+- [x] Kafka ingest ITs: buy/rent/KYC/dividend paths + notification preference gates (`kafka-integration-tests` CI job)
+- [x] Payment custodial balance guard on escrow initiate
+- [x] Shared Kafka DLQ handler (`tokenrealty-kafka`, opt-in)
+- [x] Gateway Redis-backed rate limiting (compose Redis :6379)
 
 ### 11.5 Frontend
 

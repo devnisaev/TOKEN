@@ -103,6 +103,7 @@ tokenrealty:
     rate-limit:
       enabled: ${GATEWAY_RATE_LIMIT_ENABLED:true}
       requests-per-minute: ${GATEWAY_RATE_LIMIT_RPM:120}
+      backend: ${GATEWAY_RATE_LIMIT_BACKEND:memory}   # memory | redis
 
 management:
   tracing:
@@ -116,7 +117,7 @@ management:
 
 ## Rate limiting
 
-In-memory per-client-IP token bucket (`GatewayRateLimitFilter`). Returns **429** ProblemDetail-style JSON when exceeded. Actuator paths are exempt. Disabled via `tokenrealty.gateway.rate-limit.enabled=false`.
+Per-client-IP token bucket (`GatewayRateLimitFilter` + `RateLimitCounterStore`). Default backend is **in-memory**; set `backend: redis` with Redis running (`docker compose up -d redis`) for multi-instance gateways. Falls back to in-memory when Redis is unavailable. Returns **429** ProblemDetail-style JSON when exceeded. Actuator paths are exempt. Disabled via `tokenrealty.gateway.rate-limit.enabled=false`.
 
 ---
 
@@ -158,5 +159,5 @@ CI job: `docker-build-gateway` in `.github/workflows/ci.yml`.
 - [x] Per-IP rate limiting (in-memory MVP)
 - [x] OpenAPI spec for BFF (`gateway.yaml`)
 - [x] Response caching (short TTL) for BFF listing and flat detail (`Caffeine`, 60s default)
-- [ ] Redis-backed rate limiting for multi-instance gateway
+- [x] Redis-backed rate limiting for multi-instance gateway (`backend: redis`, compose Redis :6379)
 - [ ] GraphQL layer (optional; REST BFF sufficient for MVP)

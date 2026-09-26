@@ -274,11 +274,18 @@ Kafka ingest integration tests (Spring context + `KafkaEventConsumer`, no Testco
 
 | Test | Service | Verifies |
 |------|---------|----------|
-| `NotificationKafkaIntegrationTest` | notification-service | `trade.settled` + preference gate + eventId dedupe |
+| `NotificationKafkaIntegrationTest` | notification-service | `trade.settled`, `rent.due`, `rent.collected`, `building.approved`, `lease.expired`, `kyc-revoked` + preference gates + dedupe |
 | `DocumentUploadedKafkaIntegrationTest` | property-registry | `document.uploaded` CID/storageUrl backfill + dedupe |
 | `DocumentUploadedKafkaIntegrationTest` | compliance-service | Review queue ingest + dedupe |
-| `NotificationKafkaIntegrationTest` (rent.due) | notification-service | `rent.due` + rentReminders preference + dedupe |
+| `KycApprovedKafkaIntegrationTest` | token-issuance-service | `kyc-approved` → on-chain whitelist + dedupe |
+| `KycRevokedKafkaIntegrationTest` | token-issuance-service | `kyc-revoked` → on-chain revoke + dedupe |
+| `FlatTokenizedKafkaIntegrationTest` | marketplace-service | `flat.tokenized` → primary listing + dedupe |
+| `RentCollectedKafkaIntegrationTest` | token-issuance-service | `rent.collected` → pro-rata dividend + dedupe |
+| `OrderMatchedKafkaIntegrationTest` | payment-service | `order.matched` escrow reconciliation + dedupe |
+| `DividendDistributedKafkaIntegrationTest` | payment-service | `dividend.distributed` → holder payouts + dedupe |
 | `PropertyRegistryIntegrationTest` | property-registry | 17-step building → tokenize regression (H2) |
+
+CI jobs: `kafka-integration-tests`, `registry-integration-test`, `issuance-integration-test`, `marketplace-testcontainers`, `payment-testcontainers`.
 
 ---
 

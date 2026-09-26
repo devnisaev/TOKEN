@@ -24,7 +24,9 @@ Requires a live gateway and seeded demo data:
 
 ```bash
 ./scripts/demo-start.sh          # Postgres + Kafka + Jaeger
-# Start minimum stack: auth, registry, payment, marketplace, gateway (see script output)
+# Start minimum stack: auth, registry, payment, marketplace, rental, notification, gateway
+./scripts/demo-services.sh
+./scripts/wait-for-services.sh
 ./scripts/seed-demo.sh
 
 export E2E_GATEWAY_URL=http://localhost:8080
@@ -34,7 +36,7 @@ export E2E_GATEWAY_URL=http://localhost:8080
 Or manually:
 
 ```bash
-./scripts/wait-for-services.sh              # default: gateway + auth + registry + marketplace + payment
+./scripts/wait-for-services.sh              # default: gateway + auth + registry + marketplace + payment + rental + notification
 SERVICES="8080" ./scripts/wait-for-services.sh --timeout 120   # gateway only
 cd frontend/e2e && npm run test:full
 ```
@@ -49,7 +51,8 @@ Full specs skip automatically when `E2E_GATEWAY_URL` is unset.
 | `tests/full/investor-buy-flow.spec.ts` | Login → listing → place buy order → order status page |
 | `tests/full/investor-secondary-sell-flow.spec.ts` | Login → portfolio → sell form (skips if no holdings) |
 | `tests/full/admin-kyc-flow.spec.ts` | Admin login → compliance page |
-| `tests/full/tenant-rent-flow.spec.ts` | Tenant login → lease view |
+| `tests/full/admin-document-review-flow.spec.ts` | Admin login → document reviews → approve (or empty queue) |
+| `tests/full/tenant-rent-flow.spec.ts` | Tenant login → lease view → pay rent (or already-paid) |
 
 CI: `frontend-e2e-full` runs on `workflow_dispatch` when repo secret `E2E_GATEWAY_URL` is set.
 
@@ -59,7 +62,7 @@ CI: `frontend-e2e-full` runs on `workflow_dispatch` when repo secret `E2E_GATEWA
 ./scripts/demo-start.sh              # Postgres + Kafka + Jaeger + startup checklist
 ./scripts/demo-start.sh --infra-only  # Postgres + Kafka only (no Jaeger)
 ./scripts/demo-start.sh --seed       # Also runs seed-demo.sh if gateway :8080 is up
-./scripts/demo-services.sh           # Start buy-flow backend in background (auth → gateway)
+./scripts/demo-services.sh           # Start full demo backend (auth → document → wallet → indexer → gateway)
 ./scripts/demo-services.sh --stop    # Stop background Spring Boot processes
 ```
 

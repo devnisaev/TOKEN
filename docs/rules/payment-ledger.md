@@ -23,13 +23,12 @@ Adapted from Titan `ledger-accounting.mdc`. Cursor rule: [`.cursor/rules/payment
 | Wallet balance API | `GET /v1/wallet-balances/{investorId}` — used by Wallet Service aggregate view |
 | On-chain tx reconciliation | `PaymentBlockchainReconciliationWorker` — CONFIRMED payments / COMPLETED payouts vs receipt |
 | Wallet balance sync | `WalletBalanceService` — hold on initiate, settle on confirm, credit on payout; dev seed 10k USDC |
+| Custodial balance guard | `WalletBalanceService.holdForPayment()` throws `InsufficientFundsException` when a balance row exists and funds are insufficient; no-op when no custodial row (external-wallet path) |
 
 ## Pending
 
 - On-chain deposit auto-detection for production (dev uses `PaymentAutoConfirmWorker`)
 - Polygon mainnet USDC contract address (local dev uses `MockUSDC` from `npm run deploy:local`)
-- Strict custodial debit on initiate when balance insufficient (currently skips hold for external-wallet path)
-- DLQ for failed consumer retries
 
 Token holder balance reconciliation lives in [blockchain-indexer.md](blockchain-indexer.md) (`BalanceReconciliationService`).
 
@@ -52,7 +51,7 @@ Token holder balance reconciliation lives in [blockchain-indexer.md](blockchain-
 Investor → Payment (escrow, sync) → confirm → payment.confirmed (Kafka)
          → Issuance (transfer) → transfer.completed (Kafka)
          → Payment (release escrow) + Marketplace (settle)
-Tenant rent → Payment (payout) → Rental confirms (future)
+Tenant rent → Rental `POST /v1/rent-payments` → Payment `POST /v1/payouts` (RENT) → credits SPV wallet + `rent.collected` (Kafka) → Issuance dividend distribution
 Dividends → Issuance (calculate) → Payment (payout)
 ```
 
