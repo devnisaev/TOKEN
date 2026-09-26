@@ -38,6 +38,18 @@ Real-estate tokenization platform — fractional property ownership, crypto paym
 
 Human-readable expansions: [docs/rules/](docs/rules/)
 
+## Frontend
+
+| App | Folder | Dev URL |
+|-----|--------|---------|
+| Investor Portal | `frontend/investor-portal/` | http://localhost:5173 |
+
+```bash
+cd frontend/investor-portal && npm install && npm run dev
+```
+
+Requires API Gateway on `:8080`. See [frontend/investor-portal/README.md](frontend/investor-portal/README.md).
+
 ## Local startup order
 
 ```bash
