@@ -21,9 +21,11 @@ class BffGraphQlControllerTest {
 
     @Mock BffFlatService flatService;
     @Mock BffListingService listingService;
+    @Mock BffBuildingService buildingService;
     @Mock BffPortfolioService portfolioService;
     @Mock BffTenantLeaseService tenantLeaseService;
     @Mock BffTenantMaintenanceService tenantMaintenanceService;
+    @Mock BffAdminMaintenanceService adminMaintenanceService;
 
     @InjectMocks BffGraphQlController controller;
 
@@ -40,6 +42,24 @@ class BffGraphQlControllerTest {
         when(flatService.getFlatDetail(flatId)).thenReturn(response);
 
         assertThat(controller.flatDetail(flatId.toString()).buildingName()).isEqualTo("Tower A");
+    }
+
+    @Test
+    void buildingDetailDelegatesToBffService() {
+        UUID buildingId = UUID.randomUUID();
+        when(buildingService.getBuildingDetail(buildingId)).thenReturn(BuildingBffDetailResponse.builder()
+                .tokenizedFlatCount(2)
+                .availableFlatCount(1)
+                .build());
+
+        assertThat(controller.buildingDetail(buildingId.toString()).tokenizedFlatCount()).isEqualTo(2);
+    }
+
+    @Test
+    void adminMaintenanceQueueDelegatesToBffService() {
+        when(adminMaintenanceService.getMaintenanceQueue()).thenReturn(List.of());
+
+        assertThat(controller.adminMaintenanceQueue()).isEmpty();
     }
 
     @Test

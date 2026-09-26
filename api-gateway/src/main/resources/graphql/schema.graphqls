@@ -1,9 +1,11 @@
 type Query {
     flatDetail(flatId: ID!): FlatDetail
     listingDetail(listingId: ID!): ListingDetail
+    buildingDetail(buildingId: ID!): BuildingDetail
     investorPortfolio(investorId: ID!): Portfolio
     tenantLeases(tenantId: ID!): [TenantLease]
     tenantMaintenance(tenantId: ID!): [TenantMaintenance]
+    adminMaintenanceQueue: [MaintenanceTicket]
 }
 
 type FlatDetail {
@@ -25,6 +27,23 @@ type ListingDetail {
     flatStatus: String
     listing: ListingSummary!
     tokenContract: TokenContractSummary
+}
+
+type BuildingDetail {
+    building: BuildingSummary!
+    tokenizedFlatCount: Int!
+    availableFlatCount: Int!
+}
+
+type BuildingSummary {
+    id: ID!
+    name: String
+    address: String
+    city: String
+    country: String
+    status: String
+    propertyCategory: String
+    flatCount: Int
 }
 
 type ListingSummary {

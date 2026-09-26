@@ -1,6 +1,7 @@
 package com.tokenrealty.gateway.graphql;
 
 import com.tokenrealty.gateway.bff.*;
+import com.tokenrealty.gateway.client.RentalClient;
 import com.tokenrealty.gateway.dto.BffDtos.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -16,9 +17,11 @@ public class BffGraphQlController {
 
     private final BffFlatService flatService;
     private final BffListingService listingService;
+    private final BffBuildingService buildingService;
     private final BffPortfolioService portfolioService;
     private final BffTenantLeaseService tenantLeaseService;
     private final BffTenantMaintenanceService tenantMaintenanceService;
+    private final BffAdminMaintenanceService adminMaintenanceService;
 
     @QueryMapping
     public FlatDetailResponse flatDetail(@Argument String flatId) {
@@ -28,6 +31,11 @@ public class BffGraphQlController {
     @QueryMapping
     public ListingDetailResponse listingDetail(@Argument String listingId) {
         return listingService.getListingDetail(UUID.fromString(listingId));
+    }
+
+    @QueryMapping
+    public BuildingBffDetailResponse buildingDetail(@Argument String buildingId) {
+        return buildingService.getBuildingDetail(UUID.fromString(buildingId));
     }
 
     @QueryMapping
@@ -43,5 +51,10 @@ public class BffGraphQlController {
     @QueryMapping
     public List<TenantMaintenanceBffResponse> tenantMaintenance(@Argument String tenantId) {
         return tenantMaintenanceService.getTenantMaintenance(UUID.fromString(tenantId));
+    }
+
+    @QueryMapping
+    public List<RentalClient.MaintenanceTicketView> adminMaintenanceQueue() {
+        return adminMaintenanceService.getMaintenanceQueue();
     }
 }
