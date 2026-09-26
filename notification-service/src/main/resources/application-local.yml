@@ -1,6 +1,8 @@
 tokenrealty:
   kafka:
     enabled: true
+    dlq:
+      enabled: true
 
 spring:
   kafka:

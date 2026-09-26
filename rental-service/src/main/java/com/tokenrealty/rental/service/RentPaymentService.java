@@ -39,6 +39,7 @@ public class RentPaymentService {
                 .toList();
     }
 
+    @Transactional
     public RentPaymentResponse record(RecordRentPaymentRequest request, UUID callerUserId, boolean tenantCaller) {
         Lease lease = leaseService.getLease(request.leaseId());
         if (tenantCaller && !lease.getTenantId().equals(callerUserId)) {

@@ -8,7 +8,7 @@ import java.util.UUID;
 final class NotificationPayloadUsers {
 
     private static final List<String> USER_ID_FIELDS = List.of(
-            "userId", "investorId", "buyerId", "tenantId", "sellerId");
+            "userId", "investorId", "buyerId", "payerId", "tenantId", "sellerId");
 
     private NotificationPayloadUsers() {
     }

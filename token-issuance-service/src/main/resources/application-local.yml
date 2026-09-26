@@ -1,6 +1,10 @@
 tokenrealty:
+  issuance:
+    seed-dev-token-contract: true
   kafka:
     enabled: true
+    dlq:
+      enabled: true
 
 spring:
   kafka:

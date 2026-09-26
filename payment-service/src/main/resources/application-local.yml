@@ -10,3 +10,9 @@ tokenrealty:
       usdc-contract-address: ${USDC_CONTRACT_ADDRESS:}
   kafka:
     enabled: true
+    dlq:
+      enabled: true
+
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
