@@ -2,6 +2,7 @@ package com.tokenrealty.marketplace.service;
 
 import com.tokenrealty.marketplace.client.ComplianceClient;
 import com.tokenrealty.marketplace.client.PaymentClient;
+import com.tokenrealty.marketplace.client.PropertyRegistryClient;
 import com.tokenrealty.marketplace.dto.MarketplaceDtos.PlaceOrderRequest;
 import com.tokenrealty.marketplace.dto.MarketplaceDtos.OrderResponse;
 import com.tokenrealty.marketplace.kafka.command.PaymentConfirmedCommand;
@@ -42,6 +43,7 @@ class OrderServiceTest {
     @Mock TradeRepository tradeRepository;
     @Mock ComplianceClient complianceClient;
     @Mock PaymentClient paymentClient;
+    @Mock PropertyRegistryClient propertyRegistryClient;
     @Mock ListingService listingService;
     @Mock MarketplaceMapper mapper;
     @Mock OrderMatchedPublisher orderMatchedPublisher;
@@ -137,6 +139,58 @@ class OrderServiceTest {
         verify(tradeRepository, times(2)).save(any(Trade.class));
         verify(orderMatchedPublisher).publishOrderMatched(any());
         verify(orderRepository).save(any(MarketOrder.class));
+    }
+
+    @Test
+    @DisplayName("placeBuyOrder marks flat FULLY_SOLD when primary listing sells out")
+    void marksFlatFullySoldWhenPrimaryListingDepleted() {
+        listing.setTokensAvailable(10L);
+        UUID buyerId = UUID.randomUUID();
+        PlaceOrderRequest request = PlaceOrderRequest.builder()
+                .listingId(listingId)
+                .buyerId(buyerId)
+                .buyerWallet("0xabc")
+                .tokenAmount(10L)
+                .build();
+
+        MarketOrder savedOrder = MarketOrder.builder()
+                .listingId(listingId)
+                .flatId(listing.getFlatId())
+                .listingType(Listing.ListingType.PRIMARY)
+                .orderType(MarketOrder.OrderType.BUY)
+                .status(MarketOrder.OrderStatus.MATCHED)
+                .buyerId(buyerId)
+                .buyerWallet("0xabc")
+                .tokenAmount(10L)
+                .totalPriceUsd(new BigDecimal("100.00"))
+                .build();
+        savedOrder.setId(UUID.randomUUID());
+
+        Trade trade = Trade.builder()
+                .orderId(savedOrder.getId())
+                .listingId(listingId)
+                .flatId(listing.getFlatId())
+                .listingType(Listing.ListingType.PRIMARY)
+                .buyerId(buyerId)
+                .tokenAmount(10L)
+                .totalPriceUsd(new BigDecimal("100.00"))
+                .status(Trade.TradeStatus.PENDING)
+                .build();
+        trade.setId(UUID.randomUUID());
+
+        when(listingRepository.findById(listingId)).thenReturn(Optional.of(listing));
+        when(complianceClient.isWalletApproved("0xabc")).thenReturn(true);
+        when(orderRepository.save(any(MarketOrder.class))).thenReturn(savedOrder);
+        when(tradeRepository.save(any(Trade.class))).thenReturn(trade);
+        when(paymentClient.initiateTokenPurchase(any(), any(), any(), any()))
+                .thenReturn(new PaymentClient.InitiatePaymentResponse(
+                        UUID.randomUUID(), savedOrder.getId(), null));
+        when(mapper.toOrderResponse(savedOrder)).thenReturn(OrderResponse.builder().id(savedOrder.getId()).build());
+
+        orderService.placeBuyOrder(request);
+
+        verify(propertyRegistryClient).markFlatFullySold(listing.getFlatId());
+        assertThat(listing.getStatus()).isEqualTo(Listing.ListingStatus.SOLD);
     }
 
     @Test

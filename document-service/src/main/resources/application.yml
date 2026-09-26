@@ -1,0 +1,68 @@
+spring:
+  application:
+    name: document-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/document_service
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 25MB
+
+server:
+  port: 8088
+  servlet:
+    context-path: /api
+
+services:
+  auth:
+    url: ${AUTH_SERVICE_URL:http://localhost:8083/api}
+  property-registry:
+    url: ${PROPERTY_REGISTRY_URL:http://localhost:8081/api}
+
+tokenrealty:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-change-in-production-min-32-chars!!}
+    issuer: tokenrealty-auth
+  service-account:
+    client-id: document
+    client-secret: ${SERVICE_ACCOUNT_SECRET:document-secret}
+  document:
+    ipfs:
+      mode: ${IPFS_MODE:simulated}
+      pinata:
+        jwt: ${PINATA_JWT:}
+  kafka:
+    enabled: ${KAFKA_ENABLED:false}
+    relay:
+      poll-ms: 1000
+      publish-timeout-ms: 10000
+      max-retries: 5
+    topic:
+      document-uploaded: tokenrealty.document.document.uploaded.v1
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    com.tokenrealty: DEBUG

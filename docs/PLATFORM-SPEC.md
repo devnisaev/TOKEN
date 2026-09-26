@@ -397,12 +397,12 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 
 ### 9.1 Smart contracts
 
-- [ ] Implement `PropertyToken.sol` (ERC-1400 or ERC-20 + compliance hook)
-- [ ] Implement `ComplianceRegistry.sol` (whitelist add/remove/check)
+- [x] Implement `PropertyToken.sol` (ERC-1400 or ERC-20 + compliance hook)
+- [x] Implement `ComplianceRegistry.sol` (whitelist add/remove/check)
 - [ ] Implement `DividendDistributor.sol` (optional; or dividend logic in PropertyToken)
-- [ ] Fix file naming: `Propertytoken.sol` → `PropertyToken.sol`, `Complianceregistry.sol` → `ComplianceRegistry.sol`
-- [ ] Create `hardhat/scripts/deployFlat.js` (called by `ContractDeployer`)
-- [ ] Run `npm run compile` and verify artifacts generated
+- [x] Fix file naming: `Propertytoken.sol` → `PropertyToken.sol`, `Complianceregistry.sol` → `ComplianceRegistry.sol`
+- [x] Create `hardhat/scripts/deployFlat.js` (called by `ContractDeployer`)
+- [x] Run `npm run compile` and verify artifacts generated
 - [ ] Test deploy on local Hardhat node
 - [ ] Copy contract addresses to `application.yml` profiles
 
@@ -428,7 +428,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 
 ### 9.5 Business logic gaps
 
-- [ ] Implement `FULLY_SOLD` flat status when all tokens distributed
+- [x] Implement `FULLY_SOLD` flat status when all tokens distributed (Marketplace → Registry on primary sell-out)
 - [ ] Complete ComplianceService on-chain ABI encoding (currently simplified/stub)
 - [ ] Generate Web3j contract wrappers (replace manual ABI encoding in `BlockchainConnector`)
 
@@ -555,7 +555,7 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 
 #### Phase 4b-2 — With Document Service (:8088)
 
-- [ ] `POST /v1/documents/upload` → IPFS → register `PropertyDocument` with CID
+- [x] `POST /v1/documents/upload` → IPFS → register `PropertyDocument` with CID
 - [ ] Verify workflow links documents to building/flat/SPV
 - [ ] Optional S3/MinIO for private KYC/legal docs (`storageUrl`)
 
@@ -567,21 +567,21 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 
 ### 10.8 Document Service (Phase 4)
 
-- [ ] Scaffold project (`document-service/`)
-- [ ] POST `/v1/documents/upload` — multipart upload → IPFS
-- [ ] GET `/v1/documents/{cid}` — retrieve metadata
-- [ ] IPFS client (Pinata API or local node)
+- [x] Scaffold project (`document-service/`)
+- [x] POST `/v1/documents/upload` — multipart upload → IPFS
+- [x] GET `/v1/documents/{documentId}` — retrieve metadata from Registry
+- [x] IPFS client (simulated dev mode + optional Pinata API)
 - [ ] Optional S3/MinIO for private documents
-- [ ] Callback to Property Registry with CID
-- [ ] Publish `DocumentUploaded` event
-- [ ] Unit + integration tests
+- [x] Callback to Property Registry with CID
+- [x] Publish `DocumentUploaded` event (outbox)
+- [x] Unit + context tests
 
 ### 10.9 Notification Service (Phase 5)
 
-- [ ] Scaffold project (`notification-service/`)
-- [ ] Email provider integration (SendGrid, AWS SES)
-- [ ] Kafka consumers for all notification-worthy events
-- [ ] Template engine for emails (KYC approved, dividend paid, etc.)
+- [x] Scaffold project (`notification-service/`)
+- [x] Email provider integration (log mode dev + optional SMTP)
+- [x] Kafka consumers for key notification events (KYC, trade settled, dividend, rent)
+- [x] Simple email templates per event type
 - [ ] POST `/v1/notifications/send` — manual trigger (admin)
 - [ ] Notification preferences per user
 

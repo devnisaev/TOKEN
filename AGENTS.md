@@ -40,6 +40,7 @@ Human-readable expansions: [docs/rules/](docs/rules/) — start with [shared-lib
 | Notification | 8089 | `com.tokenrealty.notification` |
 | Rental | 8086 | `com.tokenrealty.rental` |
 | Compliance | 8087 | `com.tokenrealty.compliance` |
+| Document | 8088 | `com.tokenrealty.document` |
 
 New services: copy structure from `marketplace-service/` or `auth-service/`.
 

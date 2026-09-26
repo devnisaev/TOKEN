@@ -48,6 +48,8 @@ services:
     url: ${COMPLIANCE_SERVICE_URL:http://localhost:8087/api}
   payment:
     url: ${PAYMENT_SERVICE_URL:http://localhost:8085/api}
+  property-registry:
+    url: ${PROPERTY_REGISTRY_URL:http://localhost:8081/api}
 
 tokenrealty:
   jwt:

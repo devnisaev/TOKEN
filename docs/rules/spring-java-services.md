@@ -98,9 +98,10 @@ adapter/in/web → application/service → adapter/out/{persistence,client,kafka
 | Auth | 8083 | `com.tokenrealty.auth` | Layered + JWT issuer |
 | Marketplace | 8084 | `com.tokenrealty.marketplace` | Layered + kafka in/out |
 | Payment | 8085 | `com.tokenrealty.payment` | Layered + escrow + kafka in/out |
-| Notification | 8089 | `com.tokenrealty.notification` | Kafka consumer stub only |
+| Notification | 8089 | `com.tokenrealty.notification` | Kafka consumer + email (log/SMTP) |
 | Rental | 8086 | `com.tokenrealty.rental` | Layered + Payment client |
 | Compliance | 8087 | `com.tokenrealty.compliance` | Layered + KYC outbox |
+| Document | 8088 | `com.tokenrealty.document` | Layered + IPFS upload + Registry callback + outbox |
 
 ### API Gateway (edge)
 
@@ -114,7 +115,23 @@ proxy/GatewayProxyController.java    ← forwards /api/** to services
 
 Routes in `application.yml` under `tokenrealty.gateway.routes`. Downstream services keep `/api` context path; gateway forwards full path unchanged.
 
+**Route order matters** — more specific prefixes first. Example: `/api/v1/documents/upload` → Document Service (:8088) before `/api/v1/documents` → Property Registry (:8081).
+
 Clients should call `http://localhost:8080/api/v1/...` instead of individual service ports.
+
+### Document Service (data room upload)
+
+Handles IPFS pinning and Registry registration — Registry stores metadata only (`PropertyDocument.ipfsCid`).
+
+```
+controller/DocumentController.java     ← multipart POST /v1/documents/upload
+service/DocumentUploadService.java     ← pin → Registry callback → outbox event
+storage/IpfsStorageService.java        ← simulated CID (dev) or Pinata API
+client/PropertyRegistryClient.java     ← POST building/flat documents
+kafka/outbox/                          ← document.uploaded
+```
+
+Service account: `document` / `document-secret` (ADMIN). Roles for upload: `ADMIN`, `PROPERTY_MANAGER`.
 
 ---
 

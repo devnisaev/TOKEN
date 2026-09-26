@@ -28,7 +28,7 @@ Spring conventions: [spring-java-services.md](spring-java-services.md)
 | Full hexagonal `adapter/in/kafka` mandatory | Layered `kafka/` OK for existing services |
 | `cardsystem-outbox` shared lib | `tokenrealty-outbox` (`OutboxWriter`, `OutboxRelay`, `OutboxPayload`); per-service `outbox_events` table + thin relay worker |
 | Avro + Schema Registry (implied) | JSON envelope first; Avro optional in Phase 5 |
-| 20+ service-specific references | 11 topics in [EVENTS.md](../EVENTS.md) |
+| 20+ service-specific references | 12+ topics in [EVENTS.md](../EVENTS.md) |
 | PCI: never PAN/PIN | Never private keys, seeds, full KYC docs |
 
 ## What we skipped
@@ -59,10 +59,12 @@ Spring conventions: [spring-java-services.md](spring-java-services.md)
 - [x] Outbox publisher for `flat.tokenized` (Property Registry)
 - [x] Emit `flat.tokenized` after DB commit in `FlatService.setTokenInfo()`
 
-### Phase 1 — First consumers (Notification stub)
+### Phase 1 — First consumers (Notification)
 
 - [x] `NotificationEventListener` with idempotent `eventId` check (`notification-service`)
-- [x] Log-only handler until email provider connected
+- [x] `NotificationEmailService` — log mode (default) or SMTP (`NOTIFICATION_EMAIL_MODE=smtp`)
+- [x] Listeners: flat tokenized, listing created, order matched, payment confirmed, transfer completed
+- [x] Listeners: kyc approved/revoked, trade settled, dividend distributed, rent collected
 
 ### Phase 2+ — Commerce & rental
 
@@ -76,6 +78,7 @@ Spring conventions: [spring-java-services.md](spring-java-services.md)
 - [x] Token Issuance: publish `dividend.distributed`; consume `rent.collected` (Kafka → `DividendService.distribute()`)
 - [x] Compliance: publish `kyc-approved`, `kyc-revoked` via outbox
 - [x] Token Issuance: consume `kyc-approved`, `kyc-revoked` → on-chain whitelist sync
+- [x] Document: publish `document.uploaded` via outbox after Registry callback
 
 ---
 
@@ -274,6 +277,7 @@ Event-driven settlement for primary and secondary listings (replaces admin `PATC
                            → transfer.completed (outbox → Kafka)
 5. Marketplace consumer    → trade.status = SETTLED + PaymentClient.releaseEscrow
                            → trade.settled event
+6. Primary sell-out        → PATCH Registry flat status FULLY_SOLD (sync, on step 1 when tokensAvailable = 0)
 ```
 
 KYC verify/revoke (Compliance → Issuance):
@@ -301,7 +305,9 @@ Inter-service REST (service JWT):
 | Issuance → Marketplace | `MarketplaceClient` | `GET /v1/orders/{id}/trade` |
 | Marketplace → Payment | `PaymentClient` | `POST /v1/payments`, `PATCH /v1/payments/{id}/release` |
 | Marketplace → Compliance | `ComplianceClient` | `GET /v1/compliance/check/{wallet}` |
+| Marketplace → Registry | `PropertyRegistryClient` | `PATCH /v1/flats/{id}/status?status=FULLY_SOLD` (primary sell-out) |
 | Marketplace → Issuance | `TokenIssuanceClient` | `GET /v1/tokens/by-flat/{flatId}`, `GET /v1/tokens/{contractId}/holders/by-wallet/{wallet}` |
+| Document → Registry | `PropertyRegistryClient` | `POST /v1/buildings/{id}/documents`, `POST /v1/flats/{id}/documents`, `GET /v1/documents/{id}` |
 | Issuance → Compliance | `ComplianceClient` | `GET /v1/compliance/check/{wallet}` (transfer KYC gate) |
 
 **Dev auto-confirm:** `PaymentAutoConfirmWorker` polls `PENDING` payments when `tokenrealty.payment.auto-confirm.enabled=true` (`PAYMENT_AUTO_CONFIRM` env or `local` profile). Uses `0xSIMULATED_{paymentId}` tx hash. Production still needs on-chain deposit detection.
@@ -363,18 +369,47 @@ com.tokenrealty.issuance/
 
 **Payment (implemented):** outbox publishers + `kafka/in/OrderMatchedListener` for escrow reconciliation.
 
-**Notification (implemented — consumer stub):**
+**Document (implemented — publisher):**
+
+```text
+com.tokenrealty.document/
+├── client/PropertyRegistryClient.java     ← register document after IPFS pin
+├── storage/IpfsStorageService.java        ← simulated dev CID or Pinata API
+├── service/DocumentUploadService.java
+├── controller/DocumentController.java     ← POST /v1/documents/upload, GET /v1/documents/{id}
+└── kafka/
+    ├── DocumentKafkaEventTypes.java
+    ├── DocumentKafkaConfig.java
+    ├── port/DocumentUploadedPublisher.java
+    └── outbox/                            ← OutboxWriter, OutboxDocumentUploadedPublisher, relay
+```
+
+Upload flow: multipart → IPFS pin → Registry `PropertyDocument` with `ipfsCid` → outbox `document.uploaded`.
+
+**Notification (implemented — consumer + email):**
 
 ```text
 com.tokenrealty.notification/
-├── service/NotificationLogService.java    ← log-only until email provider
-├── kafka/
-│   ├── NotificationKafkaEventTypes.java
-│   ├── NotificationKafkaConfig.java
-│   └── in/NotificationEventListener.java  ← multi-topic @KafkaListener + KafkaEventConsumer
+├── service/
+│   ├── NotificationLogService.java        ← ingest + dispatch
+│   └── NotificationEmailService.java      ← log mode or SMTP
+├── config/NotificationMailConfig.java     ← JavaMailSender when mode=smtp
+└── kafka/
+    ├── NotificationKafkaEventTypes.java
+    ├── NotificationKafkaConfig.java
+    └── in/NotificationEventListener.java  ← multi-topic @KafkaListener + KafkaEventConsumer
 ```
 
-No outbox — Notification is consume-only for now.
+No outbox — Notification is consume-only. Email config:
+
+```yaml
+tokenrealty:
+  notification:
+    email:
+      enabled: true
+      mode: log          # or smtp
+      default-recipient: admin@tokenrealty.com
+```
 
 ---
 
@@ -385,6 +420,8 @@ No outbox — Notification is consume-only for now.
 | `KAFKA_ENABLED=true` | All Kafka services | Outbox relay + listeners active |
 | `PAYMENT_AUTO_CONFIRM=true` | Payment | Auto-confirms pending payments every 3s |
 | `spring.profiles.active=local` | Payment | Enables auto-confirm + Kafka (see `application-local.yml`) |
+| `IPFS_MODE=simulated` (default) | Document | SHA-256 based dev CID; set `pinata` + `PINATA_JWT` for real pins |
+| `NOTIFICATION_EMAIL_MODE=log` (default) | Notification | Logs email body; `smtp` uses `spring.mail.*` |
 
 ---
 

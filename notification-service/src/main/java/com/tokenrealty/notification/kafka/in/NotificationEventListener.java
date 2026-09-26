@@ -40,6 +40,31 @@ public class NotificationEventListener {
         ingest(message, NotificationKafkaEventTypes.TRANSFER_COMPLETED);
     }
 
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.kyc-approved}")
+    public void onKycApproved(String message) {
+        ingest(message, NotificationKafkaEventTypes.KYC_APPROVED);
+    }
+
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.kyc-revoked}")
+    public void onKycRevoked(String message) {
+        ingest(message, NotificationKafkaEventTypes.KYC_REVOKED);
+    }
+
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.trade-settled}")
+    public void onTradeSettled(String message) {
+        ingest(message, NotificationKafkaEventTypes.TRADE_SETTLED);
+    }
+
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.dividend-distributed}")
+    public void onDividendDistributed(String message) {
+        ingest(message, NotificationKafkaEventTypes.DIVIDEND_DISTRIBUTED);
+    }
+
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.rent-collected}")
+    public void onRentCollected(String message) {
+        ingest(message, NotificationKafkaEventTypes.RENT_COLLECTED);
+    }
+
     private void ingest(String message, String eventType) {
         eventConsumer.consume(message, eventType, "Notification processing failed",
                 event -> notificationLogService.logEvent(eventType, event));

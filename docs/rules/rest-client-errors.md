@@ -28,6 +28,8 @@ Domain clients (`PaymentClient`, `TokenIssuanceClient`, …) stay per-service. S
 | Client | Service | Calls | Auth |
 |--------|---------|-------|------|
 | `PropertyRegistryClient` | Token Issuance → Registry | GET flat, GET SPV, PATCH token-info | Service token |
+| `PropertyRegistryClient` | Marketplace → Registry | PATCH flat status `FULLY_SOLD` on primary sell-out | Service token |
+| `PropertyRegistryClient` | Document → Registry | POST building/flat documents, GET document by id | Service token (`document` account) |
 | `ComplianceClient` | Marketplace, Issuance → Compliance | KYC check (`isWhitelisted`, `investorId`) | Service token |
 | `TokenIssuanceClient` | Marketplace → Issuance | Contract by flat, holder balance by wallet, transfer | Service token |
 | `PaymentClient` | Marketplace, Rental → Payment | Initiate escrow, release escrow, payouts | Service token |
@@ -42,6 +44,7 @@ Domain clients (`PaymentClient`, `TokenIssuanceClient`, …) stay per-service. S
 | Marketplace | `marketplace_` |
 | Payment | `payment_` |
 | Compliance | `compliance_` |
+| Document | `document_` |
 | Auth | `auth_` |
 
 ## Target behavior

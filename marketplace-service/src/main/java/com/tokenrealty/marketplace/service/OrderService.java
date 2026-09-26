@@ -2,6 +2,7 @@ package com.tokenrealty.marketplace.service;
 
 import com.tokenrealty.marketplace.client.ComplianceClient;
 import com.tokenrealty.marketplace.client.PaymentClient;
+import com.tokenrealty.marketplace.client.PropertyRegistryClient;
 import com.tokenrealty.marketplace.dto.MarketplaceDtos.*;
 import com.tokenrealty.marketplace.entity.Listing;
 import com.tokenrealty.marketplace.entity.MarketOrder;
@@ -36,6 +37,7 @@ public class OrderService {
     private final TradeRepository tradeRepository;
     private final ComplianceClient complianceClient;
     private final PaymentClient paymentClient;
+    private final PropertyRegistryClient propertyRegistryClient;
     private final ListingService listingService;
     private final MarketplaceMapper mapper;
     private final OrderMatchedPublisher orderMatchedPublisher;
@@ -66,7 +68,8 @@ public class OrderService {
         }
 
         listing.setTokensAvailable(listing.getTokensAvailable() - request.tokenAmount());
-        if (listing.getTokensAvailable() == 0) {
+        boolean primaryListingSoldOut = listing.getTokensAvailable() == 0;
+        if (primaryListingSoldOut) {
             listing.setStatus(Listing.ListingStatus.SOLD);
         }
 
@@ -93,6 +96,9 @@ public class OrderService {
         Trade trade = createPendingTrade(savedOrder);
         linkEscrowPayment(savedOrder, trade);
         publishOrderMatched(savedOrder, trade);
+        if (primaryListingSoldOut && listing.getListingType() == Listing.ListingType.PRIMARY) {
+            propertyRegistryClient.markFlatFullySold(listing.getFlatId());
+        }
         return mapper.toOrderResponse(savedOrder);
     }
 

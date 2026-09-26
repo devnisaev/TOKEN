@@ -27,6 +27,7 @@
         <module>api-gateway</module>
         <module>rental-service</module>
         <module>compliance-service</module>
+        <module>document-service</module>
     </modules>
 
     <properties>

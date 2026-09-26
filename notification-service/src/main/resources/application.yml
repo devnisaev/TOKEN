@@ -22,6 +22,15 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
+  mail:
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PORT:1025}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail.smtp.auth: ${SMTP_AUTH:false}
+      mail.smtp.starttls.enable: ${SMTP_STARTTLS:false}
+
 server:
   port: 8089
   servlet:
@@ -36,6 +45,17 @@ tokenrealty:
       order-matched: tokenrealty.marketplace.order.matched.v1
       payment-confirmed: tokenrealty.payment.payment.confirmed.v1
       transfer-completed: tokenrealty.issuance.transfer.completed.v1
+      kyc-approved: tokenrealty.compliance.investor.kyc-approved.v1
+      kyc-revoked: tokenrealty.compliance.investor.kyc-revoked.v1
+      trade-settled: tokenrealty.marketplace.trade.settled.v1
+      dividend-distributed: tokenrealty.issuance.dividend.distributed.v1
+      rent-collected: tokenrealty.payment.rent.collected.v1
+  notification:
+    email:
+      enabled: ${NOTIFICATION_EMAIL_ENABLED:true}
+      mode: ${NOTIFICATION_EMAIL_MODE:log}
+      default-recipient: ${NOTIFICATION_EMAIL_DEFAULT:admin@tokenrealty.com}
+      from: ${NOTIFICATION_EMAIL_FROM:noreply@tokenrealty.com}
 
 management:
   endpoints:

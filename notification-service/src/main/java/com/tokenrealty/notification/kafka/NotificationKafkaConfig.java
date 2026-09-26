@@ -39,4 +39,29 @@ public class NotificationKafkaConfig {
     NewTopic transferCompletedTopic(@Value("${tokenrealty.kafka.topic.transfer-completed}") String topic) {
         return new NewTopic(topic, PARTITIONS, REPLICAS);
     }
+
+    @Bean
+    NewTopic kycApprovedTopic(@Value("${tokenrealty.kafka.topic.kyc-approved}") String topic) {
+        return new NewTopic(topic, PARTITIONS, REPLICAS);
+    }
+
+    @Bean
+    NewTopic kycRevokedTopic(@Value("${tokenrealty.kafka.topic.kyc-revoked}") String topic) {
+        return new NewTopic(topic, PARTITIONS, REPLICAS);
+    }
+
+    @Bean
+    NewTopic tradeSettledTopic(@Value("${tokenrealty.kafka.topic.trade-settled}") String topic) {
+        return new NewTopic(topic, PARTITIONS, REPLICAS);
+    }
+
+    @Bean
+    NewTopic dividendDistributedTopic(@Value("${tokenrealty.kafka.topic.dividend-distributed}") String topic) {
+        return new NewTopic(topic, PARTITIONS, REPLICAS);
+    }
+
+    @Bean
+    NewTopic rentCollectedTopic(@Value("${tokenrealty.kafka.topic.rent-collected}") String topic) {
+        return new NewTopic(topic, PARTITIONS, REPLICAS);
+    }
 }

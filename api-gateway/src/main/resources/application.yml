@@ -18,6 +18,10 @@ tokenrealty:
         paths:
           - /api/v1/auth
           - /api/v1/users
+      - id: document-service
+        target: http://localhost:8088
+        paths:
+          - /api/v1/documents/upload
       - id: property-registry
         target: http://localhost:8081
         paths:

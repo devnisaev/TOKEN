@@ -37,6 +37,7 @@ Adapted from Titan `limits-engine.mdc`. Cursor rule: [`.cursor/rules/investment-
 | Escrow before transfer | Payment | `POST /v1/payments` on match; release after `transfer.completed` |
 | Event-driven settle | Marketplace + Issuance | Kafka: `payment.confirmed` → transfer → `transfer.completed` |
 | Secondary transfer path | Token Issuance | `PaymentTransferService`: `SECONDARY` → seller wallet; `PRIMARY` → SPV wallet |
+| Primary sell-out status | Marketplace → Registry | When `tokensAvailable = 0` on PRIMARY buy → `PATCH /v1/flats/{id}/status?status=FULLY_SOLD` |
 | Dev payment confirm | Payment | `PAYMENT_AUTO_CONFIRM=true` — auto-confirms pending escrow |
 | Role-based access | All | JWT + `@PreAuthorize`; SERVICE role for inter-service release |
 
