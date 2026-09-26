@@ -15,5 +15,6 @@
     <include file="003-create-spv.xml"       relativeToChangelogFile="true"/>
     <include file="004-create-valuations.xml" relativeToChangelogFile="true"/>
     <include file="005-create-documents.xml" relativeToChangelogFile="true"/>
+    <include file="006-building-metadata.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

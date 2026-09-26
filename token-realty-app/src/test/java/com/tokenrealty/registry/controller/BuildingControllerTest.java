@@ -63,7 +63,7 @@ class BuildingControllerTest {
                 BUILDING_ID, "Sunrise Tower", "123 Main St", "Bishkek", "KG",
                 null, null, null, null, null,
                 Building.BuildingStatus.PENDING_REVIEW,
-                null, null, null, null, 0, Instant.now(), Instant.now());
+                null, null, null, null, null, null, null, 0, Instant.now(), Instant.now());
     }
 
     // ─── GET /v1/buildings ───────────────────────────────────────────────────
@@ -126,7 +126,7 @@ class BuildingControllerTest {
     void create_returns201() throws Exception {
         var request = new CreateBuildingRequest(
                 "Sunrise Tower", "123 Main St", "Bishkek", "KG",
-                "720001", 10, 40, 2020, 3500.0, 42.87, 74.59, null, null);
+                "720001", 10, 40, 2020, 3500.0, 42.87, 74.59, null, null, null, null, null);
 
         when(buildingService.create(any())).thenReturn(sampleResponse());
 
@@ -143,7 +143,7 @@ class BuildingControllerTest {
     void create_returns400_whenNameBlank() throws Exception {
         var request = new CreateBuildingRequest(
                 "", "123 Main St", "Bishkek", "KG",
-                null, null, null, null, null, null, null, null, null);
+                null, null, null, null, null, null, null, null, null, null, null, null);
 
         mockMvc.perform(post("/v1/buildings")
                         .with(user("admin").roles("ADMIN")).with(csrf())
@@ -158,7 +158,7 @@ class BuildingControllerTest {
     void create_returns409_whenDuplicate() throws Exception {
         var request = new CreateBuildingRequest(
                 "Duplicate", "123 Main St", "Bishkek", "KG",
-                null, null, null, null, null, null, null, null, null);
+                null, null, null, null, null, null, null, null, null, null, null, null);
 
         when(buildingService.create(any()))
                 .thenThrow(new ConflictException("Building already registered at this address in Bishkek"));
@@ -175,7 +175,7 @@ class BuildingControllerTest {
     void create_returns403_forInvestorRole() throws Exception {
         var request = new CreateBuildingRequest(
                 "Sunrise Tower", "123 Main St", "Bishkek", "KG",
-                null, 5, 20, 2020, 1000.0, null, null, null, null);
+                null, 5, 20, 2020, 1000.0, null, null, null, null, null, null, null);
 
         mockMvc.perform(post("/v1/buildings")
                         .with(user("investor").roles("INVESTOR")).with(csrf())
@@ -194,7 +194,7 @@ class BuildingControllerTest {
                         BUILDING_ID, "Sunrise Tower", "123 Main St", "Bishkek", "KG",
                         null, null, null, null, null,
                         Building.BuildingStatus.APPROVED,
-                        null, null, null, null, 0, Instant.now(), Instant.now()));
+                        null, null, null, null, null, null, null, 0, Instant.now(), Instant.now()));
 
         mockMvc.perform(patch("/v1/buildings/{id}/status", BUILDING_ID)
                         .with(user("admin").roles("ADMIN")).with(csrf())

@@ -28,7 +28,10 @@ public class PropertyDtos {
             Double latitude,
             Double longitude,
             Building.PropertyCategory propertyCategory,
-            @Size(max = 100) String cadastralReference
+            @Size(max = 100) String cadastralReference,
+            @Size(max = 20) String energyEfficiencyRating,
+            @Size(max = 50) String zoningCode,
+            @Min(1800) @Max(2100) Integer lastRenovationYear
     ) {}
 
     @Builder
@@ -43,7 +46,10 @@ public class PropertyDtos {
             Double latitude,
             Double longitude,
             Building.PropertyCategory propertyCategory,
-            String cadastralReference
+            String cadastralReference,
+            String energyEfficiencyRating,
+            String zoningCode,
+            Integer lastRenovationYear
     ) {}
 
     @Builder
@@ -61,6 +67,9 @@ public class PropertyDtos {
             Building.BuildingStatus status,
             Building.PropertyCategory propertyCategory,
             String cadastralReference,
+            String energyEfficiencyRating,
+            String zoningCode,
+            Integer lastRenovationYear,
             Double latitude,
             Double longitude,
             int flatCount,
@@ -83,6 +92,9 @@ public class PropertyDtos {
             Building.BuildingStatus status,
             Building.PropertyCategory propertyCategory,
             String cadastralReference,
+            String energyEfficiencyRating,
+            String zoningCode,
+            Integer lastRenovationYear,
             Double latitude,
             Double longitude,
             int flatCount,

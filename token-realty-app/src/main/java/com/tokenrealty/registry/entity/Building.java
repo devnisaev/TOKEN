@@ -45,6 +45,15 @@ public class Building extends BaseEntity {
     @Column(name = "cadastral_reference", length = 100)
     private String cadastralReference;
 
+    @Column(name = "energy_efficiency_rating", length = 20)
+    private String energyEfficiencyRating;
+
+    @Column(name = "zoning_code", length = 50)
+    private String zoningCode;
+
+    @Column(name = "last_renovation_year")
+    private Integer lastRenovationYear;
+
     @Column(name = "total_area_sqm")
     private Double totalAreaSqm;
 
