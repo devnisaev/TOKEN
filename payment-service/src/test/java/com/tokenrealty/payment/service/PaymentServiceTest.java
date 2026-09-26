@@ -4,6 +4,7 @@ import com.tokenrealty.payment.blockchain.PaymentBlockchainService;
 import com.tokenrealty.payment.config.PaymentProperties;
 import com.tokenrealty.payment.dto.PaymentDtos.*;
 import com.tokenrealty.payment.entity.*;
+import com.tokenrealty.web.exception.InsufficientFundsException;
 import com.tokenrealty.web.exception.ValidationException;
 import com.tokenrealty.payment.kafka.port.PaymentConfirmedPublisher;
 import com.tokenrealty.payment.mapper.PaymentMapper;
@@ -90,6 +91,24 @@ class PaymentServiceTest {
 
         assertThat(response.orderId()).isEqualTo(orderId);
         verify(ledgerService).recordEscrowHold(saved.getId(), request.amount(), PaymentCurrency.USDC);
+    }
+
+    @Test
+    @DisplayName("initiate propagates insufficient custodial funds")
+    void initiateInsufficientFunds() {
+        when(paymentProperties.getEscrowWalletAddress()).thenReturn("0xEscrow");
+        when(paymentRepository.findByIdempotencyKey("key-1")).thenReturn(Optional.empty());
+        when(paymentRepository.save(any())).thenAnswer(inv -> {
+            Payment payment = inv.getArgument(0);
+            payment.setId(UUID.randomUUID());
+            return payment;
+        });
+        when(escrowRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        doThrow(new InsufficientFundsException("Insufficient USDC balance"))
+                .when(walletBalanceService).holdForPayment(any(), any(), any());
+
+        assertThatThrownBy(() -> paymentService.initiate(request, "key-1"))
+                .isInstanceOf(InsufficientFundsException.class);
     }
 
     @Test

@@ -46,9 +46,13 @@ public class WalletBalanceService {
     /** Custodial path: move available → held when escrow is initiated. */
     @Transactional
     public void holdForPayment(UUID investorId, BigDecimal amount, PaymentCurrency currency) {
-        WalletBalance balance = ensureBalanceRow(investorId, currency);
-        if (balance.getAvailableBalance().compareTo(amount) < 0) {
+        var existing = repository.findByInvestorIdAndCurrency(investorId, currency);
+        if (existing.isEmpty()) {
             return;
+        }
+        WalletBalance balance = existing.get();
+        if (balance.getAvailableBalance().compareTo(amount) < 0) {
+            throw new InsufficientFundsException("Insufficient USDC balance");
         }
         balance.setAvailableBalance(balance.getAvailableBalance().subtract(amount));
         balance.setHeldBalance(balance.getHeldBalance().add(amount));

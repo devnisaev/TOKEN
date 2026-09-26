@@ -4,6 +4,7 @@ import com.tokenrealty.payment.entity.PaymentCurrency;
 import com.tokenrealty.payment.entity.WalletBalance;
 import com.tokenrealty.payment.mapper.PaymentMapper;
 import com.tokenrealty.payment.repository.WalletBalanceRepository;
+import com.tokenrealty.web.exception.InsufficientFundsException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,6 +50,35 @@ class WalletBalanceServiceTest {
         assertThat(balance.getAvailableBalance()).isEqualByComparingTo("400.00");
         assertThat(balance.getHeldBalance()).isEqualByComparingTo("100.00");
         verify(repository).save(balance);
+    }
+
+    @Test
+    @DisplayName("holdForPayment throws when custodial balance is insufficient")
+    void holdForPayment_throwsWhenInsufficient() {
+        UUID investorId = UUID.randomUUID();
+        WalletBalance balance = WalletBalance.builder()
+                .investorId(investorId)
+                .currency(PaymentCurrency.USDC)
+                .availableBalance(new BigDecimal("10.00"))
+                .heldBalance(BigDecimal.ZERO)
+                .build();
+
+        when(repository.findByInvestorIdAndCurrency(investorId, PaymentCurrency.USDC))
+                .thenReturn(Optional.of(balance));
+
+        assertThatThrownBy(() -> walletBalanceService.holdForPayment(
+                investorId, new BigDecimal("100.00"), PaymentCurrency.USDC))
+                .isInstanceOf(InsufficientFundsException.class);
+    }
+
+    @Test
+    @DisplayName("holdForPayment no-ops when no custodial balance row exists")
+    void holdForPayment_noOpWhenNoBalanceRow() {
+        UUID investorId = UUID.randomUUID();
+        when(repository.findByInvestorIdAndCurrency(investorId, PaymentCurrency.USDC))
+                .thenReturn(Optional.empty());
+
+        walletBalanceService.holdForPayment(investorId, new BigDecimal("100.00"), PaymentCurrency.USDC);
     }
 
     @Test
