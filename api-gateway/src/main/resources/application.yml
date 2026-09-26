@@ -1,6 +1,11 @@
 spring:
   application:
     name: api-gateway
+  cache:
+    type: caffeine
+    cache-names: bff-listings, bff-flats
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=${tokenrealty.gateway.bff.cache.ttl-seconds:60}s
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
   mvc:
@@ -35,6 +40,9 @@ tokenrealty:
     rate-limit:
       enabled: ${GATEWAY_RATE_LIMIT_ENABLED:true}
       requests-per-minute: ${GATEWAY_RATE_LIMIT_RPM:120}
+    bff:
+      cache:
+        ttl-seconds: ${GATEWAY_BFF_CACHE_TTL:60}
     routes:
       - id: auth
         target: http://localhost:8083

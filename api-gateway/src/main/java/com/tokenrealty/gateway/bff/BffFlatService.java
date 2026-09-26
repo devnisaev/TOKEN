@@ -7,7 +7,10 @@ import com.tokenrealty.gateway.dto.BffDtos.FlatDetailResponse;
 import com.tokenrealty.gateway.dto.BffDtos.ListingSummary;
 import com.tokenrealty.gateway.dto.BffDtos.TokenContractSummary;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import static com.tokenrealty.gateway.config.BffCacheConfig.BFF_FLAT_CACHE;
 
 import java.util.UUID;
 
@@ -19,6 +22,7 @@ public class BffFlatService {
     private final TokenIssuanceClient issuanceClient;
     private final MarketplaceClient marketplaceClient;
 
+    @Cacheable(cacheNames = BFF_FLAT_CACHE, key = "#flatId")
     public FlatDetailResponse getFlatDetail(UUID flatId) {
         var flat = registryClient.getFlat(flatId);
         var contract = issuanceClient.getContractByFlatId(flatId);

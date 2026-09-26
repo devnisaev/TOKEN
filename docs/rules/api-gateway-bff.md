@@ -157,6 +157,6 @@ CI job: `docker-build-gateway` in `.github/workflows/ci.yml`.
 - [x] `GET /v1/bff/orders/{id}/status-stream` — SSE order status for investor portal
 - [x] Per-IP rate limiting (in-memory MVP)
 - [x] OpenAPI spec for BFF (`gateway.yaml`)
-- [ ] Response caching (short TTL) for public listing pages
+- [x] Response caching (short TTL) for BFF listing and flat detail (`Caffeine`, 60s default)
 - [ ] Redis-backed rate limiting for multi-instance gateway
 - [ ] GraphQL layer (optional; REST BFF sufficient for MVP)
