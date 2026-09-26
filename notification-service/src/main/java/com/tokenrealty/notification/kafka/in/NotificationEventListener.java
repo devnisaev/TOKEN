@@ -15,6 +15,11 @@ public class NotificationEventListener {
     private final com.tokenrealty.kafka.consume.KafkaEventConsumer eventConsumer;
     private final NotificationLogService notificationLogService;
 
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.building-approved}")
+    public void onBuildingApproved(String message) {
+        ingest(message, NotificationKafkaEventTypes.BUILDING_APPROVED);
+    }
+
     @KafkaListener(topics = "${tokenrealty.kafka.topic.flat-tokenized}")
     public void onFlatTokenized(String message) {
         ingest(message, NotificationKafkaEventTypes.FLAT_TOKENIZED);
@@ -63,6 +68,16 @@ public class NotificationEventListener {
     @KafkaListener(topics = "${tokenrealty.kafka.topic.rent-collected}")
     public void onRentCollected(String message) {
         ingest(message, NotificationKafkaEventTypes.RENT_COLLECTED);
+    }
+
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.rent-due}")
+    public void onRentDue(String message) {
+        ingest(message, NotificationKafkaEventTypes.RENT_DUE);
+    }
+
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.lease-expired}")
+    public void onLeaseExpired(String message) {
+        ingest(message, NotificationKafkaEventTypes.LEASE_EXPIRED);
     }
 
     @KafkaListener(topics = "${tokenrealty.kafka.topic.document-uploaded}")

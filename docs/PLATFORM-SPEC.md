@@ -475,7 +475,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 - [ ] Root `docker-compose.yml` with Kafka, Zookeeper, Schema Registry
 - [ ] Shared event library (`tokenrealty-events/`)
 - [ ] Define all event schemas (see Section 6.2)
-- [ ] Add Kafka producers to Property Registry (BuildingApproved, FlatTokenized)
+- [x] Add Kafka producers to Property Registry (BuildingApproved, FlatTokenized)
 - [ ] Add Kafka consumers in Notification Service (stub)
 
 ### 10.4 Marketplace Service (Phase 2)
@@ -517,11 +517,11 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 - [x] Entities: Lease, RentPayment (Tenant, MaintenanceTicket deferred)
 - [x] POST `/v1/leases` — create lease for flat
 - [x] GET `/v1/leases/{id}` — lease details
-- [ ] Rent schedule generation (monthly due dates)
+- [x] Rent schedule generation (monthly due dates)
 - [x] POST `/v1/rent-payments` — record rent payment → Payment `POST /v1/payouts` (RENT)
 - [x] Auto-trigger dividend distribution via Kafka (`rent.collected` → Issuance → `dividend.distributed` → Payment)
 - [x] GET `/v1/occupancy/flats/{flatId}` — occupancy status
-- [ ] Publish `RentDue`, `LeaseExpired` events
+- [x] Publish `RentDue`, `LeaseExpired` events
 - [x] Unit + context tests (`./mvnw test`)
 
 ### 10.7 Compliance Service (Phase 4)
@@ -533,7 +533,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 - [x] PATCH `/v1/compliance/{id}/verify` and `/revoke` — approve/reject
 - [ ] Webhook endpoint for Sumsub/Onfido (optional)
 - [x] Sync on-chain whitelist via Kafka → Issuance `KycApprovedListener` / `KycRevokedListener`
-- [ ] Periodic expiry check (@Scheduled)
+- [x] Periodic expiry check (@Scheduled)
 - [x] Publish `kyc-approved`, `kyc-revoked` events (outbox)
 - [x] Unit + context tests
 
@@ -586,7 +586,7 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] Email provider integration (log mode dev + optional SMTP)
 - [x] Kafka consumers for key notification events (KYC, trade settled, dividend, rent)
 - [x] Simple email templates per event type
-- [ ] POST `/v1/notifications/send` — manual trigger (admin)
+- [x] POST `/v1/notifications/send` — manual trigger (admin)
 - [ ] Notification preferences per user
 
 ### 10.10 Wallet Service (Phase 5)

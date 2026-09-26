@@ -37,10 +37,16 @@ server:
     context-path: /api
 
 tokenrealty:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-change-in-production-min-32-chars!!}
+    issuer: tokenrealty-auth
   kafka:
     enabled: ${KAFKA_ENABLED:false}
     topic:
+      building-approved: tokenrealty.registry.building.approved.v1
       flat-tokenized: tokenrealty.registry.flat.tokenized.v1
+      rent-due: tokenrealty.rental.rent.due.v1
+      lease-expired: tokenrealty.rental.lease.expired.v1
       listing-created: tokenrealty.marketplace.listing.created.v1
       order-matched: tokenrealty.marketplace.order.matched.v1
       payment-confirmed: tokenrealty.payment.payment.confirmed.v1

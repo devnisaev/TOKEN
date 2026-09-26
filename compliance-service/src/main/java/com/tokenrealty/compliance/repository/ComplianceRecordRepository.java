@@ -1,8 +1,11 @@
 package com.tokenrealty.compliance.repository;
 
 import com.tokenrealty.compliance.entity.ComplianceRecord;
+import com.tokenrealty.compliance.entity.ComplianceRecord.ComplianceStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,4 +18,6 @@ public interface ComplianceRecordRepository extends JpaRepository<ComplianceReco
     boolean existsByWalletAddress(String walletAddress);
 
     boolean existsByInvestorId(UUID investorId);
+
+    List<ComplianceRecord> findByStatusAndKycExpiresAtBefore(ComplianceStatus status, Instant expiresBefore);
 }

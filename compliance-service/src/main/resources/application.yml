@@ -40,6 +40,9 @@ tokenrealty:
   service-account:
     client-id: compliance
     client-secret: ${SERVICE_ACCOUNT_SECRET:compliance-secret}
+  compliance:
+    kyc-expiry:
+      cron: ${KYC_EXPIRY_CRON:0 0 6 * * *}
   kafka:
     enabled: ${KAFKA_ENABLED:false}
     relay:

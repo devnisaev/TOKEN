@@ -14,6 +14,14 @@ spring:
     show-sql: false
     open-in-view: false
 
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: rental-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
 server:
   port: 8086
   servlet:
@@ -32,6 +40,20 @@ tokenrealty:
   service-account:
     client-id: rental
     client-secret: ${SERVICE_ACCOUNT_SECRET:rental-secret}
+  rental:
+    rent-due:
+      cron: ${RENT_DUE_CRON:0 0 8 1 * *}
+    lease-expiry:
+      cron: ${LEASE_EXPIRY_CRON:0 0 9 * * *}
+  kafka:
+    enabled: ${KAFKA_ENABLED:false}
+    relay:
+      poll-ms: 1000
+      publish-timeout-ms: 10000
+      max-retries: 5
+    topic:
+      rent-due: tokenrealty.rental.rent.due.v1
+      lease-expired: tokenrealty.rental.lease.expired.v1
 
 jackson2:
   serialization:

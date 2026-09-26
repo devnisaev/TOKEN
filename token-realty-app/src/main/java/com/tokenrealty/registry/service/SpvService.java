@@ -3,6 +3,8 @@ package com.tokenrealty.registry.service;
 import com.tokenrealty.registry.dto.PropertyDtos.*;
 import com.tokenrealty.registry.entity.Building;
 import com.tokenrealty.registry.entity.SpvEntity;
+import com.tokenrealty.registry.kafka.port.BuildingApprovedPublisher;
+import com.tokenrealty.registry.kafka.port.BuildingApprovedPublisher.BuildingApprovedEvent;
 import com.tokenrealty.web.exception.ConflictException;
 import com.tokenrealty.web.exception.ResourceNotFoundException;
 import com.tokenrealty.registry.mapper.PropertyMapper;
@@ -12,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Service
@@ -22,10 +25,14 @@ public class SpvService {
     private final SpvRepository spvRepository;
     private final BuildingRepository buildingRepository;
     private final PropertyMapper mapper;
-    public SpvService(SpvRepository spvRepository, BuildingRepository buildingRepository, PropertyMapper mapper) {
+    private final BuildingApprovedPublisher buildingApprovedPublisher;
+
+    public SpvService(SpvRepository spvRepository, BuildingRepository buildingRepository,
+                      PropertyMapper mapper, BuildingApprovedPublisher buildingApprovedPublisher) {
         this.spvRepository = spvRepository;
         this.buildingRepository = buildingRepository;
         this.mapper = mapper;
+        this.buildingApprovedPublisher = buildingApprovedPublisher;
     }
 
 
@@ -57,10 +64,11 @@ public class SpvService {
         spv.setBuilding(building);
         SpvEntity saved = spvRepository.save(spv);
 
-        // Promote building to APPROVED once an SPV is registered
         if (building.getStatus() == Building.BuildingStatus.PENDING_REVIEW) {
             building.setStatus(Building.BuildingStatus.APPROVED);
             buildingRepository.save(building);
+            buildingApprovedPublisher.publishBuildingApproved(
+                    new BuildingApprovedEvent(buildingId, Instant.now(), "spv-registration"));
         }
 
         log.info("Created SPV id={} legal={} for building={}", saved.getId(), saved.getLegalName(), buildingId);

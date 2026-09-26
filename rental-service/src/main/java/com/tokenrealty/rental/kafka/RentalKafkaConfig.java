@@ -1,4 +1,4 @@
-package com.tokenrealty.registry.kafka;
+package com.tokenrealty.rental.kafka;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,20 +12,18 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableKafka
 @EnableScheduling
 @ConditionalOnProperty(name = "tokenrealty.kafka.enabled", havingValue = "true")
-public class RegistryKafkaConfig {
+public class RentalKafkaConfig {
 
     private static final int PARTITIONS = 3;
     private static final short REPLICAS = 1;
 
     @Bean
-    NewTopic buildingApprovedTopic(
-            @Value("${tokenrealty.kafka.topic.building-approved}") String topic) {
+    NewTopic rentDueTopic(@Value("${tokenrealty.kafka.topic.rent-due}") String topic) {
         return new NewTopic(topic, PARTITIONS, REPLICAS);
     }
 
     @Bean
-    NewTopic flatTokenizedTopic(
-            @Value("${tokenrealty.kafka.topic.flat-tokenized}") String topic) {
+    NewTopic leaseExpiredTopic(@Value("${tokenrealty.kafka.topic.lease-expired}") String topic) {
         return new NewTopic(topic, PARTITIONS, REPLICAS);
     }
 }

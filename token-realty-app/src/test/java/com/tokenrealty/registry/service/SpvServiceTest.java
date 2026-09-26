@@ -3,6 +3,8 @@ package com.tokenrealty.registry.service;
 import com.tokenrealty.registry.dto.PropertyDtos.*;
 import com.tokenrealty.registry.entity.Building;
 import com.tokenrealty.registry.entity.SpvEntity;
+import com.tokenrealty.registry.kafka.port.BuildingApprovedPublisher;
+import com.tokenrealty.registry.kafka.port.BuildingApprovedPublisher.BuildingApprovedEvent;
 import com.tokenrealty.web.exception.ConflictException;
 import com.tokenrealty.web.exception.ResourceNotFoundException;
 import com.tokenrealty.registry.mapper.PropertyMapper;
@@ -31,6 +33,7 @@ class SpvServiceTest {
     @Mock SpvRepository spvRepository;
     @Mock BuildingRepository buildingRepository;
     @Mock PropertyMapper mapper;
+    @Mock BuildingApprovedPublisher buildingApprovedPublisher;
     @InjectMocks SpvService spvService;
 
     private UUID buildingId;
@@ -91,6 +94,7 @@ class SpvServiceTest {
         // Building should be promoted to APPROVED
         assertThat(building.getStatus()).isEqualTo(Building.BuildingStatus.APPROVED);
         verify(buildingRepository).save(building);
+        verify(buildingApprovedPublisher).publishBuildingApproved(any(BuildingApprovedEvent.class));
     }
 
     @Test

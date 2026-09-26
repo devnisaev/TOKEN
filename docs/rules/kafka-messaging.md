@@ -55,7 +55,7 @@ Spring conventions: [spring-java-services.md](spring-java-services.md)
 
 - [x] `RegistryKafkaEventTypes` class
 - [x] `RegistryKafkaConfig` with `NewTopic` beans
-- [ ] Outbox publisher for `building.approved`
+- [x] Outbox publisher for `building.approved`
 - [x] Outbox publisher for `flat.tokenized` (Property Registry)
 - [x] Emit `flat.tokenized` after DB commit in `FlatService.setTokenInfo()`
 

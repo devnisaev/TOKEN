@@ -79,7 +79,10 @@ public class NotificationEmailService {
             case "tokenrealty.marketplace.trade.settled.v1" -> "Your trade has settled";
             case "tokenrealty.issuance.dividend.distributed.v1" -> "Dividend payment distributed";
             case "tokenrealty.payment.rent.collected.v1" -> "Rent payment collected";
+            case "tokenrealty.registry.building.approved.v1" -> "Building approved";
             case "tokenrealty.registry.flat.tokenized.v1" -> "Property tokenized";
+            case "tokenrealty.rental.rent.due.v1" -> "Rent payment due";
+            case "tokenrealty.rental.lease.expired.v1" -> "Lease expired";
             case "tokenrealty.marketplace.listing.created.v1" -> "New listing available";
             case "tokenrealty.marketplace.order.matched.v1" -> "Order matched";
             case "tokenrealty.payment.payment.confirmed.v1" -> "Payment confirmed";

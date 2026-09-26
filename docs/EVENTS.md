@@ -108,6 +108,55 @@
 
 ---
 
+## Rental domain
+
+### `tokenrealty.rental.rent.due.v1`
+
+| | |
+|---|---|
+| **Publisher** | Rental Service |
+| **Consumers** | Notification |
+| **Partition key** | `leaseId` |
+| **When** | Monthly scheduled job — active lease with no payment recorded for period |
+
+**Payload:**
+
+```json
+{
+  "leaseId": "uuid",
+  "flatId": "uuid",
+  "tenantId": "uuid",
+  "amountUsd": "1200.00",
+  "period": "2025-09",
+  "dueDate": "2025-09-01"
+}
+```
+
+---
+
+### `tokenrealty.rental.lease.expired.v1`
+
+| | |
+|---|---|
+| **Publisher** | Rental Service |
+| **Consumers** | Notification |
+| **Partition key** | `leaseId` |
+| **When** | Daily job — active lease past `endDate` |
+
+**Payload:**
+
+```json
+{
+  "leaseId": "uuid",
+  "flatId": "uuid",
+  "tenantId": "uuid",
+  "endDate": "2025-08-31",
+  "expiredAt": "2025-09-25T09:00:00Z"
+}
+```
+
+---
+
 ## Marketplace domain
 
 ### `tokenrealty.marketplace.listing.created.v1`

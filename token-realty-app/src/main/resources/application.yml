@@ -53,6 +53,7 @@ tokenrealty:
       publish-timeout-ms: 10000
       max-retries: 5
     topic:
+      building-approved: tokenrealty.registry.building.approved.v1
       flat-tokenized: tokenrealty.registry.flat.tokenized.v1
       document-uploaded: tokenrealty.document.document.uploaded.v1
 
