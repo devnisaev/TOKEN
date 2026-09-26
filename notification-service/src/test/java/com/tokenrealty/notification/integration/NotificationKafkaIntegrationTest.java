@@ -285,6 +285,14 @@ class NotificationKafkaIntegrationTest {
     }
 
     @Test
+    @DisplayName("document.uploaded sends email")
+    void documentUploaded_sendsEmail() throws Exception {
+        ingestDocumentUploaded(UUID.randomUUID());
+
+        verify(notificationEmailService).send(eq(NotificationKafkaEventTypes.DOCUMENT_UPLOADED), any());
+    }
+
+    @Test
     @DisplayName("duplicate eventId is deduped by KafkaEventConsumer")
     void tradeSettled_dedupesDuplicateEventId() throws Exception {
         UUID buyerId = UUID.randomUUID();
@@ -525,6 +533,24 @@ class NotificationKafkaIntegrationTest {
                 payload));
         eventConsumer.consume(message, NotificationKafkaEventTypes.TRANSFER_COMPLETED, "Notification ingest failed",
                 event -> notificationLogService.logEvent(NotificationKafkaEventTypes.TRANSFER_COMPLETED, event));
+    }
+
+    private void ingestDocumentUploaded(UUID eventId) throws Exception {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("documentId", UUID.randomUUID().toString());
+        payload.put("buildingId", UUID.randomUUID().toString());
+        payload.put("documentType", "TITLE_DEED");
+        payload.put("ipfsCid", "QmDocumentUploaded");
+        payload.put("uploadedAt", java.time.Instant.now().toString());
+
+        String message = objectMapper.writeValueAsString(EventEnvelope.ofWithEventId(
+                eventId,
+                NotificationKafkaEventTypes.DOCUMENT_UPLOADED,
+                "test-trace",
+                payload));
+        eventConsumer.consume(message, NotificationKafkaEventTypes.DOCUMENT_UPLOADED,
+                "Notification ingest failed",
+                event -> notificationLogService.logEvent(NotificationKafkaEventTypes.DOCUMENT_UPLOADED, event));
     }
 
     private void ingestTradeSettled(UUID buyerId, UUID eventId) throws Exception {
