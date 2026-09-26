@@ -51,6 +51,25 @@ public class IssuanceClient extends DownstreamRestClientSupport {
         }
     }
 
+    /**
+     * Stub — syncs holder balance in Issuance from on-chain value during admin remediation.
+     */
+    public void syncHolderBalance(UUID contractId, String walletAddress, long chainBalance) {
+        try {
+            postVoid(
+                    "/v1/tokens/{contractId}/holders/by-wallet/{walletAddress}/sync-balance",
+                    new SyncHolderBalanceRequest(chainBalance),
+                    DownstreamServices.TOKEN_ISSUANCE,
+                    java.util.Map.of(),
+                    contractId,
+                    walletAddress);
+            log.info("Requested holder balance sync contract={} wallet={} chainBalance={}",
+                    contractId, walletAddress, chainBalance);
+        } catch (ValidationException ex) {
+            log.warn("Token Issuance balance sync unavailable — stub skipped: {}", ex.getMessage());
+        }
+    }
+
     public record SpringPage<T>(List<T> content) {
     }
 
@@ -70,5 +89,8 @@ public class IssuanceClient extends DownstreamRestClientSupport {
             String walletAddress,
             long balance
     ) {
+    }
+
+    public record SyncHolderBalanceRequest(long chainBalance) {
     }
 }

@@ -50,9 +50,15 @@ public class BlockchainLogIndexer {
     @Value("${tokenrealty.indexer.blockchain.compliance-registry-address:}")
     private String complianceRegistryAddress;
 
+    @Value("${tokenrealty.indexer.websocket.enabled:false}")
+    private boolean websocketEnabled;
+
     @Scheduled(fixedDelayString = "${tokenrealty.indexer.poll-ms:15000}")
     @Transactional
     public void pollLogs() {
+        if (websocketEnabled) {
+            return;
+        }
         BigInteger latest = balanceReader.latestBlockNumber();
         if (latest.equals(BigInteger.ZERO)) {
             return;
@@ -95,7 +101,9 @@ public class BlockchainLogIndexer {
         filter.addOptionalTopics(
                 EventTopics.TRANSFER,
                 EventTopics.WHITELIST_ADDED,
-                EventTopics.WHITELIST_REMOVED);
+                EventTopics.WHITELIST_REMOVED,
+                EventTopics.DIVIDEND_DEPOSITED,
+                EventTopics.DIVIDEND_CLAIMED);
 
         try {
             List<Log> logs = web3j.ethGetLogs(filter).send().getLogs().stream()
@@ -121,6 +129,11 @@ public class BlockchainLogIndexer {
             addresses.add(complianceRegistryAddress.toLowerCase());
         }
         return addresses;
+    }
+
+    @Transactional
+    public void indexLog(Log logEntry) {
+        persistLog(logEntry);
     }
 
     private void persistLog(Log logEntry) {
@@ -164,6 +177,12 @@ public class BlockchainLogIndexer {
         }
         if (EventTopics.WHITELIST_REMOVED.equals(topic0)) {
             return "WhitelistRemoved";
+        }
+        if (EventTopics.DIVIDEND_DEPOSITED.equals(topic0)) {
+            return "DividendDeposited";
+        }
+        if (EventTopics.DIVIDEND_CLAIMED.equals(topic0)) {
+            return "DividendClaimed";
         }
         return "Unknown";
     }

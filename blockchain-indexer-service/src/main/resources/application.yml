@@ -53,6 +53,9 @@ tokenrealty:
     batch-blocks: ${INDEXER_BATCH_BLOCKS:500}
     reconciliation:
       cron: ${INDEXER_RECONCILIATION_CRON:0 30 */6 * * *}
+    websocket:
+      enabled: ${INDEXER_WEBSOCKET_ENABLED:false}
+      rpc-url: ${BLOCKCHAIN_WS_RPC_URL:ws://localhost:8545}
     blockchain:
       rpc-url: ${BLOCKCHAIN_RPC_URL:http://localhost:8545}
       compliance-registry-address: ${COMPLIANCE_REGISTRY_ADDRESS:}
