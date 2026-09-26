@@ -17,6 +17,8 @@ services:
     url: http://localhost:8084/api
   wallet:
     url: http://localhost:8090/api
+  rental:
+    url: http://localhost:8086/api
 
 tokenrealty:
   jwt:

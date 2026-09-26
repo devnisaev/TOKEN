@@ -151,3 +151,25 @@ export interface Trade {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface IssueTokenRequest {
+  flatId: string;
+  buildingId: string;
+  tokenName: string;
+  tokenSymbol: string;
+  totalSupply: number;
+  tokenPriceUsd: number;
+  spvWalletAddress: string;
+}
+
+export interface TokenContract {
+  id: string;
+  flatId: string;
+  buildingId: string;
+  tokenName: string;
+  tokenSymbol: string;
+  totalSupply: number;
+  tokenPriceUsd: number;
+  contractAddress?: string;
+  status: string;
+}

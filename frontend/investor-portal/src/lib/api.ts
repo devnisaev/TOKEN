@@ -11,6 +11,8 @@ import type {
   SpringPage,
   TokenResponse,
   Trade,
+  NotificationPreferences,
+  UpdateNotificationPreferencesRequest,
   UserProfile,
 } from '@/types/api';
 
@@ -111,6 +113,17 @@ export const api = {
     return request<UserProfile>('/v1/users/me/wallet', {
       method: 'PATCH',
       body: JSON.stringify({ walletAddress }),
+    });
+  },
+
+  getNotificationPreferences(userId: string) {
+    return request<NotificationPreferences>(`/v1/notifications/preferences/${userId}`);
+  },
+
+  updateNotificationPreferences(userId: string, body: UpdateNotificationPreferencesRequest) {
+    return request<NotificationPreferences>(`/v1/notifications/preferences/${userId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
     });
   },
 };

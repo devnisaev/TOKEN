@@ -8,6 +8,7 @@ import { CompliancePage } from '@/pages/CompliancePage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { DocumentReviewsPage } from '@/pages/DocumentReviewsPage';
 import { FlatFormPage } from '@/pages/FlatFormPage';
+import { FlatTokenizePage } from '@/pages/FlatTokenizePage';
 import { LoginPage } from '@/pages/LoginPage';
 import { OrderDetailPage } from '@/pages/OrderDetailPage';
 import { OrdersPage } from '@/pages/OrdersPage';
@@ -30,6 +31,7 @@ export function App() {
           <Route path="buildings/:buildingId/edit" element={<BuildingFormPage />} />
           <Route path="buildings/:buildingId/flats/new" element={<FlatFormPage />} />
           <Route path="buildings/:buildingId/flats/:flatId/edit" element={<FlatFormPage />} />
+          <Route path="buildings/:buildingId/flats/:flatId/tokenize" element={<FlatTokenizePage />} />
           <Route path="buildings/:buildingId" element={<BuildingDetailPage />} />
           <Route path="orders" element={<OrdersPage />} />
           <Route path="orders/:orderId" element={<OrderDetailPage />} />

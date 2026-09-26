@@ -1,6 +1,7 @@
 package com.tokenrealty.gateway.dto;
 
 import com.tokenrealty.gateway.client.PropertyRegistryClient;
+import com.tokenrealty.gateway.client.RentalClient;
 import com.tokenrealty.gateway.client.TokenIssuanceClient;
 import com.tokenrealty.gateway.client.WalletClient;
 import lombok.Builder;
@@ -99,5 +100,25 @@ public final class BffDtos {
     }
 
     public record OrderStatusEvent(UUID orderId, String orderStatus, String tradeStatus) {
+    }
+
+    @Builder
+    public record TenantFlatSummary(
+            UUID flatId,
+            UUID buildingId,
+            String buildingName,
+            String flatNumber,
+            Integer floor,
+            Double areaSqm,
+            String status
+    ) {
+    }
+
+    @Builder
+    public record TenantLeaseBffResponse(
+            RentalClient.LeaseView lease,
+            TenantFlatSummary flat,
+            boolean rentDue
+    ) {
     }
 }

@@ -89,3 +89,18 @@ export interface Trade {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface NotificationPreferences {
+  userId: string;
+  emailEnabled: boolean;
+  tradeAlerts: boolean;
+  dividendAlerts: boolean;
+  rentReminders: boolean;
+}
+
+export interface UpdateNotificationPreferencesRequest {
+  emailEnabled: boolean;
+  tradeAlerts: boolean;
+  dividendAlerts: boolean;
+  rentReminders: boolean;
+}

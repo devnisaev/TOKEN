@@ -40,3 +40,19 @@ export interface RentPayment {
   status: string;
   paidAt?: string;
 }
+
+export interface TenantFlatSummary {
+  flatId: string;
+  buildingId: string;
+  buildingName: string;
+  flatNumber: string;
+  floor?: number;
+  areaSqm?: number;
+  status: string;
+}
+
+export interface TenantLeaseBffResponse {
+  lease: Lease;
+  flat: TenantFlatSummary;
+  rentDue: boolean;
+}

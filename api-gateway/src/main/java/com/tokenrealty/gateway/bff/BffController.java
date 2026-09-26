@@ -4,12 +4,14 @@ import com.tokenrealty.gateway.dto.BffDtos.BuildingBffDetailResponse;
 import com.tokenrealty.gateway.dto.BffDtos.FlatDetailResponse;
 import com.tokenrealty.gateway.dto.BffDtos.ListingDetailResponse;
 import com.tokenrealty.gateway.dto.BffDtos.PortfolioBffResponse;
+import com.tokenrealty.gateway.dto.BffDtos.TenantLeaseBffResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -21,6 +23,7 @@ public class BffController {
     private final BffListingService listingService;
     private final BffBuildingService buildingService;
     private final BffPortfolioService portfolioService;
+    private final BffTenantLeaseService tenantLeaseService;
 
     @GetMapping("/flats/{flatId}")
     public FlatDetailResponse flatDetail(@PathVariable UUID flatId) {
@@ -40,5 +43,10 @@ public class BffController {
     @GetMapping("/investors/{investorId}/portfolio")
     public PortfolioBffResponse portfolio(@PathVariable UUID investorId) {
         return portfolioService.getPortfolio(investorId);
+    }
+
+    @GetMapping("/tenants/{tenantId}/lease")
+    public List<TenantLeaseBffResponse> tenantLeases(@PathVariable UUID tenantId) {
+        return tenantLeaseService.getTenantLeases(tenantId);
     }
 }

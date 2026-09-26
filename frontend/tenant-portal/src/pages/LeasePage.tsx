@@ -27,13 +27,16 @@ export function LeasePage() {
   const [paidNotice, setPaidNotice] = useState<string | null>(null);
 
   const leasesQuery = useQuery({
-    queryKey: ['leases', user?.id],
-    queryFn: () => api.listLeases(user!.id),
+    queryKey: ['tenant-leases-bff', user?.id],
+    queryFn: () => api.listTenantLeasesBff(user!.id),
     enabled: !!user?.id,
   });
 
-  const leases = leasesQuery.data ?? [];
-  const lease = leases.find((l) => l.id === selectedLeaseId) ?? leases[0] ?? null;
+  const leaseItems = leasesQuery.data ?? [];
+  const leaseItem =
+    leaseItems.find((item) => item.lease.id === selectedLeaseId) ?? leaseItems[0] ?? null;
+  const lease = leaseItem?.lease ?? null;
+  const flat = leaseItem?.flat ?? null;
 
   const paymentsQuery = useQuery({
     queryKey: ['rent-payments', lease?.id],
@@ -90,7 +93,7 @@ export function LeasePage() {
     (p) => p.period === period && p.status !== 'FAILED',
   );
   const currentMonth = currentPeriod();
-  const rentDueNow = period === currentMonth && !paidThisPeriod;
+  const rentDueNow = leaseItem?.rentDue && period === currentMonth && !paidThisPeriod;
   const overdue = isOverduePeriod(period) && !paidThisPeriod;
 
   return (
@@ -121,19 +124,19 @@ export function LeasePage() {
         </div>
       )}
 
-      {leases.length > 1 && (
+      {leaseItems.length > 1 && (
         <div className="flex flex-wrap gap-2">
-          {leases.map((item) => (
+          {leaseItems.map((item) => (
             <Button
-              key={item.id}
+              key={item.lease.id}
               size="sm"
-              variant={item.id === lease.id ? 'default' : 'outline'}
+              variant={item.lease.id === lease.id ? 'default' : 'outline'}
               onClick={() => {
-                setSelectedLeaseId(item.id);
+                setSelectedLeaseId(item.lease.id);
                 setPaidNotice(null);
               }}
             >
-              Flat {item.flatId.slice(0, 8)}…
+              {item.flat.flatNumber} · {item.flat.buildingName}
             </Button>
           ))}
         </div>
@@ -143,7 +146,8 @@ export function LeasePage() {
         <CardHeader>
           <CardTitle className="text-lg">{formatUsd(lease.monthlyRentUsd)} / month</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Flat {lease.flatId} · {lease.startDate} → {lease.endDate ?? 'open-ended'} · {lease.status}
+            {flat ? `${flat.buildingName} · Unit ${flat.flatNumber}` : `Flat ${lease.flatId}`} ·{' '}
+            {lease.startDate} → {lease.endDate ?? 'open-ended'} · {lease.status}
           </p>
         </CardHeader>
         <CardContent className="space-y-4">

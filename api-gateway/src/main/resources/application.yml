@@ -30,6 +30,8 @@ services:
     url: ${MARKETPLACE_SERVICE_URL:http://localhost:8084/api}
   wallet:
     url: ${WALLET_SERVICE_URL:http://localhost:8090/api}
+  rental:
+    url: ${RENTAL_SERVICE_URL:http://localhost:8086/api}
 
 tokenrealty:
   jwt:

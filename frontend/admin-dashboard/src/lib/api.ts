@@ -15,6 +15,8 @@ import type {
   TokenResponse,
   UpdateBuildingRequest,
   UpdateFlatRequest,
+  IssueTokenRequest,
+  TokenContract,
   UserProfile,
 } from '@/types/api';
 
@@ -135,6 +137,13 @@ export const api = {
   settleOrder(orderId: string, body: SettleTradeRequest) {
     return request<Trade>(`/v1/orders/${orderId}/settle`, {
       method: 'PATCH',
+      body: JSON.stringify(body),
+    });
+  },
+
+  issueTokens(body: IssueTokenRequest) {
+    return request<TokenContract>('/v1/tokens', {
+      method: 'POST',
       body: JSON.stringify(body),
     });
   },

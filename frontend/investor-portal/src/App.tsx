@@ -7,6 +7,7 @@ import { LoginPage } from '@/pages/LoginPage';
 import { OrderStatusPage } from '@/pages/OrderStatusPage';
 import { OrdersPage } from '@/pages/OrdersPage';
 import { DividendsPage } from '@/pages/DividendsPage';
+import { NotificationPreferencesPage } from '@/pages/NotificationPreferencesPage';
 import { PortfolioPage } from '@/pages/PortfolioPage';
 import { SellTokensPage } from '@/pages/SellTokensPage';
 
@@ -29,6 +30,7 @@ export function App() {
           <Route path="portfolio" element={<PortfolioPage />} />
           <Route path="portfolio/sell/:contractId" element={<SellTokensPage />} />
           <Route path="dividends" element={<DividendsPage />} />
+          <Route path="settings/notifications" element={<NotificationPreferencesPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

@@ -167,12 +167,22 @@ export function BuildingDetailPage() {
                   {flat.tokenPriceUsd != null ? `$${flat.tokenPriceUsd}` : '—'}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link
-                    to={`/buildings/${buildingId}/flats/${flat.id}/edit`}
-                    className="text-primary underline-offset-4 hover:underline"
-                  >
-                    Edit
-                  </Link>
+                  <div className="flex justify-end gap-3">
+                    {flat.status === 'AVAILABLE' && (
+                      <Link
+                        to={`/buildings/${buildingId}/flats/${flat.id}/tokenize`}
+                        className="text-primary underline-offset-4 hover:underline"
+                      >
+                        Tokenize
+                      </Link>
+                    )}
+                    <Link
+                      to={`/buildings/${buildingId}/flats/${flat.id}/edit`}
+                      className="text-primary underline-offset-4 hover:underline"
+                    >
+                      Edit
+                    </Link>
+                  </div>
                 </td>
               </tr>
             ))}

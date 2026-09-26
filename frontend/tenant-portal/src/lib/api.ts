@@ -3,6 +3,7 @@ import type {
   Lease,
   RecordRentPaymentRequest,
   RentPayment,
+  TenantLeaseBffResponse,
   TokenResponse,
   UserProfile,
 } from '@/types/api';
@@ -40,6 +41,10 @@ export const api = {
 
   listLeases(tenantId: string) {
     return request<Lease[]>(`/v1/leases?tenantId=${tenantId}`);
+  },
+
+  listTenantLeasesBff(tenantId: string) {
+    return request<TenantLeaseBffResponse[]>(`/v1/bff/tenants/${tenantId}/lease`);
   },
 
   getLease(leaseId: string) {
