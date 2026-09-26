@@ -158,14 +158,14 @@ Access raw transport: `http()` returns the wrapped `RestClientOperations`.
 
 | Client | Caller | Status |
 |--------|--------|--------|
-| `PaymentClient` | Marketplace | Done |
-| `ComplianceClient` | Marketplace | Done |
-| `PropertyRegistryClient` | Issuance, Marketplace, Document, Gateway | Pending |
-| `TokenIssuanceClient` | Marketplace, Gateway | Pending |
-| `MarketplaceClient` | Issuance, Gateway | Pending |
-| `PaymentClient` | Rental, Wallet | Pending |
-| `ComplianceClient` | Issuance | Pending |
-| `IssuanceClient` | Wallet, Blockchain Indexer | Pending |
+| `PaymentClient` | Marketplace, Rental, Wallet | Done |
+| `ComplianceClient` | Marketplace, Issuance | Done |
+| `PropertyRegistryClient` | Issuance, Marketplace, Document, Compliance, Gateway | Done |
+| `TokenIssuanceClient` | Marketplace, Gateway | Done |
+| `MarketplaceClient` | Issuance, Gateway | Done |
+| `IssuanceClient` | Wallet, Blockchain Indexer | Done |
+| `WalletClient` | Gateway | Done |
+| `RentalClient` | Issuance | Done |
 
 ### Migrating a legacy client
 

@@ -10,8 +10,9 @@ Port **8086** · Database **`rental_service`**
 |--------|----------|------|-------------|
 | POST | `/v1/leases` | ADMIN, PROPERTY_MANAGER | Create lease |
 | GET | `/v1/leases/{id}` | Any | Lease details |
-| GET | `/v1/leases?tenantId=` | Any | List leases for tenant |
+| GET | `/v1/leases?tenantId=` | Any | List leases for tenant (required param) |
 | POST | `/v1/rent-payments` | ADMIN, PROPERTY_MANAGER, TENANT | Record rent payment |
+| GET | `/v1/rent-payments` | Any | List payments (`?leaseId=`) |
 | GET | `/v1/rent-payments?leaseId=` | Any | Payment history for lease |
 | GET | `/v1/rent-payments/summary` | ADMIN, PROPERTY_MANAGER | Flat rent summary by period |
 | GET | `/v1/occupancy/flats/{flatId}` | Any | Occupancy status |
