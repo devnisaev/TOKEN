@@ -417,3 +417,17 @@ Example: `tokenrealty.marketplace.order.matched.v1.dlq`
 | Change semantics | New topic `.v2` |
 
 Update this file when adding or retiring topics.
+
+---
+
+## Avro serialization (opt-in)
+
+When `tokenrealty.kafka.serialization=avro` is set on a publishing service (Marketplace, Payment):
+
+| Component | Role |
+|-----------|------|
+| `AvroSchemaRegistrar` | Registers `EventEnvelope` + domain schemas with Apicurio on startup |
+| `AvroOutboxPayloadEncoder` | Wraps JSON outbox payload in Avro `EventEnvelope` bytes (base64 in Kafka value) |
+| Apicurio (`schema-registry:8080` in compose kafka profile) | Schema Registry compatible with Confluent API |
+
+Consumers remain JSON by default. Enable Avro consumer deserialization only after dual-read validation in staging.

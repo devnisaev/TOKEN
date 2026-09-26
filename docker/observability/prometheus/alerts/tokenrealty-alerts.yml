@@ -10,6 +10,7 @@ groups:
           summary: "TokenRealty service {{ $labels.job }} is down"
           description: "Prometheus cannot scrape {{ $labels.instance }} (job {{ $labels.job }}) for more than 2 minutes."
 
+      # Micrometer gauge indexer.balance.mismatches.open → Prometheus indexer_balance_mismatches_open
       - alert: TokenRealtyIndexerBalanceMismatch
         expr: indexer_balance_mismatches_open > 0
         for: 5m

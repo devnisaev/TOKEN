@@ -712,6 +712,23 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] `OrderServiceTest.placeBuyOrderOnSecondaryMatchesPendingSellOrder` (track 200)
 - [x] Nightly compose E2E workflow (`.github/workflows/nightly-e2e.yml`, track 201)
 - [x] Tracks 178–201 synced in PLATFORM-SPEC §11.4 (track 202)
+- [x] Compose E2E expanded to 11 specs: dividend, notification-prefs, secondary buy, building detail, document review, tenant rent (track 203)
+- [x] GraphQL `buildingDetail` + `adminMaintenanceQueue` queries; GraphiQL in local profile (tracks 204–206)
+- [x] Payment OpenAPI `sellerRecipientId`; integration test for seller credit on escrow release (tracks 207–208)
+- [x] Onfido KYC webhook provider + `OnfidoProperties` config (tracks 209, 223)
+- [x] Self-hosted Kubo IPFS pinning mode (`IPFS_MODE=kubo`, track 210)
+- [x] Payment outbox Avro serialization hook (`tokenrealty.kafka.serialization=avro`, track 211)
+- [x] Onfido webhook integration test (track 212)
+- [x] Investor portal GraphQL portfolio client (`VITE_USE_GRAPHQL_BFF`, track 213)
+- [x] Wallet encryption round-trip integration test (track 214)
+- [x] `IpfsStorageServiceTest` simulated + kubo failure paths (track 215)
+- [x] ADR 001 ERC-1400 token standard decision (track 216)
+- [x] ADR 002 Kafka Avro opt-in decision (track 217)
+- [x] EVENTS.md Avro serialization section (track 218)
+- [x] Gateway BFF `GET /v1/bff/admin/maintenance-tickets` (track 220)
+- [x] GraphQL controller tests for building + admin maintenance (track 221)
+- [x] Prometheus alert documents Micrometer → Prometheus metric mapping (track 226)
+- [x] Tracks 203–226 synced in PLATFORM-SPEC §11.4 (track 227)
 
 ### 11.5 Frontend
 
