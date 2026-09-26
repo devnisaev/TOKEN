@@ -1,0 +1,135 @@
+openapi: 3.0.3
+info:
+  title: TokenRealty Payment API
+  version: 1.0.0
+paths:
+  /v1/payments:
+    get:
+      operationId: listPayments
+      parameters:
+        - name: payerId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: orderId
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentPage'
+    post:
+      operationId: initiatePayment
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InitiatePaymentRequest'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+  /v1/payments/{id}:
+    get:
+      operationId: getPayment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+  /v1/payments/{id}/confirm:
+    post:
+      operationId: confirmPayment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmPaymentRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+  /v1/payments/{id}/release:
+    patch:
+      operationId: releaseEscrow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+components:
+  schemas:
+    PaymentPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+        totalElements: { type: integer }
+    InitiatePaymentRequest:
+      type: object
+      required: [orderId, payerId, payerWallet, amount, currency]
+      properties:
+        orderId: { type: string, format: uuid }
+        payerId: { type: string, format: uuid }
+        payerWallet: { type: string }
+        amount: { type: number }
+        currency: { type: string, enum: [USDC, USD, MATIC, ETH] }
+        paymentType: { type: string }
+    ConfirmPaymentRequest:
+      type: object
+      required: [txHash]
+      properties:
+        txHash: { type: string }
+    Payment:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        orderId: { type: string, format: uuid }
+        payerId: { type: string, format: uuid }
+        payerWallet: { type: string }
+        amount: { type: number }
+        currency: { type: string }
+        status: { type: string, enum: [PENDING, CONFIRMED, RELEASED, REFUNDED, FAILED] }
+        txHash: { type: string, nullable: true }
+        escrow:
+          $ref: '#/components/schemas/Escrow'
+    Escrow:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        paymentId: { type: string, format: uuid }
+        orderId: { type: string, format: uuid }
+        amount: { type: number }
+        currency: { type: string }
+        status: { type: string, enum: [AWAITING, HELD, RELEASED, REFUNDED] }

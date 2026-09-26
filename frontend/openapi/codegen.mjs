@@ -12,6 +12,11 @@ const specs = [
   ['registry', 'specs/registry.yaml'],
   ['compliance', 'specs/compliance.yaml'],
   ['marketplace', 'specs/marketplace.yaml'],
+  ['payment', 'specs/payment.yaml'],
+  ['wallet', 'specs/wallet.yaml'],
+  ['issuance', 'specs/issuance.yaml'],
+  ['notification', 'specs/notification.yaml'],
+  ['document', 'specs/document.yaml'],
   ['rental', 'specs/rental.yaml'],
   ['gateway', 'specs/gateway.yaml'],
 ];

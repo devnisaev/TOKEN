@@ -1,0 +1,96 @@
+openapi: 3.0.3
+info:
+  title: TokenRealty Wallet API
+  version: 1.0.0
+paths:
+  /v1/wallets/{investorId}:
+    get:
+      operationId: listWallets
+      parameters:
+        - name: investorId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Wallet'
+  /v1/wallets/{investorId}/balance:
+    get:
+      operationId: getAggregateBalance
+      parameters:
+        - name: investorId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AggregateBalance'
+  /v1/wallets:
+    post:
+      operationId: createCustodialWallet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustodialWalletRequest'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Wallet'
+  /v1/wallets/link:
+    post:
+      operationId: linkWallet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkWalletRequest'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Wallet'
+components:
+  schemas:
+    CreateCustodialWalletRequest:
+      type: object
+      properties:
+        investorId: { type: string, format: uuid }
+        label: { type: string }
+    LinkWalletRequest:
+      type: object
+      required: [investorId, walletAddress]
+      properties:
+        investorId: { type: string, format: uuid }
+        walletAddress: { type: string }
+        label: { type: string }
+        primary: { type: boolean }
+    Wallet:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        investorId: { type: string, format: uuid }
+        walletAddress: { type: string }
+        walletType: { type: string, enum: [CUSTODIAL, LINKED] }
+        label: { type: string, nullable: true }
+        primary: { type: boolean }
+    AggregateBalance:
+      type: object
+      properties:
+        investorId: { type: string, format: uuid }
+        fiatBalanceUsd: { type: number }
+        tokenHoldingsUsd: { type: number }
+        totalBalanceUsd: { type: number }

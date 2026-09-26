@@ -1,0 +1,76 @@
+openapi: 3.0.3
+info:
+  title: TokenRealty Document API
+  version: 1.0.0
+paths:
+  /v1/documents/{documentId}:
+    get:
+      operationId: getDocument
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+  /v1/documents/upload:
+    post:
+      operationId: uploadDocument
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, documentName, documentType]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                documentName:
+                  type: string
+                documentType:
+                  type: string
+                  enum:
+                    - TITLE_DEED
+                    - FLOOR_PLAN
+                    - BUILDING_PERMIT
+                    - INSPECTION_REPORT
+                    - VALUATION_REPORT
+                    - SPV_REGISTRATION
+                    - ARTICLES_OF_INCORPORATION
+                    - ENVIRONMENTAL_AUDIT
+                    - KYC_DOCUMENT
+                    - LEASE_AGREEMENT
+                    - INSURANCE_POLICY
+                    - OTHER
+                buildingId:
+                  type: string
+                  format: uuid
+                flatId:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+components:
+  schemas:
+    Document:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        documentName: { type: string }
+        documentType: { type: string }
+        ipfsCid: { type: string, nullable: true }
+        storageUrl: { type: string, nullable: true }
+        fileSizeBytes: { type: integer, nullable: true }
+        mimeType: { type: string, nullable: true }
+        isVerified: { type: boolean }
+        createdAt: { type: string, format: date-time }

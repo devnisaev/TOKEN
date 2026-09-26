@@ -1,0 +1,118 @@
+openapi: 3.0.3
+info:
+  title: TokenRealty Token Issuance API
+  version: 1.0.0
+paths:
+  /v1/tokens:
+    get:
+      operationId: listTokens
+      parameters:
+        - name: activeOnly
+          in: query
+          schema: { type: boolean, default: false }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenContractPage'
+    post:
+      operationId: issueTokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueTokenRequest'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenContract'
+  /v1/tokens/{id}:
+    get:
+      operationId: getToken
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenContract'
+  /v1/tokens/by-flat/{flatId}:
+    get:
+      operationId: getTokenByFlat
+      parameters:
+        - name: flatId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenContract'
+  /v1/investors/{investorId}/holdings:
+    get:
+      operationId: listInvestorHoldings
+      parameters:
+        - name: investorId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TokenHolding'
+components:
+  schemas:
+    TokenContractPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/TokenContract'
+        totalElements: { type: integer }
+    IssueTokenRequest:
+      type: object
+      required: [flatId, buildingId, tokenName, tokenSymbol, totalSupply, tokenPriceUsd, spvWalletAddress]
+      properties:
+        flatId: { type: string, format: uuid }
+        buildingId: { type: string, format: uuid }
+        tokenName: { type: string }
+        tokenSymbol: { type: string }
+        totalSupply: { type: integer }
+        tokenPriceUsd: { type: number }
+        spvWalletAddress: { type: string }
+    TokenContract:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        flatId: { type: string, format: uuid }
+        buildingId: { type: string, format: uuid }
+        tokenName: { type: string }
+        tokenSymbol: { type: string }
+        totalSupply: { type: integer }
+        tokenPriceUsd: { type: number }
+        contractAddress: { type: string, nullable: true }
+        status: { type: string }
+        spvWalletAddress: { type: string }
+    TokenHolding:
+      type: object
+      properties:
+        contractId: { type: string, format: uuid }
+        flatId: { type: string, format: uuid }
+        tokenSymbol: { type: string }
+        balance: { type: integer }
+        balanceUsd: { type: number }

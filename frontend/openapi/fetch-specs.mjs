@@ -15,6 +15,11 @@ const services = [
   { name: 'registry', url: process.env.REGISTRY_URL ?? 'http://localhost:8081/api' },
   { name: 'compliance', url: process.env.COMPLIANCE_URL ?? 'http://localhost:8087/api' },
   { name: 'marketplace', url: process.env.MARKETPLACE_URL ?? 'http://localhost:8084/api' },
+  { name: 'payment', url: process.env.PAYMENT_URL ?? 'http://localhost:8085/api' },
+  { name: 'wallet', url: process.env.WALLET_URL ?? 'http://localhost:8090/api' },
+  { name: 'issuance', url: process.env.ISSUANCE_URL ?? 'http://localhost:8082/api' },
+  { name: 'notification', url: process.env.NOTIFICATION_URL ?? 'http://localhost:8089/api' },
+  { name: 'document', url: process.env.DOCUMENT_URL ?? 'http://localhost:8088/api' },
   { name: 'rental', url: process.env.RENTAL_URL ?? 'http://localhost:8086/api' },
 ];
 

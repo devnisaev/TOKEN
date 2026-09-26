@@ -1,0 +1,82 @@
+openapi: 3.0.3
+info:
+  title: TokenRealty Notification API
+  version: 1.0.0
+paths:
+  /v1/notifications/preferences/{userId}:
+    get:
+      operationId: getNotificationPreferences
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationPreferences'
+    patch:
+      operationId: updateNotificationPreferences
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateNotificationPreferencesRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationPreferences'
+  /v1/notifications/send:
+    post:
+      operationId: sendNotification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendNotificationRequest'
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendNotificationResponse'
+components:
+  schemas:
+    NotificationPreferences:
+      type: object
+      properties:
+        userId: { type: string, format: uuid }
+        emailEnabled: { type: boolean }
+        tradeAlerts: { type: boolean }
+        dividendAlerts: { type: boolean }
+        rentReminders: { type: boolean }
+    UpdateNotificationPreferencesRequest:
+      type: object
+      required: [emailEnabled, tradeAlerts, dividendAlerts, rentReminders]
+      properties:
+        emailEnabled: { type: boolean }
+        tradeAlerts: { type: boolean }
+        dividendAlerts: { type: boolean }
+        rentReminders: { type: boolean }
+    SendNotificationRequest:
+      type: object
+      required: [eventType, payload]
+      properties:
+        eventType: { type: string }
+        payload: { type: object }
+    SendNotificationResponse:
+      type: object
+      properties:
+        eventType: { type: string }
+        status: { type: string }
