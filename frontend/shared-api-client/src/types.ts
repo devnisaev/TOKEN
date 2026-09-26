@@ -98,17 +98,46 @@ export interface BuildingBffDetail {
   availableFlatCount: number;
 }
 
+export interface FiatBalance {
+  currency: string;
+  available: number;
+  held: number;
+}
+
+export interface TokenHolding {
+  contractId: string;
+  tokenSymbol: string;
+  walletAddress: string;
+  balance: number;
+}
+
 export interface AggregateBalance {
   investorId: string;
-  totalUsd: number;
-  walletBalanceUsd: number;
-  tokenHoldingsUsd: number;
-  holdings?: Array<{
-    flatId: string;
-    tokenSymbol?: string;
-    balance: number;
-    valueUsd: number;
-  }>;
+  primaryWalletAddress: string | null;
+  fiatBalances: FiatBalance[];
+  tokenHoldings: TokenHolding[];
+}
+
+export interface DividendPayment {
+  id: string;
+  contractId: string;
+  investorId: string;
+  investorWallet?: string;
+  periodStart?: string;
+  periodEnd?: string;
+  tokensHeld?: number;
+  ownershipPct?: number;
+  grossRentalIncomeUsd?: number;
+  amountUsd: number;
+  txHash?: string;
+  paidAt?: string;
+  status: string;
+  createdAt?: string;
+}
+
+export interface PortfolioBffDetail {
+  balance: AggregateBalance;
+  recentDividends: DividendPayment[];
 }
 
 export type ApiError = ProblemDetail;

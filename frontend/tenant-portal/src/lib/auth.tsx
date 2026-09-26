@@ -1,9 +1,17 @@
 import {
+  loadStoredAuth,
+  needsRefresh,
+  saveStoredAuth,
+  storedFromTokens,
+  type StoredAuth,
+} from '@tokenrealty/shared-api-client';
+import {
   createContext,
   useCallback,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -11,14 +19,7 @@ import { api, setAccessTokenGetter } from '@/lib/api';
 import type { TokenResponse, UserProfile } from '@/types/api';
 
 const STORAGE_KEY = 'tokenrealty.tenant.auth';
-
-interface StoredAuth {
-  accessToken: string;
-  refreshToken: string;
-  userId: string;
-  email: string;
-  role: string;
-}
+const REFRESH_CHECK_MS = 30_000;
 
 interface AuthContextValue {
   user: UserProfile | null;
@@ -31,83 +32,108 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-function loadStored(): StoredAuth | null {
-  const raw = sessionStorage.getItem(STORAGE_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as StoredAuth;
-  } catch {
-    return null;
-  }
-}
-
-function saveStored(auth: StoredAuth | null) {
-  if (auth) sessionStorage.setItem(STORAGE_KEY, JSON.stringify(auth));
-  else sessionStorage.removeItem(STORAGE_KEY);
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [stored, setStored] = useState<StoredAuth | null>(() => loadStored());
+  const [stored, setStored] = useState<StoredAuth | null>(() => loadStoredAuth(STORAGE_KEY));
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(!!loadStored());
-
-  const accessToken = stored?.accessToken ?? null;
-
-  useEffect(() => {
-    setAccessTokenGetter(() => accessToken);
-  }, [accessToken]);
+  const [isLoading, setIsLoading] = useState(!!loadStoredAuth(STORAGE_KEY));
+  const refreshInFlight = useRef<Promise<StoredAuth | null> | null>(null);
 
   useEffect(() => {
-    if (!accessToken) {
+    setAccessTokenGetter(() => stored?.accessToken ?? null);
+  }, [stored]);
+
+  const clearSession = useCallback(() => {
+    saveStoredAuth(STORAGE_KEY, null);
+    setStored(null);
+    setUser(null);
+  }, []);
+
+  const applyTokens = useCallback((tokens: TokenResponse) => {
+    const next = storedFromTokens(tokens);
+    saveStoredAuth(STORAGE_KEY, next);
+    setStored(next);
+    return next;
+  }, []);
+
+  const refreshSession = useCallback(async (): Promise<StoredAuth | null> => {
+    if (refreshInFlight.current) return refreshInFlight.current;
+    const current = loadStoredAuth(STORAGE_KEY);
+    if (!current?.refreshToken) {
+      clearSession();
+      return null;
+    }
+    refreshInFlight.current = (async () => {
+      try {
+        const tokens = await api.refresh(current.refreshToken);
+        return applyTokens(tokens);
+      } catch {
+        clearSession();
+        return null;
+      } finally {
+        refreshInFlight.current = null;
+      }
+    })();
+    return refreshInFlight.current;
+  }, [applyTokens, clearSession]);
+
+  const loadProfile = useCallback(async () => {
+    if (!stored?.accessToken) {
+      setUser(null);
+      return;
+    }
+    try {
+      setUser(await api.getProfile());
+    } catch {
+      const renewed = await refreshSession();
+      if (!renewed) return;
+      setUser(await api.getProfile());
+    }
+  }, [stored?.accessToken, refreshSession]);
+
+  useEffect(() => {
+    if (!stored?.accessToken) {
       setIsLoading(false);
       setUser(null);
       return;
     }
-    api.getProfile()
-      .then(setUser)
-      .catch(() => {
-        saveStored(null);
-        setStored(null);
-        setUser(null);
-      })
+    loadProfile()
+      .catch(() => clearSession())
       .finally(() => setIsLoading(false));
-  }, [accessToken]);
+  }, [stored?.accessToken, loadProfile, clearSession]);
+
+  useEffect(() => {
+    if (!stored) return;
+    const timer = window.setInterval(() => {
+      if (needsRefresh(stored)) {
+        refreshSession().catch(() => clearSession());
+      }
+    }, REFRESH_CHECK_MS);
+    return () => window.clearInterval(timer);
+  }, [stored, refreshSession, clearSession]);
 
   const login = useCallback(async (email: string, password: string) => {
     const tokens: TokenResponse = await api.login(email, password);
     if (tokens.role !== 'TENANT') {
       throw new Error('Tenant role required');
     }
-    const next: StoredAuth = {
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
-      userId: tokens.userId,
-      email: tokens.email,
-      role: tokens.role,
-    };
-    saveStored(next);
-    setStored(next);
+    applyTokens(tokens);
     setIsLoading(true);
-  }, []);
+  }, [applyTokens]);
 
-  const logout = useCallback(() => {
-    saveStored(null);
-    setStored(null);
-    setUser(null);
-  }, []);
+  const logout = useCallback(() => clearSession(), [clearSession]);
 
   const isTenant = user?.role === 'TENANT';
 
   const value = useMemo(
     () => ({
       user,
-      isAuthenticated: !!accessToken,
+      isAuthenticated: !!stored?.accessToken,
       isTenant,
       isLoading,
       login,
       logout,
     }),
-    [user, accessToken, isTenant, isLoading, login, logout],
+    [user, stored?.accessToken, isTenant, isLoading, login, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

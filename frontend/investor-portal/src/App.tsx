@@ -6,6 +6,7 @@ import { ListingsPage } from '@/pages/ListingsPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { OrderStatusPage } from '@/pages/OrderStatusPage';
 import { OrdersPage } from '@/pages/OrdersPage';
+import { DividendsPage } from '@/pages/DividendsPage';
 import { PortfolioPage } from '@/pages/PortfolioPage';
 
 export function App() {
@@ -25,6 +26,7 @@ export function App() {
           <Route path="orders" element={<OrdersPage />} />
           <Route path="orders/:orderId" element={<OrderStatusPage />} />
           <Route path="portfolio" element={<PortfolioPage />} />
+          <Route path="dividends" element={<DividendsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

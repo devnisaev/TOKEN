@@ -27,6 +27,13 @@ export const api = {
     });
   },
 
+  refresh(refreshToken: string) {
+    return request<TokenResponse>('/v1/auth/refresh', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken }),
+    });
+  },
+
   getProfile() {
     return request<UserProfile>('/v1/users/me');
   },

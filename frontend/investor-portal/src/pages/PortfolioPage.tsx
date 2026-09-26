@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { formatUsd } from '@/lib/utils';
@@ -10,19 +11,22 @@ export function PortfolioPage() {
   const { user } = useAuth();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['portfolio', user?.id],
-    queryFn: () => api.getPortfolio(user!.id),
+    queryKey: ['portfolio-bff', user?.id],
+    queryFn: () => api.getPortfolioBff(user!.id),
     enabled: !!user?.id,
   });
 
   if (!user) return null;
+
+  const balance = data?.balance;
+  const recentDividends = data?.recentDividends ?? [];
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Portfolio</h1>
-          <p className="mt-1 text-muted-foreground">USDC balances and token holdings</p>
+          <p className="mt-1 text-muted-foreground">USDC balances, token holdings, and recent dividends</p>
         </div>
         <ConnectWalletButton />
       </div>
@@ -40,7 +44,7 @@ export function PortfolioPage() {
         </div>
       )}
 
-      {data && (
+      {balance && (
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
             <CardHeader>
@@ -48,10 +52,10 @@ export function PortfolioPage() {
               <CardDescription>Custodial USDC in Payment Service</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {data.fiatBalances.length === 0 ? (
+              {balance.fiatBalances.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No balance rows yet</p>
               ) : (
-                data.fiatBalances.map((b) => (
+                balance.fiatBalances.map((b) => (
                   <div key={b.currency} className="flex justify-between text-sm">
                     <span>{b.currency}</span>
                     <span>
@@ -61,8 +65,8 @@ export function PortfolioPage() {
                   </div>
                 ))
               )}
-              {data.primaryWalletAddress && (
-                <p className="font-mono text-xs text-muted-foreground">{data.primaryWalletAddress}</p>
+              {balance.primaryWalletAddress && (
+                <p className="font-mono text-xs text-muted-foreground">{balance.primaryWalletAddress}</p>
               )}
             </CardContent>
           </Card>
@@ -73,10 +77,10 @@ export function PortfolioPage() {
               <CardDescription>From Token Issuance registry</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {data.tokenHoldings.length === 0 ? (
+              {balance.tokenHoldings.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No token holdings yet — buy on a listing to start</p>
               ) : (
-                data.tokenHoldings.map((h) => (
+                balance.tokenHoldings.map((h) => (
                   <div key={h.contractId} className="flex justify-between text-sm">
                     <span className="font-medium">{h.tokenSymbol}</span>
                     <span>{h.balance.toLocaleString()} tokens</span>
@@ -86,6 +90,32 @@ export function PortfolioPage() {
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {recentDividends.length > 0 && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Recent dividends</CardTitle>
+              <CardDescription>Latest rental income distributions</CardDescription>
+            </div>
+            <Link to="/dividends" className="text-sm text-primary underline-offset-4 hover:underline">
+              View all
+            </Link>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {recentDividends.slice(0, 5).map((d) => (
+              <div key={d.id} className="flex justify-between text-sm">
+                <span className="text-muted-foreground">
+                  {d.periodEnd ?? d.paidAt?.slice(0, 10) ?? 'Period'}
+                </span>
+                <span>
+                  {formatUsd(d.amountUsd)} · {d.status}
+                </span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       )}
     </div>
   );

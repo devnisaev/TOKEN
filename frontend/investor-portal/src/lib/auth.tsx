@@ -1,9 +1,17 @@
 import {
+  loadStoredAuth,
+  needsRefresh,
+  saveStoredAuth,
+  storedFromTokens,
+  type StoredAuth,
+} from '@tokenrealty/shared-api-client';
+import {
   createContext,
   useCallback,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -11,14 +19,7 @@ import { api, setAccessTokenGetter } from '@/lib/api';
 import type { TokenResponse, UserProfile } from '@/types/api';
 
 const STORAGE_KEY = 'tokenrealty.auth';
-
-interface StoredAuth {
-  accessToken: string;
-  refreshToken: string;
-  userId: string;
-  email: string;
-  role: string;
-}
+const REFRESH_CHECK_MS = 30_000;
 
 interface AuthContextValue {
   user: UserProfile | null;
@@ -31,78 +32,103 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-function loadStored(): StoredAuth | null {
-  const raw = sessionStorage.getItem(STORAGE_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as StoredAuth;
-  } catch {
-    return null;
-  }
-}
-
-function saveStored(auth: StoredAuth | null) {
-  if (auth) {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(auth));
-  } else {
-    sessionStorage.removeItem(STORAGE_KEY);
-  }
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [stored, setStored] = useState<StoredAuth | null>(() => loadStored());
+  const [stored, setStored] = useState<StoredAuth | null>(() => loadStoredAuth(STORAGE_KEY));
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(!!loadStored());
+  const [isLoading, setIsLoading] = useState(!!loadStoredAuth(STORAGE_KEY));
+  const refreshInFlight = useRef<Promise<StoredAuth | null> | null>(null);
 
   const accessToken = stored?.accessToken ?? null;
 
   useEffect(() => {
-    setAccessTokenGetter(() => accessToken);
-  }, [accessToken]);
+    setAccessTokenGetter(() => stored?.accessToken ?? null);
+  }, [stored]);
+
+  const applyTokens = useCallback((tokens: TokenResponse) => {
+    const next = storedFromTokens(tokens);
+    saveStoredAuth(STORAGE_KEY, next);
+    setStored(next);
+    return next;
+  }, []);
+
+  const clearSession = useCallback(() => {
+    saveStoredAuth(STORAGE_KEY, null);
+    setStored(null);
+    setUser(null);
+  }, []);
+
+  const refreshSession = useCallback(async (): Promise<StoredAuth | null> => {
+    if (refreshInFlight.current) {
+      return refreshInFlight.current;
+    }
+    const current = loadStoredAuth(STORAGE_KEY);
+    if (!current?.refreshToken) {
+      clearSession();
+      return null;
+    }
+    refreshInFlight.current = (async () => {
+      try {
+        const tokens = await api.refresh(current.refreshToken);
+        return applyTokens(tokens);
+      } catch {
+        clearSession();
+        return null;
+      } finally {
+        refreshInFlight.current = null;
+      }
+    })();
+    return refreshInFlight.current;
+  }, [applyTokens, clearSession]);
 
   const refreshProfile = useCallback(async () => {
-    if (!accessToken) {
+    if (!stored?.accessToken) {
       setUser(null);
       return;
     }
-    const profile = await api.getProfile();
-    setUser(profile);
-  }, [accessToken]);
+    try {
+      const profile = await api.getProfile();
+      setUser(profile);
+    } catch {
+      const renewed = await refreshSession();
+      if (!renewed) return;
+      const profile = await api.getProfile();
+      setUser(profile);
+    }
+  }, [stored?.accessToken, refreshSession]);
 
   useEffect(() => {
-    if (!accessToken) {
+    if (!stored?.accessToken) {
       setIsLoading(false);
       setUser(null);
       return;
     }
     refreshProfile()
-      .catch(() => {
-        saveStored(null);
-        setStored(null);
-        setUser(null);
-      })
+      .catch(() => clearSession())
       .finally(() => setIsLoading(false));
-  }, [accessToken, refreshProfile]);
+  }, [stored?.accessToken, refreshProfile, clearSession]);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const tokens: TokenResponse = await api.login(email, password);
-    const next: StoredAuth = {
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
-      userId: tokens.userId,
-      email: tokens.email,
-      role: tokens.role,
-    };
-    saveStored(next);
-    setStored(next);
-    setIsLoading(true);
-  }, []);
+  useEffect(() => {
+    if (!stored) return;
+    const timer = window.setInterval(() => {
+      if (needsRefresh(stored)) {
+        refreshSession().catch(() => clearSession());
+      }
+    }, REFRESH_CHECK_MS);
+    return () => window.clearInterval(timer);
+  }, [stored, refreshSession, clearSession]);
+
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const tokens = await api.login(email, password);
+      applyTokens(tokens);
+      setIsLoading(true);
+    },
+    [applyTokens],
+  );
 
   const logout = useCallback(() => {
-    saveStored(null);
-    setStored(null);
-    setUser(null);
-  }, []);
+    clearSession();
+  }, [clearSession]);
 
   const value = useMemo(
     () => ({

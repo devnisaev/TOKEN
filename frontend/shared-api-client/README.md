@@ -21,6 +21,10 @@ const profile = await client.request<UserProfile>('/v1/users/me');
 
 Portal-specific DTOs with required fields live in each app's `src/types/api.ts` — re-export shared types where openapi schemas are loose.
 
+## Auth refresh
+
+`auth-storage.ts` provides `storedFromTokens`, `needsRefresh`, and sessionStorage helpers. Portals refresh JWT ~60s before expiry and retry profile load after a 401.
+
 ## Types source
 
 Generated types: [../shared-api-types/](../shared-api-types/) via `cd ../openapi && npm run codegen`.

@@ -38,25 +38,13 @@ export interface Listing {
   createdAt?: string;
 }
 
-export interface FiatBalance {
-  currency: string;
-  available: number;
-  held: number;
-}
-
-export interface TokenHolding {
-  contractId: string;
-  tokenSymbol: string;
-  walletAddress: string;
-  balance: number;
-}
-
-export interface AggregateBalance {
-  investorId: string;
-  primaryWalletAddress: string | null;
-  fiatBalances: FiatBalance[];
-  tokenHoldings: TokenHolding[];
-}
+export type {
+  AggregateBalance,
+  DividendPayment,
+  FiatBalance,
+  PortfolioBffDetail,
+  TokenHolding,
+} from '@tokenrealty/shared-api-client';
 
 export interface Order {
   id: string;

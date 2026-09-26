@@ -1,11 +1,12 @@
 import { createApiClient, resolveApiBaseUrl } from '@tokenrealty/shared-api-client';
 import type {
-  AggregateBalance,
+  DividendPayment,
   FlatDetailResponse,
   Listing,
   ListingDetailResponse,
   Order,
   PlaceOrderRequest,
+  PortfolioBffDetail,
   SpringPage,
   TokenResponse,
   Trade,
@@ -78,8 +79,12 @@ export const api = {
     return request<Trade>(`/v1/orders/${orderId}/trade`);
   },
 
-  getPortfolio(investorId: string) {
-    return request<AggregateBalance>(`/v1/wallets/${investorId}/balance`);
+  getPortfolioBff(investorId: string) {
+    return request<PortfolioBffDetail>(`/v1/bff/investors/${investorId}/portfolio`);
+  },
+
+  listDividends(investorId: string) {
+    return request<DividendPayment[]>(`/v1/investors/${investorId}/dividends`);
   },
 
   linkWallet(investorId: string, walletAddress: string) {

@@ -31,6 +31,9 @@ export function Header() {
           <NavLink to="/portfolio" className={navLinkClass}>
             Portfolio
           </NavLink>
+          <NavLink to="/dividends" className={navLinkClass}>
+            Dividends
+          </NavLink>
         </nav>
 
         <div className="flex items-center gap-3">
