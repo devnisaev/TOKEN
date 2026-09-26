@@ -1,6 +1,7 @@
 package com.tokenrealty.marketplace.controller;
 
 import com.tokenrealty.marketplace.dto.MarketplaceDtos.*;
+import com.tokenrealty.marketplace.entity.MarketOrder;
 import com.tokenrealty.marketplace.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,8 +29,9 @@ public class OrderController {
     public Page<OrderResponse> list(
             @RequestParam(required = false) UUID buyerId,
             @RequestParam(required = false) UUID listingId,
+            @RequestParam(required = false) MarketOrder.OrderStatus status,
             @PageableDefault(size = 20) Pageable pageable) {
-        return orderService.findAll(buyerId, listingId, pageable);
+        return orderService.findAll(buyerId, listingId, status, pageable);
     }
 
     @GetMapping("/{id}")

@@ -351,8 +351,8 @@ Examples: `tokenrealty.registry.flat-tokenized`, `tokenrealty.marketplace.order-
 
 - [x] Kafka (KRaft) in `docker-compose.yml` — `docker compose --profile kafka up -d` from repo root
 - [ ] Define shared event schema (Avro or JSON Schema in `docs/schemas/`)
-- [ ] Create `tokenrealty-events` shared library (Java records + serializers)
-- [ ] Add `@KafkaListener` stubs in each service as they are built
+- [x] Create `tokenrealty-events` shared library (Java records + serializers)
+- [x] Add `@KafkaListener` stubs in each service as they are built
 
 ---
 
@@ -476,7 +476,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 - [x] Route definitions for all services (incl. notification, document)
 - [x] JWT validation at gateway level
 - [x] CORS configuration
-- [ ] Rate limiting (optional)
+- [x] Rate limiting (optional — in-memory per-IP at gateway)
 - [x] Health check aggregation endpoint (`GET /actuator/platform-health`)
 
 ### 10.3 Kafka infrastructure (Phase 1)
@@ -596,7 +596,7 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] Kafka consumers for key notification events (KYC, trade settled, dividend, rent)
 - [x] Simple email templates per event type
 - [x] POST `/v1/notifications/send` — manual trigger (admin)
-- [ ] Notification preferences per user
+- [x] Notification preferences per user (in-memory stub GET/PATCH `/v1/notifications/preferences/{userId}`)
 
 ### 10.10 Wallet Service (Phase 5)
 
@@ -637,15 +637,15 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 
 - [x] Structured logging (JSON) with `traceId` via `tokenrealty-web` (`TraceIdFilter`, logback-spring.xml)
 - [x] Micrometer + Prometheus metrics (`/actuator/prometheus` on all services)
-- [ ] Distributed tracing (OpenTelemetry / Zipkin export)
+- [x] Distributed tracing (OpenTelemetry OTLP export; Jaeger in compose `otel` profile)
 - [x] Health checks: `/actuator/health` on all services
 
 ### 11.4 CI/CD
 
 - [x] GitHub Actions: Java tests (all services), Hardhat tests, frontend builds, OpenAPI codegen check
 - [x] Contract compile + test in CI (Hardhat job)
-- [ ] Docker image build per service
-- [ ] Integration test suite with Testcontainers (PostgreSQL, Kafka)
+- [x] Docker image build per service (generic `docker/Dockerfile.spring-service` + CI gateway job)
+- [x] Integration test suite with Testcontainers (PostgreSQL — marketplace buy-flow, payment escrow)
 
 ### 11.5 Frontend
 

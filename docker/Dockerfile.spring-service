@@ -1,0 +1,18 @@
+# Generic Spring Boot service image. Build the JAR first, then:
+#   docker build -f docker/Dockerfile.spring-service \
+#     --build-arg SERVICE_DIR=api-gateway \
+#     --build-arg SERVICE_JAR=api-gateway-0.0.1-SNAPSHOT.jar \
+#     --build-arg EXPOSE_PORT=8080 \
+#     -t tokenrealty/api-gateway:local .
+
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+
+ARG SERVICE_DIR=api-gateway
+ARG SERVICE_JAR=app.jar
+ARG EXPOSE_PORT=8080
+
+COPY ${SERVICE_DIR}/target/${SERVICE_JAR} app.jar
+
+EXPOSE ${EXPOSE_PORT}
+ENTRYPOINT ["java", "-jar", "app.jar"]

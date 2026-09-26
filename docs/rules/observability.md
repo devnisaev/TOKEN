@@ -10,6 +10,7 @@ Shared observability defaults via `tokenrealty-web` (auto-configured on all serv
 | Trace propagation | Outbound `RestClient` copies MDC `traceId` → `X-Trace-Id` (`ServiceRestClientBuilder`) |
 | Structured logging | JSON console when profile `json-log` or `prod` (Logstash encoder) |
 | Metrics | Micrometer + Prometheus registry (transitive via `tokenrealty-web`) |
+| Distributed tracing | Optional OTLP via `application-otel.yml` + `OTEL_ENABLED=true` (Micrometer OTel bridge in `tokenrealty-web`) |
 | Actuator | `/actuator/health`, `/info`, `/metrics`, `/prometheus` exposed |
 
 Header and MDC constants: `com.tokenrealty.web.rest.RestHeaders` (`TRACE_ID`, `TRACE_ID_MDC`).
@@ -32,6 +33,24 @@ spring.profiles.active=json-log
 ```
 
 Logback config: `tokenrealty-web/src/main/resources/logback-spring.xml`.
+
+## OpenTelemetry (local)
+
+Start Jaeger with the compose `otel` profile (or `./scripts/demo-start.sh`):
+
+```bash
+docker compose --profile otel up -d
+# UI: http://localhost:16686
+```
+
+Enable export on any service:
+
+```bash
+OTEL_ENABLED=true OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318 \
+  ./mvnw spring-boot:run -Dspring-boot.run.profiles=local,otel
+```
+
+Shared defaults: `tokenrealty-web/src/main/resources/application-otel.yml`.
 
 ## Prometheus scrape
 

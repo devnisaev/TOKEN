@@ -1,0 +1,9 @@
+# Optional OpenTelemetry export — activate with spring.profiles.include=otel or OTEL_ENABLED=true
+management:
+  tracing:
+    enabled: ${OTEL_ENABLED:false}
+    sampling:
+      probability: ${OTEL_TRACES_SAMPLER_PROBABILITY:1.0}
+  otlp:
+    tracing:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318}

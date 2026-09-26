@@ -113,6 +113,40 @@ jobs:
         working-directory: marketplace-service
         run: ../token-realty-app/mvnw test -Dtest=BuyFlowContainersIntegrationTest -q
 
+  payment-testcontainers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Install shared libraries
+        run: ./token-realty-app/mvnw -f pom.xml -pl tokenrealty-security,tokenrealty-web,tokenrealty-jpa,tokenrealty-kafka,tokenrealty-events,tokenrealty-outbox install -q
+
+      - name: Run payment Testcontainers integration test
+        working-directory: payment-service
+        run: ../token-realty-app/mvnw test -Dtest=PaymentContainersIntegrationTest -q
+
+  docker-build-gateway:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build api-gateway Docker image
+        run: ./scripts/docker-build.sh api-gateway 8080
+
   openapi-codegen:
     runs-on: ubuntu-latest
     steps:

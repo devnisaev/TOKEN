@@ -12,4 +12,6 @@ public interface MarketOrderRepository extends JpaRepository<MarketOrder, UUID> 
     Page<MarketOrder> findByBuyerId(UUID buyerId, Pageable pageable);
 
     Page<MarketOrder> findByListingId(UUID listingId, Pageable pageable);
+
+    Page<MarketOrder> findByStatus(MarketOrder.OrderStatus status, Pageable pageable);
 }

@@ -43,7 +43,14 @@ public class OrderService {
     private final OrderMatchedPublisher orderMatchedPublisher;
     private final TradeSettledPublisher tradeSettledPublisher;
 
-    public Page<OrderResponse> findAll(UUID buyerId, UUID listingId, Pageable pageable) {
+    public Page<OrderResponse> findAll(
+            UUID buyerId,
+            UUID listingId,
+            MarketOrder.OrderStatus status,
+            Pageable pageable) {
+        if (status != null) {
+            return orderRepository.findByStatus(status, pageable).map(mapper::toOrderResponse);
+        }
         if (buyerId != null) {
             return orderRepository.findByBuyerId(buyerId, pageable).map(mapper::toOrderResponse);
         }

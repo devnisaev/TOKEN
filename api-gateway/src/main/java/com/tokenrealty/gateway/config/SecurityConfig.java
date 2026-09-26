@@ -1,5 +1,6 @@
 package com.tokenrealty.gateway.config;
 
+import com.tokenrealty.gateway.filter.GatewayRateLimitFilter;
 import com.tokenrealty.security.ActuatorSecurityPaths;
 import com.tokenrealty.security.JwtAuthenticationFilter;
 import com.tokenrealty.security.config.TokenRealtyJwtAutoConfiguration;
@@ -23,6 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final GatewayRateLimitFilter rateLimitFilter;
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,6 +40,7 @@ public class SecurityConfig {
                                 "/api/v1/auth/refresh").permitAll()
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
