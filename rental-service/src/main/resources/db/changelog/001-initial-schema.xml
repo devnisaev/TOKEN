@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="001-leases" author="tokenrealty">
+        <createTable tableName="leases">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="flat_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="tenant_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="tenant_wallet" type="varchar(66)"><constraints nullable="false"/></column>
+            <column name="spv_recipient_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="spv_wallet" type="varchar(66)"><constraints nullable="false"/></column>
+            <column name="monthly_rent_usd" type="numeric(19,2)"><constraints nullable="false"/></column>
+            <column name="start_date" type="date"><constraints nullable="false"/></column>
+            <column name="end_date" type="date"/>
+            <column name="status" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <createIndex tableName="leases" indexName="idx_leases_flat_id">
+            <column name="flat_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="002-rent-payments" author="tokenrealty">
+        <createTable tableName="rent_payments">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lease_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="flat_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="period" type="varchar(7)"><constraints nullable="false"/></column>
+            <column name="amount" type="numeric(19,2)"><constraints nullable="false"/></column>
+            <column name="payout_id" type="uuid"/>
+            <column name="status" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="paid_at" type="timestamptz"/>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <createIndex tableName="rent_payments" indexName="idx_rent_payments_lease_period" unique="true">
+            <column name="lease_id"/>
+            <column name="period"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="003-outbox-events" author="tokenrealty">
+        <createTable tableName="outbox_events">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="aggregate_type" type="varchar(50)"><constraints nullable="false"/></column>
+            <column name="aggregate_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="event_type" type="varchar(120)"><constraints nullable="false"/></column>
+            <column name="payload" type="text"><constraints nullable="false"/></column>
+            <column name="status" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="published_at" type="timestamptz"/>
+            <column name="retry_count" type="int" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="trace_id" type="varchar(64)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="004-processed-events" author="tokenrealty">
+        <createTable tableName="processed_events">
+            <column name="event_id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="event_type" type="varchar(120)"><constraints nullable="false"/></column>
+            <column name="processed_at" type="timestamptz"><constraints nullable="false"/></column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

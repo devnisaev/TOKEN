@@ -21,6 +21,7 @@ spring:
         format_sql: true
 
   liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
     enabled: false
 
   kafka:
@@ -72,6 +73,7 @@ tokenrealty:
       listing-created: tokenrealty.marketplace.listing.created.v1
       order-matched: tokenrealty.marketplace.order.matched.v1
       trade-settled: tokenrealty.marketplace.trade.settled.v1
+      building-approved: tokenrealty.registry.building.approved.v1
       flat-tokenized: tokenrealty.registry.flat.tokenized.v1
       payment-confirmed: tokenrealty.payment.payment.confirmed.v1
       transfer-completed: tokenrealty.issuance.transfer.completed.v1

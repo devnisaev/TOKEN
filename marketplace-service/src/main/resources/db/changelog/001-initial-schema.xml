@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="001-listings" author="tokenrealty">
+        <createTable tableName="listings">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="flat_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="contract_id" type="uuid"/>
+            <column name="listing_type" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="status" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="price_usd" type="numeric(19,2)"><constraints nullable="false"/></column>
+            <column name="tokens_available" type="bigint"><constraints nullable="false"/></column>
+            <column name="tokens_total" type="bigint"><constraints nullable="false"/></column>
+            <column name="min_investment_tokens" type="bigint"><constraints nullable="false"/></column>
+            <column name="title" type="varchar(500)"/>
+            <column name="description" type="varchar(2000)"/>
+            <column name="seller_investor_id" type="uuid"/>
+            <column name="seller_wallet" type="varchar(66)"/>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <createIndex tableName="listings" indexName="idx_listings_flat_id">
+            <column name="flat_id"/>
+        </createIndex>
+        <createIndex tableName="listings" indexName="idx_listings_status">
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="002-market-orders" author="tokenrealty">
+        <createTable tableName="market_orders">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="listing_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="flat_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="contract_id" type="uuid"/>
+            <column name="order_type" type="varchar(10)"><constraints nullable="false"/></column>
+            <column name="status" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="buyer_id" type="uuid"/>
+            <column name="seller_id" type="uuid"/>
+            <column name="buyer_wallet" type="varchar(66)"/>
+            <column name="seller_wallet" type="varchar(66)"/>
+            <column name="listing_type" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="token_amount" type="bigint"><constraints nullable="false"/></column>
+            <column name="total_price_usd" type="numeric(19,2)"><constraints nullable="false"/></column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <createIndex tableName="market_orders" indexName="idx_orders_listing_id">
+            <column name="listing_id"/>
+        </createIndex>
+        <createIndex tableName="market_orders" indexName="idx_orders_buyer_id">
+            <column name="buyer_id"/>
+        </createIndex>
+        <createIndex tableName="market_orders" indexName="idx_orders_status">
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="003-trades" author="tokenrealty">
+        <createTable tableName="trades">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="order_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="listing_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="flat_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="contract_id" type="uuid"/>
+            <column name="buyer_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="seller_id" type="uuid"/>
+            <column name="seller_wallet" type="varchar(66)"/>
+            <column name="listing_type" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="token_amount" type="bigint"><constraints nullable="false"/></column>
+            <column name="total_price_usd" type="numeric(19,2)"><constraints nullable="false"/></column>
+            <column name="status" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="payment_id" type="uuid"/>
+            <column name="transfer_id" type="uuid"/>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <addUniqueConstraint tableName="trades" columnNames="order_id"
+                             constraintName="uk_trades_order_id"/>
+        <createIndex tableName="trades" indexName="idx_trades_order_id">
+            <column name="order_id"/>
+        </createIndex>
+        <createIndex tableName="trades" indexName="idx_trades_listing_id">
+            <column name="listing_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="004-approved-buildings" author="tokenrealty">
+        <createTable tableName="approved_buildings">
+            <column name="building_id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="approved_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="approved_by" type="varchar(128)"><constraints nullable="false"/></column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="005-outbox-events" author="tokenrealty">
+        <createTable tableName="outbox_events">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="aggregate_type" type="varchar(50)"><constraints nullable="false"/></column>
+            <column name="aggregate_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="event_type" type="varchar(120)"><constraints nullable="false"/></column>
+            <column name="payload" type="text"><constraints nullable="false"/></column>
+            <column name="status" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="published_at" type="timestamptz"/>
+            <column name="retry_count" type="int" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="trace_id" type="varchar(64)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="006-processed-events" author="tokenrealty">
+        <createTable tableName="processed_events">
+            <column name="event_id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="event_type" type="varchar(120)"><constraints nullable="false"/></column>
+            <column name="processed_at" type="timestamptz"><constraints nullable="false"/></column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

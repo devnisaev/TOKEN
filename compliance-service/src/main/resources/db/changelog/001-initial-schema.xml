@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="001-compliance-records" author="tokenrealty">
+        <createTable tableName="compliance_records">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="investor_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="wallet_address" type="varchar(66)"><constraints nullable="false"/></column>
+            <column name="full_name" type="varchar(255)"/>
+            <column name="country_code" type="varchar(2)"/>
+            <column name="kyc_provider" type="varchar(64)"/>
+            <column name="kyc_reference_id" type="varchar(128)"/>
+            <column name="kyc_verified_at" type="timestamptz"/>
+            <column name="kyc_expires_at" type="timestamptz"/>
+            <column name="status" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="rejection_reason" type="varchar(512)"/>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <addUniqueConstraint tableName="compliance_records" columnNames="wallet_address"
+                             constraintName="uk_compliance_records_wallet_address"/>
+    </changeSet>
+
+    <changeSet id="002-investment-policies" author="tokenrealty">
+        <createTable tableName="investment_policies">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="jurisdiction" type="varchar(2)"><constraints nullable="false"/></column>
+            <column name="min_investment_usd" type="numeric(19,2)"><constraints nullable="false"/></column>
+            <column name="max_investment_usd" type="numeric(19,2)"/>
+            <column name="accredited_only" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <addUniqueConstraint tableName="investment_policies" columnNames="jurisdiction"
+                             constraintName="uk_investment_policies_jurisdiction"/>
+    </changeSet>
+
+    <changeSet id="003-document-reviews" author="tokenrealty">
+        <createTable tableName="document_reviews">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="document_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="building_id" type="uuid"/>
+            <column name="flat_id" type="uuid"/>
+            <column name="document_type" type="varchar(64)"><constraints nullable="false"/></column>
+            <column name="ipfs_cid" type="varchar(128)"/>
+            <column name="storage_url" type="varchar(512)"/>
+            <column name="status" type="varchar(32)"><constraints nullable="false"/></column>
+            <column name="uploaded_at" type="timestamptz"/>
+            <column name="reviewed_at" type="timestamptz"/>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <addUniqueConstraint tableName="document_reviews" columnNames="document_id"
+                             constraintName="uk_document_reviews_document_id"/>
+    </changeSet>
+
+    <changeSet id="004-outbox-events" author="tokenrealty">
+        <createTable tableName="outbox_events">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="aggregate_type" type="varchar(50)"><constraints nullable="false"/></column>
+            <column name="aggregate_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="event_type" type="varchar(120)"><constraints nullable="false"/></column>
+            <column name="payload" type="text"><constraints nullable="false"/></column>
+            <column name="status" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="published_at" type="timestamptz"/>
+            <column name="retry_count" type="int" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="trace_id" type="varchar(64)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="005-processed-events" author="tokenrealty">
+        <createTable tableName="processed_events">
+            <column name="event_id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="event_type" type="varchar(120)"><constraints nullable="false"/></column>
+            <column name="processed_at" type="timestamptz"><constraints nullable="false"/></column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
