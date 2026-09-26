@@ -52,6 +52,23 @@ OTEL_ENABLED=true OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318 \
 
 Shared defaults: `tokenrealty-web/src/main/resources/application-otel.yml`.
 
+## Prometheus + Grafana stack (local)
+
+Optional Docker stack for metrics visualization:
+
+```bash
+docker compose -f docker/observability/docker-compose.observability.yml up -d
+```
+
+| Service | URL |
+|---------|-----|
+| Prometheus | http://localhost:9090 |
+| Grafana | http://localhost:3000 (admin / admin) |
+
+Scrape config: `docker/observability/prometheus/prometheus.yml` — actuator `/prometheus` on gateway (:8080) and services (:8081–8091). Dashboard: `docker/observability/grafana/dashboards/tokenrealty-overview.json`.
+
+Start platform services locally before scraping; Prometheus uses `host.docker.internal` targets.
+
 ## Prometheus scrape
 
 Each service (context-path `/api`):

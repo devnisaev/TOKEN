@@ -96,6 +96,21 @@ async function main() {
     await enableTx.wait();
     console.log("✅ Transfers enabled on demo PropertyToken");
 
+    // ─── 4d. Optional DividendDistributor (DEPLOY_DIVIDEND_DISTRIBUTOR=true) ─
+    let dividendDistributorAddress = null;
+    if (process.env.DEPLOY_DIVIDEND_DISTRIBUTOR === "true") {
+        console.log("\n💰 Deploying DividendDistributor...");
+        const DividendDistributor = await ethers.getContractFactory("DividendDistributor");
+        const dividendDistributor = await DividendDistributor.deploy(
+            operator.address,
+            usdcAddress,
+            tokenAddress
+        );
+        await dividendDistributor.waitForDeployment();
+        dividendDistributorAddress = await dividendDistributor.getAddress();
+        console.log(`✅ DividendDistributor deployed at: ${dividendDistributorAddress}`);
+    }
+
     // ─── 5. Verify deployment ───────────────────────────────────────────────
     const operatorBalance = await propertyToken.balanceOf(operator.address);
     const spvBalance = await propertyToken.balanceOf(operator.address);
@@ -116,6 +131,9 @@ async function main() {
     console.log(`ComplianceRegistry:       ${complianceAddress}`);
     console.log(`MockUSDC:                 ${usdcAddress}`);
     console.log(`PropertyToken (Flat 101): ${tokenAddress}`);
+    if (dividendDistributorAddress) {
+        console.log(`DividendDistributor:        ${dividendDistributorAddress}`);
+    }
     console.log(`Operator wallet:          ${operator.address}`);
     console.log("─".repeat(60));
     console.log("\n📋 Copy to application.yml:");
@@ -134,6 +152,7 @@ async function main() {
         complianceRegistryAddress: complianceAddress,
         usdcContractAddress: usdcAddress,
         demoPropertyTokenAddress: tokenAddress,
+        dividendDistributorAddress,
         devWallets: DEV_WALLETS,
         deployedAt: new Date().toISOString(),
     };

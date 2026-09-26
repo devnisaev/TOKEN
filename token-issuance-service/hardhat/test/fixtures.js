@@ -48,9 +48,21 @@ async function whitelist(registry, operator, wallet, country = "KG", expiresAt =
     await tx.wait();
 }
 
+async function deployDividendDistributor(operator, usdc, propertyToken) {
+    const Factory = await ethers.getContractFactory("DividendDistributor");
+    const distributor = await Factory.deploy(
+        operator.address,
+        await usdc.getAddress(),
+        await propertyToken.getAddress()
+    );
+    await distributor.waitForDeployment();
+    return distributor;
+}
+
 module.exports = {
     deployComplianceRegistry,
     deployMockUsdc,
     deployPropertyToken,
+    deployDividendDistributor,
     whitelist,
 };

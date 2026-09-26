@@ -4,6 +4,7 @@
 #   docker compose up -d postgres                 # All service DBs (see docker/postgres/init-databases.sql)
 #   docker compose --profile kafka up -d          # Postgres + Kafka
 #   docker compose --profile otel up -d           # + Jaeger (OTLP :4318, UI :16686)
+#   docker compose -f docker/observability/docker-compose.observability.yml up -d  # Prometheus :9090 + Grafana :3000
 #   ./scripts/demo-start.sh                       # Postgres + Kafka + Jaeger + checklist
 #
 # Hardhat: cd token-issuance-service/hardhat && npm run node
