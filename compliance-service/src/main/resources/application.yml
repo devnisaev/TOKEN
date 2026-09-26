@@ -48,6 +48,13 @@ tokenrealty:
     seed-dev-records: ${SEED_DEV_COMPLIANCE:true}
     kyc-expiry:
       cron: ${KYC_EXPIRY_CRON:0 0 6 * * *}
+    sumsub:
+      enabled: ${SUMSUB_ENABLED:false}
+      api-url: ${SUMSUB_API_URL:https://api.sumsub.com}
+      app-token: ${SUMSUB_APP_TOKEN:}
+      app-secret: ${SUMSUB_APP_SECRET:}
+      level-name: ${SUMSUB_LEVEL_NAME:basic-kyc-level}
+      webhook-secret: ${SUMSUB_WEBHOOK_SECRET:}
   kafka:
     enabled: ${KAFKA_ENABLED:false}
     relay:

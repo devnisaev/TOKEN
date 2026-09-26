@@ -1,5 +1,6 @@
 package com.tokenrealty.compliance.service;
 
+import com.tokenrealty.compliance.client.SumsubClient;
 import com.tokenrealty.compliance.dto.ComplianceDtos.*;
 import com.tokenrealty.compliance.entity.ComplianceRecord;
 import com.tokenrealty.compliance.kafka.port.KycEventPublisher;
@@ -9,9 +10,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -30,6 +33,7 @@ class ComplianceServiceTest {
     @Mock ComplianceRecordRepository repository;
     @Mock KycEventPublisher kycEventPublisher;
     @Mock InvestmentPolicyService investmentPolicyService;
+    @Mock ObjectProvider<SumsubClient> sumsubClient;
     @InjectMocks ComplianceService service;
 
     private UUID investorId;
@@ -60,6 +64,24 @@ class ComplianceServiceTest {
 
         assertThat(result).isNotNull();
         verify(repository).save(any(ComplianceRecord.class));
+    }
+
+    @Test
+    void register_sumsubProviderCreatesApplicantWhenReferenceMissing() {
+        var request = new RegisterComplianceRequest(
+                investorId, "0xInvestorWallet123", "Test Investor", "KG", "sumsub", null);
+        SumsubClient client = org.mockito.Mockito.mock(SumsubClient.class);
+        when(sumsubClient.getIfAvailable()).thenReturn(client);
+        when(client.createApplicant(investorId, "Test Investor", "KG")).thenReturn("sumsub-applicant-1");
+        when(repository.existsByWalletAddress("0xinvestorwallet123")).thenReturn(false);
+        when(repository.existsByInvestorId(investorId)).thenReturn(false);
+        when(repository.save(any())).thenReturn(record);
+
+        service.register(request);
+
+        ArgumentCaptor<ComplianceRecord> captor = ArgumentCaptor.forClass(ComplianceRecord.class);
+        verify(repository).save(captor.capture());
+        assertThat(captor.getValue().getKycReferenceId()).isEqualTo("sumsub-applicant-1");
     }
 
     @Test

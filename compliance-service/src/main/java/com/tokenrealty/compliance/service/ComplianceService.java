@@ -1,5 +1,6 @@
 package com.tokenrealty.compliance.service;
 
+import com.tokenrealty.compliance.client.SumsubClient;
 import com.tokenrealty.compliance.dto.ComplianceDtos.*;
 import com.tokenrealty.compliance.entity.ComplianceRecord;
 import com.tokenrealty.compliance.kafka.port.KycEventPublisher;
@@ -8,6 +9,7 @@ import com.tokenrealty.web.exception.ConflictException;
 import com.tokenrealty.web.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,9 +25,12 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class ComplianceService {
 
+    private static final String SUMSUB_PROVIDER = "sumsub";
+
     private final ComplianceRecordRepository repository;
     private final KycEventPublisher kycEventPublisher;
     private final InvestmentPolicyService investmentPolicyService;
+    private final ObjectProvider<SumsubClient> sumsubClient;
 
     public Page<ComplianceRecordResponse> findAll(Pageable pageable) {
         return repository.findAll(pageable).map(this::toResponse);
@@ -72,13 +77,15 @@ public class ComplianceService {
             throw new ConflictException("Investor " + request.investorId() + " already registered");
         }
 
+        String kycReferenceId = resolveKycReferenceId(request);
+
         ComplianceRecord record = ComplianceRecord.builder()
                 .investorId(request.investorId())
                 .walletAddress(request.walletAddress().toLowerCase())
                 .fullName(request.fullName())
                 .countryCode(request.countryCode())
                 .kycProvider(request.kycProvider())
-                .kycReferenceId(request.kycReferenceId())
+                .kycReferenceId(kycReferenceId)
                 .status(ComplianceRecord.ComplianceStatus.PENDING)
                 .build();
 
@@ -118,6 +125,23 @@ public class ComplianceService {
                 saved.getInvestorId(), saved.getWalletAddress(), reason, revokedAt);
         log.info("Investor {} KYC revoked", saved.getInvestorId());
         return toResponse(saved);
+    }
+
+    private String resolveKycReferenceId(RegisterComplianceRequest request) {
+        if (request.kycReferenceId() != null && !request.kycReferenceId().isBlank()) {
+            return request.kycReferenceId();
+        }
+        if (!SUMSUB_PROVIDER.equalsIgnoreCase(request.kycProvider())) {
+            return null;
+        }
+        SumsubClient client = sumsubClient.getIfAvailable();
+        if (client != null) {
+            return client.createApplicant(
+                    request.investorId(),
+                    request.fullName() != null ? request.fullName() : "Investor",
+                    request.countryCode() != null ? request.countryCode() : "US");
+        }
+        return "sumsub-local-" + request.investorId();
     }
 
     private ComplianceRecord getOrThrow(UUID id) {
