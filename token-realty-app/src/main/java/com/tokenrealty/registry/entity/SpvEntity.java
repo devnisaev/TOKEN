@@ -26,6 +26,15 @@ public class SpvEntity extends BaseEntity {
     @Column(name = "registration_country")
     private String registrationCountry;
 
+    /** State, province, or special economic zone (e.g. Delaware, DIFC). */
+    @Column(name = "legal_jurisdiction", length = 100)
+    private String legalJurisdiction;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ownership_type", length = 40)
+    @Builder.Default
+    private OwnershipType ownershipType = OwnershipType.SPV_SHARE_EQUITY;
+
     @Column(name = "registration_date")
     private java.time.LocalDate registrationDate;
 
@@ -52,5 +61,12 @@ public class SpvEntity extends BaseEntity {
         PENDING,
         ACTIVE,
         DISSOLVED
+    }
+
+    public enum OwnershipType {
+        DIRECT_DEED,
+        SPV_SHARE_EQUITY,
+        PART_DEBT_INSTRUMENT,
+        PROFIT_SHARING_AGREEMENT
     }
 }

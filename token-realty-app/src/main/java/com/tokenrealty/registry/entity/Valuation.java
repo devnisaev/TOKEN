@@ -45,6 +45,13 @@ public class Valuation extends BaseEntity {
     @Column(name = "annual_rental_income_usd", precision = 18, scale = 2)
     private BigDecimal annualRentalIncomeUsd;
 
+    @Column(name = "operating_expenses_estimate_usd", precision = 18, scale = 2)
+    private BigDecimal operatingExpensesEstimateUsd;
+
+    /** Projected net rental yield as percentage (e.g. 7.25 = 7.25%). */
+    @Column(name = "target_rental_yield_pct", precision = 8, scale = 4)
+    private BigDecimal targetRentalYieldPct;
+
     // Whether this is the current active valuation
     @Column(name = "is_current", nullable = false)
     @Builder.Default

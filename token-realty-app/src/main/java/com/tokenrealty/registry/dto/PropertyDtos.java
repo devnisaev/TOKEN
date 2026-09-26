@@ -26,7 +26,9 @@ public class PropertyDtos {
             @Min(1800) @Max(2100) Integer constructionYear,
             @Positive Double totalAreaSqm,
             Double latitude,
-            Double longitude
+            Double longitude,
+            Building.PropertyCategory propertyCategory,
+            @Size(max = 100) String cadastralReference
     ) {}
 
     @Builder
@@ -39,7 +41,9 @@ public class PropertyDtos {
             @Min(1) Integer totalFloors,
             @Positive Double totalAreaSqm,
             Double latitude,
-            Double longitude
+            Double longitude,
+            Building.PropertyCategory propertyCategory,
+            String cadastralReference
     ) {}
 
     @Builder
@@ -55,6 +59,8 @@ public class PropertyDtos {
             Integer constructionYear,
             Double totalAreaSqm,
             Building.BuildingStatus status,
+            Building.PropertyCategory propertyCategory,
+            String cadastralReference,
             Double latitude,
             Double longitude,
             int flatCount,
@@ -75,6 +81,8 @@ public class PropertyDtos {
             Integer constructionYear,
             Double totalAreaSqm,
             Building.BuildingStatus status,
+            Building.PropertyCategory propertyCategory,
+            String cadastralReference,
             Double latitude,
             Double longitude,
             int flatCount,
@@ -93,7 +101,9 @@ public class PropertyDtos {
             @Min(0) Integer floor,
             @Positive Double areaSqm,
             @Min(1) Integer numRooms,
-            @Min(1) Integer numBathrooms
+            @Min(1) Integer numBathrooms,
+            @Size(max = 100) String cadastralReference,
+            @Positive Double netUsableAreaSqm
     ) {}
 
     @Builder
@@ -102,7 +112,9 @@ public class PropertyDtos {
             Integer floor,
             @Positive Double areaSqm,
             Integer numRooms,
-            Integer numBathrooms
+            Integer numBathrooms,
+            String cadastralReference,
+            Double netUsableAreaSqm
     ) {}
 
     @Builder
@@ -113,6 +125,8 @@ public class PropertyDtos {
             String flatNumber,
             Integer floor,
             Double areaSqm,
+            Double netUsableAreaSqm,
+            String cadastralReference,
             Integer numRooms,
             Integer numBathrooms,
             Flat.FlatStatus status,
@@ -144,7 +158,9 @@ public class PropertyDtos {
             LocalDate registrationDate,
             String registeredAddress,
             String walletAddress,
-            String taxId
+            String taxId,
+            @Size(max = 100) String legalJurisdiction,
+            SpvEntity.OwnershipType ownershipType
     ) {}
 
     @Builder
@@ -158,6 +174,8 @@ public class PropertyDtos {
             String registeredAddress,
             String walletAddress,
             String taxId,
+            String legalJurisdiction,
+            SpvEntity.OwnershipType ownershipType,
             Boolean kycVerified,
             SpvEntity.SpvStatus status,
             Instant createdAt
@@ -184,6 +202,8 @@ public class PropertyDtos {
             String appraiserLicense,
             @NotNull Valuation.ValuationMethod method,
             @Positive BigDecimal annualRentalIncomeUsd,
+            @Positive BigDecimal operatingExpensesEstimateUsd,
+            @Positive @DecimalMax("100") BigDecimal targetRentalYieldPct,
             String notes
     ) {}
 
@@ -198,6 +218,8 @@ public class PropertyDtos {
             String appraiserName,
             Valuation.ValuationMethod method,
             BigDecimal annualRentalIncomeUsd,
+            BigDecimal operatingExpensesEstimateUsd,
+            BigDecimal targetRentalYieldPct,
             Boolean isCurrent,
             String notes,
             Instant createdAt

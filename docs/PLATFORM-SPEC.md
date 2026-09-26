@@ -533,6 +533,38 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 - [x] Publish `kyc-approved`, `kyc-revoked` events (outbox)
 - [x] Unit + context tests
 
+### 10.8b Property Registry — Asset Metadata Expansion (Phase 4b)
+
+Blueprint for legal, physical, and financial metadata required for tokenized real estate (adapted from external registry spec). **Do not add per-document `*IpfsCid` columns** — use existing `PropertyDocument` + `DocumentType` enum; Document Service uploads and sets `ipfsCid`.
+
+#### Phase 4b-1 — Implemented (Property Registry entities)
+
+| Domain | Field | Entity | Notes |
+|--------|-------|--------|-------|
+| Legal / SPV | `legalJurisdiction` | `SpvEntity` | State/province (e.g. Delaware, DIFC) |
+| Legal / SPV | `ownershipType` | `SpvEntity` | `DIRECT_DEED`, `SPV_SHARE_EQUITY`, `PART_DEBT_INSTRUMENT`, `PROFIT_SHARING_AGREEMENT` |
+| Legal / SPV | `registrationNumber`, `registrationCountry` | `SpvEntity` | Already existed |
+| Physical | `propertyCategory` | `Building` | `RESIDENTIAL_FLAT`, `COMMERCIAL_BUILDING`, … |
+| Physical | `constructionYear` | `Building` | Already existed |
+| Physical | `cadastralReference` | `Building`, `Flat` | Land registry / title deed parcel ID |
+| Physical | `areaSqm`, `netUsableAreaSqm` | `Flat` | Gross vs net usable area |
+| Valuation | `valueUsd`, `valuationDate`, `appraiserName` | `Valuation` | Already existed |
+| Valuation | `operatingExpensesEstimateUsd` | `Valuation` | Annual opex baseline |
+| Valuation | `targetRentalYieldPct` | `Valuation` | Projected net yield % |
+| Documents | typed data room | `PropertyDocument` | `TITLE_DEED`, `VALUATION_REPORT`, `ARTICLES_OF_INCORPORATION`, `ENVIRONMENTAL_AUDIT`, … |
+
+#### Phase 4b-2 — With Document Service (:8088)
+
+- [ ] `POST /v1/documents/upload` → IPFS → register `PropertyDocument` with CID
+- [ ] Verify workflow links documents to building/flat/SPV
+- [ ] Optional S3/MinIO for private KYC/legal docs (`storageUrl`)
+
+#### Phase 4b-3 — Deferred
+
+- [ ] `energyEfficiencyRating`, `zoningCode` on `Building`
+- [ ] `lastRenovationYear` on `Building`
+- [ ] Non-equity token structures (`PART_DEBT_INSTRUMENT`, `PROFIT_SHARING_AGREEMENT`) in Issuance/Marketplace
+
 ### 10.8 Document Service (Phase 4)
 
 - [ ] Scaffold project (`document-service/`)

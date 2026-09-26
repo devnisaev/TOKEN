@@ -30,6 +30,12 @@ public class Flat extends BaseEntity {
     @Column(name = "area_sqm")
     private Double areaSqm;
 
+    @Column(name = "net_usable_area_sqm")
+    private Double netUsableAreaSqm;
+
+    @Column(name = "cadastral_reference", length = 100)
+    private String cadastralReference;
+
     @Column(name = "num_rooms")
     private Integer numRooms;
 

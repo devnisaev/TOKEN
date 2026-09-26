@@ -59,6 +59,8 @@ public class PropertyDocument extends BaseEntity {
         INSPECTION_REPORT,
         VALUATION_REPORT,
         SPV_REGISTRATION,
+        ARTICLES_OF_INCORPORATION,
+        ENVIRONMENTAL_AUDIT,
         KYC_DOCUMENT,
         LEASE_AGREEMENT,
         INSURANCE_POLICY,

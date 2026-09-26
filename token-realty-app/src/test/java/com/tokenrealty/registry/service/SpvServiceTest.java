@@ -76,7 +76,7 @@ class SpvServiceTest {
     void create_registersSpvAndPromotesBuilding() {
         var request = new CreateSpvRequest(
                 "Sunrise SPV LLC", "KG-2024-001", "KG",
-                LocalDate.of(2024, 1, 15), "123 Main St", null, "TAX-001");
+                LocalDate.of(2024, 1, 15), "123 Main St", null, "TAX-001", null, null);
 
         when(buildingRepository.findById(buildingId)).thenReturn(Optional.of(building));
         when(spvRepository.findByBuildingId(buildingId)).thenReturn(Optional.empty());
@@ -97,7 +97,7 @@ class SpvServiceTest {
     @DisplayName("create throws ConflictException when building already has SPV")
     void create_throwsConflict_whenSpvAlreadyExists() {
         var request = new CreateSpvRequest(
-                "Another SPV", "KG-2024-002", "KG", null, null, null, null);
+                "Another SPV", "KG-2024-002", "KG", null, null, null, null, null, null);
 
         when(buildingRepository.findById(buildingId)).thenReturn(Optional.of(building));
         when(spvRepository.findByBuildingId(buildingId)).thenReturn(Optional.of(spv));
@@ -113,7 +113,7 @@ class SpvServiceTest {
     @DisplayName("create throws ConflictException on duplicate registration number")
     void create_throwsConflict_whenDuplicateRegNumber() {
         var request = new CreateSpvRequest(
-                "Dupe SPV", "KG-2024-001", "KG", null, null, null, null);
+                "Dupe SPV", "KG-2024-001", "KG", null, null, null, null, null, null);
 
         when(buildingRepository.findById(buildingId)).thenReturn(Optional.of(building));
         when(spvRepository.findByBuildingId(buildingId)).thenReturn(Optional.empty());
@@ -135,6 +135,7 @@ class SpvServiceTest {
                         spvResponse.registrationNumber(), spvResponse.registrationCountry(),
                         spvResponse.registrationDate(), spvResponse.registeredAddress(),
                         spvResponse.walletAddress(), spvResponse.taxId(),
+                        spvResponse.legalJurisdiction(), spvResponse.ownershipType(),
                         true, SpvEntity.SpvStatus.ACTIVE, spvResponse.createdAt()));
 
         var result = spvService.verifyKyc(spvId, true);

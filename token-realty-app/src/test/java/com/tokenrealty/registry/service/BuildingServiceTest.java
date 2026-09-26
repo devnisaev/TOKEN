@@ -74,7 +74,7 @@ class BuildingServiceTest {
     void create_savesBuilding() {
         var request = new CreateBuildingRequest(
                 "Sunrise Tower", "123 Main St", "Bishkek", "KG",
-                null, 10, 40, 2020, 3500.0, null, null);
+                null, 10, 40, 2020, 3500.0, null, null, null, null);
 
         when(buildingRepository.existsByAddressAndCity(any(), any())).thenReturn(false);
         when(mapper.toBuilding(request)).thenReturn(building);
@@ -92,7 +92,7 @@ class BuildingServiceTest {
     void create_throwsConflict_whenDuplicateAddress() {
         var request = new CreateBuildingRequest(
                 "Duplicate", "123 Main St", "Bishkek", "KG",
-                null, 5, 20, 2015, 1000.0, null, null);
+                null, 5, 20, 2015, 1000.0, null, null, null, null);
 
         when(buildingRepository.existsByAddressAndCity("123 Main St", "Bishkek")).thenReturn(true);
 
@@ -138,6 +138,7 @@ class BuildingServiceTest {
                         buildingResponse.city(), buildingResponse.country(), buildingResponse.postalCode(),
                         buildingResponse.totalFloors(), buildingResponse.totalFlats(), buildingResponse.constructionYear(),
                         buildingResponse.totalAreaSqm(), Building.BuildingStatus.APPROVED,
+                        buildingResponse.propertyCategory(), buildingResponse.cadastralReference(),
                         buildingResponse.latitude(), buildingResponse.longitude(),
                         buildingResponse.flatCount(), buildingResponse.createdAt(), buildingResponse.updatedAt()));
 

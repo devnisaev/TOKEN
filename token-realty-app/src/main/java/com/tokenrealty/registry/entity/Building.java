@@ -37,6 +37,14 @@ public class Building extends BaseEntity {
     @Column(name = "construction_year")
     private Integer constructionYear;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "property_category", length = 40)
+    @Builder.Default
+    private PropertyCategory propertyCategory = PropertyCategory.RESIDENTIAL_FLAT;
+
+    @Column(name = "cadastral_reference", length = 100)
+    private String cadastralReference;
+
     @Column(name = "total_area_sqm")
     private Double totalAreaSqm;
 
@@ -65,5 +73,13 @@ public class Building extends BaseEntity {
         APPROVED,          // Approved, flats can be tokenized
         TOKENIZED,         // At least one flat has been tokenized
         SUSPENDED          // Temporarily halted
+    }
+
+    public enum PropertyCategory {
+        RESIDENTIAL_FLAT,
+        COMMERCIAL_BUILDING,
+        SINGLE_FAMILY_HOUSE,
+        LAND_PARCEL,
+        INDUSTRIAL_WAREHOUSE
     }
 }

@@ -77,7 +77,7 @@ class ValuationServiceTest {
                 BigDecimal.valueOf(80_000),
                 null, null, "John Doe", "APP-001",
                 Valuation.ValuationMethod.COMPARABLE_SALES,
-                BigDecimal.valueOf(5_000), null);
+                BigDecimal.valueOf(5_000), null, null, null);
 
         when(flatRepository.findById(flatId)).thenReturn(Optional.of(flat));
         when(mapper.toValuation(request)).thenReturn(valuation);
@@ -100,7 +100,7 @@ class ValuationServiceTest {
         var request = new CreateValuationRequest(
                 LocalDate.now(), BigDecimal.valueOf(50_000),
                 null, null, null, null,
-                Valuation.ValuationMethod.INCOME_APPROACH, null, null);
+                Valuation.ValuationMethod.INCOME_APPROACH, null, null, null, null);
 
         when(flatRepository.findById(flatId)).thenReturn(Optional.of(flat));
         when(mapper.toValuation(request)).thenReturn(valuation);
