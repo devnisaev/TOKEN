@@ -53,6 +53,13 @@ public class WalletController {
         return walletService.linkWallet(request);
     }
 
+    @PostMapping("/connect-session")
+    @PreAuthorize("hasRole('INVESTOR') or hasRole('ADMIN')")
+    @Operation(summary = "Prepare WalletConnect v2 handshake (session topic + URI stub)")
+    public ConnectSessionResponse connectSession(@Valid @RequestBody ConnectSessionRequest request) {
+        return walletService.createConnectSession(request);
+    }
+
     @PostMapping("/{investorId}/sign")
     @PreAuthorize("hasRole('INVESTOR') or hasRole('ADMIN')")
     @Operation(summary = "Sign a transaction with the investor custodial wallet")

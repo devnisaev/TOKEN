@@ -30,6 +30,17 @@ public final class WalletDtos {
     ) {
     }
 
+    public record ConnectSessionRequest(
+            UUID investorId
+    ) {
+    }
+
+    public record ConnectSessionResponse(
+            String sessionTopic,
+            String uri
+    ) {
+    }
+
     public record WalletResponse(
             UUID id,
             UUID investorId,

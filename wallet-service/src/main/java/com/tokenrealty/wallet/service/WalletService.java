@@ -66,6 +66,15 @@ public class WalletService {
         return toResponse(wallet);
     }
 
+    public ConnectSessionResponse createConnectSession(ConnectSessionRequest request) {
+        UUID investorId = resolveInvestorId(request.investorId());
+        accessGuard.checkInvestorAccess(investorId);
+        String sessionTopic = "wc:" + UUID.randomUUID();
+        String uri = sessionTopic + "@2?relay-protocol=irn&symKey=stub";
+        log.info("Created WalletConnect v2 session stub for investor {}", investorId);
+        return new ConnectSessionResponse(sessionTopic, uri);
+    }
+
     @Transactional
     public WalletResponse linkWallet(LinkWalletRequest request) {
         accessGuard.checkInvestorAccess(request.investorId());

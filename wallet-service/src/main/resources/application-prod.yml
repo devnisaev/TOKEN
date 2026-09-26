@@ -3,6 +3,12 @@ spring:
     hibernate:
       ddl-auto: none
 
+tokenrealty:
+  wallet:
+    encryption:
+      mode: kms
+      kms-key-id: ${AWS_KMS_KEY_ID:alias/tokenrealty-wallet}
+
 logging:
   level:
     com.tokenrealty: INFO

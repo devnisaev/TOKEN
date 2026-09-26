@@ -41,6 +41,7 @@ export function ConnectWalletButton() {
     );
   }
 
+  // WalletConnect v2: call POST /v1/wallets/connect-session for sessionTopic/uri before WC connector.
   return (
     <Button
       size="sm"
