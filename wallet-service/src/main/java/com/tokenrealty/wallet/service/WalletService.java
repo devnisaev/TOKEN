@@ -13,12 +13,14 @@ import com.tokenrealty.web.exception.ConflictException;
 import com.tokenrealty.web.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.crypto.ECKeyPair;
 import org.web3j.crypto.Keys;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,6 +35,12 @@ public class WalletService {
     private final PaymentClient paymentClient;
     private final IssuanceClient issuanceClient;
     private final WalletAccessGuard accessGuard;
+
+    @Value("${tokenrealty.wallet.walletconnect.relay-url:wss://relay.walletconnect.org}")
+    private String walletConnectRelayUrl;
+
+    @Value("${tokenrealty.wallet.walletconnect.session-ttl-seconds:300}")
+    private long walletConnectSessionTtlSeconds;
 
     public List<WalletResponse> listWallets(UUID investorId) {
         accessGuard.checkInvestorAccess(investorId);
@@ -70,9 +78,27 @@ public class WalletService {
         UUID investorId = resolveInvestorId(request.investorId());
         accessGuard.checkInvestorAccess(investorId);
         String sessionTopic = "wc:" + UUID.randomUUID();
-        String uri = sessionTopic + "@2?relay-protocol=irn&symKey=stub";
-        log.info("Created WalletConnect v2 session stub for investor {}", investorId);
-        return new ConnectSessionResponse(sessionTopic, uri);
+        String symKey = UUID.randomUUID().toString().replace("-", "");
+        String uri = "wc:" + sessionTopic.substring(3) + "@2?relay-protocol=irn&symKey=" + symKey;
+        Instant expiresAt = Instant.now().plusSeconds(walletConnectSessionTtlSeconds);
+        log.info("Created WalletConnect v2 session for investor {} relay={}", investorId, walletConnectRelayUrl);
+        return new ConnectSessionResponse(sessionTopic, uri, walletConnectRelayUrl, expiresAt);
+    }
+
+    @Transactional
+    public RotateEncryptionResponse rotateCustodialEncryption(UUID investorId) {
+        accessGuard.checkInvestorAccess(investorId);
+        var custodialWallets = repository.findByInvestorIdOrderByPrimaryDescCreatedAtAsc(investorId).stream()
+                .filter(w -> w.getWalletType() == WalletType.CUSTODIAL)
+                .filter(w -> w.getEncryptedPrivateKey() != null && !w.getEncryptedPrivateKey().isBlank())
+                .toList();
+        for (InvestorWallet wallet : custodialWallets) {
+            String plain = encryptionService.decrypt(wallet.getEncryptedPrivateKey());
+            wallet.setEncryptedPrivateKey(encryptionService.encrypt(plain));
+            repository.save(wallet);
+        }
+        log.info("Re-encrypted {} custodial wallet(s) for investor {}", custodialWallets.size(), investorId);
+        return new RotateEncryptionResponse(investorId, custodialWallets.size(), Instant.now());
     }
 
     @Transactional

@@ -37,7 +37,16 @@ public final class WalletDtos {
 
     public record ConnectSessionResponse(
             String sessionTopic,
-            String uri
+            String uri,
+            String relayUrl,
+            Instant expiresAt
+    ) {
+    }
+
+    public record RotateEncryptionResponse(
+            UUID investorId,
+            int walletsReEncrypted,
+            Instant rotatedAt
     ) {
     }
 

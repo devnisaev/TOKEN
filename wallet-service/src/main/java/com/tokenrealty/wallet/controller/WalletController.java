@@ -55,9 +55,16 @@ public class WalletController {
 
     @PostMapping("/connect-session")
     @PreAuthorize("hasRole('INVESTOR') or hasRole('ADMIN')")
-    @Operation(summary = "Prepare WalletConnect v2 handshake (session topic + URI stub)")
+    @Operation(summary = "Prepare WalletConnect v2 handshake (session topic + URI)")
     public ConnectSessionResponse connectSession(@Valid @RequestBody ConnectSessionRequest request) {
         return walletService.createConnectSession(request);
+    }
+
+    @PostMapping("/{investorId}/rotate-encryption")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Re-encrypt custodial private keys after KMS/key rotation")
+    public RotateEncryptionResponse rotateEncryption(@PathVariable UUID investorId) {
+        return walletService.rotateCustodialEncryption(investorId);
     }
 
     @PostMapping("/{investorId}/sign")
