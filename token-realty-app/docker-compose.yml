@@ -71,5 +71,18 @@ services:
     profiles:
       - kafka
 
+  # ── Jaeger (OTLP traces) ────────────────────────────────────────────────────
+  jaeger:
+    image: jaegertracing/all-in-one:1.64
+    container_name: tokenrealty-jaeger
+    ports:
+      - "4318:4318"   # OTLP HTTP
+      - "16686:16686" # UI
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    profiles:
+      - otel
+      - demo
+
 volumes:
   postgres_data:

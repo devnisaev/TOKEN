@@ -3,7 +3,8 @@
 # Usage:
 #   docker compose up -d postgres                 # All service DBs (see docker/postgres/init-databases.sql)
 #   docker compose --profile kafka up -d          # Postgres + Kafka
-#   docker compose --profile kafka --profile tools up -d
+#   docker compose --profile otel up -d           # + Jaeger (OTLP :4318, UI :16686)
+#   ./scripts/demo-start.sh                       # Postgres + Kafka + Jaeger + checklist
 #
 # Hardhat: cd token-issuance-service/hardhat && npm run node
 # Service apps: ./mvnw with --spring.profiles.active=local (see docs/hardhat-demo.md, AGENTS.md).
