@@ -150,7 +150,7 @@ class DocumentServiceTest {
         when(documentRepository.findById(docId)).thenReturn(Optional.of(document));
 
         documentService.acknowledgeUpload(new DocumentUploadedCommand(
-                docId, buildingId, null, "TITLE_DEED", "Qm123456789", Instant.now()));
+                docId, buildingId, null, "TITLE_DEED", "Qm123456789", null, Instant.now()));
 
         verify(documentRepository, never()).save(any());
     }
@@ -164,7 +164,7 @@ class DocumentServiceTest {
         when(documentRepository.save(document)).thenReturn(document);
 
         documentService.acknowledgeUpload(new DocumentUploadedCommand(
-                docId, buildingId, null, "TITLE_DEED", "Qm123456789", Instant.now()));
+                docId, buildingId, null, "TITLE_DEED", "Qm123456789", null, Instant.now()));
 
         assertThat(document.getIpfsCid()).isEqualTo("Qm123456789");
         verify(documentRepository).save(document);
@@ -177,7 +177,7 @@ class DocumentServiceTest {
         when(documentRepository.findById(docId)).thenReturn(Optional.of(document));
 
         assertThatThrownBy(() -> documentService.acknowledgeUpload(new DocumentUploadedCommand(
-                docId, buildingId, null, "TITLE_DEED", "QmDifferent", Instant.now())))
+                docId, buildingId, null, "TITLE_DEED", "QmDifferent", null, Instant.now())))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("CID mismatch");
     }

@@ -84,16 +84,32 @@ public class DocumentService {
     @Transactional
     public void acknowledgeUpload(DocumentUploadedCommand command) {
         PropertyDocument doc = getOrThrow(command.documentId());
-        if (doc.getIpfsCid() != null && !doc.getIpfsCid().equals(command.ipfsCid())) {
-            throw new ValidationException(
-                    "IPFS CID mismatch for document " + command.documentId());
+        boolean updated = false;
+        if (command.ipfsCid() != null) {
+            if (doc.getIpfsCid() != null && !doc.getIpfsCid().equals(command.ipfsCid())) {
+                throw new ValidationException(
+                        "IPFS CID mismatch for document " + command.documentId());
+            }
+            if (doc.getIpfsCid() == null) {
+                doc.setIpfsCid(command.ipfsCid());
+                updated = true;
+            }
         }
-        if (doc.getIpfsCid() == null) {
-            doc.setIpfsCid(command.ipfsCid());
+        if (command.storageUrl() != null) {
+            if (doc.getStorageUrl() != null && !doc.getStorageUrl().equals(command.storageUrl())) {
+                throw new ValidationException(
+                        "Storage URL mismatch for document " + command.documentId());
+            }
+            if (doc.getStorageUrl() == null) {
+                doc.setStorageUrl(command.storageUrl());
+                updated = true;
+            }
+        }
+        if (updated) {
             documentRepository.save(doc);
         }
-        log.info("Acknowledged document upload id={} type={} cid={}",
-                command.documentId(), command.documentType(), command.ipfsCid());
+        log.info("Acknowledged document upload id={} type={} cid={} storageUrl={}",
+                command.documentId(), command.documentType(), command.ipfsCid(), command.storageUrl());
     }
 
     @Transactional

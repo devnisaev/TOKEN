@@ -42,6 +42,12 @@ tokenrealty:
       mode: ${IPFS_MODE:simulated}
       pinata:
         jwt: ${PINATA_JWT:}
+    minio:
+      mode: ${MINIO_MODE:simulated}
+      endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+      bucket: ${MINIO_BUCKET:tokenrealty-private}
+      access-key: ${MINIO_ROOT_USER:minio}
+      secret-key: ${MINIO_ROOT_PASSWORD:minio123}
   kafka:
     enabled: ${KAFKA_ENABLED:false}
     relay:

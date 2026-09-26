@@ -13,6 +13,7 @@ public interface DocumentUploadedPublisher {
             UUID flatId,
             String documentType,
             String ipfsCid,
+            String storageUrl,
             Instant uploadedAt
     ) {}
 }

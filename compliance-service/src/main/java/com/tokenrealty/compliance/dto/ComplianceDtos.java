@@ -61,6 +61,7 @@ public final class ComplianceDtos {
             UUID flatId,
             String documentType,
             String ipfsCid,
+            String storageUrl,
             com.tokenrealty.compliance.entity.DocumentReview.ReviewStatus status,
             @JsonProperty("isVerified") boolean verified,
             Instant uploadedAt,

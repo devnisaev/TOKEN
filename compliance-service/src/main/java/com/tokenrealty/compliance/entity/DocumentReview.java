@@ -28,8 +28,11 @@ public class DocumentReview extends BaseEntity {
     @Column(name = "document_type", nullable = false, length = 64)
     private String documentType;
 
-    @Column(name = "ipfs_cid", nullable = false, length = 128)
+    @Column(name = "ipfs_cid", length = 128)
     private String ipfsCid;
+
+    @Column(name = "storage_url", length = 512)
+    private String storageUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 32)

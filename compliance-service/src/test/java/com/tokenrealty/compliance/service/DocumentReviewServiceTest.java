@@ -47,6 +47,7 @@ class DocumentReviewServiceTest {
                 null,
                 "TITLE_DEED",
                 "Qm123456789",
+                null,
                 Instant.parse("2025-09-25T16:00:00Z"));
         pendingReview = DocumentReview.builder()
                 .documentId(documentId)

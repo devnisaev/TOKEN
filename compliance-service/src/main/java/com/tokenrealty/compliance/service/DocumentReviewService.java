@@ -39,6 +39,7 @@ public class DocumentReviewService {
                 .flatId(command.flatId())
                 .documentType(command.documentType())
                 .ipfsCid(command.ipfsCid())
+                .storageUrl(command.storageUrl())
                 .uploadedAt(command.uploadedAt())
                 .status(ReviewStatus.PENDING)
                 .build();
@@ -79,6 +80,7 @@ public class DocumentReviewService {
                 review.getFlatId(),
                 review.getDocumentType(),
                 review.getIpfsCid(),
+                review.getStorageUrl(),
                 review.getStatus(),
                 registryVerified,
                 review.getUploadedAt(),

@@ -5,7 +5,8 @@ import com.tokenrealty.document.dto.DocumentDtos.DocumentResponse;
 import com.tokenrealty.document.dto.DocumentDtos.DocumentType;
 import com.tokenrealty.document.dto.DocumentDtos.RegisterDocumentRequest;
 import com.tokenrealty.document.kafka.port.DocumentUploadedPublisher;
-import com.tokenrealty.document.storage.IpfsStorageService;
+import com.tokenrealty.document.storage.DocumentStorageRouter;
+import com.tokenrealty.document.storage.DocumentStorageRouter.StorageResult;
 import com.tokenrealty.web.exception.ValidationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,7 @@ import static org.mockito.Mockito.when;
 @DisplayName("DocumentUploadService unit tests")
 class DocumentUploadServiceTest {
 
-    @Mock IpfsStorageService ipfsStorageService;
+    @Mock DocumentStorageRouter storageRouter;
     @Mock PropertyRegistryClient registryClient;
     @Mock DocumentUploadedPublisher documentUploadedPublisher;
     @InjectMocks DocumentUploadService documentUploadService;
@@ -42,7 +43,8 @@ class DocumentUploadServiceTest {
         MockMultipartFile file = new MockMultipartFile(
                 "file", "deed.pdf", "application/pdf", "pdf-content".getBytes());
 
-        when(ipfsStorageService.pin(any(), eq("deed.pdf"))).thenReturn("bafyTestCid");
+        when(storageRouter.store(any(), eq("deed.pdf"), eq(DocumentType.TITLE_DEED)))
+                .thenReturn(new StorageResult("bafyTestCid", null));
         when(registryClient.registerForFlat(eq(flatId), any(RegisterDocumentRequest.class)))
                 .thenReturn(DocumentResponse.builder()
                         .id(documentId)
@@ -70,13 +72,14 @@ class DocumentUploadServiceTest {
     }
 
     @Test
-    @DisplayName("upload registers building document")
+    @DisplayName("upload registers building document via IPFS")
     void uploadBuildingDocument() {
         UUID buildingId = UUID.randomUUID();
         MockMultipartFile file = new MockMultipartFile(
                 "file", "plan.pdf", "application/pdf", "plan".getBytes());
 
-        when(ipfsStorageService.pin(any(), eq("plan.pdf"))).thenReturn("bafyBuilding");
+        when(storageRouter.store(any(), eq("plan.pdf"), eq(DocumentType.FLOOR_PLAN)))
+                .thenReturn(new StorageResult("bafyBuilding", null));
         when(registryClient.registerForBuilding(eq(buildingId), any(RegisterDocumentRequest.class)))
                 .thenReturn(DocumentResponse.builder()
                         .id(UUID.randomUUID())
@@ -90,5 +93,31 @@ class DocumentUploadServiceTest {
         ArgumentCaptor<RegisterDocumentRequest> captor = ArgumentCaptor.forClass(RegisterDocumentRequest.class);
         verify(registryClient).registerForBuilding(eq(buildingId), captor.capture());
         assertThat(captor.getValue().ipfsCid()).isEqualTo("bafyBuilding");
+        assertThat(captor.getValue().storageUrl()).isNull();
+    }
+
+    @Test
+    @DisplayName("KYC document routes to private MinIO storageUrl")
+    void uploadKycDocumentUsesMinio() {
+        UUID buildingId = UUID.randomUUID();
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "passport.pdf", "application/pdf", "kyc".getBytes());
+
+        when(storageRouter.store(any(), eq("passport.pdf"), eq(DocumentType.KYC_DOCUMENT)))
+                .thenReturn(new StorageResult(null, "s3://tokenrealty-private/kyc/passport.pdf"));
+        when(registryClient.registerForBuilding(eq(buildingId), any(RegisterDocumentRequest.class)))
+                .thenReturn(DocumentResponse.builder()
+                        .id(UUID.randomUUID())
+                        .documentName("Passport")
+                        .documentType(DocumentType.KYC_DOCUMENT)
+                        .storageUrl("s3://tokenrealty-private/kyc/passport.pdf")
+                        .build());
+
+        documentUploadService.upload(file, "Passport", DocumentType.KYC_DOCUMENT, buildingId, null);
+
+        ArgumentCaptor<RegisterDocumentRequest> captor = ArgumentCaptor.forClass(RegisterDocumentRequest.class);
+        verify(registryClient).registerForBuilding(eq(buildingId), captor.capture());
+        assertThat(captor.getValue().ipfsCid()).isNull();
+        assertThat(captor.getValue().storageUrl()).isEqualTo("s3://tokenrealty-private/kyc/passport.pdf");
     }
 }

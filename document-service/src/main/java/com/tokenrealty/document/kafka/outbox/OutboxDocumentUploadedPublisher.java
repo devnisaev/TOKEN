@@ -23,7 +23,8 @@ public class OutboxDocumentUploadedPublisher implements DocumentUploadedPublishe
                 .put("buildingId", event.buildingId())
                 .put("flatId", event.flatId())
                 .put("documentType", event.documentType())
-                .put("ipfsCid", event.ipfsCid())
+                .putIfPresent("ipfsCid", event.ipfsCid())
+                .putIfPresent("storageUrl", event.storageUrl())
                 .put("uploadedAt", event.uploadedAt().toString())
                 .enqueue(outboxWriter, documentUploadedTopic, event.documentId().toString());
     }

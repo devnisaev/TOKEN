@@ -38,6 +38,7 @@ class DataRoomLoopIntegrationTest {
                 null,
                 "TITLE_DEED",
                 "QmTestCid123",
+                null,
                 Instant.parse("2025-09-25T16:00:00Z"));
 
         documentReviewService.queueForReview(command);

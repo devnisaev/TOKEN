@@ -5,7 +5,8 @@ import com.tokenrealty.document.dto.DocumentDtos.DocumentResponse;
 import com.tokenrealty.document.dto.DocumentDtos.DocumentType;
 import com.tokenrealty.document.dto.DocumentDtos.RegisterDocumentRequest;
 import com.tokenrealty.document.kafka.port.DocumentUploadedPublisher;
-import com.tokenrealty.document.storage.IpfsStorageService;
+import com.tokenrealty.document.storage.DocumentStorageRouter;
+import com.tokenrealty.document.storage.DocumentStorageRouter.StorageResult;
 import com.tokenrealty.web.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DocumentUploadService {
 
-    private final IpfsStorageService ipfsStorageService;
+    private final DocumentStorageRouter storageRouter;
     private final PropertyRegistryClient registryClient;
     private final DocumentUploadedPublisher documentUploadedPublisher;
 
@@ -38,11 +39,12 @@ public class DocumentUploadService {
     ) {
         validateTarget(buildingId, flatId);
         byte[] content = readContent(file);
-        String cid = ipfsStorageService.pin(content, file.getOriginalFilename());
+        StorageResult stored = storageRouter.store(content, file.getOriginalFilename(), documentType);
         RegisterDocumentRequest request = RegisterDocumentRequest.builder()
                 .documentName(documentName)
                 .documentType(documentType)
-                .ipfsCid(cid)
+                .ipfsCid(stored.ipfsCid())
+                .storageUrl(stored.storageUrl())
                 .fileSizeBytes(file.getSize())
                 .mimeType(file.getContentType())
                 .build();
@@ -57,7 +59,8 @@ public class DocumentUploadService {
                         buildingId,
                         flatId,
                         documentType.name(),
-                        cid,
+                        stored.ipfsCid(),
+                        stored.storageUrl(),
                         Instant.now()));
         return response;
     }
