@@ -37,17 +37,20 @@ public class DividendService {
     private final TokenHolderRepository holderRepository;
     private final DividendDistributedPublisher dividendDistributedPublisher;
     private final RentalClient rentalClient;
+    private final DividendDistributorService dividendDistributorService;
 
     public DividendService(DividendPaymentRepository dividendRepository,
                            TokenContractRepository contractRepository,
                            TokenHolderRepository holderRepository,
                            DividendDistributedPublisher dividendDistributedPublisher,
-                           RentalClient rentalClient) {
+                           RentalClient rentalClient,
+                           DividendDistributorService dividendDistributorService) {
         this.dividendRepository = dividendRepository;
         this.contractRepository = contractRepository;
         this.holderRepository = holderRepository;
         this.dividendDistributedPublisher = dividendDistributedPublisher;
         this.rentalClient = rentalClient;
+        this.dividendDistributorService = dividendDistributorService;
     }
 
     public Page<DividendPaymentResponse> findByContract(UUID contractId, Pageable pageable) {
@@ -125,6 +128,11 @@ public class DividendService {
             payments.add(dividendRepository.save(payment));
             totalDistributed = totalDistributed.add(holderShare);
         }
+
+        dividendDistributorService.depositIfConfigured(
+                        contract.getDividendDistributorAddress(), totalDistributed)
+                .ifPresent(txHash -> log.info(
+                        "DividendDistributor deposit tx={} contract={}", txHash, contractId));
 
         log.info("Scheduled ${} dividend payout to {} holders for contract {} (Payment Service settles on-chain)",
                 totalDistributed, payments.size(), contractId);
