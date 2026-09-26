@@ -93,11 +93,117 @@ public class NotificationEmailService {
     }
 
     private String buildBody(String eventType, JsonNode payload) {
-        return "Event: " + eventType + "\n\nDetails:\n" + payload;
+        return switch (eventType) {
+            case "tokenrealty.compliance.investor.kyc-approved.v1" -> """
+                    Hello,
+
+                    Your KYC verification has been approved. You may now invest on TokenRealty.
+
+                    Wallet: %s
+                    Approved at: %s
+
+                    — TokenRealty
+                    """.formatted(
+                    textOr(payload, "walletAddress", "n/a"),
+                    textOr(payload, "approvedAt", "n/a"));
+            case "tokenrealty.marketplace.trade.settled.v1" -> """
+                    Hello,
+
+                    Your trade has settled successfully.
+
+                    Trade ID: %s
+                    Order ID: %s
+                    Listing ID: %s
+                    Payment ID: %s
+
+                    — TokenRealty
+                    """.formatted(
+                    textOr(payload, "tradeId", "n/a"),
+                    textOr(payload, "orderId", "n/a"),
+                    textOr(payload, "listingId", "n/a"),
+                    textOr(payload, "paymentId", "n/a"));
+            case "tokenrealty.issuance.dividend.distributed.v1" -> """
+                    Hello,
+
+                    A dividend has been distributed for your property holding.
+
+                    Flat ID: %s
+                    Period: %s
+                    Total amount: %s %s
+                    Distributed at: %s
+
+                    — TokenRealty
+                    """.formatted(
+                    textOr(payload, "flatId", "n/a"),
+                    textOr(payload, "period", "n/a"),
+                    amountValue(payload, "totalAmount"),
+                    amountCurrency(payload, "totalAmount"),
+                    textOr(payload, "distributedAt", "n/a"));
+            case "tokenrealty.rental.rent.due.v1" -> """
+                    Hello,
+
+                    Your rent payment is due.
+
+                    Lease ID: %s
+                    Period: %s
+                    Amount due: $%s
+                    Due date: %s
+
+                    Please pay through the tenant portal.
+
+                    — TokenRealty
+                    """.formatted(
+                    textOr(payload, "leaseId", "n/a"),
+                    textOr(payload, "period", "n/a"),
+                    textOr(payload, "amountUsd", "n/a"),
+                    textOr(payload, "dueDate", "n/a"));
+            case "tokenrealty.marketplace.order.matched.v1" -> """
+                    Hello,
+
+                    Your buy order has been matched.
+
+                    Order ID: %s
+                    Listing ID: %s
+                    Tokens: %s
+                    Total price: $%s
+
+                    Complete payment to proceed with settlement.
+
+                    — TokenRealty
+                    """.formatted(
+                    textOr(payload, "orderId", "n/a"),
+                    textOr(payload, "listingId", "n/a"),
+                    textOr(payload, "tokenAmount", "n/a"),
+                    textOr(payload, "totalPriceUsd", "n/a"));
+            default -> "Event: " + eventType + "\n\nDetails:\n" + payload;
+        };
     }
 
     private static String textOrNull(JsonNode payload, String field) {
         JsonNode node = payload.get(field);
         return node != null && !node.isNull() ? node.asText() : null;
+    }
+
+    private static String textOr(JsonNode payload, String field, String fallback) {
+        String value = textOrNull(payload, field);
+        return value != null && !value.isBlank() ? value : fallback;
+    }
+
+    private static String amountValue(JsonNode payload, String field) {
+        JsonNode amount = payload.get(field);
+        if (amount == null || amount.isNull()) {
+            return "n/a";
+        }
+        JsonNode value = amount.get("value");
+        return value != null && !value.isNull() ? value.asText() : amount.asText();
+    }
+
+    private static String amountCurrency(JsonNode payload, String field) {
+        JsonNode amount = payload.get(field);
+        if (amount == null || amount.isNull()) {
+            return "USD";
+        }
+        JsonNode currency = amount.get("currency");
+        return currency != null && !currency.isNull() ? currency.asText() : "USD";
     }
 }

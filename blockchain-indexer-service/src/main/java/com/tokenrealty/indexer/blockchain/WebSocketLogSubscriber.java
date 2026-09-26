@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
@@ -18,8 +19,9 @@ import org.web3j.protocol.core.methods.response.Log;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @ConditionalOnProperty(name = "tokenrealty.indexer.websocket.enabled", havingValue = "true")
@@ -34,34 +36,60 @@ public class WebSocketLogSubscriber {
     @Value("${tokenrealty.indexer.blockchain.compliance-registry-address:}")
     private String complianceRegistryAddress;
 
-    private final List<io.reactivex.disposables.Disposable> subscriptions = new CopyOnWriteArrayList<>();
+    private final Map<String, io.reactivex.disposables.Disposable> subscriptionsByAddress =
+            new ConcurrentHashMap<>();
 
     @PostConstruct
     void subscribe() {
+        refreshSubscriptions();
+    }
+
+    @Scheduled(fixedRate = 60_000)
+    void refreshSubscriptions() {
         Set<String> tracked = new HashSet<>(trackedAddresses());
-        for (String address : tracked) {
-            EthFilter filter = new EthFilter(
-                    DefaultBlockParameterName.LATEST,
-                    DefaultBlockParameterName.LATEST,
-                    address);
-            filter.addOptionalTopics(
-                    EventTopics.TRANSFER,
-                    EventTopics.WHITELIST_ADDED,
-                    EventTopics.WHITELIST_REMOVED,
-                    EventTopics.DIVIDEND_DEPOSITED,
-                    EventTopics.DIVIDEND_CLAIMED);
-            var subscription = webSocketWeb3j.ethLogFlowable(filter).subscribe(
-                    this::handleLog,
-                    error -> log.warn("WebSocket log subscription error address={}: {}", address, error.getMessage()));
-            subscriptions.add(subscription);
-            log.info("WebSocket log subscription active for {}", address);
-        }
+        subscriptionsByAddress.keySet().stream()
+                .filter(address -> !tracked.contains(address))
+                .forEach(this::unsubscribeAddress);
+        tracked.forEach(this::subscribeToAddress);
     }
 
     @PreDestroy
     void unsubscribe() {
-        subscriptions.forEach(io.reactivex.disposables.Disposable::dispose);
-        subscriptions.clear();
+        subscriptionsByAddress.keySet().forEach(this::unsubscribeAddress);
+    }
+
+    private void subscribeToAddress(String address) {
+        String normalized = address.toLowerCase();
+        if (subscriptionsByAddress.containsKey(normalized)) {
+            return;
+        }
+        EthFilter filter = new EthFilter(
+                DefaultBlockParameterName.LATEST,
+                DefaultBlockParameterName.LATEST,
+                normalized);
+        filter.addOptionalTopics(
+                EventTopics.TRANSFER,
+                EventTopics.WHITELIST_ADDED,
+                EventTopics.WHITELIST_REMOVED,
+                EventTopics.DIVIDEND_DEPOSITED,
+                EventTopics.DIVIDEND_CLAIMED);
+        var subscription = webSocketWeb3j.ethLogFlowable(filter).subscribe(
+                this::handleLog,
+                error -> {
+                    log.warn("WebSocket log subscription error address={}: {}", normalized, error.getMessage());
+                    unsubscribeAddress(normalized);
+                    subscribeToAddress(normalized);
+                });
+        subscriptionsByAddress.put(normalized, subscription);
+        log.info("WebSocket log subscription active for {}", normalized);
+    }
+
+    private void unsubscribeAddress(String address) {
+        io.reactivex.disposables.Disposable subscription = subscriptionsByAddress.remove(address);
+        if (subscription != null) {
+            subscription.dispose();
+            log.info("WebSocket log subscription removed for {}", address);
+        }
     }
 
     private void handleLog(Log logEntry) {
