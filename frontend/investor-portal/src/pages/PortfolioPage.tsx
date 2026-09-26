@@ -2,7 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { api } from '@/lib/api';
+import { fetchPortfolioViaGraphql } from '@/lib/graphql';
 import { useAuth } from '@/lib/auth';
+import { loadStoredAuth } from '@tokenrealty/shared-api-client';
 import { formatUsd } from '@/lib/utils';
 import { ConnectWalletButton } from '@/components/ConnectWalletButton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,9 +12,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 export function PortfolioPage() {
   const { user } = useAuth();
 
+  const useGraphql = import.meta.env.VITE_USE_GRAPHQL_BFF === 'true';
+
   const { data, isLoading, error } = useQuery({
-    queryKey: ['portfolio-bff', user?.id],
-    queryFn: () => api.getPortfolioBff(user!.id),
+    queryKey: ['portfolio-bff', user?.id, useGraphql ? 'graphql' : 'rest'],
+    queryFn: () =>
+      useGraphql
+        ? fetchPortfolioViaGraphql(
+            user!.id,
+            loadStoredAuth('tokenrealty.auth')?.accessToken ?? null,
+          )
+        : api.getPortfolioBff(user!.id),
     enabled: !!user?.id,
   });
 
