@@ -1,15 +1,18 @@
 package com.tokenrealty.marketplace.service;
 
 import com.tokenrealty.marketplace.dto.MarketplaceDtos.*;
+import com.tokenrealty.marketplace.entity.ApprovedBuilding;
 import com.tokenrealty.marketplace.entity.Listing;
 import com.tokenrealty.web.exception.ConflictException;
 import com.tokenrealty.web.exception.ResourceNotFoundException;
 import com.tokenrealty.web.exception.ValidationException;
 import com.tokenrealty.marketplace.client.ComplianceClient;
 import com.tokenrealty.marketplace.client.TokenIssuanceClient;
+import com.tokenrealty.marketplace.kafka.command.BuildingApprovedCommand;
 import com.tokenrealty.marketplace.kafka.command.FlatTokenizedCommand;
 import com.tokenrealty.marketplace.kafka.port.ListingCreatedPublisher;
 import com.tokenrealty.marketplace.mapper.MarketplaceMapper;
+import com.tokenrealty.marketplace.repository.ApprovedBuildingRepository;
 import com.tokenrealty.marketplace.repository.ListingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,6 +28,7 @@ import java.util.UUID;
 public class ListingService {
 
     private final ListingRepository listingRepository;
+    private final ApprovedBuildingRepository approvedBuildingRepository;
     private final MarketplaceMapper mapper;
     private final ListingCreatedPublisher listingCreatedPublisher;
     private final TokenIssuanceClient tokenIssuanceClient;
@@ -97,6 +101,18 @@ public class ListingService {
                 .description("Auto-created from flat.tokenized event")
                 .build();
         return create(request);
+    }
+
+    @Transactional
+    public void recordBuildingApproved(BuildingApprovedCommand command) {
+        if (approvedBuildingRepository.existsById(command.buildingId())) {
+            return;
+        }
+        approvedBuildingRepository.save(ApprovedBuilding.builder()
+                .buildingId(command.buildingId())
+                .approvedAt(command.approvedAt())
+                .approvedBy(command.approvedBy())
+                .build());
     }
 
     @Transactional

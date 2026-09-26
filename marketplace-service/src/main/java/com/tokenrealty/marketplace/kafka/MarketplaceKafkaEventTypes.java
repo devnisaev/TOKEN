@@ -10,6 +10,7 @@ public final class MarketplaceKafkaEventTypes {
     public static final String TRADE_SETTLED = "tokenrealty.marketplace.trade.settled.v1";
 
     public static final String FLAT_TOKENIZED = "tokenrealty.registry.flat.tokenized.v1";
+    public static final String BUILDING_APPROVED = "tokenrealty.registry.building.approved.v1";
     public static final String PAYMENT_CONFIRMED = "tokenrealty.payment.payment.confirmed.v1";
     public static final String TRANSFER_COMPLETED = "tokenrealty.issuance.transfer.completed.v1";
 }

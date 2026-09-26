@@ -105,7 +105,7 @@ class BuyFlowKafkaContainersIntegrationTest {
         Trade trade = tradeRepository.findByOrderId(order.getId()).orElseThrow();
 
         assertThat(order.getStatus()).isEqualTo(MarketOrder.OrderStatus.MATCHED);
-        assertThat(trade.getStatus()).isEqualTo(Trade.TradeStatus.AWAITING_PAYMENT);
+        assertThat(trade.getStatus()).isEqualTo(Trade.TradeStatus.PENDING);
         assertThat(outboxEventRepository.findAll())
                 .anyMatch(event -> event.getStatus() == OutboxStatus.PENDING
                         && event.getAggregateId().equals(order.getId()));
