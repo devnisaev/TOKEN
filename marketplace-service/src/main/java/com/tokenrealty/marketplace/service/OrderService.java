@@ -69,21 +69,26 @@ public class OrderService {
     public OrderResponse placeBuyOrder(PlaceOrderRequest request) {
         Listing listing = getActiveListing(request.listingId());
         validateOrderRequest(request, listing);
-        assertWalletApproved(request.buyerWallet(), "Buyer");
+        ComplianceClient.ComplianceCheckResponse buyerCompliance =
+                assertWalletApproved(request.buyerWallet(), "Buyer");
         if (listing.getListingType() == Listing.ListingType.SECONDARY
                 && listing.getSellerWallet() != null) {
             assertWalletApproved(listing.getSellerWallet(), "Seller");
         }
+
+        BigDecimal totalPrice = listing.getPriceUsd()
+                .multiply(BigDecimal.valueOf(request.tokenAmount()))
+                .setScale(2, RoundingMode.HALF_UP);
+        String buyerCountry = buyerCompliance.countryCode() != null
+                ? buyerCompliance.countryCode()
+                : "US";
+        complianceClient.checkInvestment(request.buyerId(), buyerCountry, totalPrice);
 
         listing.setTokensAvailable(listing.getTokensAvailable() - request.tokenAmount());
         boolean primaryListingSoldOut = listing.getTokensAvailable() == 0;
         if (primaryListingSoldOut) {
             listing.setStatus(Listing.ListingStatus.SOLD);
         }
-
-        BigDecimal totalPrice = listing.getPriceUsd()
-                .multiply(BigDecimal.valueOf(request.tokenAmount()))
-                .setScale(2, RoundingMode.HALF_UP);
 
         MarketOrder order = MarketOrder.builder()
                 .listingId(listing.getId())
@@ -278,10 +283,12 @@ public class OrderService {
         }
     }
 
-    private void assertWalletApproved(String wallet, String role) {
-        if (!complianceClient.isWalletApproved(wallet)) {
+    private ComplianceClient.ComplianceCheckResponse assertWalletApproved(String wallet, String role) {
+        ComplianceClient.ComplianceCheckResponse response = complianceClient.checkWallet(wallet);
+        if (response == null || !response.whitelisted()) {
             throw new ComplianceBlockedException(role + " wallet is not KYC approved");
         }
+        return response;
     }
 
     private MarketOrder getOrder(UUID id) {

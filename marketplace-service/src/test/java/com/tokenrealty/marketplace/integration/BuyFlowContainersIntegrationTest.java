@@ -64,7 +64,9 @@ class BuyFlowContainersIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        when(complianceClient.isWalletApproved(any())).thenReturn(true);
+        when(complianceClient.checkWallet(any())).thenReturn(
+                new ComplianceClient.ComplianceCheckResponse(
+                        "0xwallet", true, "APPROVED", null, "US", null));
         when(paymentClient.initiateTokenPurchase(any(), any(), any(), any()))
                 .thenReturn(new PaymentClient.InitiatePaymentResponse(
                         UUID.randomUUID(),

@@ -70,7 +70,9 @@ class BuyFlowKafkaContainersIntegrationTest {
         outboxEventRepository.deleteAll();
         buyerId = UUID.randomUUID();
 
-        when(complianceClient.isWalletApproved(any())).thenReturn(true);
+        when(complianceClient.checkWallet(any())).thenReturn(
+                new ComplianceClient.ComplianceCheckResponse(
+                        "0xwallet", true, "APPROVED", buyerId, "US", null));
         when(paymentClient.initiateTokenPurchase(any(), any(), any(), any()))
                 .thenAnswer(invocation -> new PaymentClient.InitiatePaymentResponse(
                         UUID.randomUUID(),

@@ -1,5 +1,6 @@
 package com.tokenrealty.marketplace.service;
 
+import com.tokenrealty.marketplace.client.PropertyRegistryClient;
 import com.tokenrealty.marketplace.dto.MarketplaceDtos.CreateListingRequest;
 import com.tokenrealty.marketplace.dto.MarketplaceDtos.ListingResponse;
 import com.tokenrealty.marketplace.entity.Listing;
@@ -15,6 +16,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -26,19 +29,29 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("ListingService unit tests")
 class ListingServiceTest {
 
     @Mock ListingRepository listingRepository;
     @Mock MarketplaceMapper mapper;
     @Mock ListingCreatedPublisher listingCreatedPublisher;
+    @Mock PropertyRegistryClient propertyRegistryClient;
     @InjectMocks ListingService listingService;
 
     private UUID flatId;
+    private UUID buildingId;
 
     @BeforeEach
     void setUp() {
         flatId = UUID.randomUUID();
+        buildingId = UUID.randomUUID();
+        when(propertyRegistryClient.getFlat(flatId)).thenReturn(
+                new PropertyRegistryClient.FlatView(flatId, buildingId, "Tower", "101", 1, 50.0, "TOKENIZED"));
+        when(propertyRegistryClient.getSpvByBuilding(buildingId)).thenReturn(
+                new PropertyRegistryClient.SpvView(
+                        UUID.randomUUID(), buildingId, "SPV", "REG-1", "0xspv",
+                        "SPV_SHARE_EQUITY", true, "ACTIVE"));
     }
 
     @Test
@@ -91,6 +104,27 @@ class ListingServiceTest {
 
         assertThatThrownBy(() -> listingService.create(request))
                 .isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    @DisplayName("create rejects non-equity SPV ownership")
+    void createRejectsNonEquitySpv() {
+        when(propertyRegistryClient.getSpvByBuilding(buildingId)).thenReturn(
+                new PropertyRegistryClient.SpvView(
+                        UUID.randomUUID(), buildingId, "SPV", "REG-1", "0xspv",
+                        "PART_DEBT_INSTRUMENT", true, "ACTIVE"));
+
+        CreateListingRequest request = CreateListingRequest.builder()
+                .flatId(flatId)
+                .listingType(Listing.ListingType.PRIMARY)
+                .priceUsd(new BigDecimal("100.00"))
+                .tokensTotal(100L)
+                .minInvestmentTokens(10L)
+                .build();
+
+        assertThatThrownBy(() -> listingService.create(request))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining("PART_DEBT_INSTRUMENT");
     }
 
     @Test

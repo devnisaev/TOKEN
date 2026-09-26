@@ -7,6 +7,7 @@ import com.tokenrealty.web.exception.ConflictException;
 import com.tokenrealty.web.exception.ResourceNotFoundException;
 import com.tokenrealty.web.exception.ValidationException;
 import com.tokenrealty.marketplace.client.ComplianceClient;
+import com.tokenrealty.marketplace.client.PropertyRegistryClient;
 import com.tokenrealty.marketplace.client.TokenIssuanceClient;
 import com.tokenrealty.marketplace.kafka.command.BuildingApprovedCommand;
 import com.tokenrealty.marketplace.kafka.command.FlatTokenizedCommand;
@@ -15,6 +16,7 @@ import com.tokenrealty.marketplace.mapper.MarketplaceMapper;
 import com.tokenrealty.marketplace.repository.ApprovedBuildingRepository;
 import com.tokenrealty.marketplace.repository.ListingRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional(readOnly = true)
 public class ListingService {
 
@@ -33,6 +36,7 @@ public class ListingService {
     private final ListingCreatedPublisher listingCreatedPublisher;
     private final TokenIssuanceClient tokenIssuanceClient;
     private final ComplianceClient complianceClient;
+    private final PropertyRegistryClient propertyRegistryClient;
 
     public Page<ListingResponse> findAll(Listing.ListingStatus status, UUID flatId, Pageable pageable) {
         if (flatId != null) {
@@ -51,6 +55,7 @@ public class ListingService {
     @Transactional
     public ListingResponse create(CreateListingRequest request) {
         validateCreateRequest(request);
+        assertEquityOwnershipStructure(request.flatId());
         if (request.listingType() == Listing.ListingType.PRIMARY) {
             listingRepository.findByFlatIdAndStatus(request.flatId(), Listing.ListingStatus.ACTIVE)
                     .ifPresent(existing -> {
@@ -85,6 +90,11 @@ public class ListingService {
 
     @Transactional
     public ListingResponse createFromFlatTokenized(FlatTokenizedCommand command) {
+        if (!approvedBuildingRepository.existsById(command.buildingId())) {
+            log.info("Skipping auto-listing for flat {} — building {} not approved yet",
+                    command.flatId(), command.buildingId());
+            return null;
+        }
         var existing = listingRepository.findByFlatIdAndStatus(command.flatId(), Listing.ListingStatus.ACTIVE);
         if (existing.isPresent()) {
             return mapper.toListingResponse(existing.get());
@@ -158,6 +168,17 @@ public class ListingService {
     private static void validateCreateRequest(CreateListingRequest request) {
         if (request.minInvestmentTokens() > request.tokensTotal()) {
             throw new ValidationException("minInvestmentTokens cannot exceed tokensTotal");
+        }
+    }
+
+    private void assertEquityOwnershipStructure(UUID flatId) {
+        var flat = propertyRegistryClient.getFlat(flatId);
+        var spv = propertyRegistryClient.getSpvByBuilding(flat.buildingId());
+        if ("PART_DEBT_INSTRUMENT".equals(spv.ownershipType())
+                || "PROFIT_SHARING_AGREEMENT".equals(spv.ownershipType())) {
+            throw new ValidationException(
+                    "Token marketplace listings require equity SPV ownership; found "
+                            + spv.ownershipType());
         }
     }
 }

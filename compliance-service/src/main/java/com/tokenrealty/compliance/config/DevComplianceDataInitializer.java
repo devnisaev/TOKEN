@@ -2,7 +2,9 @@ package com.tokenrealty.compliance.config;
 
 import com.tokenrealty.compliance.entity.ComplianceRecord;
 import com.tokenrealty.compliance.entity.ComplianceRecord.ComplianceStatus;
+import com.tokenrealty.compliance.entity.InvestmentPolicy;
 import com.tokenrealty.compliance.repository.ComplianceRecordRepository;
+import com.tokenrealty.compliance.repository.InvestmentPolicyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +12,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
@@ -24,6 +27,7 @@ public class DevComplianceDataInitializer implements ApplicationRunner {
     public static final String DEMO_INVESTOR_WALLET = "0x70997970c51812dc3a010c724d1afe6fc599aa84";
 
     private final ComplianceRecordRepository repository;
+    private final InvestmentPolicyRepository investmentPolicyRepository;
 
     @Value("${tokenrealty.compliance.seed-dev-records:true}")
     private boolean seedDevRecords;
@@ -33,6 +37,11 @@ public class DevComplianceDataInitializer implements ApplicationRunner {
         if (!seedDevRecords) {
             return;
         }
+        seedDemoKycRecord();
+        seedInvestmentPolicies();
+    }
+
+    private void seedDemoKycRecord() {
         if (repository.existsByWalletAddress(DEMO_INVESTOR_WALLET)) {
             return;
         }
@@ -50,5 +59,27 @@ public class DevComplianceDataInitializer implements ApplicationRunner {
                 .status(ComplianceStatus.APPROVED)
                 .build());
         log.info("Seeded demo KYC for investor {} wallet {}", DEMO_INVESTOR_ID, DEMO_INVESTOR_WALLET);
+    }
+
+    private void seedInvestmentPolicies() {
+        seedPolicyIfAbsent("US", new BigDecimal("100.00"), new BigDecimal("500000.00"), false);
+    }
+
+    private void seedPolicyIfAbsent(
+            String jurisdiction,
+            BigDecimal minInvestmentUsd,
+            BigDecimal maxInvestmentUsd,
+            boolean accreditedOnly) {
+        if (investmentPolicyRepository.findByJurisdiction(jurisdiction).isPresent()) {
+            return;
+        }
+        investmentPolicyRepository.save(InvestmentPolicy.builder()
+                .jurisdiction(jurisdiction)
+                .minInvestmentUsd(minInvestmentUsd)
+                .maxInvestmentUsd(maxInvestmentUsd)
+                .accreditedOnly(accreditedOnly)
+                .build());
+        log.info("Seeded investment policy for {} (min={}, max={})",
+                jurisdiction, minInvestmentUsd, maxInvestmentUsd);
     }
 }

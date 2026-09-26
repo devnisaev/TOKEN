@@ -10,6 +10,7 @@ import com.tokenrealty.marketplace.kafka.command.TransferCompletedCommand;
 import com.tokenrealty.marketplace.entity.Listing;
 import com.tokenrealty.marketplace.entity.MarketOrder;
 import com.tokenrealty.marketplace.entity.Trade;
+import com.tokenrealty.web.exception.ComplianceBlockedException;
 import com.tokenrealty.web.exception.ValidationException;
 import com.tokenrealty.marketplace.kafka.port.OrderMatchedPublisher;
 import com.tokenrealty.marketplace.kafka.port.TradeSettledPublisher;
@@ -79,10 +80,11 @@ class OrderServiceTest {
                 .build();
 
         when(listingRepository.findById(listingId)).thenReturn(Optional.of(listing));
-        when(complianceClient.isWalletApproved("0xabc")).thenReturn(false);
+        when(complianceClient.checkWallet("0xabc")).thenReturn(
+                new ComplianceClient.ComplianceCheckResponse("0xabc", false, "PENDING", null, null, null));
 
         assertThatThrownBy(() -> orderService.placeBuyOrder(request))
-                .isInstanceOf(ValidationException.class);
+                .isInstanceOf(ComplianceBlockedException.class);
     }
 
     @Test
@@ -122,7 +124,9 @@ class OrderServiceTest {
         trade.setId(UUID.randomUUID());
 
         when(listingRepository.findById(listingId)).thenReturn(Optional.of(listing));
-        when(complianceClient.isWalletApproved("0xabc")).thenReturn(true);
+        when(complianceClient.checkWallet("0xabc")).thenReturn(
+                new ComplianceClient.ComplianceCheckResponse(
+                        "0xabc", true, "APPROVED", buyerId, "US", null));
         UUID paymentId = UUID.randomUUID();
         when(orderRepository.save(any(MarketOrder.class))).thenReturn(savedOrder);
         when(tradeRepository.save(any(Trade.class))).thenReturn(trade);
@@ -134,6 +138,7 @@ class OrderServiceTest {
 
         orderService.placeBuyOrder(request);
 
+        verify(complianceClient).checkInvestment(buyerId, "US", new BigDecimal("100.00"));
         verify(paymentClient).initiateTokenPurchase(
                 savedOrder.getId(), buyerId, "0xabc", new BigDecimal("100.00"));
         verify(tradeRepository, times(2)).save(any(Trade.class));
@@ -179,7 +184,9 @@ class OrderServiceTest {
         trade.setId(UUID.randomUUID());
 
         when(listingRepository.findById(listingId)).thenReturn(Optional.of(listing));
-        when(complianceClient.isWalletApproved("0xabc")).thenReturn(true);
+        when(complianceClient.checkWallet("0xabc")).thenReturn(
+                new ComplianceClient.ComplianceCheckResponse(
+                        "0xabc", true, "APPROVED", buyerId, "KG", null));
         when(orderRepository.save(any(MarketOrder.class))).thenReturn(savedOrder);
         when(tradeRepository.save(any(Trade.class))).thenReturn(trade);
         when(paymentClient.initiateTokenPurchase(any(), any(), any(), any()))
@@ -189,8 +196,33 @@ class OrderServiceTest {
 
         orderService.placeBuyOrder(request);
 
+        verify(complianceClient).checkInvestment(buyerId, "KG", new BigDecimal("100.00"));
         verify(propertyRegistryClient).markFlatFullySold(listing.getFlatId());
         assertThat(listing.getStatus()).isEqualTo(Listing.ListingStatus.SOLD);
+    }
+
+    @Test
+    @DisplayName("placeBuyOrder rejects investment blocked by compliance policy")
+    void rejectsInvestmentBlockedByPolicy() {
+        UUID buyerId = UUID.randomUUID();
+        PlaceOrderRequest request = PlaceOrderRequest.builder()
+                .listingId(listingId)
+                .buyerId(buyerId)
+                .buyerWallet("0xabc")
+                .tokenAmount(10L)
+                .build();
+
+        when(listingRepository.findById(listingId)).thenReturn(Optional.of(listing));
+        when(complianceClient.checkWallet("0xabc")).thenReturn(
+                new ComplianceClient.ComplianceCheckResponse(
+                        "0xabc", true, "APPROVED", buyerId, "US", null));
+        org.mockito.Mockito.doThrow(new ComplianceBlockedException("Investment below minimum"))
+                .when(complianceClient)
+                .checkInvestment(buyerId, "US", new BigDecimal("100.00"));
+
+        assertThatThrownBy(() -> orderService.placeBuyOrder(request))
+                .isInstanceOf(ComplianceBlockedException.class)
+                .hasMessageContaining("Investment below minimum");
     }
 
     @Test
