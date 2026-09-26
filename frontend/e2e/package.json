@@ -1,0 +1,14 @@
+{
+  "name": "tokenrealty-e2e",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test tests/smoke",
+    "test:full": "E2E_GATEWAY_URL=http://localhost:8080 playwright test tests/full"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.0"
+  }
+}

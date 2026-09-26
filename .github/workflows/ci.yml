@@ -65,6 +65,32 @@ jobs:
           npm ci
           npm run build
 
+  frontend-e2e-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build frontends
+        run: |
+          for app in investor-portal admin-dashboard tenant-portal; do
+            cd frontend/$app
+            npm ci
+            npm run build
+            cd ../..
+          done
+
+      - name: Run Playwright smoke tests
+        working-directory: frontend/e2e
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npm run test:smoke
+
   openapi-codegen:
     runs-on: ubuntu-latest
     steps:
