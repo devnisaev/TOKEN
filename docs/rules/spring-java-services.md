@@ -25,6 +25,7 @@ Cursor rule: [`.cursor/rules/spring-java-services.mdc`](../../.cursor/rules/spri
 | [investor-portal.md](investor-portal.md) | React investor UI (Vite, TanStack Query, wagmi) |
 | [admin-dashboard.md](admin-dashboard.md) | React admin UI (buildings, KYC review) |
 | [api-gateway-bff.md](api-gateway-bff.md) | Gateway BFF aggregate endpoints |
+| [phase-6-services.md](phase-6-services.md) | Phase 6 ports 8093–8099, tiers, Kafka matrix |
 
 ---
 
@@ -189,7 +190,7 @@ Token Issuance support endpoint: `GET /v1/investors/{investorId}/holdings`.
 
 ## Checklist — new microservice
 
-Phase 6 planned services (ports 8093–8099): see [PLATFORM-SPEC.md §12](../PLATFORM-SPEC.md#12-phase-6--planned-services).
+Phase 6 services (ports 8093–8099, **implemented**): see [phase-6-services.md](phase-6-services.md) and [PLATFORM-SPEC.md §12](../PLATFORM-SPEC.md#12-phase-6--planned-services).
 
 - [ ] Spring Boot 4 / Java 21 Maven module
 - [ ] Port + DB from [PLATFORM-SPEC.md](../PLATFORM-SPEC.md) §7

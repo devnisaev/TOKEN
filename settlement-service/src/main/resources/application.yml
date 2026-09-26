@@ -33,15 +33,22 @@ tokenrealty:
     issuer: tokenrealty-auth
   kafka:
     enabled: ${KAFKA_ENABLED:false}
+    serialization: ${KAFKA_SERIALIZATION:json}
     dlq:
       enabled: ${KAFKA_DLQ_ENABLED:false}
       max-retries: 3
       backoff-ms: 1000
+    relay:
+      poll-ms: 1000
+      publish-timeout-ms: 10000
+      max-retries: 5
     topic:
       order-matched: tokenrealty.marketplace.order.matched.v1
       payment-confirmed: tokenrealty.payment.payment.confirmed.v1
       transfer-completed: tokenrealty.issuance.transfer.completed.v1
       trade-settled: tokenrealty.marketplace.trade.settled.v1
+      settlement-stuck: tokenrealty.settlement.stuck.v1
+      settlement-recovered: tokenrealty.settlement.recovered.v1
   settlement:
     stuck-sla-minutes: ${SETTLEMENT_STUCK_SLA_MINUTES:30}
     stuck-check-ms: ${SETTLEMENT_STUCK_CHECK_MS:300000}

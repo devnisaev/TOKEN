@@ -16,6 +16,7 @@ public final class DownstreamServices {
     public static final ServiceSpec RENTAL = new ServiceSpec("Rental service");
     public static final ServiceSpec BLOCKCHAIN_INDEXER = new ServiceSpec("Blockchain Indexer service");
     public static final ServiceSpec REPORTING = new ServiceSpec("Reporting service");
+    public static final ServiceSpec SEARCH = new ServiceSpec("Search service");
     public static final ServiceSpec SETTLEMENT = new ServiceSpec("Settlement service");
 
     private DownstreamServices() {

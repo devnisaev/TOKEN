@@ -19,6 +19,8 @@ server:
 services:
   compliance:
     url: ${COMPLIANCE_URL:http://localhost:8087/api}
+  document:
+    url: ${DOCUMENT_URL:http://localhost:8088/api}
 
 tokenrealty:
   jwt:

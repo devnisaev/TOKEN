@@ -2,7 +2,7 @@
 
 > **Version:** 1.3  
 > **Date:** 2026-09-26  
-> **Status:** Phases 0–5 complete (tracks 1–277); Phase 6 planned  
+> **Status:** Phases 0–5 complete (tracks 1–277); Phase 6 complete (tracks 278–402)  
 > **Purpose:** Master specification and implementation backlog for the TokenRealty real-estate tokenization platform (buy, sell, rent with cryptocurrency).
 
 ---
@@ -680,13 +680,14 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] GET `/v1/settlements/{orderId}` — step timeline + current status
 - [x] Admin retry hook `POST /v1/settlements/{orderId}/retry` (STUCK → IN_PROGRESS)
 - [x] Scheduled stuck detection (`tokenrealty.settlement.stuck-sla-minutes`)
+- [x] Outbox publish `settlement.stuck`, `settlement.recovered`
 - [x] Kafka integration tests
 
 ### 10.14 Valuation / NAV Service (Phase 6 — implemented)
 
 - [x] Scaffold project (`valuation-service/`, port 8095)
 - [x] Appraisal workflow for `APPRAISER` role (submit, review, approve/reject)
-- [ ] Periodic revaluation schedules per building/flat
+- [x] Periodic revaluation schedules per building/flat
 - [x] Token NAV calculation from latest valuation + outstanding tokens
 - [x] Outbox publish `valuation.updated` (Registry sync via future consumer)
 - [x] GET `/v1/valuations/building/{id}`, `/v1/valuations/flat/{id}/nav`
@@ -718,7 +719,7 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] Kafka consumers: `listing.created`, `flat.tokenized`, `building.approved`, `valuation.updated`
 - [x] GET `/v1/search/listings?q=`, `/v1/search/buildings?q=` with filters + pagination
 - [x] Gateway route
-- [ ] Optional BFF wrapper
+- [x] Optional BFF wrapper (`GET /v1/bff/search/listings`, `/buildings`)
 
 ### 10.18 Integration Hub Service (Phase 6 — implemented, P3)
 
@@ -727,7 +728,8 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] Delivery tracking with retry (max 5 attempts, exponential backoff)
 - [x] GET `/v1/integrations/deliveries` (ADMIN)
 - [x] Gateway route `/api/v1/integrations`
-- [ ] Document/Payment webhook migration; outbound adapter layer
+- [x] Document storage webhook relay (`POST /v1/integrations/webhooks/storage/{provider}`)
+- [ ] Payment webhook migration; outbound adapter layer
 - [ ] Credential rotation via KMS
 
 ---
@@ -1062,6 +1064,22 @@ Phase 6 implementation tracks begin at **278**. Suggested batching (25 tracks pe
 | 303–327 | Settlement Saga Service + stuck detection + admin UI |
 | 328–352 | Valuation/NAV + Audit Ledger |
 | 353–377 | Corporate Actions extraction + Search/Integration Hub (as needed) |
+| 378–402 | Phase 6 hardening: Search BFF, settlement outbox, revaluation schedules, document webhooks, outbox ITs |
+
+### 12.7 Tier 4 — Phase 6 hardening (implemented)
+
+Cross-service follow-ups after all seven Phase 6 services scaffolded:
+
+| Area | Deliverable |
+|------|-------------|
+| Search BFF | Gateway pass-through `GET /v1/bff/search/listings`, `/buildings` |
+| Settlement outbox | `settlement.stuck`, `settlement.recovered` events on SLA breach + admin retry |
+| Valuation schedules | `RevaluationSchedule` entity + job + admin APIs |
+| Integration Hub | Storage webhook relay → Document service ack stub |
+| Outbox ITs | Valuation, Corporate Actions, Settlement relay tests |
+| Issuance local | `rent-collected-listener-enabled: false` when Corporate Actions owns dividend path |
+
+**Still deferred:** OpenSearch backend, Payment webhooks, KMS credential rotation.
 
 ---
 

@@ -472,8 +472,9 @@ Publishing services with `OutboxRelayWorker` + integration tests (tracks 253–2
 | Rental | `rent.due`, `lease.expired` | `OutboxRelayIntegrationTest` |
 | Document | `document.uploaded` | `OutboxRelayIntegrationTest` + upload IT |
 | Blockchain Indexer | `transfer.indexed`, `balance.mismatch` | `OutboxRelayIntegrationTest` |
-| Valuation | `valuation.updated` | outbox relay worker (IT pending) |
-| Corporate Actions | `dividend.distribution-requested` | outbox relay worker (IT pending) |
+| Valuation | `valuation.updated` | `OutboxRelayIntegrationTest` |
+| Corporate Actions | `dividend.distribution-requested` | `OutboxRelayIntegrationTest` |
+| Settlement | `settlement.stuck`, `settlement.recovered` | `OutboxRelayIntegrationTest` |
 
 Shared test helper: `OutboxKafkaListenerTestConfiguration` in `tokenrealty-kafka` (for services with `@KafkaListener` beans).
 
@@ -487,14 +488,14 @@ See [PLATFORM-SPEC.md §12](PLATFORM-SPEC.md#12-phase-6--planned-services).
 |-------|-----------|-----------|--------|
 | `tokenrealty.valuation.updated.v1` | Valuation Service | Registry, Search, Reporting | Implemented (outbox) |
 | `tokenrealty.corporateactions.dividend.distribution-requested.v1` | Corporate Actions | Token Issuance | Implemented (outbox) |
+| `tokenrealty.settlement.stuck.v1` | Settlement Service | Notification, Reporting | Implemented (outbox) |
+| `tokenrealty.settlement.recovered.v1` | Settlement Service | Audit Ledger, Notification | Implemented (outbox) |
 
 **Still planned:**
 
 | Topic (proposed) | Publisher | Consumers | Purpose |
 |------------------|-----------|-----------|---------|
 | `tokenrealty.valuation.approved.v1` | Valuation Service | Audit Ledger, Notification | Appraisal workflow completion |
-| `tokenrealty.settlement.stuck.v1` | Settlement Service | Notification, Reporting | Saga step exceeded SLA |
-| `tokenrealty.settlement.recovered.v1` | Settlement Service | Audit Ledger, Notification | Admin retry/compensation succeeded |
 | `tokenrealty.audit.entry-recorded.v1` | Audit Ledger | Reporting (optional) | Cross-service audit fan-in |
 
 **Existing topics consumed by Phase 6 services (read-only projections):**

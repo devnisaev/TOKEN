@@ -34,6 +34,7 @@ public class SecurityConfig {
                         .requestMatchers(ActuatorSecurityPaths.PUBLIC).permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/v1/valuations").hasAnyRole("APPRAISER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/v1/valuations/schedules").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/v1/valuations/*/approve").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/v1/valuations/*/reject").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/v1/valuations/**")

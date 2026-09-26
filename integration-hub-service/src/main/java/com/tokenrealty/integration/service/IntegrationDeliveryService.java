@@ -38,8 +38,26 @@ public class IntegrationDeliveryService {
             String rawBody,
             String payloadDigest,
             String signature) {
+        return createPendingDelivery(IntegrationType.KYC, provider, rawBody, payloadDigest, signature);
+    }
+
+    @Transactional
+    public UUID createPendingDocumentDelivery(
+            String provider,
+            String rawBody,
+            String payloadDigest,
+            String signature) {
+        return createPendingDelivery(IntegrationType.DOCUMENT, provider, rawBody, payloadDigest, signature);
+    }
+
+    private UUID createPendingDelivery(
+            IntegrationType integrationType,
+            String provider,
+            String rawBody,
+            String payloadDigest,
+            String signature) {
         IntegrationDelivery delivery = IntegrationDelivery.builder()
-                .integrationType(IntegrationType.KYC)
+                .integrationType(integrationType)
                 .provider(provider)
                 .payload(rawBody)
                 .payloadDigest(payloadDigest)

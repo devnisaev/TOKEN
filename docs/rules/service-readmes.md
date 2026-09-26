@@ -18,6 +18,15 @@ Each microservice `README.md` should include an **API overview** table aligned w
 | Notification | [notification-service/README.md](../../notification-service/README.md) |
 | Wallet | [wallet-service/README.md](../../wallet-service/README.md) |
 | Blockchain Indexer | [blockchain-indexer-service/README.md](../../blockchain-indexer-service/README.md) |
+| Reporting / Analytics | [reporting-service/README.md](../../reporting-service/README.md) |
+| Settlement / Saga Tracker | [settlement-service/README.md](../../settlement-service/README.md) |
+| Valuation / NAV | [valuation-service/README.md](../../valuation-service/README.md) |
+| Audit Ledger | [audit-ledger-service/README.md](../../audit-ledger-service/README.md) |
+| Corporate Actions | [corporate-actions-service/README.md](../../corporate-actions-service/README.md) |
+| Search | [search-service/README.md](../../search-service/README.md) |
+| Integration Hub | [integration-hub-service/README.md](../../integration-hub-service/README.md) |
+
+Phase 6 overview: [phase-6-services.md](phase-6-services.md).
 
 ## When adding endpoints
 

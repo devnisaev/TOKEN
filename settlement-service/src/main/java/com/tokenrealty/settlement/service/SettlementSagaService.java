@@ -9,6 +9,7 @@ import com.tokenrealty.settlement.entity.SagaStatus;
 import com.tokenrealty.settlement.entity.SagaStepName;
 import com.tokenrealty.settlement.entity.SettlementSaga;
 import com.tokenrealty.settlement.entity.SettlementSagaStep;
+import com.tokenrealty.settlement.kafka.port.SettlementEventPublisher;
 import com.tokenrealty.settlement.repository.SettlementSagaRepository;
 import com.tokenrealty.settlement.repository.SettlementSagaStepRepository;
 import com.tokenrealty.web.exception.ResourceNotFoundException;
@@ -27,6 +28,7 @@ public class SettlementSagaService {
 
     private final SettlementSagaRepository sagaRepository;
     private final SettlementSagaStepRepository stepRepository;
+    private final SettlementEventPublisher eventPublisher;
     private final Clock clock;
 
     @Transactional
@@ -90,8 +92,14 @@ public class SettlementSagaService {
             return new SettlementRetryResponse(orderId, saga.getStatus(),
                     "Retry only applies to STUCK sagas");
         }
+        Instant recoveredAt = clock.instant();
         saga.setStatus(SagaStatus.IN_PROGRESS);
         sagaRepository.save(saga);
+        eventPublisher.publishRecovered(new SettlementEventPublisher.SettlementRecoveredEvent(
+                saga.getId(),
+                saga.getOrderId(),
+                saga.getCurrentStep(),
+                recoveredAt));
         return new SettlementRetryResponse(orderId, SagaStatus.IN_PROGRESS,
                 "Saga marked IN_PROGRESS for ops follow-up");
     }
@@ -99,10 +107,16 @@ public class SettlementSagaService {
     @Transactional
     public int markStuckSagas(Instant updatedBefore) {
         int count = 0;
+        Instant stuckAt = clock.instant();
         for (SettlementSaga saga : sagaRepository.findByStatusAndUpdatedAtBefore(
                 SagaStatus.IN_PROGRESS, updatedBefore)) {
             saga.setStatus(SagaStatus.STUCK);
             sagaRepository.save(saga);
+            eventPublisher.publishStuck(new SettlementEventPublisher.SettlementStuckEvent(
+                    saga.getId(),
+                    saga.getOrderId(),
+                    saga.getCurrentStep(),
+                    stuckAt));
             count++;
         }
         return count;

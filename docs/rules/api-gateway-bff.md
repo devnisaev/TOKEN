@@ -31,8 +31,14 @@ Service account: `api-gateway` / `gateway-secret` (ADMIN) — used by BFF RestCl
 | `GET` | `/v1/bff/buildings/{buildingId}` | Registry building detail (flats + SPV) + tokenized/available counts |
 | `GET` | `/v1/bff/investors/{investorId}/portfolio` | Wallet balance + enriched token holdings (`flatId`, `tokenPriceUsd`) + recent dividends |
 | `GET` | `/v1/bff/orders/{orderId}/status-stream` | SSE poll of Marketplace order + trade status (heartbeat, 404 → error event) |
+| `GET` | `/v1/bff/admin/reports/summary` | Reporting trading + occupancy + dividend aggregates |
+| `GET` | `/v1/bff/admin/maintenance-tickets` | Rental maintenance queue (admin) |
+| `GET` | `/v1/bff/tenants/{tenantId}/lease` | Tenant lease + flat summary |
+| `GET` | `/v1/bff/tenants/{tenantId}/maintenance` | Tenant maintenance tickets |
+| `GET` | `/v1/bff/search/listings` | Search service listings (`q`, `listingType`, `minPrice`, `maxPrice`, page) |
+| `GET` | `/v1/bff/search/buildings` | Search service buildings (`q`, page) |
 
-Same JWT as other gateway routes — investor token required.
+Same JWT as other gateway routes — investor token required (search endpoints: any authenticated user).
 
 OpenAPI: `frontend/openapi/specs/gateway.yaml` → `frontend/shared-api-types/gateway.ts`.
 
@@ -58,13 +64,16 @@ api-gateway/src/main/java/com/tokenrealty/gateway/
 │   ├── BffOrderStatusStreamController.java
 │   ├── BffOrderStatusStreamService.java
 │   ├── BffPortfolioService.java
+│   ├── BffSearchService.java           ← pass-through to Search :8098
 │   └── …
 ├── filter/GatewayRateLimitFilter.java
 ├── proxy/GatewayProxyController.java   ← StreamingResponseBody for Accept: text/event-stream
 ├── client/
 │   ├── PropertyRegistryClient.java
 │   ├── MarketplaceClient.java
-│   └── TokenIssuanceClient.java
+│   ├── TokenIssuanceClient.java
+│   ├── ReportingClient.java
+│   └── SearchClient.java
 ├── config/ServiceClientConfig.java
 └── dto/BffDtos.java
 ```
@@ -94,6 +103,10 @@ services:
     url: ${TOKEN_ISSUANCE_URL:http://localhost:8082/api}
   marketplace:
     url: ${MARKETPLACE_SERVICE_URL:http://localhost:8084/api}
+  reporting:
+    url: ${REPORTING_SERVICE_URL:http://localhost:8093/api}
+  search:
+    url: ${SEARCH_SERVICE_URL:http://localhost:8098/api}
 
 tokenrealty:
   service-account:

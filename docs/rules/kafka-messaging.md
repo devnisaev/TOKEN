@@ -408,7 +408,23 @@ com.tokenrealty.notification/
     └── in/NotificationEventListener.java  ← multi-topic @KafkaListener + KafkaEventConsumer
 ```
 
-No outbox — Notification is consume-only. Email config:
+No outbox — Notification is consume-only.
+
+**Phase 6 services (implemented)** — see [phase-6-services.md](phase-6-services.md):
+
+| Service | Outbox events | Consumer topics |
+|---------|---------------|-----------------|
+| Reporting | — | `trade.settled`, `order.matched`, `dividend.distributed`, `rent.collected`, `flat.tokenized` |
+| Settlement | `settlement.stuck`, `settlement.recovered` | `order.matched`, `payment.confirmed`, `transfer.completed`, `trade.settled` |
+| Valuation | `valuation.updated` | — |
+| Audit Ledger | — | `kyc-approved`, `kyc-revoked`, `trade.settled`, `document.uploaded`, `order.matched` |
+| Corporate Actions | `dividend.distribution-requested` | `rent.collected`, `dividend.distributed` |
+| Search | — | `listing.created`, `flat.tokenized`, `building.approved`, `valuation.updated` |
+| Integration Hub | — | Webhook relay only (no Kafka) |
+
+**Rent → dividend (Corporate Actions path):** disable Issuance `RentCollectedListener` in local/prod when Hub path active (`tokenrealty.dividend.rent-collected-listener-enabled: false`).
+
+Email config:
 
 ```yaml
 tokenrealty:

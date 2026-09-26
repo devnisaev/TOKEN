@@ -1,6 +1,7 @@
 package com.tokenrealty.integration.integration;
 
 import com.tokenrealty.integration.client.ComplianceClient;
+import com.tokenrealty.integration.client.DocumentClient;
 import com.tokenrealty.integration.entity.IntegrationDelivery;
 import com.tokenrealty.integration.entity.IntegrationDeliveryStatus;
 import com.tokenrealty.integration.entity.IntegrationType;
@@ -38,6 +39,7 @@ class WebhookRelayIntegrationTest {
     @Autowired IntegrationDeliveryRetryWorker retryWorker;
 
     @MockitoBean ComplianceClient complianceClient;
+    @MockitoBean DocumentClient documentClient;
 
     @BeforeEach
     void cleanDeliveries() {
@@ -84,6 +86,47 @@ class WebhookRelayIntegrationTest {
         assertThat(delivery.getAttempts()).isEqualTo(1);
         assertThat(delivery.getNextRetryAt()).isAfter(Instant.now());
         assertThat(delivery.getLastError()).contains("Compliance service unavailable");
+    }
+
+    @Test
+    void storageWebhook_relaysToDocumentAndMarksDelivered() throws Exception {
+        String body = "{\"objectKey\":\"deeds/building-1.pdf\",\"event\":\"upload.completed\"}";
+
+        mockMvc.perform(post("/v1/integrations/webhooks/storage/pinata")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-Payload-Digest", "digest789")
+                        .header("X-Signature", "sig012")
+                        .content(body))
+                .andExpect(status().isNoContent());
+
+        verify(documentClient).forwardStorageWebhook("pinata", body, "digest789", "sig012");
+
+        IntegrationDelivery delivery = deliveryRepository.findAll().getFirst();
+        assertThat(delivery.getIntegrationType()).isEqualTo(IntegrationType.DOCUMENT);
+        assertThat(delivery.getProvider()).isEqualTo("pinata");
+        assertThat(delivery.getPayload()).isEqualTo(body);
+        assertThat(delivery.getPayloadDigest()).isEqualTo("digest789");
+        assertThat(delivery.getSignature()).isEqualTo("sig012");
+        assertThat(delivery.getStatus()).isEqualTo(IntegrationDeliveryStatus.DELIVERED);
+    }
+
+    @Test
+    void storageWebhook_marksFailedWhenDocumentUnavailable() throws Exception {
+        String body = "{\"objectKey\":\"lease-42.pdf\"}";
+        doThrow(new ValidationException("Document service unavailable"))
+                .when(documentClient)
+                .forwardStorageWebhook(eq("s3"), eq(body), eq(null), eq(null));
+
+        mockMvc.perform(post("/v1/integrations/webhooks/storage/s3")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isNoContent());
+
+        IntegrationDelivery delivery = deliveryRepository.findAll().getFirst();
+        assertThat(delivery.getIntegrationType()).isEqualTo(IntegrationType.DOCUMENT);
+        assertThat(delivery.getStatus()).isEqualTo(IntegrationDeliveryStatus.FAILED);
+        assertThat(delivery.getAttempts()).isEqualTo(1);
+        assertThat(delivery.getLastError()).contains("Document service unavailable");
     }
 
     @Test

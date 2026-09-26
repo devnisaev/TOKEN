@@ -217,6 +217,9 @@ jobs:
           ./token-realty-app/mvnw -f rental-service/pom.xml test -Dtest=OutboxRelayIntegrationTest -q
           ./token-realty-app/mvnw -f blockchain-indexer-service/pom.xml test -Dtest=OutboxRelayIntegrationTest -q
           ./token-realty-app/mvnw -f document-service/pom.xml test -Dtest=OutboxRelayIntegrationTest,DocumentUploadedOutboxIntegrationTest -q
+          ./token-realty-app/mvnw -f settlement-service/pom.xml test -Dtest=OutboxRelayIntegrationTest -q
+          ./token-realty-app/mvnw -f valuation-service/pom.xml test -Dtest=OutboxRelayIntegrationTest -q
+          ./token-realty-app/mvnw -f corporate-actions-service/pom.xml test -Dtest=OutboxRelayIntegrationTest -q
           ./token-realty-app/mvnw -f tokenrealty-kafka/pom.xml test -Dtest=KafkaDlqIntegrationTest -q
 
   marketplace-kafka-containers:
