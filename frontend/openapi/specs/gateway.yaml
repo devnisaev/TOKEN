@@ -1,0 +1,157 @@
+openapi: 3.0.3
+info:
+  title: TokenRealty API Gateway BFF
+  version: 1.0.0
+paths:
+  /v1/bff/flats/{flatId}:
+    get:
+      operationId: getBffFlatDetail
+      parameters:
+        - name: flatId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlatDetailResponse'
+  /v1/bff/listings/{listingId}:
+    get:
+      operationId: getBffListingDetail
+      parameters:
+        - name: listingId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListingDetailResponse'
+  /v1/bff/buildings/{buildingId}:
+    get:
+      operationId: getBffBuildingDetail
+      parameters:
+        - name: buildingId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuildingBffDetailResponse'
+  /v1/bff/investors/{investorId}/portfolio:
+    get:
+      operationId: getBffPortfolio
+      parameters:
+        - name: investorId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortfolioBffResponse'
+  /v1/bff/orders/{orderId}/status-stream:
+    get:
+      operationId: streamOrderStatus
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Server-sent events stream of order status updates
+          content:
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/OrderStatusEvent'
+components:
+  schemas:
+    TokenContractSummary:
+      type: object
+      properties:
+        contractId: { type: string, format: uuid }
+        contractAddress: { type: string }
+        tokenSymbol: { type: string }
+        totalSupply: { type: integer, format: int64 }
+        tokenPriceUsd: { type: number }
+        status: { type: string }
+    ListingSummary:
+      type: object
+      properties:
+        listingId: { type: string, format: uuid }
+        listingType: { type: string }
+        status: { type: string }
+        priceUsd: { type: number }
+        tokensAvailable: { type: integer, format: int64 }
+        tokensTotal: { type: integer, format: int64 }
+        minInvestmentTokens: { type: integer, format: int64 }
+        title: { type: string }
+    FlatDetailResponse:
+      type: object
+      properties:
+        flatId: { type: string, format: uuid }
+        buildingId: { type: string, format: uuid }
+        buildingName: { type: string }
+        flatNumber: { type: string }
+        floor: { type: integer }
+        areaSqm: { type: number }
+        status: { type: string }
+        tokenContract:
+          $ref: '#/components/schemas/TokenContractSummary'
+        listing:
+          $ref: '#/components/schemas/ListingSummary'
+    ListingDetailResponse:
+      type: object
+      properties:
+        listing:
+          $ref: '#/components/schemas/ListingSummary'
+        flatId: { type: string, format: uuid }
+        buildingName: { type: string }
+        flatNumber: { type: string }
+        flatStatus: { type: string }
+        tokenContract:
+          $ref: '#/components/schemas/TokenContractSummary'
+    EnrichedTokenHoldingView:
+      type: object
+      properties:
+        contractId: { type: string, format: uuid }
+        flatId: { type: string, format: uuid }
+        tokenSymbol: { type: string }
+        walletAddress: { type: string }
+        balance: { type: integer, format: int64 }
+        tokenPriceUsd: { type: number }
+    PortfolioBalanceView:
+      type: object
+      properties:
+        investorId: { type: string, format: uuid }
+        primaryWalletAddress: { type: string }
+        tokenHoldings:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnrichedTokenHoldingView'
+    PortfolioBffResponse:
+      type: object
+      properties:
+        balance:
+          $ref: '#/components/schemas/PortfolioBalanceView'
+    BuildingBffDetailResponse:
+      type: object
+      properties:
+        tokenizedFlatCount: { type: integer }
+        availableFlatCount: { type: integer }
+    OrderStatusEvent:
+      type: object
+      properties:
+        orderId: { type: string, format: uuid }
+        orderStatus: { type: string }
+        tradeStatus: { type: string }

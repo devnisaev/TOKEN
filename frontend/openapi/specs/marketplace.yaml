@@ -67,6 +67,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Trade'
+  /v1/orders/sell:
+    post:
+      operationId: placeSellOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlaceSellOrderRequest'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+  /v1/orders/{id}/settle:
+    patch:
+      operationId: settleOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SettleTradeRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trade'
 components:
   schemas:
     ListingPage:
@@ -116,5 +151,23 @@ components:
         id: { type: string, format: uuid }
         orderId: { type: string, format: uuid }
         status: { type: string }
+        paymentId: { type: string, format: uuid }
+        transferId: { type: string, format: uuid }
+    PlaceSellOrderRequest:
+      type: object
+      required: [flatId, contractId, sellerInvestorId, sellerWallet, priceUsd, tokenAmount]
+      properties:
+        flatId: { type: string, format: uuid }
+        contractId: { type: string, format: uuid }
+        sellerInvestorId: { type: string, format: uuid }
+        sellerWallet: { type: string }
+        priceUsd: { type: number }
+        tokenAmount: { type: integer }
+        title: { type: string }
+        description: { type: string }
+    SettleTradeRequest:
+      type: object
+      required: [paymentId, transferId]
+      properties:
         paymentId: { type: string, format: uuid }
         transferId: { type: string, format: uuid }

@@ -13,6 +13,7 @@ const specs = [
   ['compliance', 'specs/compliance.yaml'],
   ['marketplace', 'specs/marketplace.yaml'],
   ['rental', 'specs/rental.yaml'],
+  ['gateway', 'specs/gateway.yaml'],
 ];
 
 for (const [name, specPath] of specs) {

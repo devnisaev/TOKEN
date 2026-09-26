@@ -45,6 +45,8 @@ export type Listing = Marketplace['Listing'] & { id: string; flatId: string };
 export type Order = Marketplace['Order'] & { id: string; listingId: string; buyerId: string };
 export type Trade = Marketplace['Trade'] & { id: string; orderId: string };
 export type PlaceOrderRequest = Marketplace['PlaceOrderRequest'];
+export type PlaceSellOrderRequest = Marketplace['PlaceSellOrderRequest'];
+export type SettleTradeRequest = Marketplace['SettleTradeRequest'];
 
 export type Lease = Rental['Lease'] & { id: string };
 export type RentPayment = Rental['RentPayment'] & { id: string };
@@ -106,9 +108,11 @@ export interface FiatBalance {
 
 export interface TokenHolding {
   contractId: string;
+  flatId?: string | null;
   tokenSymbol: string;
   walletAddress: string;
   balance: number;
+  tokenPriceUsd?: number | null;
 }
 
 export interface AggregateBalance {

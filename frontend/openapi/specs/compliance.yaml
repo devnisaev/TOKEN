@@ -6,6 +6,12 @@ paths:
   /v1/compliance:
     get:
       operationId: listCompliance
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [PENDING, APPROVED, REJECTED, EXPIRED, REVOKED]
       responses:
         '200':
           content:

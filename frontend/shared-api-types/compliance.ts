@@ -117,7 +117,9 @@ export type $defs = Record<string, never>;
 export interface operations {
   listCompliance: {
     parameters: {
-      query?: never;
+      query?: {
+        status?: "PENDING" | "APPROVED" | "REJECTED" | "EXPIRED" | "REVOKED";
+      };
       header?: never;
       path?: never;
       cookie?: never;
