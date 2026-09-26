@@ -84,7 +84,7 @@ controller → service → repository → entity (extends tokenrealty-jpa BaseEn
             kafka/outbox/OutboxEvent         ← implements OutboxRelayTarget
 ```
 
-Shared libs replace per-service copies: exceptions/handler (`tokenrealty-web`), auditing (`tokenrealty-jpa`), idempotency (`tokenrealty-kafka`), RestClient auth (`ServiceRestClientBuilder`). See [shared-libraries.md](shared-libraries.md).
+Shared libs replace per-service copies: exceptions/handler + outbound REST (`tokenrealty-web`), auditing (`tokenrealty-jpa`), idempotency (`tokenrealty-kafka`), RestClient builder (`ServiceRestClientBuilder` in `tokenrealty-security`). See [shared-libraries.md](shared-libraries.md) and [rest-client-errors.md](rest-client-errors.md).
 
 Future extraction path:
 
@@ -193,6 +193,7 @@ Token Issuance support endpoint: `GET /v1/investors/{investorId}/holdings`.
 - [ ] Port + DB from [PLATFORM-SPEC.md](../PLATFORM-SPEC.md) §7
 - [ ] `SecurityConfig` + `tokenrealty-security` JWT filter
 - [ ] `tokenrealty-web` + `tokenrealty-jpa` dependencies (exceptions/handler + BaseEntity auto-config)
+- [ ] Outbound `*Client` classes extend `DownstreamRestClientSupport` (uses `RestClientOperations` — no raw `restClient.get/post` in adapters); one `@Bean` RestClient per base URL via `ServiceRestClientBuilder` with explicit timeout
 - [ ] `tokenrealty-kafka` if consuming events; `tokenrealty-outbox` if publishing
 - [ ] `application.yml` + `application-test.yml` (H2)
 - [ ] springdoc OpenAPI
@@ -210,12 +211,22 @@ Token Issuance support endpoint: `GET /v1/investors/{investorId}/holdings`.
 @Transactional
 public ListingResponse create(CreateListingRequest request) { ... }
 
-// RestClient with service token (shared builder)
+// RestClient bean — auth, timeout, X-Trace-Id (shared builder)
 @Bean("tokenIssuanceRestClient")
 RestClient tokenIssuanceRestClient(
         @Value("${services.token-issuance.url}") String baseUrl,
         ObjectProvider<ServiceTokenProvider> serviceTokenProvider) {
-    return ServiceRestClientBuilder.build(baseUrl, serviceTokenProvider);
+    return ServiceRestClientBuilder.build(
+            baseUrl, Duration.ofSeconds(10), serviceTokenProvider);
+}
+
+// Domain client — extend shared base, no try/catch
+@Component
+public class TokenIssuanceClient extends DownstreamRestClientSupport {
+    public TokenIssuanceClient(@Qualifier("tokenIssuanceRestClient") RestClient restClient) {
+        super(restClient);
+    }
+    // get/post/postVoid/patchVoid + DownstreamServices.* for error labels
 }
 
 // Exceptions — import from tokenrealty-web, do not copy

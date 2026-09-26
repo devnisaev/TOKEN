@@ -8,73 +8,76 @@ alwaysApply: false
 
 Human doc: [docs/rules/rest-client-errors.md](../../docs/rules/rest-client-errors.md).
 
+## Shared infrastructure (`tokenrealty-web/rest`)
+
+| Class | Role |
+|-------|------|
+| `RestHeaders` | `X-Trace-Id`, MDC key, `Idempotency-Key` |
+| `RestClientOperations` | Raw GET/POST/PATCH/PUT + header helpers |
+| `DownstreamServices` | `ServiceSpec` constants (PAYMENT, COMPLIANCE, …) |
+| `DownstreamClientErrors` | 5xx/timeout → `ValidationException`; 404 → `ResourceNotFoundException` |
+| `DownstreamRestClientSupport` | Base class for outbound adapters |
+
+Build `RestClient` beans with `ServiceRestClientBuilder` (`tokenrealty-security`) — Bearer token, timeout, `X-Trace-Id` from MDC.
+
+## Required: use `RestClientOperations`
+
+**Never** call `restClient.get().uri(...).retrieve()` (or post/patch/put) directly in `*Client` classes.
+
+| Layer | Allowed API |
+|-------|-------------|
+| `*ClientConfig` | `ServiceRestClientBuilder.build(...)` → raw `RestClient` `@Bean` only |
+| `*Client` | Extend `DownstreamRestClientSupport` → `get` / `post` / `patchVoid` / … |
+| Rare custom URI | `http()` on the base class → `RestClientOperations` (still no raw `RestClient`) |
+
+`DownstreamRestClientSupport` delegates transport to `RestClientOperations` and errors to `DownstreamClientErrors`. Do not bypass either layer.
+
+Headers: use `RestClientOperations.idempotencyKey(...)` and `RestClientOperations.header(...)` — not manual `.header()` chains on raw `RestClient`.
+
 ## Required mapping
 
-Every `RestClient.retrieve()` to another TokenRealty service or external API must map errors explicitly.
+| Condition | Exception |
+|-----------|-----------|
+| 5xx or timeout (`ResourceAccessException`) | `ValidationException` — `{service} unavailable` |
+| 404 on resource lookup (when `notFoundMessage` set) | `ResourceNotFoundException` |
+| Other 4xx | `ValidationException` — `{service} rejected request: {detail}` |
 
-| Condition | Code / exception |
-|-----------|------------------|
-| 5xx or timeout (`ResourceAccessException`) | `{service}_unavailable` |
-| 404 on resource lookup | `ResourceNotFoundException` or domain-specific not-found |
-| Other 4xx | `{service}_error` or `ValidationException` |
-
-Catch only `RestClientResponseException` and `ResourceAccessException` in client adapters — let domain exceptions propagate.
-
-## Service name prefixes
-
-| Downstream | Prefix | Example code |
-|------------|--------|--------------|
-| Property Registry | `property_registry_` | `property_registry_unavailable` |
-| Token Issuance | `token_issuance_` | `token_issuance_unavailable` |
-| Marketplace | `marketplace_` | `marketplace_unavailable` |
-| Payment | `payment_` | `payment_unavailable` |
+Do not catch domain exceptions in client adapters. Extend `DownstreamRestClientSupport` instead of duplicating try/catch.
 
 ## Pattern
 
-One `RestClient` `@Bean` per base URL in `*ClientConfig`. Client class wraps calls:
-
 ```java
 @Component
-public class TokenIssuanceClient {
+public class PaymentClient extends DownstreamRestClientSupport {
 
-    private final RestClient restClient;
-
-    public TokenIssuanceClient(@Qualifier("tokenIssuanceRestClient") RestClient restClient) {
-        this.restClient = restClient;
+    public PaymentClient(@Qualifier("paymentRestClient") RestClient restClient) {
+        super(restClient);
     }
 
-    public ComplianceCheckResponse checkWallet(String walletAddress) {
-        try {
-            return restClient.get()
-                    .uri("/v1/compliance/check/{walletAddress}", walletAddress)
-                    .retrieve()
-                    .body(ComplianceCheckResponse.class);
-        } catch (RestClientResponseException ex) {
-            if (ex.getStatusCode().is5xxServerError()) {
-                throw new ValidationException("Token Issuance service unavailable");
-            }
-            throw new ValidationException("Compliance check failed: " + ex.getStatusText());
-        } catch (ResourceAccessException ex) {
-            throw new ValidationException("Token Issuance service unavailable");
-        }
+    public InitiatePaymentResponse initiateTokenPurchase(UUID orderId, ...) {
+        return post("/v1/payments", body, InitiatePaymentResponse.class,
+                DownstreamServices.PAYMENT,
+                RestClientOperations.idempotencyKey("marketplace-order-" + orderId));
     }
 }
 ```
 
-Extract package-private `*ClientErrors` helper when a service has 3+ outbound clients.
+`*ClientConfig` — one `@Bean` per base URL with explicit timeout:
+
+```java
+return ServiceRestClientBuilder.build(baseUrl, Duration.ofSeconds(10), serviceTokenProvider);
+```
 
 ## Rules
 
-* No silent failures — no empty `catch (Exception)` that returns null
-* Do not use broad `catch (Exception)` for business logic
-* Propagate `Authorization` or service-account token when Auth Service exists
-* Propagate `X-Trace-Id` (or `traceId`) on outbound calls
-* Timeouts configured on `RestClient.Builder` — do not rely on defaults for financial paths
+* **Use `RestClientOperations` via `DownstreamRestClientSupport`** — no direct `RestClient` calls in client adapters
+* No silent failures — no empty `catch (Exception)` that returns null (use `getAllowNull` when 404 is valid)
+* Propagate `Authorization` via `ServiceTokenProvider`; propagate `X-Trace-Id` via builder interceptor
 * Retries: only for idempotent GET; never auto-retry POST without idempotency key
+* Migrate remaining `*Client` classes incrementally — reference: `PaymentClient`, `ComplianceClient`
 
 ## References
 
-* `token-issuance-service/.../client/PropertyRegistryClient.java` — needs auth + error mapping
-* `token-issuance-service/.../client/MarketplaceClient.java` — GET trade by orderId
-* `marketplace-service/.../client/TokenIssuanceClient.java` — compliance, contract, transfer
-* `marketplace-service/.../client/PaymentClient.java` — initiate + release escrow
+* `tokenrealty-web/.../rest/DownstreamRestClientSupport.java`
+* `marketplace-service/.../client/PaymentClient.java`
+* `marketplace-service/.../client/ComplianceClient.java`

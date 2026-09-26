@@ -89,7 +89,7 @@ Spring conventions: [spring-java-services.md](spring-java-services.md)
 | `tokenrealty-events` | `com.tokenrealty.events` | `EventEnvelope`, `KafkaJsonEvent` (consumer parse helper) |
 | `tokenrealty-kafka` | `com.tokenrealty.kafka` | `KafkaEventConsumer`, `ProcessedEventClaimService`, `ProcessedEvent` entity |
 | `tokenrealty-outbox` | `com.tokenrealty.outbox` | `OutboxWriter`, `OutboxPayload`, `OutboxRelay`, `OutboxStatus` |
-| `tokenrealty-web` | `com.tokenrealty.web` | Shared exceptions, `TokenRealtyExceptionHandler` (RFC 7807 auto-config) |
+| `tokenrealty-web` | `com.tokenrealty.web` | Exceptions, RFC 7807 handler, observability, outbound REST helpers |
 | `tokenrealty-jpa` | `com.tokenrealty.jpa` | `BaseEntity`, `@EnableJpaAuditing` auto-config |
 | `tokenrealty-security` | `com.tokenrealty.security` | JWT, service tokens, `ServiceRestClientBuilder` |
 

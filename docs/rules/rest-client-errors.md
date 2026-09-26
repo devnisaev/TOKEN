@@ -2,13 +2,73 @@
 
 Cursor rule: [`.cursor/rules/rest-client-errors.mdc`](../../.cursor/rules/rest-client-errors.mdc)
 
-## RestClient bean setup
+Inter-service HTTP adapters: transport in `RestClientOperations`, error mapping in `DownstreamClientErrors`, domain URIs in per-service `*Client` classes.
 
-Use shared `ServiceRestClientBuilder` from `tokenrealty-security` — do not copy the Bearer interceptor boilerplate.
+## Architecture
+
+```text
+*ClientConfig                    *Client (per service)
+     │                                │
+     ▼                                ▼
+ServiceRestClientBuilder ──► DownstreamRestClientSupport
+ (Bearer, timeout, trace)         │ get / post / patchVoid
+                                   ▼
+                            RestClientOperations  →  Spring RestClient
+                                   │
+                                   ▼
+                            DownstreamClientErrors
+                             5xx/timeout → ValidationException
+                             404 + message → ResourceNotFoundException
+                             4xx → ValidationException + RFC 7807 detail
+```
+
+Package: `tokenrealty-web/src/main/java/com/tokenrealty/web/rest/`.
+
+| Class | Purpose |
+|-------|---------|
+| `RestHeaders` | `X-Trace-Id`, MDC key `traceId`, `Idempotency-Key` |
+| `RestClientOperations` | Transport — GET/POST/PATCH/PUT; header helpers `idempotencyKey()` |
+| `DownstreamServices` | `ServiceSpec` constants for human-readable error labels |
+| `DownstreamClientErrors` | Exception mapping around `Supplier`/`Runnable` calls |
+| `DownstreamRestClientSupport` | Protected helpers — extend in each `*Client` |
+
+`TraceIdFilter` (inbound) and `ServiceRestClientBuilder` (outbound) share the same header/MDC names. The security module inlines string constants to avoid a circular Maven dependency on `tokenrealty-web`.
+
+See also [observability.md](observability.md) for trace flow and [shared-libraries.md](shared-libraries.md) for module layout.
+
+---
+
+## Required: use `RestClientOperations`
+
+All inter-service HTTP from `*Client` classes must go through the shared stack — not raw Spring `RestClient`.
+
+| Layer | What to use | Do not |
+|-------|-------------|--------|
+| Bean factory (`*ClientConfig`) | `ServiceRestClientBuilder.build(...)` | Copy Bearer/timeout/trace interceptors |
+| Domain adapter (`*Client`) | `extends DownstreamRestClientSupport` | `restClient.get().uri(...).retrieve()` |
+| Transport | `RestClientOperations` (via base `get`/`post`/…) | Duplicate verb + header boilerplate |
+| Errors | `DownstreamClientErrors` (automatic via base) | Per-method try/catch on `RestClientResponseException` |
+| Headers | `RestClientOperations.idempotencyKey(...)`, `.header(...)` | Ad-hoc `.header()` on raw spec |
+
+For non-standard URIs (query params built with `UriBuilder`), use the base-class overload that accepts `Function<UriBuilder, URI>`, or call `http()` to get the wrapped `RestClientOperations`.
 
 ```java
-import com.tokenrealty.security.client.ServiceRestClientBuilder;
+// BAD — bypasses shared transport and error mapping
+return restClient.get().uri("/v1/foo/{id}", id).retrieve().body(Foo.class);
 
+// GOOD — DownstreamRestClientSupport → RestClientOperations → DownstreamClientErrors
+return get("/v1/foo/{id}", Foo.class, DownstreamServices.PAYMENT, id);
+```
+
+Only `*ClientConfig` classes may hold a raw `RestClient` reference (the `@Bean` from `ServiceRestClientBuilder`).
+
+---
+
+## RestClient bean setup
+
+One `@Bean` per downstream base URL in `*ClientConfig`. Always set an explicit timeout for financial paths.
+
+```java
 @Configuration
 public class PaymentClientConfig {
 
@@ -16,51 +76,129 @@ public class PaymentClientConfig {
     RestClient paymentRestClient(
             @Value("${services.payment.url}") String baseUrl,
             ObjectProvider<ServiceTokenProvider> serviceTokenProvider) {
-        return ServiceRestClientBuilder.build(baseUrl, serviceTokenProvider);
+        return ServiceRestClientBuilder.build(
+                baseUrl, Duration.ofSeconds(10), serviceTokenProvider);
     }
 }
 ```
 
-Domain clients (`PaymentClient`, `TokenIssuanceClient`, …) stay per-service. See [shared-libraries.md](shared-libraries.md).
+Suggested timeouts (tune per SLA):
 
-## Inter-service clients today
+| Downstream | Typical timeout |
+|------------|-----------------|
+| Payment | 10s |
+| Compliance | 3–5s |
+| Registry / Issuance reads | 5–10s |
+| Gateway BFF aggregates | 15s+ (caller-side) |
 
-| Client | Service | Calls | Auth |
-|--------|---------|-------|------|
-| `PropertyRegistryClient` | Token Issuance → Registry | GET flat, GET SPV, PATCH token-info | Service token |
-| `PropertyRegistryClient` | Marketplace → Registry | PATCH flat status `FULLY_SOLD` on primary sell-out | Service token |
-| `PropertyRegistryClient` | Document → Registry | POST building/flat documents, GET document by id | Service token (`document` account) |
-| `ComplianceClient` | Marketplace, Issuance → Compliance | KYC check (`isWhitelisted`, `investorId`) | Service token |
-| `TokenIssuanceClient` | Marketplace → Issuance | Contract by flat, holder balance by wallet, transfer | Service token |
-| `PaymentClient` | Marketplace, Rental → Payment | Initiate escrow, release escrow, payouts | Service token |
-| `PaymentClient` | Wallet → Payment | `GET /v1/wallet-balances/{investorId}` | Service token |
-| `IssuanceClient` | Wallet → Issuance | `GET /v1/investors/{investorId}/holdings` | Service token |
-| `IssuanceClient` | Blockchain Indexer → Issuance | `GET /v1/tokens`, `GET /v1/tokens/{id}/holders` | Service token |
-| `MarketplaceClient` | Token Issuance → Marketplace | GET trade by orderId (`listingType`, `sellerWallet`) | Service token |
+Default when using single-arg `build()`: 10s (`ServiceRestClientBuilder.DEFAULT_TIMEOUT`).
 
-## Service name prefixes
+---
 
-| Downstream | Prefix |
-|------------|--------|
-| Property Registry | `property_registry_` |
-| Token Issuance | `token_issuance_` |
-| Marketplace | `marketplace_` |
-| Payment | `payment_` |
-| Compliance | `compliance_` |
-| Document | `document_` |
-| Wallet | `wallet_` |
-| Blockchain Indexer | `blockchain_indexer_` |
-| Auth | `auth_` |
+## Domain client pattern
 
-## Target behavior
+Extend `DownstreamRestClientSupport`. Do not wrap calls in try/catch — the base class delegates to `DownstreamClientErrors`.
 
-1. Configure timeout on every `RestClient.Builder`
-2. Map 5xx/timeout → `{service}_unavailable` → `ValidationException` (from `tokenrealty-web`) or domain error
-3. Map 404 → `ResourceNotFoundException` where appropriate
-4. Propagate `X-Trace-Id` header
-5. Attach `Authorization: Bearer` via `ServiceTokenProvider` (`tokenrealty-security`)
+```java
+@Component
+public class PaymentClient extends DownstreamRestClientSupport {
 
-## Pending
+    public PaymentClient(@Qualifier("paymentRestClient") RestClient restClient) {
+        super(restClient);
+    }
 
-- Structured error mapping on `PropertyRegistryClient` and `TokenIssuanceClient`
-- Structured error mapping on `PaymentClient`
+    public InitiatePaymentResponse initiateTokenPurchase(UUID orderId, InitiatePaymentRequest body) {
+        return post("/v1/payments", body, InitiatePaymentResponse.class,
+                DownstreamServices.PAYMENT,
+                RestClientOperations.idempotencyKey("marketplace-order-" + orderId));
+    }
+
+    public void releaseEscrow(UUID paymentId) {
+        patchVoid("/v1/payments/{id}/release", DownstreamServices.PAYMENT, paymentId);
+    }
+}
+```
+
+### Base class helpers
+
+| Method | Use when |
+|--------|----------|
+| `get(uri, type, service, uriVars…)` | Standard GET; null body is returned as-is |
+| `get(uri, type, service, notFoundMessage, uriVars…)` | GET where null or 404 should throw `ResourceNotFoundException` |
+| `getAllowNull(uri, type, service, uriVars…)` | 404/null is valid (e.g. compliance wallet not on file) |
+| `post(uri, body, type, service, uriVars…)` | POST without extra headers |
+| `post(uri, body, type, service, headers, uriVars…)` | POST with `Idempotency-Key` or custom headers |
+| `postVoid(uri, body, service, headers, uriVars…)` | POST with empty response |
+| `patchVoid(uri, service, uriVars…)` | PATCH with empty response (e.g. escrow release) |
+
+Access raw transport: `http()` returns the wrapped `RestClientOperations`.
+
+---
+
+## Error mapping
+
+| Condition | Exception | Example message |
+|-----------|-----------|-----------------|
+| 5xx | `ValidationException` | `Payment service unavailable` |
+| Timeout / connection failure (`ResourceAccessException`) | `ValidationException` | `Payment service unavailable` |
+| 404 when `notFoundMessage` provided | `ResourceNotFoundException` | Caller-supplied message |
+| Other 4xx | `ValidationException` | `Payment service rejected request: {detail}` |
+
+4xx messages prefer RFC 7807 `detail` from the downstream body; fall back to `title` or raw body (truncated).
+
+**Rules:**
+
+- Do not catch `ValidationException` / `ResourceNotFoundException` inside clients — let them propagate to `TokenRealtyExceptionHandler`.
+- Do not use broad `catch (Exception)` or silent null returns.
+- Retries: idempotent GET only; never auto-retry POST without an idempotency key.
+
+---
+
+## Migration status
+
+| Client | Caller | Status |
+|--------|--------|--------|
+| `PaymentClient` | Marketplace | Done |
+| `ComplianceClient` | Marketplace | Done |
+| `PropertyRegistryClient` | Issuance, Marketplace, Document, Gateway | Pending |
+| `TokenIssuanceClient` | Marketplace, Gateway | Pending |
+| `MarketplaceClient` | Issuance, Gateway | Pending |
+| `PaymentClient` | Rental, Wallet | Pending |
+| `ComplianceClient` | Issuance | Pending |
+| `IssuanceClient` | Wallet, Blockchain Indexer | Pending |
+
+### Migrating a legacy client
+
+1. Add or update `*ClientConfig` to use `ServiceRestClientBuilder.build(baseUrl, timeout, provider)`.
+2. Change `*Client` to `extends DownstreamRestClientSupport`.
+3. Replace try/catch blocks with `get` / `post` / `patchVoid` + appropriate `DownstreamServices.*` constant.
+4. Use `getAllowNull` where 404 is not an error.
+5. Pass `RestClientOperations.idempotencyKey(...)` on financial POSTs.
+6. Run service tests; add cases in `DownstreamClientErrorsTest` only when mapping logic changes.
+
+Reference implementations: `marketplace-service/.../client/PaymentClient.java`, `ComplianceClient.java`.
+
+---
+
+## Service labels (`DownstreamServices`)
+
+| Constant | Label in errors |
+|----------|-----------------|
+| `PROPERTY_REGISTRY` | Property Registry |
+| `TOKEN_ISSUANCE` | Token Issuance service |
+| `MARKETPLACE` | Marketplace service |
+| `PAYMENT` | Payment service |
+| `COMPLIANCE` | Compliance service |
+| `DOCUMENT` | Document service |
+| `WALLET` | Wallet service |
+| `AUTH` | Auth service |
+
+Add a new constant here when introducing a new downstream — do not hard-code service names in client catch blocks.
+
+---
+
+## Testing
+
+Shared unit tests: `tokenrealty-web/src/test/java/com/tokenrealty/web/rest/DownstreamClientErrorsTest.java`.
+
+Per-service tests should mock the `*Client` interface/class at the service layer (existing pattern in `OrderServiceTest`, buy-flow integration tests). Wire-level RestClient tests are optional — prefer testing error mapping once in the shared module.

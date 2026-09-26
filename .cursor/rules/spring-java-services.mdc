@@ -154,18 +154,19 @@ public OrderResponse placeOrder(PlaceOrderRequest req) {
 
 ## Inter-service HTTP
 
-* Outbound calls via dedicated `*Client` classes using `RestClient` ([rest-client-errors.mdc](rest-client-errors.mdc)).
-* One `@Bean` RestClient per downstream base URL; inject with `@Qualifier`.
-* Propagate `traceId` header when available.
-* Service-to-service auth: Bearer JWT via `ServiceTokenProvider` + `tokenrealty-security` ([rest-client-errors.mdc](rest-client-errors.mdc)).
+* Outbound calls via dedicated `*Client` classes ([rest-client-errors.mdc](rest-client-errors.mdc)).
+* **Required:** extend `DownstreamRestClientSupport` — uses `RestClientOperations` for transport; no raw `restClient.get/post/patch` in adapter methods.
+* One `@Bean` RestClient per downstream base URL in `*ClientConfig` via `ServiceRestClientBuilder`; inject with `@Qualifier`.
+* Propagate `traceId` header when available (builder interceptor).
+* Service-to-service auth: Bearer JWT via `ServiceTokenProvider` + `tokenrealty-security`.
 * Config: `services.<name>.url` — never hardcode URLs in services.
 
 ```java
-// BAD — generic RestClient without qualifier
-private final RestClient restClient;
+// BAD — raw RestClient call in adapter
+return restClient.get().uri("/v1/foo/{id}", id).retrieve().body(Foo.class);
 
-// GOOD — marketplace-service
-public TokenIssuanceClient(@Qualifier("tokenIssuanceRestClient") RestClient restClient)
+// GOOD — DownstreamRestClientSupport → RestClientOperations
+return get("/v1/foo/{id}", Foo.class, DownstreamServices.TOKEN_ISSUANCE, id);
 ```
 
 ## API

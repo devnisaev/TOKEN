@@ -13,7 +13,7 @@ Cross-service Maven modules under the repo root. Install before building service
 | Module | Package | Purpose |
 |--------|---------|---------|
 | `tokenrealty-security` | `com.tokenrealty.security` | JWT validation filter, service account token provider |
-| `tokenrealty-web` | `com.tokenrealty.web` | Shared exceptions, RFC 7807 `TokenRealtyExceptionHandler` |
+| `tokenrealty-web` | `com.tokenrealty.web` | Exceptions, RFC 7807 handler, observability, outbound REST helpers |
 | `tokenrealty-jpa` | `com.tokenrealty.jpa` | `BaseEntity`, `@EnableJpaAuditing` auto-config |
 | `tokenrealty-events` | `com.tokenrealty.events` | `EventEnvelope`, `KafkaJsonEvent` parse helper |
 | `tokenrealty-kafka` | `com.tokenrealty.kafka` | `KafkaEventConsumer`, `ProcessedEventClaimService` |
@@ -25,9 +25,11 @@ All modules use Spring Boot 4 auto-configuration (`META-INF/spring/org.springfra
 
 ## tokenrealty-web
 
-**Dependency:** any service with REST APIs.
+**Dependency:** any service with REST APIs or outbound HTTP calls to other TokenRealty services.
 
-**Do not copy** per-service `GlobalExceptionHandler` or standard exception classes.
+**Do not copy** per-service `GlobalExceptionHandler`, standard exception classes, trace filters, or RestClient try/catch blocks.
+
+### Exceptions & RFC 7807
 
 | Class | HTTP | ProblemDetail type |
 |-------|------|-------------------|
@@ -47,6 +49,47 @@ import com.tokenrealty.web.exception.ResourceNotFoundException;
 
 throw new ResourceNotFoundException("Lease", leaseId);
 ```
+
+### Observability (`com.tokenrealty.web.observability`)
+
+Auto-configured when `tokenrealty-web` is on the classpath. See [observability.md](observability.md).
+
+| Class | Role |
+|-------|------|
+| `TraceIdFilter` | Reads or generates `X-Trace-Id`, puts `traceId` in MDC, echoes header on response |
+| `ObservabilityEnvironmentPostProcessor` | Enables JSON logback + Prometheus registry for `json-log` / `prod` profiles |
+
+Constants live in `RestHeaders.TRACE_ID` and `RestHeaders.TRACE_ID_MDC`.
+
+### Outbound REST (`com.tokenrealty.web.rest`)
+
+Shared inter-service HTTP stack. Full guide: [rest-client-errors.md](rest-client-errors.md).
+
+| Class | Role |
+|-------|------|
+| `RestHeaders` | `X-Trace-Id`, MDC key, `Idempotency-Key` |
+| `RestClientOperations` | Raw GET/POST/PATCH/PUT — no error mapping |
+| `DownstreamServices` | `ServiceSpec` constants (`PAYMENT`, `COMPLIANCE`, …) for error messages |
+| `DownstreamClientErrors` | Maps 5xx/timeout → `ValidationException`; 404 → `ResourceNotFoundException` |
+| `DownstreamRestClientSupport` | Base class for `*Client` adapters — **required**; wraps `RestClientOperations` + error mapping |
+
+```java
+@Component
+public class PaymentClient extends DownstreamRestClientSupport {
+
+    public PaymentClient(@Qualifier("paymentRestClient") RestClient restClient) {
+        super(restClient);
+    }
+
+    public InitiatePaymentResponse initiateTokenPurchase(UUID orderId, InitiatePaymentRequest body) {
+        return post("/v1/payments", body, InitiatePaymentResponse.class,
+                DownstreamServices.PAYMENT,
+                RestClientOperations.idempotencyKey("marketplace-order-" + orderId));
+    }
+}
+```
+
+Tests: `tokenrealty-web/src/test/.../DownstreamClientErrorsTest.java`.
 
 ---
 
@@ -130,22 +173,36 @@ public void relayPending() {
 
 ---
 
-## tokenrealty-security — RestClient
+## tokenrealty-security — RestClient builder
 
-**Do not copy** authenticated `RestClient` builder boilerplate.
+**Do not copy** authenticated `RestClient` builder boilerplate (Bearer token, timeout, trace propagation).
+
+`ServiceRestClientBuilder` (`com.tokenrealty.security.client`):
+
+| Overload | Behavior |
+|----------|----------|
+| `build(baseUrl, serviceTokenProvider)` | Default 10s connect + read timeout |
+| `build(baseUrl, readTimeout, serviceTokenProvider)` | Explicit timeout per downstream |
+
+Request interceptor attaches:
+
+1. `Authorization: Bearer {serviceToken}` when `ServiceTokenProvider` is present
+2. `X-Trace-Id` from MDC key `traceId` (must match `RestHeaders.TRACE_ID_MDC`)
 
 ```java
 import com.tokenrealty.security.client.ServiceRestClientBuilder;
+import java.time.Duration;
 
 @Bean("paymentRestClient")
 RestClient paymentRestClient(
         @Value("${services.payment.url}") String baseUrl,
         ObjectProvider<ServiceTokenProvider> serviceTokenProvider) {
-    return ServiceRestClientBuilder.build(baseUrl, serviceTokenProvider);
+    return ServiceRestClientBuilder.build(
+            baseUrl, Duration.ofSeconds(10), serviceTokenProvider);
 }
 ```
 
-Domain clients (`PaymentClient`, `TokenIssuanceClient`, …) stay per-service — only the bean factory is shared. See [rest-client-errors.md](rest-client-errors.md).
+Domain clients (`PaymentClient`, `TokenIssuanceClient`, …) stay per-service — **must** extend `DownstreamRestClientSupport` and use `RestClientOperations` (via base `get`/`post`/…); never call raw `RestClient` in adapter methods. See [rest-client-errors.md](rest-client-errors.md).
 
 ---
 
@@ -154,6 +211,7 @@ Domain clients (`PaymentClient`, `TokenIssuanceClient`, …) stay per-service �
 | Need | Add dependency |
 |------|----------------|
 | REST API + ProblemDetail | `tokenrealty-web` |
+| Outbound calls to other services | `tokenrealty-web` + `tokenrealty-security` |
 | JPA entities | `tokenrealty-jpa` |
 | JWT / service tokens | `tokenrealty-security` |
 | Kafka consumer | `tokenrealty-kafka` + `tokenrealty-events` |
@@ -167,6 +225,6 @@ Domain clients (`PaymentClient`, `TokenIssuanceClient`, …) stay per-service �
 |------------|-----|
 | `*Listener` classes | Domain reactions differ |
 | `Outbox*Publisher` | Event types and partition keys are domain |
-| `*Client` method bodies | URIs, DTOs, error semantics vary |
+| `*Client` method bodies | URIs, DTOs, idempotency keys — use shared error mapping base |
 | Kafka topic config | `application.yml` per service |
 | Business rules | No shared inheritance for domain logic |
