@@ -450,3 +450,27 @@ Publishing services with `OutboxRelayWorker` + integration tests (tracks 253–2
 | Blockchain Indexer | `transfer.indexed`, `balance.mismatch` | `OutboxRelayIntegrationTest` |
 
 Shared test helper: `OutboxKafkaListenerTestConfiguration` in `tokenrealty-kafka` (for services with `@KafkaListener` beans).
+
+---
+
+## Phase 6 — planned topics (not yet implemented)
+
+See [PLATFORM-SPEC.md §12](PLATFORM-SPEC.md#12-phase-6--planned-services). Add schemas here when each service is scaffolded.
+
+| Topic (proposed) | Publisher | Consumers | Purpose |
+|------------------|-----------|-----------|---------|
+| `tokenrealty.valuation.updated.v1` | Valuation Service | Registry, Search, Reporting | Approved valuation + NAV snapshot |
+| `tokenrealty.valuation.approved.v1` | Valuation Service | Audit Ledger, Notification | Appraisal workflow completion |
+| `tokenrealty.settlement.stuck.v1` | Settlement Service | Notification, Reporting | Saga step exceeded SLA |
+| `tokenrealty.settlement.recovered.v1` | Settlement Service | Audit Ledger, Notification | Admin retry/compensation succeeded |
+| `tokenrealty.corporateactions.distribution-requested.v1` | Corporate Actions | Token Issuance, Payment | Dividend distribution trigger |
+| `tokenrealty.audit.entry-recorded.v1` | Audit Ledger | Reporting (optional) | Cross-service audit fan-in |
+
+**Existing topics consumed by Phase 6 services (read-only projections):**
+
+| Consumer service | Topics |
+|------------------|--------|
+| Reporting | `trade.settled`, `dividend.distributed`, `rent.collected`, `order.matched`, `flat.tokenized`, `building.approved` |
+| Settlement Saga | `order.matched`, `payment.confirmed`, `transfer.completed`, `trade.settled`, `payout.completed` |
+| Audit Ledger | `investor.kyc-approved`, `investor.kyc-revoked`, `document.verified`, `trade.settled` |
+| Search | `listing.created`, `flat.tokenized`, `building.approved`, `valuation.updated` |

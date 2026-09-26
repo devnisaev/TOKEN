@@ -1,8 +1,8 @@
 # TokenRealty Platform — Implementation Spec & TODO
 
-> **Version:** 1.2  
-> **Date:** 2025-09-25  
-> **Status:** In progress — Payment Service MVP implemented  
+> **Version:** 1.3  
+> **Date:** 2026-09-26  
+> **Status:** Phases 0–5 complete (tracks 1–277); Phase 6 planned  
 > **Purpose:** Master specification and implementation backlog for the TokenRealty real-estate tokenization platform (buy, sell, rent with cryptocurrency).
 
 ---
@@ -20,9 +20,10 @@
 9. [Foundation Fixes (Phase 0)](#9-foundation-fixes-phase-0)
 10. [Per-Service TODO Checklists](#10-per-service-todo-checklists)
 11. [Cross-Cutting Concerns](#11-cross-cutting-concerns)
-12. [Diagram Index](#12-diagram-index)
-13. [Open Questions & Decisions](#13-open-questions--decisions)
-14. [Cursor Rules & Coding Standards](#14-cursor-rules--coding-standards)
+12. [Phase 6 — Planned Services](#12-phase-6--planned-services)
+13. [Diagram Index](#13-diagram-index)
+14. [Open Questions & Decisions](#14-open-questions--decisions)
+15. [Cursor Rules & Coding Standards](#15-cursor-rules--coding-standards)
 
 ---
 
@@ -264,11 +265,29 @@ Notification Service         Polygon / Hardhat + IPFS
 - Aggregate responses (flat + token price + listing in one call) — `GET /v1/bff/flats/{id}`, `/v1/bff/listings/{id}`
 - Investor Portal consumes BFF on `:5173` → gateway `:8080`
 
-#### 4.10 Blockchain Indexer (optional, high value)
+#### 4.10 Blockchain Indexer (`blockchain-indexer-service`, :8091) — **MVP implemented**
 
 - Listen to on-chain events (Transfer, DividendPaid, WhitelistUpdated)
 - Sync state to DB; reconcile with Payment Service
 - Replace trust in post-tx local balance updates
+
+---
+
+### Tier 4 — Phase 6: Scale, ops visibility & RWA depth (planned)
+
+Phases 0–5 delivered all 12 backend microservices. Phase 6 adds **read-side, ops, and compliance-depth** services without splitting cohesive write engines (Payment escrow, Issuance deploy/transfer, Compliance limits). See [§12 Phase 6 — Planned Services](#12-phase-6--planned-services) for full descriptions and build order.
+
+| Service | Port | Folder (proposed) | Priority |
+|---------|------|-------------------|----------|
+| Reporting / Analytics | 8093 | `reporting-service/` | **P1** — start here |
+| Settlement / Saga Tracker | 8094 | `settlement-service/` | **P1** |
+| Valuation / NAV | 8095 | `valuation-service/` | **P2** |
+| Audit Ledger | 8096 | `audit-ledger-service/` | **P2** |
+| Corporate Actions | 8097 | `corporate-actions-service/` | **P2** |
+| Search | 8098 | `search-service/` | **P3** — when PostgreSQL filters are insufficient |
+| Integration Hub | 8099 | `integration-hub-service/` | **P3** — centralize third-party adapters |
+
+**Explicitly not new services:** limits/policy engine (stay in Compliance + Marketplace), config service, Payment escrow split, Issuance core split, Property Registry folder rename (deferred ADR 006).
 
 ---
 
@@ -371,6 +390,19 @@ Examples: `tokenrealty.registry.flat-tokenized`, `tokenrealty.marketplace.order-
 | Document / IPFS | 8088 | `document-service/` | `document_service` |
 | Notification | 8089 | `notification-service/` | `notification_service` |
 | Wallet | 8090 | `wallet-service/` | `wallet_service` |
+| Blockchain Indexer | 8091 | `blockchain-indexer-service/` | `blockchain_indexer` |
+
+**Phase 6 (planned — not yet scaffolded):**
+
+| Service | Port | Suggested folder | Database |
+|---------|------|------------------|----------|
+| Reporting / Analytics | 8093 | `reporting-service/` | `reporting_service` |
+| Settlement / Saga Tracker | 8094 | `settlement-service/` | `settlement_service` |
+| Valuation / NAV | 8095 | `valuation-service/` | `valuation_service` |
+| Audit Ledger | 8096 | `audit-ledger-service/` | `audit_ledger_service` |
+| Corporate Actions | 8097 | `corporate-actions-service/` | `corporate_actions_service` |
+| Search | 8098 | `search-service/` | — (OpenSearch/Elasticsearch index) |
+| Integration Hub | 8099 | `integration-hub-service/` | `integration_hub_service` |
 
 **Infrastructure (non-HTTP):**
 
@@ -378,6 +410,7 @@ Examples: `tokenrealty.registry.flat-tokenized`, `tokenrealty.marketplace.order-
 |-----------|------|
 | PostgreSQL | 5432 |
 | Kafka | 9092 |
+| Apicurio Schema Registry | 8092 |
 | Redis | 6379 |
 | Hardhat node | 8545 |
 | IPFS API | 5001 |
@@ -397,6 +430,11 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 | **Phase 3** | Rental | Rental Service + rent → dividend pipeline |
 | **Phase 4** | Compliance & docs | KYC Service, Document/IPFS Service |
 | **Phase 5** | Scale & UX | Wallet, Notification, Blockchain Indexer, frontend |
+| **Phase 6** | Ops visibility & RWA depth | Reporting, Settlement Saga, Valuation/NAV, Audit Ledger, Corporate Actions; Search + Integration Hub when scaling |
+
+See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml) (Phase 6 block added).
+
+**Recommended Phase 6 build order:** Reporting → Settlement Saga → Valuation/NAV → Audit Ledger → Corporate Actions → Search → Integration Hub.
 
 ---
 
@@ -617,6 +655,71 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] Reconciliation job: on-chain balance vs DB holder balance
 - [x] Alert on mismatch (logged + `GET /v1/indexer/reconciliation`)
 
+### 10.12 Reporting / Analytics Service (Phase 6 — planned)
+
+- [ ] Scaffold project (`reporting-service/`, port 8093)
+- [ ] Kafka consumers: `trade.settled`, `dividend.distributed`, `rent.collected`, `order.matched`, `flat.tokenized`
+- [ ] Materialized read models: trading volume, occupancy, dividend aggregates, SPV P&L snapshots
+- [ ] GET `/v1/reports/trading-summary`, `/v1/reports/occupancy`, `/v1/reports/dividends`
+- [ ] Regulatory export: investor holdings + transaction history (CSV/JSON)
+- [ ] Gateway BFF aggregate for admin dashboard charts
+- [ ] Unit + Kafka integration tests; link in docs/README.md
+
+### 10.13 Settlement / Saga Tracker Service (Phase 6 — planned)
+
+- [ ] Scaffold project (`settlement-service/`, port 8094)
+- [ ] Saga state machine: primary/secondary buy flow steps (match → escrow → transfer → release → settled)
+- [ ] Kafka consumers: `order.matched`, `payment.confirmed`, `transfer.completed`, `trade.settled`
+- [ ] GET `/v1/settlements/{orderId}` — step timeline + current status
+- [ ] Admin retry/compensation hooks for stuck sagas (does **not** move escrow out of Payment)
+- [ ] Alert on sagas exceeding SLA threshold
+- [ ] Unit + Kafka integration tests
+
+### 10.14 Valuation / NAV Service (Phase 6 — planned)
+
+- [ ] Scaffold project (`valuation-service/`, port 8095)
+- [ ] Appraisal workflow for `APPRAISER` role (submit, review, approve)
+- [ ] Periodic revaluation schedules per building/flat
+- [ ] Token NAV calculation from latest valuation + outstanding tokens
+- [ ] Outbox publish `valuation.updated` → Registry syncs metadata via consumer or REST callback
+- [ ] GET `/v1/valuations/building/{id}`, `/v1/valuations/flat/{id}/nav`
+- [ ] Unit + integration tests
+
+### 10.15 Audit Ledger Service (Phase 6 — planned)
+
+- [ ] Scaffold project (`audit-ledger-service/`, port 8096)
+- [ ] Append-only audit entries (no updates/deletes)
+- [ ] Kafka consumers: KYC approve/revoke, document verify/reject, admin overrides, settlement milestones
+- [ ] GET `/v1/audit/investor/{id}`, `/v1/audit/flat/{id}` — paginated immutable trail
+- [ ] Regulatory export endpoint
+- [ ] Unit + Kafka integration tests
+
+### 10.16 Corporate Actions Service (Phase 6 — planned)
+
+- [ ] Scaffold project (`corporate-actions-service/`, port 8097)
+- [ ] Extract dividend distribution orchestration from Issuance (holder snapshots, pro-rata calc triggers)
+- [ ] Issuance keeps deploy/transfer/on-chain whitelist; this service owns recurring investor events
+- [ ] Kafka: consume `rent.collected`, publish `dividend.distribution-requested` (or delegate to Issuance API)
+- [ ] Future: stock splits, rights issues (schema only in v1)
+- [ ] GET `/v1/corporate-actions/dividends`, `/v1/corporate-actions/{actionId}`
+- [ ] Unit + integration tests
+
+### 10.17 Search Service (Phase 6 — planned, P3)
+
+- [ ] Scaffold project (`search-service/`, port 8098)
+- [ ] OpenSearch/Elasticsearch index for listings, buildings, documents (public metadata only)
+- [ ] Kafka consumers to keep index in sync (`listing.created`, `flat.tokenized`, `building.approved`)
+- [ ] GET `/v1/search/listings?q=`, `/v1/search/buildings?q=`
+- [ ] Gateway route + optional BFF wrapper
+
+### 10.18 Integration Hub Service (Phase 6 — planned, P3)
+
+- [ ] Scaffold project (`integration-hub-service/`, port 8099)
+- [ ] Centralize outbound webhooks and third-party adapters (Onfido, Sumsub, Pinata, future fiat rails)
+- [ ] Inbound webhook normalization → route to Compliance/Document/Payment
+- [ ] Retry, dead-letter, and credential rotation per integration
+- [ ] Migrate existing provider clients incrementally (Compliance Onfido/Sumsub first)
+
 ---
 
 ## 11. Cross-Cutting Concerns
@@ -773,7 +876,186 @@ See [docs/rules/investor-portal.md](rules/investor-portal.md), [docs/rules/admin
 
 ---
 
-## 12. Diagram Index
+## 12. Phase 6 — Planned Services
+
+Phases 0–5 are **complete** (all checkboxes through track 277). Phase 6 extends the platform with **read-side analytics, settlement visibility, RWA compliance depth, and scale integrations** — without violating tier-1 invariants ([BUSINESS_RULES.md](BUSINESS_RULES.md)).
+
+### 12.1 Design principles
+
+| Principle | Rationale |
+|-----------|-----------|
+| **Do not split write engines** | Payment escrow, Issuance deploy/transfer, and Compliance limits stay in existing services |
+| **Event-first read models** | New services consume Kafka; avoid cross-DB joins at query time |
+| **Append-only where regulated** | Audit Ledger is immutable; corrections = compensating entries (same pattern as Payment ledger) |
+| **Saga tracker ≠ orchestrator rewrite** | Settlement service tracks state and ops recovery; Marketplace/Payment/Issuance still own domain writes |
+| **Template** | Scaffold from `marketplace-service/` (layered + kafka/outbox) |
+
+### 12.2 Tier 1 — Ops visibility (build first)
+
+#### 12.2.1 Reporting / Analytics Service (`reporting-service`, :8093)
+
+**Why:** Admin dashboards and regulatory reporting need cross-service aggregates. Today the gateway BFF performs point-in-time REST fan-out; at scale this becomes slow and inconsistent.
+
+| Responsibility | Details |
+|----------------|---------|
+| Event ingestion | Consume settlement, rental, dividend, and tokenization events |
+| Read models | Trading volume, occupancy rates, dividend history aggregates, SPV P&L snapshots |
+| Admin APIs | Summary endpoints for admin dashboard charts and exports |
+| Regulatory export | Investor holdings + transaction history (CSV/JSON) for compliance filings |
+| Idempotency | Dedupe by `eventId` via `KafkaEventConsumer` + `processed_events` |
+
+**Kafka consumes:** `trade.settled`, `dividend.distributed`, `rent.collected`, `order.matched`, `flat.tokenized`, `building.approved`
+
+**Kafka publishes:** none required in v1 (read-only projection)
+
+**Integrates with:** API Gateway BFF (admin charts), Compliance (export requests)
+
+**Key entities:** `TradingSummary`, `OccupancySnapshot`, `DividendAggregate`, `SpvPnlSnapshot`
+
+---
+
+#### 12.2.2 Settlement / Saga Tracker Service (`settlement-service`, :8094)
+
+**Why:** Primary and secondary buy flows span Marketplace → Payment → Issuance → Registry via Kafka. Operators need a single view of in-flight settlements, stuck steps, and retry/compensation — without moving escrow logic out of Payment.
+
+| Responsibility | Details |
+|----------------|---------|
+| Saga state | Track step progression: match → escrow → payment.confirmed → transfer → transfer.completed → release → trade.settled |
+| Visibility | Timeline API per order/trade for admin dashboard |
+| Stuck detection | Alert when a step exceeds SLA (configurable per step) |
+| Ops recovery | Admin-triggered retry hooks; compensating actions where business rules allow |
+| Leave-alone | Escrow hold/release, ledger entries, and token transfer execution remain in Payment/Issuance |
+
+**Kafka consumes:** `order.matched`, `payment.confirmed`, `transfer.completed`, `trade.settled`, `payout.completed`
+
+**Kafka publishes:** `settlement.stuck`, `settlement.recovered` (ops/notification)
+
+**Integrates with:** Marketplace (orderId), Payment (paymentId), Issuance (transferId), Notification (alerts)
+
+**Key entities:** `SettlementSaga`, `SagaStep`, `SagaCompensation`
+
+---
+
+### 12.3 Tier 2 — RWA compliance & trust
+
+#### 12.3.1 Valuation / NAV Service (`valuation-service`, :8095)
+
+**Why:** Property Registry stores `Valuation` metadata, but appraisal workflows, periodic revaluations, and token NAV calculation deserve a dedicated bounded context — especially for the `APPRAISER` role.
+
+| Responsibility | Details |
+|----------------|---------|
+| Appraisal workflow | Submit → review → approve/reject with appraiser attribution |
+| Periodic revaluation | Scheduled re-appraisal per building/flat |
+| Token NAV | Net asset value per token from latest approved valuation ÷ outstanding tokens |
+| Registry sync | Publish `valuation.updated`; Registry remains source of truth for flat/building links |
+| Document link | Reference valuation reports in Document Service / IPFS CIDs |
+
+**Kafka publishes:** `valuation.updated`, `valuation.approved`
+
+**Integrates with:** Property Registry, Document Service, Auth (`APPRAISER` role), Marketplace (listing price hints)
+
+**Key entities:** `ValuationRequest`, `ApprovedValuation`, `NavSnapshot`
+
+---
+
+#### 12.3.2 Audit Ledger Service (`audit-ledger-service`, :8096)
+
+**Why:** RWA platforms need an immutable audit trail separate from mutable business databases — for regulators, internal forensics, and investor disputes.
+
+| Responsibility | Details |
+|----------------|---------|
+| Append-only store | No UPDATE/DELETE on audit rows; corrections = new compensating entries |
+| Event capture | KYC decisions, document verify/reject, admin overrides, settlement milestones |
+| Query APIs | Paginated trail by investor, flat, building, or admin actor |
+| Export | Regulatory audit package generation |
+| Retention | Configurable retention policy; archive to cold storage (future) |
+
+**Kafka consumes:** `investor.kyc-approved`, `investor.kyc-revoked`, `document.verified`, `trade.settled`, admin action events
+
+**Integrates with:** Compliance, Document, Settlement Saga, Auth (actor attribution)
+
+**Key entities:** `AuditEntry` (immutable)
+
+---
+
+#### 12.3.3 Corporate Actions Service (`corporate-actions-service`, :8097)
+
+**Why:** Dividend distribution, holder snapshots, and future corporate events (splits, rights) are a distinct lifecycle from token deployment and transfers. Extracting this from Issuance reduces Issuance complexity as the platform grows.
+
+| Responsibility | Details |
+|----------------|---------|
+| Dividend orchestration | Holder snapshot at record date; trigger pro-rata distribution via Issuance/Payment |
+| Rent linkage | Consume `rent.collected` → initiate distribution workflow |
+| Future actions | Schema for stock splits, rights issues (implementation deferred) |
+| Investor visibility | Action history per token/flat |
+
+**Leave-alone:** Token deploy, `operatorTransfer`, on-chain whitelist sync stay in Issuance
+
+**Kafka consumes:** `rent.collected`, `dividend.distributed`, `payout.completed`
+
+**Kafka publishes:** `dividend.distribution-requested` (or REST to Issuance in v1)
+
+**Integrates with:** Token Issuance, Payment, Rental, Notification
+
+**Key entities:** `CorporateAction`, `HolderSnapshot`, `DividendAction`
+
+---
+
+### 12.4 Tier 3 — Scale & integrations (later)
+
+#### 12.4.1 Search Service (`search-service`, :8098)
+
+**Why:** PostgreSQL `LIKE`/filter queries on listings and buildings do not scale to full-text search, faceted filters, or geo queries.
+
+| Responsibility | Details |
+|----------------|---------|
+| Search index | OpenSearch/Elasticsearch for listings, buildings, public document metadata |
+| Index sync | Kafka-driven incremental updates |
+| APIs | Full-text search, filters (city, price range, yield, status), geo radius (optional) |
+
+**Kafka consumes:** `listing.created`, `flat.tokenized`, `building.approved`, `valuation.updated`
+
+---
+
+#### 12.4.2 Integration Hub Service (`integration-hub-service`, :8099)
+
+**Why:** Third-party adapters (Onfido, Sumsub, Pinata, future Stripe/MoonPay) are scattered across Compliance, Document, and Payment. A hub centralizes credentials, retries, webhook normalization, and observability.
+
+| Responsibility | Details |
+|----------------|---------|
+| Outbound adapters | Unified client layer for KYC, IPFS, fiat on-ramp providers |
+| Inbound webhooks | Normalize signatures and route to domain services |
+| Retry & DLQ | Per-integration retry policy and dead-letter queue |
+| Credential rotation | Env/KMS-backed secrets without redeploying domain services |
+
+**Migration path:** Compliance Onfido/Sumsub webhooks first; Document Pinata second; Payment fiat rails last
+
+---
+
+### 12.5 Explicit non-goals (do not spin out)
+
+| Candidate | Decision | Rationale |
+|-----------|----------|-----------|
+| Limits / policy service | **Reject** | Rules stay in Compliance + Marketplace ([investment-limits.md](rules/investment-limits.md)) |
+| Config service | **Reject** | Over-engineering for MVP ([java-architect skill](../.cursor/skills/java-architect/SKILL.md)) |
+| Payment escrow split | **Reject** | Escrow lifecycle is cohesive in PaymentService |
+| Issuance core split | **Reject** | Deploy/transfer/whitelist stay together; only Corporate Actions extracted |
+| Property Registry rename | **Deferred** | Folder stays `token-realty-app/` ([ADR 006](adr/006-monorepo-layout.md)) |
+
+### 12.6 Track backlog (starting 278)
+
+Phase 6 implementation tracks begin at **278**. Suggested batching (25 tracks per merge commit):
+
+| Track range | Focus |
+|-------------|-------|
+| 278–302 | Reporting Service scaffold + Kafka projections + admin BFF |
+| 303–327 | Settlement Saga Service + stuck detection + admin UI |
+| 328–352 | Valuation/NAV + Audit Ledger |
+| 353–377 | Corporate Actions extraction + Search/Integration Hub (as needed) |
+
+---
+
+## 13. Diagram Index
 
 | File | Description |
 |------|-------------|
@@ -783,13 +1065,13 @@ See [docs/rules/investor-portal.md](rules/investor-portal.md), [docs/rules/admin
 | [`diagrams/04-sell-flow.puml`](diagrams/04-sell-flow.puml) | Primary market buy flow |
 | [`diagrams/05-rent-flow.puml`](diagrams/05-rent-flow.puml) | Rent collection → dividend flow |
 | [`diagrams/06-kafka-events.puml`](diagrams/06-kafka-events.puml) | Event bus topology |
-| [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml) | Implementation phase timeline |
+| [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml) | Implementation phase timeline (Phases 0–6) |
 
 **Render PlantUML:** Use [PlantUML online](https://www.plantuml.com/plantuml/uml/), VS Code PlantUML extension, or `plantuml docs/diagrams/*.puml`.
 
 ---
 
-## 13. Open Questions & Decisions
+## 14. Open Questions & Decisions
 
 | # | Question | Options | Decision |
 |---|----------|---------|----------|
@@ -803,10 +1085,13 @@ See [docs/rules/investor-portal.md](rules/investor-portal.md), [docs/rules/admin
 | 8 | Folder rename | Keep `token-realty-app` vs rename to `property-registry-service` | **Deferred** — keep current folder name |
 | 9 | Monorepo vs polyrepo | Single repo (current) vs separate repos per service | **Monorepo** — [ADR 006](adr/006-monorepo-layout.md) |
 | 10 | Target chain | Polygon mainnet vs Amoy testnet for MVP | Amoy for staging (already configured) |
+| 11 | Phase 6 first service | Reporting vs Settlement Saga vs Valuation | **Reporting** (`:8093`) — lowest risk, read-only, immediate admin value |
+| 12 | Corporate Actions extraction | Keep in Issuance vs dedicated service | **Dedicated service** — Issuance keeps deploy/transfer only |
+| 13 | Search backend | PostgreSQL vs OpenSearch | **OpenSearch** when listing/building count exceeds ~10k or full-text needed |
 
 ---
 
-## 14. Cursor Rules & Coding Standards
+## 15. Cursor Rules & Coding Standards
 
 Agent and IDE conventions live in `.cursor/rules/` (adapted from Titan fintech rules).
 

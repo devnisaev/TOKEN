@@ -189,6 +189,8 @@ Token Issuance support endpoint: `GET /v1/investors/{investorId}/holdings`.
 
 ## Checklist — new microservice
 
+Phase 6 planned services (ports 8093–8099): see [PLATFORM-SPEC.md §12](../PLATFORM-SPEC.md#12-phase-6--planned-services).
+
 - [ ] Spring Boot 4 / Java 21 Maven module
 - [ ] Port + DB from [PLATFORM-SPEC.md](../PLATFORM-SPEC.md) §7
 - [ ] `SecurityConfig` + `tokenrealty-security` JWT filter

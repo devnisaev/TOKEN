@@ -66,11 +66,29 @@ Project starts 2025-09-25
 [P5b] -> [P5c]
 [P5c] -> [P5d]
 
+-- Phase 6: Ops visibility & RWA depth (planned) --
+[Reporting / Analytics :8093] as [P6a] lasts 2 weeks
+[Settlement Saga Tracker :8094] as [P6b] lasts 2 weeks
+[Valuation / NAV :8095] as [P6c] lasts 2 weeks
+[Audit Ledger :8096] as [P6d] lasts 1 week
+[Corporate Actions :8097] as [P6e] lasts 2 weeks
+[Search :8098] as [P6f] lasts 1 week
+[Integration Hub :8099] as [P6g] lasts 2 weeks
+
+[P5d] -> [P6a]
+[P6a] -> [P6b]
+[P6b] -> [P6c]
+[P6c] -> [P6d]
+[P6d] -> [P6e]
+[P6e] -> [P6f]
+[P6f] -> [P6g]
+
 @endgantt
 
 note bottom
   **Phases:** 0 Foundation | 1 Platform | 2 Commerce
   | 3 Rental | 4 Compliance & Docs | 5 Scale & UX
+  | 6 Ops visibility & RWA depth (planned)
 end note
 
 @enduml

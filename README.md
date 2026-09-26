@@ -27,6 +27,10 @@ Real-estate tokenization platform — fractional property ownership, crypto paym
 | Wallet | `wallet-service/` | 8090 | Implemented (custodial + aggregate balance) |
 | Blockchain Indexer | `blockchain-indexer-service/` | 8091 | Implemented (on-chain sync) |
 
+### Phase 6 — planned
+
+Phases 0–5 are complete. Next services (ports 8093–8099): Reporting, Settlement Saga, Valuation/NAV, Audit Ledger, Corporate Actions, Search, Integration Hub. See [docs/PLATFORM-SPEC.md §12](docs/PLATFORM-SPEC.md#12-phase-6--planned-services).
+
 ## Shared libraries
 
 | Library | Purpose |

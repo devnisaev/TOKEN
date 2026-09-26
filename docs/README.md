@@ -82,6 +82,22 @@ Additional Cursor rules (no separate human doc yet):
 | Wallet | [wallet-service/README.md](../wallet-service/README.md) | 8090 | Implemented |
 | Blockchain Indexer | [blockchain-indexer-service/README.md](../blockchain-indexer-service/README.md) | 8091 | Implemented |
 
+### Phase 6 — planned services
+
+Full descriptions: [PLATFORM-SPEC.md §12](PLATFORM-SPEC.md#12-phase-6--planned-services).
+
+| Service | Port | Priority | Status |
+|---------|------|----------|--------|
+| Reporting / Analytics | 8093 | P1 | Planned |
+| Settlement / Saga Tracker | 8094 | P1 | Planned |
+| Valuation / NAV | 8095 | P2 | Planned |
+| Audit Ledger | 8096 | P2 | Planned |
+| Corporate Actions | 8097 | P2 | Planned |
+| Search | 8098 | P3 | Planned |
+| Integration Hub | 8099 | P3 | Planned |
+
+Track backlog starts at **278**.
+
 ## Frontend
 
 | App | Folder | Dev URL |

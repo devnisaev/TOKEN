@@ -63,6 +63,22 @@ Human-readable expansions: [docs/rules/](docs/rules/) — incl. [commit-messages
 | Wallet | 8090 | `com.tokenrealty.wallet` |
 | Blockchain Indexer | 8091 | `com.tokenrealty.indexer` |
 
+### Phase 6 — planned (not yet scaffolded)
+
+See [docs/PLATFORM-SPEC.md §12](docs/PLATFORM-SPEC.md#12-phase-6--planned-services). Build order: Reporting → Settlement Saga → Valuation/NAV → Audit Ledger → Corporate Actions → Search → Integration Hub.
+
+| Service | Port | Package (proposed) |
+|---------|------|-------------------|
+| Reporting / Analytics | 8093 | `com.tokenrealty.reporting` |
+| Settlement / Saga Tracker | 8094 | `com.tokenrealty.settlement` |
+| Valuation / NAV | 8095 | `com.tokenrealty.valuation` |
+| Audit Ledger | 8096 | `com.tokenrealty.audit` |
+| Corporate Actions | 8097 | `com.tokenrealty.corporateactions` |
+| Search | 8098 | `com.tokenrealty.search` |
+| Integration Hub | 8099 | `com.tokenrealty.integration` |
+
+**Do not spin out:** limits/policy service, config service, Payment escrow, Issuance deploy/transfer core.
+
 New services: copy structure from `marketplace-service/` or `auth-service/`.
 
 ## Frontend
