@@ -70,6 +70,14 @@ public class AuditLedgerService {
     }
 
     @Transactional
+    public void onSettlementStuck(KafkaJsonEvent event) {
+        JsonNode payload = event.payload();
+        record(event, AuditSubjectType.ORDER, uuid(payload, "orderId"), null,
+                "Settlement stuck sagaId=" + text(payload, "sagaId")
+                        + " step=" + text(payload, "currentStep"));
+    }
+
+    @Transactional
     public void onSettlementRecovered(KafkaJsonEvent event) {
         JsonNode payload = event.payload();
         record(event, AuditSubjectType.ORDER, uuid(payload, "orderId"), null,

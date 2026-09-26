@@ -293,6 +293,30 @@ class NotificationKafkaIntegrationTest {
     }
 
     @Test
+    @DisplayName("settlement.stuck sends admin alert email")
+    void settlementStuck_sendsEmail() throws Exception {
+        ingestSettlementStuck(UUID.randomUUID());
+
+        verify(notificationEmailService).send(eq(NotificationKafkaEventTypes.SETTLEMENT_STUCK), any());
+    }
+
+    @Test
+    @DisplayName("settlement.recovered sends ops recovery email")
+    void settlementRecovered_sendsEmail() throws Exception {
+        ingestSettlementRecovered(UUID.randomUUID());
+
+        verify(notificationEmailService).send(eq(NotificationKafkaEventTypes.SETTLEMENT_RECOVERED), any());
+    }
+
+    @Test
+    @DisplayName("valuation.approved sends appraisal notice email")
+    void valuationApproved_sendsEmail() throws Exception {
+        ingestValuationApproved(UUID.randomUUID());
+
+        verify(notificationEmailService).send(eq(NotificationKafkaEventTypes.VALUATION_APPROVED), any());
+    }
+
+    @Test
     @DisplayName("duplicate eventId is deduped by KafkaEventConsumer")
     void tradeSettled_dedupesDuplicateEventId() throws Exception {
         UUID buyerId = UUID.randomUUID();
@@ -551,6 +575,61 @@ class NotificationKafkaIntegrationTest {
         eventConsumer.consume(message, NotificationKafkaEventTypes.DOCUMENT_UPLOADED,
                 "Notification ingest failed",
                 event -> notificationLogService.logEvent(NotificationKafkaEventTypes.DOCUMENT_UPLOADED, event));
+    }
+
+    private void ingestSettlementStuck(UUID eventId) throws Exception {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("sagaId", UUID.randomUUID().toString());
+        payload.put("orderId", UUID.randomUUID().toString());
+        payload.put("currentStep", "AWAITING_TRANSFER");
+        payload.put("stuckAt", "2025-09-25T14:00:00Z");
+
+        String message = objectMapper.writeValueAsString(EventEnvelope.ofWithEventId(
+                eventId,
+                NotificationKafkaEventTypes.SETTLEMENT_STUCK,
+                "test-trace",
+                payload));
+        eventConsumer.consume(message, NotificationKafkaEventTypes.SETTLEMENT_STUCK,
+                "Notification ingest failed",
+                event -> notificationLogService.logEvent(NotificationKafkaEventTypes.SETTLEMENT_STUCK, event));
+    }
+
+    private void ingestSettlementRecovered(UUID eventId) throws Exception {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("sagaId", UUID.randomUUID().toString());
+        payload.put("orderId", UUID.randomUUID().toString());
+        payload.put("currentStep", "AWAITING_TRANSFER");
+        payload.put("recoveredAt", "2025-09-25T15:00:00Z");
+
+        String message = objectMapper.writeValueAsString(EventEnvelope.ofWithEventId(
+                eventId,
+                NotificationKafkaEventTypes.SETTLEMENT_RECOVERED,
+                "test-trace",
+                payload));
+        eventConsumer.consume(message, NotificationKafkaEventTypes.SETTLEMENT_RECOVERED,
+                "Notification ingest failed",
+                event -> notificationLogService.logEvent(NotificationKafkaEventTypes.SETTLEMENT_RECOVERED, event));
+    }
+
+    private void ingestValuationApproved(UUID eventId) throws Exception {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("flatId", UUID.randomUUID().toString());
+        payload.put("buildingId", UUID.randomUUID().toString());
+        payload.put("valuationRequestId", UUID.randomUUID().toString());
+        payload.put("valueUsd", "1000000.00");
+        payload.put("totalTokens", 1000);
+        payload.put("navPerTokenUsd", "1000.00");
+        payload.put("approvedAt", "2025-09-25T18:00:00Z");
+        payload.put("reviewedBy", UUID.randomUUID().toString());
+
+        String message = objectMapper.writeValueAsString(EventEnvelope.ofWithEventId(
+                eventId,
+                NotificationKafkaEventTypes.VALUATION_APPROVED,
+                "test-trace",
+                payload));
+        eventConsumer.consume(message, NotificationKafkaEventTypes.VALUATION_APPROVED,
+                "Notification ingest failed",
+                event -> notificationLogService.logEvent(NotificationKafkaEventTypes.VALUATION_APPROVED, event));
     }
 
     private void ingestTradeSettled(UUID buyerId, UUID eventId) throws Exception {

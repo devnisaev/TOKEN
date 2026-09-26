@@ -8,12 +8,14 @@ import com.tokenrealty.reporting.entity.OrderMatchedRecord;
 import com.tokenrealty.reporting.entity.RentCollectedRecord;
 import com.tokenrealty.reporting.entity.StuckSagaRecord;
 import com.tokenrealty.reporting.entity.TradeSettledRecord;
+import com.tokenrealty.reporting.entity.ValuationApprovedRecord;
 import com.tokenrealty.reporting.repository.DividendRecordRepository;
 import com.tokenrealty.reporting.repository.FlatTokenizedRecordRepository;
 import com.tokenrealty.reporting.repository.OrderMatchedRecordRepository;
 import com.tokenrealty.reporting.repository.RentCollectedRecordRepository;
 import com.tokenrealty.reporting.repository.StuckSagaRecordRepository;
 import com.tokenrealty.reporting.repository.TradeSettledRecordRepository;
+import com.tokenrealty.reporting.repository.ValuationApprovedRecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,7 @@ public class ReportingProjectionService {
     private final RentCollectedRecordRepository rentCollectedRecordRepository;
     private final FlatTokenizedRecordRepository flatTokenizedRecordRepository;
     private final StuckSagaRecordRepository stuckSagaRecordRepository;
+    private final ValuationApprovedRecordRepository valuationApprovedRecordRepository;
 
     @Transactional
     public void onTradeSettled(KafkaJsonEvent event) {
@@ -127,6 +130,22 @@ public class ReportingProjectionService {
                 .orderId(uuid(payload, "orderId"))
                 .currentStep(text(payload, "currentStep"))
                 .stuckAt(parseInstant(payload, "stuckAt", event.occurredAt()))
+                .build());
+    }
+
+    @Transactional
+    public void onValuationApproved(KafkaJsonEvent event) {
+        JsonNode payload = event.payload();
+        valuationApprovedRecordRepository.save(ValuationApprovedRecord.builder()
+                .sourceEventId(event.eventId())
+                .flatId(uuid(payload, "flatId"))
+                .buildingId(uuid(payload, "buildingId"))
+                .valuationRequestId(uuid(payload, "valuationRequestId"))
+                .valueUsd(decimal(payload, "valueUsd"))
+                .navPerTokenUsd(decimal(payload, "navPerTokenUsd"))
+                .totalTokens(longValue(payload, "totalTokens"))
+                .reviewedBy(uuid(payload, "reviewedBy"))
+                .approvedAt(parseInstant(payload, "approvedAt", event.occurredAt()))
                 .build());
     }
 

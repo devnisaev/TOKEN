@@ -74,9 +74,13 @@ Human-readable expansions: [docs/rules/](docs/rules/) — incl. [commit-messages
 
 All five Phase 6 tiers implemented (Reporting through Integration Hub). See [docs/PLATFORM-SPEC.md §12](docs/PLATFORM-SPEC.md#12-phase-6--planned-services).
 
-### Phase 7 — in progress
+### Phase 7 — complete
 
 Event mesh & production integrations (no new services). See [docs/PLATFORM-SPEC.md §13](docs/PLATFORM-SPEC.md#13-phase-7--event-mesh--production-integrations) and [docs/rules/phase-7-services.md](docs/rules/phase-7-services.md).
+
+### Phase 8 — complete
+
+Production hardening & platform completion (no new services). See [docs/PLATFORM-SPEC.md §14](docs/PLATFORM-SPEC.md#14-phase-8--production-hardening--platform-completion) and [docs/rules/phase-8-services.md](docs/rules/phase-8-services.md).
 
 **Do not spin out:** limits/policy service, config service, Payment escrow, Issuance deploy/transfer core.
 

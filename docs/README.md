@@ -41,7 +41,8 @@ Central documentation for the TokenRealty real-estate tokenization platform.
 | [rules/tenant-portal.md](rules/tenant-portal.md) | [tenant-portal.mdc](../.cursor/rules/tenant-portal.mdc) |
 | [rules/api-gateway-bff.md](rules/api-gateway-bff.md) | — (BFF aggregates on API Gateway) |
 | [rules/phase-6-services.md](rules/phase-6-services.md) | — (Phase 6 ports 8093–8099, tiers, Kafka) |
-| [rules/phase-7-services.md](rules/phase-7-services.md) | — (Phase 7 event mesh, tracks 403+) |
+| [rules/phase-7-services.md](rules/phase-7-services.md) | — (Phase 7 event mesh, tracks 403–477) |
+| [rules/phase-8-services.md](rules/phase-8-services.md) | — (Phase 8 production hardening, tracks 478–502) |
 | [rules/observability.md](rules/observability.md) | — (traceId, JSON logs, Prometheus) |
 | [rules/commit-messages.md](rules/commit-messages.md) | [commit-messages.mdc](../.cursor/rules/commit-messages.mdc) |
 | [rules/e2e-testing.md](rules/e2e-testing.md) | — (Playwright smoke + full flow, demo-start) |

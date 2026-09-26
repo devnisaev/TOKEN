@@ -18,10 +18,16 @@ import java.util.stream.Collectors;
 public class PaymentWebhookService {
 
     private final PaymentService paymentService;
+    private final PaymentWebhookSignatureVerifier signatureVerifier;
     private final ObjectMapper objectMapper;
     private final Validator validator;
 
-    public void handleWebhook(String provider, String rawBody) throws IOException {
+    public void handleWebhook(
+            String provider,
+            String rawBody,
+            String payloadDigest,
+            String signature) throws IOException {
+        signatureVerifier.verifyIfConfigured(provider, rawBody, payloadDigest, signature);
         PaymentWebhookPayload payload = objectMapper.readValue(rawBody, PaymentWebhookPayload.class);
         validatePayload(payload);
         paymentService.confirm(

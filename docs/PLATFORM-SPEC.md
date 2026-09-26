@@ -2,7 +2,7 @@
 
 > **Version:** 1.3  
 > **Date:** 2026-09-26  
-> **Status:** Phases 0–6 complete (tracks 1–402); Phase 7 in progress (tracks 403+)  
+> **Status:** Phases 0–8 complete (tracks 1–502)  
 > **Purpose:** Master specification and implementation backlog for the TokenRealty real-estate tokenization platform (buy, sell, rent with cryptocurrency).
 
 ---
@@ -22,9 +22,10 @@
 11. [Cross-Cutting Concerns](#11-cross-cutting-concerns)
 12. [Phase 6 — Planned Services](#12-phase-6--planned-services)
 13. [Phase 7 — Event Mesh & Production Integrations](#13-phase-7--event-mesh--production-integrations)
-14. [Diagram Index](#14-diagram-index)
-15. [Open Questions & Decisions](#15-open-questions--decisions)
-16. [Cursor Rules & Coding Standards](#16-cursor-rules--coding-standards)
+14. [Phase 8 — Production Hardening & Platform Completion](#14-phase-8--production-hardening--platform-completion)
+15. [Diagram Index](#15-diagram-index)
+16. [Open Questions & Decisions](#16-open-questions--decisions)
+17. [Cursor Rules & Coding Standards](#17-cursor-rules--coding-standards)
 
 ---
 
@@ -440,6 +441,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 | **Phase 5** | Scale & UX | Wallet, Notification, Blockchain Indexer, frontend |
 | **Phase 6** | Ops visibility & RWA depth | Reporting, Settlement Saga, Valuation/NAV, Audit Ledger, Corporate Actions; Search + Integration Hub |
 | **Phase 7** | Event mesh & production integrations | Wire Phase 6 publishers to consumers; Hub payment webhooks; OpenSearch (optional) |
+| **Phase 8** | Production hardening & platform completion | CI coverage; stock-split outbox; document verify; payment webhook HMAC; Reporting/Audit consumers |
 
 See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml).
 
@@ -1123,7 +1125,39 @@ Human-readable guide: [rules/phase-7-services.md](rules/phase-7-services.md).
 
 ---
 
-## 14. Diagram Index
+## 14. Phase 8 — Production Hardening & Platform Completion
+
+Phase 7 completed the event mesh and integration paths. Phase 8 **hardens production flows**, extends CI coverage, and completes deferred consumer/outbox wiring. **No new microservices.**
+
+Human-readable guide: [rules/phase-8-services.md](rules/phase-8-services.md).
+
+### 14.1 Tier 1 — CI & Notification (implemented)
+
+- [x] CI: Phase 7/8 integration tests in `kafka-integration-tests` and `integration-hub-tests` jobs
+- [x] Notification integration tests for `settlement.stuck`, `settlement.recovered`, `valuation.approved`
+
+### 14.2 Tier 2 — Corporate Actions & Document (implemented)
+
+- [x] Corporate Actions outbox `stock-split.requested` on `POST /stock-splits`
+- [x] Document storage webhook `PINNED` + `documentId` → Property Registry verify
+
+### 14.3 Tier 3 — Security & Read Models (implemented)
+
+- [x] Payment webhook HMAC signature verification (opt-in per provider secret)
+- [x] Reporting `ValuationApprovedRecord` projection from `valuation.approved`
+- [x] Audit Ledger immutable entry on `settlement.stuck`
+
+### 14.4 Track backlog (478–502)
+
+| Track range | Focus |
+|-------------|-------|
+| 478–487 | CI hardening; Notification Phase 7 ops event tests |
+| 488–497 | Stock split outbox; document PINNED → Registry verify |
+| 498–502 | Payment webhook HMAC; Reporting/Audit consumers |
+
+---
+
+## 15. Diagram Index
 
 | File | Description |
 |------|-------------|
@@ -1139,7 +1173,7 @@ Human-readable guide: [rules/phase-7-services.md](rules/phase-7-services.md).
 
 ---
 
-## 15. Open Questions & Decisions
+## 16. Open Questions & Decisions
 
 | # | Question | Options | Decision |
 |---|----------|---------|----------|
@@ -1159,7 +1193,7 @@ Human-readable guide: [rules/phase-7-services.md](rules/phase-7-services.md).
 
 ---
 
-## 16. Cursor Rules & Coding Standards
+## 17. Cursor Rules & Coding Standards
 
 Agent and IDE conventions live in `.cursor/rules/` (adapted from Titan fintech rules).
 

@@ -41,6 +41,11 @@ public class AuditEventListener {
         ingest(message, AuditKafkaEventTypes.ORDER_MATCHED, auditLedgerService::onOrderMatched);
     }
 
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.settlement-stuck}")
+    public void onSettlementStuck(String message) {
+        ingest(message, AuditKafkaEventTypes.SETTLEMENT_STUCK, auditLedgerService::onSettlementStuck);
+    }
+
     @KafkaListener(topics = "${tokenrealty.kafka.topic.settlement-recovered}")
     public void onSettlementRecovered(String message) {
         ingest(message, AuditKafkaEventTypes.SETTLEMENT_RECOVERED, auditLedgerService::onSettlementRecovered);

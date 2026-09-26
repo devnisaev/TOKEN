@@ -61,7 +61,7 @@ public class DocumentController {
     }
 
     @PatchMapping("/documents/{id}/verify")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPLIANCE')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPLIANCE') or hasRole('SERVICE')")
     @Operation(summary = "Mark a document as verified by compliance")
     public DocumentResponse verify(@PathVariable UUID id) {
         return documentService.verify(id);

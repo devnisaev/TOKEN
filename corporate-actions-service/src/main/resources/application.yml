@@ -49,6 +49,7 @@ tokenrealty:
       rent-collected: tokenrealty.payment.rent.collected.v1
       dividend-distributed: tokenrealty.issuance.dividend.distributed.v1
       dividend-distribution-requested: tokenrealty.corporateactions.dividend.distribution-requested.v1
+      stock-split-requested: tokenrealty.corporateactions.stock-split.requested.v1
 
 management:
   endpoints:

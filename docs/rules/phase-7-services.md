@@ -86,7 +86,7 @@ Master spec: [PLATFORM-SPEC.md §13](../PLATFORM-SPEC.md#13-phase-7--event-mesh-
 | `IntegrationCredentialIntegrationTest` | integration-hub-service |
 | `StockSplitIntegrationTest` | corporate-actions-service |
 
-CI: add to `kafka-integration-tests` job in `.github/workflows/ci.yml`.
+CI: `kafka-integration-tests` and `integration-hub-tests` jobs in `.github/workflows/ci.yml`.
 
 ---
 

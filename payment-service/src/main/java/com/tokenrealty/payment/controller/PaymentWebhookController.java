@@ -28,6 +28,6 @@ public class PaymentWebhookController {
             @RequestHeader(value = "X-Payload-Digest", required = false) String payloadDigest,
             @RequestHeader(value = "X-Signature", required = false) String signature)
             throws IOException {
-        paymentWebhookService.handleWebhook(provider, rawBody);
+        paymentWebhookService.handleWebhook(provider, rawBody, payloadDigest, signature);
     }
 }

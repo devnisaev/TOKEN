@@ -338,6 +338,30 @@ Issuance distributes pro-rata to token holders; `RentCollectedListener` is disab
 
 ---
 
+### `tokenrealty.corporateactions.stock-split.requested.v1`
+
+| | |
+|---|---|
+| **Publisher** | Corporate Actions (outbox) |
+| **Consumers** | Token Issuance (planned) |
+| **Partition key** | `corporateActionId` |
+
+**Payload:**
+
+```json
+{
+  "corporateActionId": "uuid",
+  "flatId": "uuid",
+  "contractId": "uuid",
+  "period": "2025-09",
+  "splitRatio": "2.0"
+}
+```
+
+Emitted when admin requests a stock split via `POST /v1/corporate-actions/stock-splits`. Issuance will apply on-chain token ratio adjustment.
+
+---
+
 ### `tokenrealty.issuance.dividend.distributed.v1`
 
 | | |
@@ -488,6 +512,7 @@ See [PLATFORM-SPEC.md §12](PLATFORM-SPEC.md#12-phase-6--planned-services).
 |-------|-----------|-----------|--------|
 | `tokenrealty.valuation.updated.v1` | Valuation Service | Registry, Search, Reporting | Implemented (outbox) |
 | `tokenrealty.corporateactions.dividend.distribution-requested.v1` | Corporate Actions | Token Issuance | Implemented (outbox) |
+| `tokenrealty.corporateactions.stock-split.requested.v1` | Corporate Actions | Token Issuance | Implemented (outbox) |
 | `tokenrealty.settlement.stuck.v1` | Settlement Service | Notification, Reporting | Implemented (outbox + consumers) |
 | `tokenrealty.settlement.recovered.v1` | Settlement Service | Audit Ledger, Notification | Implemented (outbox + consumers) |
 | `tokenrealty.valuation.approved.v1` | Valuation Service | Audit Ledger, Notification | Implemented (outbox + consumers) |

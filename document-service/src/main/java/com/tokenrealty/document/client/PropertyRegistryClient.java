@@ -42,4 +42,12 @@ public class PropertyRegistryClient extends DownstreamRestClientSupport {
                 DownstreamServices.PROPERTY_REGISTRY,
                 documentId);
     }
+
+    public DocumentResponse verifyDocument(UUID documentId) {
+        return patch(
+                "/v1/documents/{id}/verify",
+                DocumentResponse.class,
+                DownstreamServices.PROPERTY_REGISTRY,
+                documentId);
+    }
 }

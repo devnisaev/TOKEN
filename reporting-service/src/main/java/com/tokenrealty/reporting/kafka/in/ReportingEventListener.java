@@ -52,6 +52,12 @@ public class ReportingEventListener {
                 projectionService::onSettlementStuck);
     }
 
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.valuation-approved}")
+    public void onValuationApproved(String message) {
+        ingest(message, ReportingKafkaEventTypes.VALUATION_APPROVED,
+                projectionService::onValuationApproved);
+    }
+
     private void ingest(String message, String eventType,
                         java.util.function.Consumer<com.tokenrealty.events.kafka.KafkaJsonEvent> handler) {
         eventConsumer.consume(message, eventType, "Reporting projection failed", handler);

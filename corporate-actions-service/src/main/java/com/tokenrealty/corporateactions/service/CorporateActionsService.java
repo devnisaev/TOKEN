@@ -9,7 +9,9 @@ import com.tokenrealty.corporateactions.entity.CorporateActionType;
 import com.tokenrealty.corporateactions.kafka.command.DividendDistributedCommand;
 import com.tokenrealty.corporateactions.kafka.command.RentCollectedCommand;
 import com.tokenrealty.corporateactions.kafka.events.DividendDistributionRequestedEvent;
+import com.tokenrealty.corporateactions.kafka.events.StockSplitRequestedEvent;
 import com.tokenrealty.corporateactions.kafka.port.DividendDistributionRequestedPublisher;
+import com.tokenrealty.corporateactions.kafka.port.StockSplitRequestedPublisher;
 import com.tokenrealty.corporateactions.repository.CorporateActionRepository;
 import com.tokenrealty.web.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class CorporateActionsService {
     private final CorporateActionRepository repository;
     private final TokenIssuanceClient tokenIssuanceClient;
     private final DividendDistributionRequestedPublisher dividendDistributionRequestedPublisher;
+    private final StockSplitRequestedPublisher stockSplitRequestedPublisher;
 
     @Transactional
     public void onRentCollected(RentCollectedCommand command) {
@@ -91,6 +94,13 @@ public class CorporateActionsService {
                 .status(CorporateActionStatus.REQUESTED)
                 .sourceEventId(UUID.randomUUID())
                 .build());
+
+        stockSplitRequestedPublisher.publish(new StockSplitRequestedEvent(
+                action.getId(),
+                action.getFlatId(),
+                action.getContractId(),
+                action.getPeriod(),
+                action.getSplitRatio()));
         return CorporateActionView.from(action);
     }
 

@@ -1,6 +1,7 @@
 package com.tokenrealty.document.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tokenrealty.document.client.PropertyRegistryClient;
 import com.tokenrealty.document.dto.StorageWebhookPayload;
 import com.tokenrealty.document.entity.StorageWebhookEvent;
 import com.tokenrealty.document.repository.StorageWebhookEventRepository;
@@ -23,7 +24,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class StorageWebhookService {
 
+    private static final String PINNED_EVENT = "PINNED";
+
     private final StorageWebhookEventRepository repository;
+    private final PropertyRegistryClient propertyRegistryClient;
     private final ObjectMapper objectMapper;
     private final Validator validator;
     private final Clock clock;
@@ -47,12 +51,16 @@ public class StorageWebhookService {
                 .payloadDigest(payloadDigest)
                 .processedAt(clock.instant())
                 .build());
+        if (PINNED_EVENT.equalsIgnoreCase(payload.event()) && payload.documentId() != null) {
+            propertyRegistryClient.verifyDocument(payload.documentId());
+        }
         log.info(
-                "Processed storage webhook provider={} event={} objectKey={} ipfsCid={}",
+                "Processed storage webhook provider={} event={} objectKey={} ipfsCid={} documentId={}",
                 provider,
                 payload.event(),
                 payload.objectKey(),
-                payload.ipfsCid());
+                payload.ipfsCid(),
+                payload.documentId());
     }
 
     private void validatePayload(StorageWebhookPayload payload) {

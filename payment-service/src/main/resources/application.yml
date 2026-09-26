@@ -78,6 +78,9 @@ tokenrealty:
       poll-ms: 3000
     reconciliation:
       cron: ${PAYMENT_RECONCILIATION_CRON:0 0 */6 * * *}
+    webhook:
+      stripe-secret: ${PAYMENT_WEBHOOK_STRIPE_SECRET:}
+      moonpay-secret: ${PAYMENT_WEBHOOK_MOONPAY_SECRET:}
 
 jackson2:
   serialization:

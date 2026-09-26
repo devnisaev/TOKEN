@@ -64,6 +64,21 @@ class AuditKafkaIntegrationTest {
     }
 
     @Test
+    @DisplayName("settlement.stuck creates ORDER audit entry")
+    void settlementStuck_recorded() throws Exception {
+        UUID orderId = UUID.randomUUID();
+        publish(AuditKafkaEventTypes.SETTLEMENT_STUCK, UUID.randomUUID(), Map.of(
+                "sagaId", UUID.randomUUID().toString(),
+                "orderId", orderId.toString(),
+                "currentStep", "AWAITING_TRANSFER",
+                "stuckAt", "2025-09-25T16:30:00Z"
+        ), auditLedgerService::onSettlementStuck);
+
+        assertThat(repository.count()).isEqualTo(1);
+        assertThat(repository.findAll().getFirst().getSubjectId()).isEqualTo(orderId);
+    }
+
+    @Test
     @DisplayName("settlement.recovered creates ORDER audit entry")
     void settlementRecovered_recorded() throws Exception {
         UUID orderId = UUID.randomUUID();

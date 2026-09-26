@@ -6,6 +6,8 @@ public final class CorporateActionsKafkaEventTypes {
     public static final String DIVIDEND_DISTRIBUTED = "tokenrealty.issuance.dividend.distributed.v1";
     public static final String DIVIDEND_DISTRIBUTION_REQUESTED =
             "tokenrealty.corporateactions.dividend.distribution-requested.v1";
+    public static final String STOCK_SPLIT_REQUESTED =
+            "tokenrealty.corporateactions.stock-split.requested.v1";
 
     private CorporateActionsKafkaEventTypes() {
     }

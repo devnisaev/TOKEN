@@ -7,6 +7,7 @@ public final class AuditKafkaEventTypes {
     public static final String TRADE_SETTLED = "tokenrealty.marketplace.trade.settled.v1";
     public static final String DOCUMENT_UPLOADED = "tokenrealty.document.document.uploaded.v1";
     public static final String ORDER_MATCHED = "tokenrealty.marketplace.order.matched.v1";
+    public static final String SETTLEMENT_STUCK = "tokenrealty.settlement.stuck.v1";
     public static final String SETTLEMENT_RECOVERED = "tokenrealty.settlement.recovered.v1";
     public static final String VALUATION_APPROVED = "tokenrealty.valuation.approved.v1";
 
