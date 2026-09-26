@@ -10,6 +10,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@tokenrealty/shared-api-client": "file:../shared-api-client",
     "@tanstack/react-query": "^5.62.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

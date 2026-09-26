@@ -1,14 +1,17 @@
-export type UserRole = 'ADMIN' | 'INVESTOR' | 'PROPERTY_MANAGER' | 'COMPLIANCE' | 'APPRAISER' | 'TENANT';
+export type {
+  ApiError,
+  FlatDetailResponse,
+  ListingDetailResponse,
+  ListingSummary,
+  PlaceOrderRequest,
+  SpringPage,
+  TokenContractSummary,
+  TokenResponse,
+} from '@tokenrealty/shared-api-client';
 
-export interface TokenResponse {
-  accessToken: string;
-  refreshToken: string;
-  tokenType: string;
-  expiresInSeconds: number;
-  userId: string;
-  email: string;
-  role: UserRole;
-}
+import type { UserRole } from '@tokenrealty/shared-api-client';
+
+export type { UserRole };
 
 export interface UserProfile {
   id: string;
@@ -16,14 +19,6 @@ export interface UserProfile {
   role: UserRole;
   walletAddress: string | null;
   createdAt: string;
-}
-
-export interface SpringPage<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
 }
 
 export interface Listing {
@@ -41,54 +36,6 @@ export interface Listing {
   sellerInvestorId?: string;
   sellerWallet?: string;
   createdAt?: string;
-}
-
-export interface TokenContractSummary {
-  contractId?: string;
-  contractAddress?: string;
-  tokenSymbol?: string;
-  totalSupply?: number;
-  tokenPriceUsd?: number;
-  status?: string;
-}
-
-export interface ListingSummary {
-  listingId: string;
-  listingType: string;
-  status: string;
-  priceUsd: number;
-  tokensAvailable: number;
-  tokensTotal: number;
-  minInvestmentTokens: number;
-  title: string;
-}
-
-export interface ListingDetailResponse {
-  listing: ListingSummary;
-  flatId: string;
-  buildingName: string;
-  flatNumber: string;
-  flatStatus: string;
-  tokenContract: TokenContractSummary | null;
-}
-
-export interface FlatDetailResponse {
-  flatId: string;
-  buildingId: string;
-  buildingName: string;
-  flatNumber: string;
-  floor?: number;
-  areaSqm?: number;
-  status: string;
-  tokenContract: TokenContractSummary | null;
-  listing: ListingSummary | null;
-}
-
-export interface PlaceOrderRequest {
-  listingId: string;
-  buyerId: string;
-  buyerWallet: string;
-  tokenAmount: number;
 }
 
 export interface FiatBalance {
@@ -145,10 +92,4 @@ export interface Trade {
   paymentId?: string;
   transferId?: string;
   createdAt?: string;
-}
-
-export interface ApiError {
-  title?: string;
-  detail?: string;
-  status?: number;
 }

@@ -1,14 +1,17 @@
-export type UserRole = 'ADMIN' | 'INVESTOR' | 'PROPERTY_MANAGER' | 'COMPLIANCE' | 'APPRAISER' | 'TENANT';
+export type {
+  ApiError,
+  BuildingBffDetail,
+  CreateBuildingRequest,
+  CreateFlatRequest,
+  SpringPage,
+  TokenResponse,
+  UpdateBuildingRequest,
+  UpdateFlatRequest,
+} from '@tokenrealty/shared-api-client';
 
-export interface TokenResponse {
-  accessToken: string;
-  refreshToken: string;
-  tokenType: string;
-  expiresInSeconds: number;
-  userId: string;
-  email: string;
-  role: UserRole;
-}
+import type { UserRole } from '@tokenrealty/shared-api-client';
+
+export type { UserRole };
 
 export interface UserProfile {
   id: string;
@@ -16,11 +19,6 @@ export interface UserProfile {
   role: UserRole;
   walletAddress: string | null;
   createdAt: string;
-}
-
-export interface SpringPage<T> {
-  content: T[];
-  totalElements: number;
 }
 
 export interface Building {
@@ -41,32 +39,40 @@ export interface BuildingDetail extends Building {
   constructionYear?: number;
   totalAreaSqm?: number;
   cadastralReference?: string;
+  flats?: FlatSummary[];
+  spv?: SpvSummary | null;
 }
 
-export interface CreateBuildingRequest {
-  name: string;
-  address: string;
-  city: string;
-  country: string;
-  postalCode?: string;
-  totalFloors?: number;
-  totalFlats?: number;
-  constructionYear?: number;
-  totalAreaSqm?: number;
-  propertyCategory?: string;
-  cadastralReference?: string;
+export interface FlatSummary {
+  id: string;
+  flatNumber: string;
+  floor?: number;
+  areaSqm?: number;
+  status: string;
+  tokenPriceUsd?: number;
 }
 
-export interface UpdateBuildingRequest {
-  name?: string;
-  address?: string;
-  city?: string;
-  country?: string;
-  postalCode?: string;
-  totalFloors?: number;
-  totalAreaSqm?: number;
-  propertyCategory?: string;
+export interface SpvSummary {
+  id: string;
+  legalName?: string;
+  registrationNumber?: string;
+  kycVerified?: boolean;
+  status?: string;
+  walletAddress?: string;
+}
+
+export interface Flat {
+  id: string;
+  buildingId: string;
+  buildingName?: string;
+  flatNumber: string;
+  floor?: number;
+  areaSqm?: number;
+  netUsableAreaSqm?: number;
   cadastralReference?: string;
+  numRooms?: number;
+  numBathrooms?: number;
+  status?: string;
 }
 
 export interface ComplianceRecord {
@@ -93,8 +99,11 @@ export interface DocumentReview {
   reviewedAt?: string;
 }
 
-export interface ApiError {
-  title?: string;
-  detail?: string;
-  status?: number;
+export interface Order {
+  id: string;
+  listingId: string;
+  status: string;
+  buyerId: string;
+  tokenAmount: number;
+  totalPriceUsd: number;
 }

@@ -1,53 +1,27 @@
+import { createApiClient, resolveApiBaseUrl } from '@tokenrealty/shared-api-client';
 import type {
   AggregateBalance,
-  ApiError,
   FlatDetailResponse,
   Listing,
   ListingDetailResponse,
   Order,
   PlaceOrderRequest,
-  Trade,
   SpringPage,
   TokenResponse,
+  Trade,
   UserProfile,
 } from '@/types/api';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api';
+const client = createApiClient({
+  baseUrl: resolveApiBaseUrl(import.meta.env.VITE_API_BASE_URL),
+});
 
-type TokenGetter = () => string | null;
-
-let getAccessToken: TokenGetter = () => null;
-
-export function setAccessTokenGetter(getter: TokenGetter) {
-  getAccessToken = getter;
+export function setAccessTokenGetter(getter: () => string | null) {
+  client.setAccessTokenGetter(getter);
 }
 
-async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const headers = new Headers(init.headers);
-  headers.set('Content-Type', 'application/json');
-
-  const token = getAccessToken();
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`);
-  }
-
-  const response = await fetch(`${API_BASE}${path}`, { ...init, headers });
-
-  if (!response.ok) {
-    let error: ApiError = { status: response.status, detail: response.statusText };
-    try {
-      error = await response.json();
-    } catch {
-      /* empty body */
-    }
-    throw new Error(error.detail ?? error.title ?? `Request failed (${response.status})`);
-  }
-
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return response.json() as Promise<T>;
+function request<T>(path: string, init: RequestInit = {}) {
+  return client.request<T>(path, init);
 }
 
 export const api = {

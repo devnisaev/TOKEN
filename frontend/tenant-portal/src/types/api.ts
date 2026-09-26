@@ -1,14 +1,12 @@
-export type UserRole = 'ADMIN' | 'INVESTOR' | 'PROPERTY_MANAGER' | 'COMPLIANCE' | 'APPRAISER' | 'TENANT';
+export type {
+  ApiError,
+  RecordRentPaymentRequest,
+  TokenResponse,
+} from '@tokenrealty/shared-api-client';
 
-export interface TokenResponse {
-  accessToken: string;
-  refreshToken: string;
-  tokenType: string;
-  expiresInSeconds: number;
-  userId: string;
-  email: string;
-  role: UserRole;
-}
+import type { UserRole } from '@tokenrealty/shared-api-client';
+
+export type { UserRole };
 
 export interface UserProfile {
   id: string;
@@ -41,16 +39,4 @@ export interface RentPayment {
   payoutId?: string;
   status: string;
   paidAt?: string;
-}
-
-export interface RecordRentPaymentRequest {
-  leaseId: string;
-  period: string;
-  amount: number;
-}
-
-export interface ApiError {
-  title?: string;
-  detail?: string;
-  status?: number;
 }

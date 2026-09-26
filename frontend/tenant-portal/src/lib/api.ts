@@ -1,3 +1,4 @@
+import { createApiClient, resolveApiBaseUrl } from '@tokenrealty/shared-api-client';
 import type {
   Lease,
   RecordRentPaymentRequest,
@@ -6,40 +7,16 @@ import type {
   UserProfile,
 } from '@/types/api';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api';
+const client = createApiClient({
+  baseUrl: resolveApiBaseUrl(import.meta.env.VITE_API_BASE_URL),
+});
 
-type TokenGetter = () => string | null;
-
-let getAccessToken: TokenGetter = () => null;
-
-export function setAccessTokenGetter(getter: TokenGetter) {
-  getAccessToken = getter;
+export function setAccessTokenGetter(getter: () => string | null) {
+  client.setAccessTokenGetter(getter);
 }
 
-async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const headers = new Headers(init.headers);
-  headers.set('Content-Type', 'application/json');
-
-  const token = getAccessToken();
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`);
-  }
-
-  const response = await fetch(`${API_BASE}${path}`, { ...init, headers });
-
-  if (!response.ok) {
-    let detail = response.statusText;
-    try {
-      const body = await response.json();
-      detail = body.detail ?? body.title ?? detail;
-    } catch {
-      /* empty */
-    }
-    throw new Error(detail);
-  }
-
-  if (response.status === 204) return undefined as T;
-  return response.json() as Promise<T>;
+function request<T>(path: string, init: RequestInit = {}) {
+  return client.request<T>(path, init);
 }
 
 export const api = {
