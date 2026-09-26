@@ -5,13 +5,18 @@ import com.tokenrealty.payment.entity.PaymentCurrency;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.Credentials;
+import org.web3j.crypto.Hash;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.request.EthFilter;
+import org.web3j.protocol.core.methods.response.EthLog;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
+import org.web3j.protocol.core.methods.response.Log;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.utils.Convert;
+import org.web3j.utils.Numeric;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -26,6 +31,7 @@ import java.util.Optional;
 public class PaymentBlockchainService {
 
     private static final int USDC_DECIMALS = 6;
+    private static final String ERC20_TRANSFER_TOPIC = Hash.sha3String("Transfer(address,address,uint256)");
 
     private final Web3j web3j;
     private final Credentials credentials;
@@ -83,6 +89,42 @@ public class PaymentBlockchainService {
     }
 
     /**
+     * Finds the first on-chain USDC Transfer to {@code recipient} with value &gt;= {@code minAmount}
+     * (6-decimal token units) via {@code eth_getLogs}.
+     */
+    public Optional<String> findUsdcDepositToAddress(String recipient, BigInteger minAmount) {
+        if (!enabled || recipient == null || recipient.isBlank() || minAmount == null) {
+            return Optional.empty();
+        }
+        try {
+            String paddedTo = "0x" + padLeft(recipient.replace("0x", "").toLowerCase(), 64);
+            EthFilter filter = new EthFilter(
+                    DefaultBlockParameterName.EARLIEST,
+                    DefaultBlockParameterName.LATEST,
+                    props.getUsdcContractAddress());
+            filter.addSingleTopic(ERC20_TRANSFER_TOPIC);
+            filter.addOptionalTopics((String) null, paddedTo);
+
+            EthLog ethLog = web3j.ethGetLogs(filter).send();
+            if (ethLog.hasError()) {
+                log.warn("eth_getLogs failed for recipient {}: {}", recipient, ethLog.getError().getMessage());
+                return Optional.empty();
+            }
+            for (EthLog.LogResult<?> logResult : ethLog.getLogs()) {
+                Log logEntry = (Log) logResult.get();
+                BigInteger value = Numeric.toBigInt(logEntry.getData());
+                if (value.compareTo(minAmount) >= 0) {
+                    return Optional.of(logEntry.getTransactionHash());
+                }
+            }
+            return Optional.empty();
+        } catch (Exception ex) {
+            log.warn("USDC deposit lookup failed for {}: {}", recipient, ex.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    /**
      * Sends ERC-20 transfer from operator wallet. Amount is USD with 2 decimal places (e.g. 50.00 USDC).
      */
     public String sendTokenTransfer(String recipientWallet, BigDecimal amount, PaymentCurrency currency) {
@@ -128,7 +170,7 @@ public class PaymentBlockchainService {
         }
     }
 
-    static BigInteger toTokenUnits(BigDecimal amount) {
+    public static BigInteger toTokenUnits(BigDecimal amount) {
         return amount.movePointRight(USDC_DECIMALS).setScale(0, RoundingMode.HALF_UP).toBigInteger();
     }
 
