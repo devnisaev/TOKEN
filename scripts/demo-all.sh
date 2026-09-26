@@ -4,6 +4,8 @@
 # Usage:
 #   ./scripts/demo-all.sh              # full demo stack (no E2E)
 #   ./scripts/demo-all.sh --e2e        # also run Playwright full tests
+#   ./scripts/demo-all.sh --tokenize   # also run seed-tokenize-demo.sh (Hardhat)
+#   ./scripts/demo-all.sh --tokenize --buy  # tokenize then demo-buy-flow.sh
 #   ./scripts/demo-all.sh --infra-only # Postgres + Kafka only (via demo-start)
 #   ./scripts/demo-all.sh --stop       # stop background Spring Boot processes
 
@@ -14,6 +16,7 @@ cd "${ROOT}"
 
 RUN_E2E=false
 RUN_TOKENIZE=false
+RUN_BUY=false
 INFRA_ONLY=false
 STOP=false
 
@@ -21,15 +24,21 @@ for arg in "$@"; do
   case "${arg}" in
     --e2e) RUN_E2E=true ;;
     --tokenize) RUN_TOKENIZE=true ;;
+    --buy) RUN_BUY=true ;;
     --infra-only) INFRA_ONLY=true ;;
     --stop) STOP=true ;;
     *)
       echo "Unknown option: ${arg}" >&2
-      echo "Usage: $0 [--e2e] [--tokenize] [--infra-only] [--stop]" >&2
+      echo "Usage: $0 [--e2e] [--tokenize] [--buy] [--infra-only] [--stop]" >&2
       exit 1
       ;;
   esac
 done
+
+if [[ "${RUN_BUY}" == "true" && "${RUN_TOKENIZE}" != "true" ]]; then
+  echo "--buy requires --tokenize (demo buy needs a tokenized flat + listing)" >&2
+  exit 1
+fi
 
 if [[ "${STOP}" == "true" ]]; then
   exec "${ROOT}/scripts/demo-services.sh" --stop
@@ -58,6 +67,12 @@ if [[ "${RUN_TOKENIZE}" == "true" ]]; then
   echo ""
   echo "==> Optional: tokenize demo flat + wait for listing..."
   "${ROOT}/scripts/seed-tokenize-demo.sh"
+
+  if [[ "${RUN_BUY}" == "true" ]]; then
+    echo ""
+    echo "==> Optional: place demo buy order..."
+    "${ROOT}/scripts/demo-buy-flow.sh"
+  fi
 fi
 
 cat <<'EOF'

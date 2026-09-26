@@ -52,10 +52,13 @@ Full specs skip automatically when `E2E_GATEWAY_URL` is unset.
 |------|------|
 | `tests/full/investor-login-flow.spec.ts` | Login → listings nav |
 | `tests/full/investor-buy-flow.spec.ts` | Login → listing → place buy order → order status page |
+| `tests/full/investor-buy-settled.spec.ts` | Login → buy order → poll until SETTLED (3 min; needs auto-confirm + tokenized listing) |
+| `tests/full/investor-notification-preferences.spec.ts` | Login → notification settings → toggle + save |
 | `tests/full/investor-secondary-sell-flow.spec.ts` | Login → portfolio → sell form (skips if no holdings) |
 | `tests/full/admin-kyc-flow.spec.ts` | Admin login → compliance page |
 | `tests/full/admin-document-review-flow.spec.ts` | Admin login → document reviews → approve (or empty queue) |
 | `tests/full/admin-building-detail.spec.ts` | Admin login → buildings → building detail + flats |
+| `tests/full/admin-tokenize-flat.spec.ts` | Admin login → building → tokenize form for AVAILABLE flat |
 | `tests/full/investor-dividend-history.spec.ts` | Investor login → dividend history page |
 | `tests/full/tenant-rent-flow.spec.ts` | Tenant login → lease view → pay rent (or already-paid) |
 
@@ -67,6 +70,7 @@ CI: `frontend-e2e-full` runs on `workflow_dispatch` when repo secret `E2E_GATEWA
 ./scripts/demo-all.sh                # One command: infra → services → wait → seed
 ./scripts/demo-all.sh --e2e          # Same + Playwright full tests
 ./scripts/demo-all.sh --tokenize     # Also run seed-tokenize-demo.sh (Hardhat)
+./scripts/demo-all.sh --tokenize --buy  # Tokenize + place demo buy order via API
 ./scripts/seed-tokenize-demo.sh      # On-chain tokenize + wait for primary listing
 ./scripts/demo-all.sh --stop         # Stop background Spring Boot processes
 ./scripts/demo-start.sh              # Postgres + Kafka + Jaeger + startup checklist
