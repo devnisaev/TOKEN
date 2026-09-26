@@ -23,8 +23,11 @@ CI job: `.github/workflows/ci.yml` → `frontend-e2e-smoke`.
 Requires a live gateway and seeded demo data:
 
 ```bash
+./scripts/demo-all.sh              # one command: infra → services → wait → seed
+./scripts/demo-all.sh --e2e          # same + Playwright full tests
+
+# Or step-by-step:
 ./scripts/demo-start.sh          # Postgres + Kafka + Jaeger
-# Start minimum stack: auth, registry, payment, marketplace, rental, notification, gateway
 ./scripts/demo-services.sh
 ./scripts/wait-for-services.sh
 ./scripts/seed-demo.sh
@@ -52,6 +55,8 @@ Full specs skip automatically when `E2E_GATEWAY_URL` is unset.
 | `tests/full/investor-secondary-sell-flow.spec.ts` | Login → portfolio → sell form (skips if no holdings) |
 | `tests/full/admin-kyc-flow.spec.ts` | Admin login → compliance page |
 | `tests/full/admin-document-review-flow.spec.ts` | Admin login → document reviews → approve (or empty queue) |
+| `tests/full/admin-building-detail.spec.ts` | Admin login → buildings → building detail + flats |
+| `tests/full/investor-dividend-history.spec.ts` | Investor login → dividend history page |
 | `tests/full/tenant-rent-flow.spec.ts` | Tenant login → lease view → pay rent (or already-paid) |
 
 CI: `frontend-e2e-full` runs on `workflow_dispatch` when repo secret `E2E_GATEWAY_URL` is set.
@@ -59,12 +64,19 @@ CI: `frontend-e2e-full` runs on `workflow_dispatch` when repo secret `E2E_GATEWA
 ## Demo infrastructure
 
 ```bash
+./scripts/demo-all.sh                # One command: infra → services → wait → seed
+./scripts/demo-all.sh --e2e          # Same + Playwright full tests
+./scripts/demo-all.sh --tokenize     # Also run seed-tokenize-demo.sh (Hardhat)
+./scripts/seed-tokenize-demo.sh      # On-chain tokenize + wait for primary listing
+./scripts/demo-all.sh --stop         # Stop background Spring Boot processes
 ./scripts/demo-start.sh              # Postgres + Kafka + Jaeger + startup checklist
 ./scripts/demo-start.sh --infra-only  # Postgres + Kafka only (no Jaeger)
 ./scripts/demo-start.sh --seed       # Also runs seed-demo.sh if gateway :8080 is up
 ./scripts/demo-services.sh           # Start full demo backend (auth → document → wallet → indexer → gateway)
 ./scripts/demo-services.sh --stop    # Stop background Spring Boot processes
 ```
+
+Dev seed includes a pending document review (`66666666-…`) for admin document-review E2E.
 
 Jaeger UI: http://localhost:16686 (OTLP HTTP `:4318`).
 

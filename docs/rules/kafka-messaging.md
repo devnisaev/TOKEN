@@ -81,6 +81,7 @@ Spring conventions: [spring-java-services.md](spring-java-services.md)
 - [x] Token Issuance: consume `kyc-approved`, `kyc-revoked` → on-chain whitelist sync
 - [x] Document: publish `document.uploaded` via outbox after Registry callback
 - [x] Shared DLQ error handler (`tokenrealty-kafka` `KafkaDlqAutoConfiguration`) — opt-in via `tokenrealty.kafka.dlq.enabled=true`
+- [x] Local profile DLQ enabled for marketplace, payment, issuance, compliance, notification, document (`application-local.yml`)
 
 Config keys: `tokenrealty.kafka.dlq.enabled`, `max-retries` (default 3), `backoff-ms` (default 1000), `suffix` (default `.dlq`). Failed listener messages publish to `<topic>.dlq` after retries.
 

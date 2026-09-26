@@ -137,7 +137,7 @@ Generic multi-service Dockerfile: `docker/Dockerfile.spring-service`.
 ./scripts/docker-build.sh api-gateway 8080
 ```
 
-CI job: `docker-build-gateway` in `.github/workflows/ci.yml`.
+CI job: `docker-build` matrix in `.github/workflows/ci.yml` (gateway, auth, registry, marketplace, payment).
 
 ---
 
