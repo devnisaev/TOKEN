@@ -46,6 +46,10 @@ services:
     url: ${AUDIT_LEDGER_SERVICE_URL:http://localhost:8096/api}
   corporate-actions:
     url: ${CORPORATE_ACTIONS_SERVICE_URL:http://localhost:8097/api}
+  search:
+    url: ${SEARCH_SERVICE_URL:http://localhost:8098/api}
+  integration-hub:
+    url: ${INTEGRATION_HUB_SERVICE_URL:http://localhost:8099/api}
 
 tokenrealty:
   jwt:
@@ -141,6 +145,14 @@ tokenrealty:
         target: http://localhost:8097
         paths:
           - /api/v1/corporate-actions
+      - id: search
+        target: http://localhost:8098
+        paths:
+          - /api/v1/search
+      - id: integration-hub
+        target: http://localhost:8099
+        paths:
+          - /api/v1/integrations
 
 management:
   tracing:

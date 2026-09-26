@@ -31,10 +31,12 @@ Real-estate tokenization platform — fractional property ownership, crypto paym
 | Valuation / NAV | `valuation-service/` | 8095 | Implemented (appraisal workflow, NAV) |
 | Audit Ledger | `audit-ledger-service/` | 8096 | Implemented (immutable audit trail) |
 | Corporate Actions | `corporate-actions-service/` | 8097 | Implemented (dividend orchestration) |
+| Search | `search-service/` | 8098 | Implemented (Kafka search index) |
+| Integration Hub | `integration-hub-service/` | 8099 | Implemented (webhook relay + retries) |
 
-### Phase 6 — in progress
+### Phase 6 — complete
 
-Tiers 1–2 complete (Reporting, Settlement, Valuation, Audit Ledger, Corporate Actions). Remaining: Search, Integration Hub. See [docs/PLATFORM-SPEC.md §12](docs/PLATFORM-SPEC.md#12-phase-6--planned-services).
+All Phase 6 services implemented. See [docs/PLATFORM-SPEC.md §12](docs/PLATFORM-SPEC.md#12-phase-6--planned-services).
 
 ## Shared libraries
 

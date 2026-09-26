@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: integration-hub-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/integration_hub_service
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+server:
+  port: 8099
+  servlet:
+    context-path: /api
+
+services:
+  compliance:
+    url: ${COMPLIANCE_URL:http://localhost:8087/api}
+
+tokenrealty:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-change-in-production-min-32-chars!!}
+    issuer: tokenrealty-auth
+  integration:
+    retry:
+      max-attempts: 5
+      base-backoff-seconds: 30
+      poll-ms: 5000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    com.tokenrealty: DEBUG

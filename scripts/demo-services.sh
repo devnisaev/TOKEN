@@ -77,6 +77,8 @@ start_one "settlement" "settlement-service"
 start_one "valuation" "valuation-service"
 start_one "audit-ledger" "audit-ledger-service"
 start_one "corporate-actions" "corporate-actions-service"
+start_one "search" "search-service"
+start_one "integration-hub" "integration-hub-service"
 sleep 2
 start_one "gateway" "api-gateway"
 

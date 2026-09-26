@@ -15,3 +15,5 @@ CREATE DATABASE settlement_service;
 CREATE DATABASE valuation_service;
 CREATE DATABASE audit_ledger_service;
 CREATE DATABASE corporate_actions_service;
+CREATE DATABASE search_service;
+CREATE DATABASE integration_hub_service;

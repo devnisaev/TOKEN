@@ -68,6 +68,8 @@ TokenRealty tokenizes real estate assets (buildings, flats, and other property t
 | Valuation / NAV | `valuation-service/` | 8095 | `valuation_service` | Implemented |
 | Audit Ledger | `audit-ledger-service/` | 8096 | `audit_ledger_service` | Implemented |
 | Corporate Actions | `corporate-actions-service/` | 8097 | `corporate_actions_service` | Implemented |
+| Search | `search-service/` | 8098 | `search_service` | Implemented |
+| Integration Hub | `integration-hub-service/` | 8099 | `integration_hub_service` | Implemented |
 
 ### What works today
 
@@ -280,7 +282,7 @@ Notification Service         Polygon / Hardhat + IPFS
 
 ### Tier 4 — Phase 6: Scale, ops visibility & RWA depth (planned)
 
-Phases 0–5 delivered 12 backend microservices; Phase 6 adds five more (17 total). Phase 6 adds **read-side, ops, and compliance-depth** services without splitting cohesive write engines (Payment escrow, Issuance deploy/transfer, Compliance limits). See [§12 Phase 6 — Planned Services](#12-phase-6--planned-services) for full descriptions and build order.
+Phases 0–5 delivered 12 backend microservices; Phase 6 adds seven more (19 total). Phase 6 adds **read-side, ops, and compliance-depth** services without splitting cohesive write engines (Payment escrow, Issuance deploy/transfer, Compliance limits). See [§12 Phase 6 — Planned Services](#12-phase-6--planned-services) for full descriptions and build order.
 
 | Service | Port | Folder (proposed) | Priority |
 |---------|------|-------------------|----------|
@@ -289,8 +291,8 @@ Phases 0–5 delivered 12 backend microservices; Phase 6 adds five more (17 tota
 | Valuation / NAV | 8095 | `valuation-service/` | **P2** — implemented |
 | Audit Ledger | 8096 | `audit-ledger-service/` | **P2** — implemented |
 | Corporate Actions | 8097 | `corporate-actions-service/` | **P2** — implemented |
-| Search | 8098 | `search-service/` | **P3** — when PostgreSQL filters are insufficient |
-| Integration Hub | 8099 | `integration-hub-service/` | **P3** — centralize third-party adapters |
+| Search | 8098 | `search-service/` | **P3** — implemented (PostgreSQL index) |
+| Integration Hub | 8099 | `integration-hub-service/` | **P3** — implemented |
 
 **Explicitly not new services:** limits/policy engine (stay in Compliance + Marketplace), config service, Payment escrow split, Issuance core split, Property Registry folder rename (deferred ADR 006).
 
@@ -709,21 +711,24 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] GET `/v1/corporate-actions/dividends`, `/v1/corporate-actions/{actionId}`
 - [x] Unit + integration tests
 
-### 10.17 Search Service (Phase 6 — planned, P3)
+### 10.17 Search Service (Phase 6 — implemented, P3)
 
-- [ ] Scaffold project (`search-service/`, port 8098)
-- [ ] OpenSearch/Elasticsearch index for listings, buildings, documents (public metadata only)
-- [ ] Kafka consumers to keep index in sync (`listing.created`, `flat.tokenized`, `building.approved`)
-- [ ] GET `/v1/search/listings?q=`, `/v1/search/buildings?q=`
-- [ ] Gateway route + optional BFF wrapper
+- [x] Scaffold project (`search-service/`, port 8098)
+- [x] PostgreSQL search index for listings and buildings (OpenSearch deferred)
+- [x] Kafka consumers: `listing.created`, `flat.tokenized`, `building.approved`, `valuation.updated`
+- [x] GET `/v1/search/listings?q=`, `/v1/search/buildings?q=` with filters + pagination
+- [x] Gateway route
+- [ ] Optional BFF wrapper
 
-### 10.18 Integration Hub Service (Phase 6 — planned, P3)
+### 10.18 Integration Hub Service (Phase 6 — implemented, P3)
 
-- [ ] Scaffold project (`integration-hub-service/`, port 8099)
-- [ ] Centralize outbound webhooks and third-party adapters (Onfido, Sumsub, Pinata, future fiat rails)
-- [ ] Inbound webhook normalization → route to Compliance/Document/Payment
-- [ ] Retry, dead-letter, and credential rotation per integration
-- [ ] Migrate existing provider clients incrementally (Compliance Onfido/Sumsub first)
+- [x] Scaffold project (`integration-hub-service/`, port 8099)
+- [x] Inbound KYC webhook relay → Compliance with signature header passthrough
+- [x] Delivery tracking with retry (max 5 attempts, exponential backoff)
+- [x] GET `/v1/integrations/deliveries` (ADMIN)
+- [x] Gateway route `/api/v1/integrations`
+- [ ] Document/Payment webhook migration; outbound adapter layer
+- [ ] Credential rotation via KMS
 
 ---
 

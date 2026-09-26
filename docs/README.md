@@ -86,15 +86,12 @@ Additional Cursor rules (no separate human doc yet):
 | Valuation / NAV | [valuation-service/README.md](../valuation-service/README.md) | 8095 | Implemented |
 | Audit Ledger | [audit-ledger-service/README.md](../audit-ledger-service/README.md) | 8096 | Implemented |
 | Corporate Actions | [corporate-actions-service/README.md](../corporate-actions-service/README.md) | 8097 | Implemented |
+| Search | [search-service/README.md](../search-service/README.md) | 8098 | Implemented |
+| Integration Hub | [integration-hub-service/README.md](../integration-hub-service/README.md) | 8099 | Implemented |
 
-### Phase 6 — remaining planned services
+### Phase 6 — complete
 
 Full descriptions: [PLATFORM-SPEC.md §12](PLATFORM-SPEC.md#12-phase-6--planned-services).
-
-| Service | Port | Priority | Status |
-|---------|------|----------|--------|
-| Search | 8098 | P3 | Planned |
-| Integration Hub | 8099 | P3 | Planned |
 
 ## Frontend
 

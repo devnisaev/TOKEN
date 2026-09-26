@@ -29,6 +29,10 @@ services:
     url: http://localhost:8096/api
   corporate-actions:
     url: http://localhost:8097/api
+  search:
+    url: http://localhost:8098/api
+  integration-hub:
+    url: http://localhost:8099/api
 
 tokenrealty:
   jwt:

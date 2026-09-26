@@ -35,6 +35,8 @@
         <module>valuation-service</module>
         <module>audit-ledger-service</module>
         <module>corporate-actions-service</module>
+        <module>search-service</module>
+        <module>integration-hub-service</module>
     </modules>
 
     <properties>

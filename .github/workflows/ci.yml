@@ -189,6 +189,7 @@ jobs:
           ./token-realty-app/mvnw -f settlement-service/pom.xml test -Dtest=SettlementKafkaIntegrationTest -q
           ./token-realty-app/mvnw -f audit-ledger-service/pom.xml test -Dtest=AuditKafkaIntegrationTest -q
           ./token-realty-app/mvnw -f corporate-actions-service/pom.xml test -Dtest=CorporateActionsKafkaIntegrationTest -q
+          ./token-realty-app/mvnw -f search-service/pom.xml test -Dtest=SearchKafkaIntegrationTest -q
 
   kafka-outbox-tests:
     runs-on: ubuntu-latest
@@ -278,6 +279,7 @@ jobs:
           ./token-realty-app/mvnw -f blockchain-indexer-service/pom.xml test -Dtest=ReconciliationIntegrationTest,BalanceRemediationIntegrationTest -q
           ./token-realty-app/mvnw -f marketplace-service/pom.xml test -Dtest=BuyFlowIntegrationTest -q
           ./token-realty-app/mvnw -f compliance-service/pom.xml test -Dtest=DataRoomLoopIntegrationTest -q
+          ./token-realty-app/mvnw -f integration-hub-service/pom.xml test -Dtest=WebhookRelayIntegrationTest -q
 
   issuance-integration-test:
     runs-on: ubuntu-latest
@@ -337,6 +339,10 @@ jobs:
             port: 8096
           - service: corporate-actions-service
             port: 8097
+          - service: search-service
+            port: 8098
+          - service: integration-hub-service
+            port: 8099
     steps:
       - uses: actions/checkout@v4
 

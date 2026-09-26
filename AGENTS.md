@@ -67,15 +67,12 @@ Human-readable expansions: [docs/rules/](docs/rules/) — incl. [commit-messages
 | Valuation / NAV | 8095 | `com.tokenrealty.valuation` |
 | Audit Ledger | 8096 | `com.tokenrealty.audit` |
 | Corporate Actions | 8097 | `com.tokenrealty.corporateactions` |
+| Search | 8098 | `com.tokenrealty.search` |
+| Integration Hub | 8099 | `com.tokenrealty.integration` |
 
-### Phase 6 — remaining (planned)
+### Phase 6 — complete
 
-See [docs/PLATFORM-SPEC.md §12](docs/PLATFORM-SPEC.md#12-phase-6--planned-services).
-
-| Service | Port | Package (proposed) | Status |
-|---------|------|-------------------|--------|
-| Search | 8098 | `com.tokenrealty.search` | Planned |
-| Integration Hub | 8099 | `com.tokenrealty.integration` | Planned |
+All five Phase 6 tiers implemented (Reporting through Integration Hub). See [docs/PLATFORM-SPEC.md §12](docs/PLATFORM-SPEC.md#12-phase-6--planned-services).
 
 **Do not spin out:** limits/policy service, config service, Payment escrow, Issuance deploy/transfer core.
 

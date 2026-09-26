@@ -505,4 +505,4 @@ See [PLATFORM-SPEC.md §12](PLATFORM-SPEC.md#12-phase-6--planned-services).
 | Settlement Saga | `order.matched`, `payment.confirmed`, `transfer.completed`, `trade.settled`, `payout.completed` |
 | Audit Ledger | `kyc-approved`, `kyc-revoked`, `trade.settled`, `document.uploaded`, `order.matched` |
 | Corporate Actions | `rent.collected`, `dividend.distributed` |
-| Search | `listing.created`, `flat.tokenized`, `building.approved`, `valuation.updated` |
+| Search | `listing.created`, `flat.tokenized`, `building.approved`, `valuation.updated` (implemented) |
