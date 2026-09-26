@@ -55,6 +55,11 @@ tokenrealty:
       app-secret: ${SUMSUB_APP_SECRET:}
       level-name: ${SUMSUB_LEVEL_NAME:basic-kyc-level}
       webhook-secret: ${SUMSUB_WEBHOOK_SECRET:}
+    onfido:
+      enabled: ${ONFIDO_ENABLED:false}
+      api-url: ${ONFIDO_API_URL:https://api.onfido.com/v3.6}
+      api-token: ${ONFIDO_API_TOKEN:}
+      webhook-secret: ${ONFIDO_WEBHOOK_SECRET:}
   kafka:
     enabled: ${KAFKA_ENABLED:false}
     relay:

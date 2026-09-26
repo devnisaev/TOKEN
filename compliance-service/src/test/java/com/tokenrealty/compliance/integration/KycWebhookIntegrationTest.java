@@ -71,6 +71,21 @@ class KycWebhookIntegrationTest {
     }
 
     @Test
+    void onfidoGreenWebhook_approvesInvestor() {
+        KycWebhookPayload payload = new KycWebhookPayload(
+                "onfido-check-" + investorId.toString().substring(0, 8),
+                investorId.toString(),
+                "completed",
+                Instant.parse("2027-06-01T00:00:00Z"),
+                new KycReviewResult("GREEN", List.of()));
+
+        kycWebhookService.handleWebhook("onfido", payload);
+
+        ComplianceRecord record = complianceRecordRepository.findByInvestorId(investorId).orElseThrow();
+        assertThat(record.getStatus()).isEqualTo(ComplianceRecord.ComplianceStatus.APPROVED);
+    }
+
+    @Test
     void sumsubRedWebhook_revokesInvestor() {
         complianceService.verify(
                 complianceRecordRepository.findByInvestorId(investorId).orElseThrow().getId(),

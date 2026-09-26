@@ -21,13 +21,14 @@ import java.util.UUID;
 public class KycWebhookService {
 
     private static final String SUMSUB_PROVIDER = "sumsub";
+    private static final String ONFIDO_PROVIDER = "onfido";
 
     private final ComplianceRecordRepository repository;
     private final ComplianceService complianceService;
 
     @Transactional
     public void handleWebhook(String provider, KycWebhookPayload payload) {
-        if (!SUMSUB_PROVIDER.equalsIgnoreCase(provider)) {
+        if (!SUMSUB_PROVIDER.equalsIgnoreCase(provider) && !ONFIDO_PROVIDER.equalsIgnoreCase(provider)) {
             raiseValidation("Unsupported KYC provider: " + provider);
         }
         ComplianceRecord record = resolveRecord(payload);
