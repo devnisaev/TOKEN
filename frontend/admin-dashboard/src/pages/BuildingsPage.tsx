@@ -50,6 +50,9 @@ export function BuildingsPage() {
               <span>{b.flatCount} flats</span>
               <div className="flex items-center gap-2">
                 <span className="rounded-md bg-secondary px-2 py-0.5 text-xs font-medium">{b.status}</span>
+                <Link to={`/buildings/${b.id}`} className="text-xs text-primary underline-offset-4 hover:underline">
+                  View
+                </Link>
                 <Link to={`/buildings/${b.id}/edit`} className="text-xs text-primary underline-offset-4 hover:underline">
                   Edit
                 </Link>
