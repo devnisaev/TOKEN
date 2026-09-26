@@ -1,5 +1,9 @@
 package com.tokenrealty.indexer.client;
 
+import com.tokenrealty.web.exception.ValidationException;
+import com.tokenrealty.web.rest.DownstreamRestClientSupport;
+import com.tokenrealty.web.rest.DownstreamServices;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -9,36 +13,40 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-public class IssuanceClient {
-
-    private final RestClient restClient;
+@Slf4j
+public class IssuanceClient extends DownstreamRestClientSupport {
 
     public IssuanceClient(@Qualifier("issuanceRestClient") RestClient restClient) {
-        this.restClient = restClient;
+        super(restClient);
     }
 
     public List<TokenContractView> listContracts() {
         try {
-            var page = restClient.get()
-                    .uri("/v1/tokens?size=100")
-                    .retrieve()
-                    .body(new ParameterizedTypeReference<SpringPage<TokenContractView>>() {
-                    });
+            SpringPage<TokenContractView> page = get(
+                    uriBuilder -> uriBuilder.path("/v1/tokens").queryParam("size", 100).build(),
+                    new ParameterizedTypeReference<>() {
+                    },
+                    DownstreamServices.TOKEN_ISSUANCE);
             return page != null ? page.content() : List.of();
-        } catch (Exception ex) {
+        } catch (ValidationException ex) {
+            log.warn("Token Issuance unavailable — skipping contract list: {}", ex.getMessage());
             return List.of();
         }
     }
 
     public List<TokenHolderView> listHolders(UUID contractId) {
         try {
-            var page = restClient.get()
-                    .uri("/v1/tokens/{contractId}/holders?size=200", contractId)
-                    .retrieve()
-                    .body(new ParameterizedTypeReference<SpringPage<TokenHolderView>>() {
-                    });
+            SpringPage<TokenHolderView> page = get(
+                    uriBuilder -> uriBuilder
+                            .path("/v1/tokens/{contractId}/holders")
+                            .queryParam("size", 200)
+                            .build(contractId),
+                    new ParameterizedTypeReference<>() {
+                    },
+                    DownstreamServices.TOKEN_ISSUANCE);
             return page != null ? page.content() : List.of();
-        } catch (Exception ex) {
+        } catch (ValidationException ex) {
+            log.warn("Token Issuance unavailable — skipping holders for {}: {}", contractId, ex.getMessage());
             return List.of();
         }
     }

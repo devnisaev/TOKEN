@@ -1,5 +1,7 @@
 package com.tokenrealty.wallet.client;
 
+import com.tokenrealty.web.rest.DownstreamRestClientSupport;
+import com.tokenrealty.web.rest.DownstreamServices;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -8,23 +10,22 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Component
-public class PaymentClient {
-
-    private final RestClient restClient;
+public class PaymentClient extends DownstreamRestClientSupport {
 
     public PaymentClient(@Qualifier("paymentRestClient") RestClient restClient) {
-        this.restClient = restClient;
+        super(restClient);
     }
 
     public WalletBalanceResponse getWalletBalance(UUID investorId) {
-        try {
-            return restClient.get()
-                    .uri("/v1/wallet-balances/{investorId}", investorId)
-                    .retrieve()
-                    .body(WalletBalanceResponse.class);
-        } catch (Exception ex) {
-            return new WalletBalanceResponse(investorId, "USDC", BigDecimal.ZERO, BigDecimal.ZERO);
+        WalletBalanceResponse response = getAllowNotFound(
+                "/v1/wallet-balances/{investorId}",
+                WalletBalanceResponse.class,
+                DownstreamServices.PAYMENT,
+                investorId);
+        if (response != null) {
+            return response;
         }
+        return new WalletBalanceResponse(investorId, "USDC", BigDecimal.ZERO, BigDecimal.ZERO);
     }
 
     public record WalletBalanceResponse(

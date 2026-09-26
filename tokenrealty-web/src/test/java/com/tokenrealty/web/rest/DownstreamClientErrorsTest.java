@@ -75,6 +75,17 @@ class DownstreamClientErrorsTest {
     }
 
     @Test
+    void readAllowNotFound_404_returnsNull() {
+        String value = DownstreamClientErrors.readAllowNotFound(
+                () -> {
+                    throw HttpClientErrorException.create(
+                            HttpStatus.NOT_FOUND, "Not Found", null, null, null);
+                },
+                PAYMENT);
+        assertThat(value).isNull();
+    }
+
+    @Test
     void read_timeout_throwsUnavailable() {
         assertThatThrownBy(() -> DownstreamClientErrors.read(
                         () -> {

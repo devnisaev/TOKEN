@@ -1,17 +1,17 @@
 package com.tokenrealty.issuance.client;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.tokenrealty.web.rest.DownstreamRestClientSupport;
+import com.tokenrealty.web.rest.DownstreamServices;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 @Component
-public class ComplianceClient {
-
-    private final RestClient restClient;
+public class ComplianceClient extends DownstreamRestClientSupport {
 
     public ComplianceClient(@Qualifier("complianceRestClient") RestClient restClient) {
-        this.restClient = restClient;
+        super(restClient);
     }
 
     public boolean isWalletApproved(String walletAddress) {
@@ -20,10 +20,11 @@ public class ComplianceClient {
     }
 
     public ComplianceCheckResponse checkWallet(String walletAddress) {
-        return restClient.get()
-                .uri("/v1/compliance/check/{walletAddress}", walletAddress)
-                .retrieve()
-                .body(ComplianceCheckResponse.class);
+        return getAllowNull(
+                "/v1/compliance/check/{walletAddress}",
+                ComplianceCheckResponse.class,
+                DownstreamServices.COMPLIANCE,
+                walletAddress);
     }
 
     public record ComplianceCheckResponse(

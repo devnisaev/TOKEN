@@ -13,6 +13,8 @@ public final class DownstreamServices {
     public static final ServiceSpec DOCUMENT = new ServiceSpec("Document service");
     public static final ServiceSpec WALLET = new ServiceSpec("Wallet service");
     public static final ServiceSpec AUTH = new ServiceSpec("Auth service");
+    public static final ServiceSpec RENTAL = new ServiceSpec("Rental service");
+    public static final ServiceSpec BLOCKCHAIN_INDEXER = new ServiceSpec("Blockchain Indexer service");
 
     private DownstreamServices() {
     }

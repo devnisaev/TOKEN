@@ -76,8 +76,20 @@ public final class RestClientOperations {
                 .toBodilessEntity();
     }
 
+    public <T> T patch(String uri, Class<T> responseType, Object... uriVariables) {
+        return client.patch().uri(uri, uriVariables).retrieve().body(responseType);
+    }
+
+    public <T> T patch(Function<UriBuilder, URI> uriFunction, Class<T> responseType) {
+        return client.patch().uri(uriFunction).retrieve().body(responseType);
+    }
+
     public void patchVoid(String uri, Object... uriVariables) {
         client.patch().uri(uri, uriVariables).retrieve().toBodilessEntity();
+    }
+
+    public void patchVoid(Function<UriBuilder, URI> uriFunction) {
+        client.patch().uri(uriFunction).retrieve().toBodilessEntity();
     }
 
     public void patchVoid(String uri, Object requestBody, Object... uriVariables) {

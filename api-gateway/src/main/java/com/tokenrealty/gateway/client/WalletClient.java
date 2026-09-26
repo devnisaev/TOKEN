@@ -1,47 +1,29 @@
 package com.tokenrealty.gateway.client;
 
-import com.tokenrealty.web.exception.ResourceNotFoundException;
-import com.tokenrealty.web.exception.ValidationException;
+import com.tokenrealty.web.rest.DownstreamRestClientSupport;
+import com.tokenrealty.web.rest.DownstreamServices;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientResponseException;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
 @Component
-public class WalletClient {
-
-    private final RestClient restClient;
+public class WalletClient extends DownstreamRestClientSupport {
 
     public WalletClient(@Qualifier("walletRestClient") RestClient restClient) {
-        this.restClient = restClient;
+        super(restClient);
     }
 
     public AggregateBalanceView getAggregateBalance(UUID investorId) {
-        try {
-            return restClient.get()
-                    .uri("/v1/wallets/{investorId}/balance", investorId)
-                    .retrieve()
-                    .body(AggregateBalanceView.class);
-        } catch (RestClientResponseException ex) {
-            if (ex.getStatusCode().value() == 404) {
-                throw new ResourceNotFoundException("Investor wallet not found: " + investorId);
-            }
-            throw unavailable(ex);
-        } catch (ResourceAccessException ex) {
-            throw new ValidationException("Wallet service unavailable");
-        }
-    }
-
-    private static ValidationException unavailable(RestClientResponseException ex) {
-        if (ex.getStatusCode().is5xxServerError()) {
-            return new ValidationException("Wallet service unavailable");
-        }
-        return new ValidationException("Wallet request failed: " + ex.getStatusText());
+        return get(
+                "/v1/wallets/{investorId}/balance",
+                AggregateBalanceView.class,
+                DownstreamServices.WALLET,
+                "Investor wallet not found: " + investorId,
+                investorId);
     }
 
     public record FiatBalanceView(String currency, BigDecimal available, BigDecimal held) {

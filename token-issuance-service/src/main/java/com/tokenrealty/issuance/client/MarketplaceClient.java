@@ -1,5 +1,7 @@
 package com.tokenrealty.issuance.client;
 
+import com.tokenrealty.web.rest.DownstreamRestClientSupport;
+import com.tokenrealty.web.rest.DownstreamServices;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -8,19 +10,18 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Component
-public class MarketplaceClient {
-
-    private final RestClient restClient;
+public class MarketplaceClient extends DownstreamRestClientSupport {
 
     public MarketplaceClient(@Qualifier("marketplaceRestClient") RestClient restClient) {
-        this.restClient = restClient;
+        super(restClient);
     }
 
     public TradeSnapshot getTradeByOrderId(UUID orderId) {
-        return restClient.get()
-                .uri("/v1/orders/{orderId}/trade", orderId)
-                .retrieve()
-                .body(TradeSnapshot.class);
+        return get(
+                "/v1/orders/{orderId}/trade",
+                TradeSnapshot.class,
+                DownstreamServices.MARKETPLACE,
+                orderId);
     }
 
     public record TradeSnapshot(

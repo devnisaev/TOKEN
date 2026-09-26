@@ -50,6 +50,19 @@ public final class DownstreamClientErrors {
         }
     }
 
+    public static <T> T readAllowNotFound(Supplier<T> call, ServiceSpec service) {
+        try {
+            return call.get();
+        } catch (RestClientResponseException ex) {
+            if (ex.getStatusCode().value() == 404) {
+                return null;
+            }
+            throw mapResponse(ex, service, null);
+        } catch (ResourceAccessException ex) {
+            throw unavailable(service);
+        }
+    }
+
     public static void run(Runnable call, ServiceSpec service) {
         run(call, service, null);
     }

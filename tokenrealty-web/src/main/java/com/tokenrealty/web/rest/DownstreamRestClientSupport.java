@@ -1,5 +1,6 @@
 package com.tokenrealty.web.rest;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriBuilder;
 
@@ -59,6 +60,30 @@ public abstract class DownstreamRestClientSupport {
                 service);
     }
 
+    protected <T> T getAllowNotFound(String uri, Class<T> responseType, ServiceSpec service, Object... uriVariables) {
+        return DownstreamClientErrors.readAllowNotFound(
+                () -> http.get(uri, responseType, uriVariables),
+                service);
+    }
+
+    protected <T> T get(
+            Function<UriBuilder, URI> uriFunction,
+            ParameterizedTypeReference<T> responseType,
+            ServiceSpec service) {
+        return DownstreamClientErrors.read(
+                () -> http.get(uriFunction, responseType),
+                service);
+    }
+
+    protected <T> T getAllowNotFound(
+            Function<UriBuilder, URI> uriFunction,
+            ParameterizedTypeReference<T> responseType,
+            ServiceSpec service) {
+        return DownstreamClientErrors.readAllowNotFound(
+                () -> http.get(uriFunction, responseType),
+                service);
+    }
+
     protected <T> T post(String uri, Object body, Class<T> responseType, ServiceSpec service, Object... uriVars) {
         return DownstreamClientErrors.read(
                 () -> http.post(uri, body, responseType, uriVars),
@@ -91,6 +116,27 @@ public abstract class DownstreamRestClientSupport {
     protected void patchVoid(String uri, ServiceSpec service, Object... uriVariables) {
         DownstreamClientErrors.run(
                 () -> http.patchVoid(uri, uriVariables),
+                service);
+    }
+
+    protected void patchVoid(Function<UriBuilder, URI> uriFunction, ServiceSpec service) {
+        DownstreamClientErrors.run(
+                () -> http.patchVoid(uriFunction),
+                service);
+    }
+
+    protected <T> T patch(
+            Function<UriBuilder, URI> uriFunction,
+            Class<T> responseType,
+            ServiceSpec service) {
+        return DownstreamClientErrors.read(
+                () -> http.patch(uriFunction, responseType),
+                service);
+    }
+
+    protected <T> T patch(String uri, Class<T> responseType, ServiceSpec service, Object... uriVariables) {
+        return DownstreamClientErrors.read(
+                () -> http.patch(uri, responseType, uriVariables),
                 service);
     }
 }

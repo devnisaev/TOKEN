@@ -1,76 +1,46 @@
 package com.tokenrealty.marketplace.client;
 
-import com.tokenrealty.web.exception.ValidationException;
+import com.tokenrealty.web.rest.DownstreamRestClientSupport;
+import com.tokenrealty.web.rest.DownstreamServices;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientResponseException;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Component
-public class TokenIssuanceClient {
-
-    private final RestClient restClient;
+public class TokenIssuanceClient extends DownstreamRestClientSupport {
 
     public TokenIssuanceClient(@Qualifier("tokenIssuanceRestClient") RestClient restClient) {
-        this.restClient = restClient;
+        super(restClient);
     }
 
     public long getHolderBalance(UUID contractId, String walletAddress) {
-        try {
-            HolderBalanceResponse response = restClient.get()
-                    .uri("/v1/tokens/{contractId}/holders/by-wallet/{walletAddress}",
-                            contractId, walletAddress)
-                    .retrieve()
-                    .body(HolderBalanceResponse.class);
-            return response != null ? response.balance() : 0L;
-        } catch (RestClientResponseException ex) {
-            if (ex.getStatusCode().value() == 404) {
-                return 0L;
-            }
-            if (ex.getStatusCode().is5xxServerError()) {
-                throw new ValidationException("Token Issuance service unavailable");
-            }
-            throw new ValidationException("Holder lookup failed: " + ex.getStatusText());
-        } catch (ResourceAccessException ex) {
-            throw new ValidationException("Token Issuance service unavailable");
-        }
+        HolderBalanceResponse response = getAllowNotFound(
+                "/v1/tokens/{contractId}/holders/by-wallet/{walletAddress}",
+                HolderBalanceResponse.class,
+                DownstreamServices.TOKEN_ISSUANCE,
+                contractId,
+                walletAddress);
+        return response != null ? response.balance() : 0L;
     }
 
     public TokenContractResponse getContractByFlatId(UUID flatId) {
-        try {
-            return restClient.get()
-                    .uri("/v1/tokens/by-flat/{flatId}", flatId)
-                    .retrieve()
-                    .body(TokenContractResponse.class);
-        } catch (RestClientResponseException ex) {
-            if (ex.getStatusCode().is5xxServerError()) {
-                throw new ValidationException("Token Issuance service unavailable");
-            }
-            throw new ValidationException("Contract lookup failed: " + ex.getStatusText());
-        } catch (ResourceAccessException ex) {
-            throw new ValidationException("Token Issuance service unavailable");
-        }
+        return get(
+                "/v1/tokens/by-flat/{flatId}",
+                TokenContractResponse.class,
+                DownstreamServices.TOKEN_ISSUANCE,
+                flatId);
     }
 
     public TokenTransferResponse transferTokens(UUID contractId, TransferRequest request) {
-        try {
-            return restClient.post()
-                    .uri("/v1/tokens/{contractId}/transfers", contractId)
-                    .body(request)
-                    .retrieve()
-                    .body(TokenTransferResponse.class);
-        } catch (RestClientResponseException ex) {
-            if (ex.getStatusCode().is5xxServerError()) {
-                throw new ValidationException("Token Issuance service unavailable");
-            }
-            throw new ValidationException("Token transfer failed: " + ex.getStatusText());
-        } catch (ResourceAccessException ex) {
-            throw new ValidationException("Token Issuance service unavailable");
-        }
+        return post(
+                "/v1/tokens/{contractId}/transfers",
+                request,
+                TokenTransferResponse.class,
+                DownstreamServices.TOKEN_ISSUANCE,
+                contractId);
     }
 
     public record HolderBalanceResponse(

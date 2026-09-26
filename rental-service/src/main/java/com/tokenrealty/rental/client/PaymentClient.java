@@ -1,22 +1,20 @@
 package com.tokenrealty.rental.client;
 
-import com.tokenrealty.web.exception.ValidationException;
+import com.tokenrealty.web.rest.DownstreamRestClientSupport;
+import com.tokenrealty.web.rest.DownstreamServices;
+import com.tokenrealty.web.rest.RestClientOperations;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientResponseException;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Component
-public class PaymentClient {
-
-    private final RestClient restClient;
+public class PaymentClient extends DownstreamRestClientSupport {
 
     public PaymentClient(@Qualifier("paymentRestClient") RestClient restClient) {
-        this.restClient = restClient;
+        super(restClient);
     }
 
     public PayoutResponse recordRentCollection(
@@ -39,20 +37,12 @@ public class PaymentClient {
                 tenantId,
                 period
         );
-        try {
-            return restClient.post()
-                    .uri("/v1/payouts")
-                    .body(body)
-                    .retrieve()
-                    .body(PayoutResponse.class);
-        } catch (RestClientResponseException ex) {
-            if (ex.getStatusCode().is5xxServerError()) {
-                throw new ValidationException("Payment service unavailable");
-            }
-            throw new ValidationException("Rent collection failed: " + ex.getStatusText());
-        } catch (ResourceAccessException ex) {
-            throw new ValidationException("Payment service unavailable");
-        }
+        return post(
+                "/v1/payouts",
+                body,
+                PayoutResponse.class,
+                DownstreamServices.PAYMENT,
+                RestClientOperations.idempotencyKey("rent-" + leaseId + "-" + period));
     }
 
     public record CreatePayoutRequest(
