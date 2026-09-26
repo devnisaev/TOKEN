@@ -57,7 +57,7 @@ public class LeaseService {
         return mapper.toLeaseResponse(leaseRepository.save(lease));
     }
 
-    Lease getLease(UUID id) {
+    public Lease getLease(UUID id) {
         return leaseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Lease", id));
     }

@@ -75,4 +75,23 @@ public final class RentalDtos {
             LocalDate leaseEndDate
     ) {
     }
+
+    public record CreateMaintenanceTicketRequest(
+            @NotNull UUID leaseId,
+            @NotBlank @Size(max = 200) String title,
+            @NotBlank @Size(max = 2000) String description
+    ) {
+    }
+
+    public record MaintenanceTicketResponse(
+            UUID id,
+            UUID leaseId,
+            UUID flatId,
+            UUID tenantId,
+            String title,
+            String description,
+            com.tokenrealty.rental.entity.MaintenanceTicket.TicketStatus status,
+            Instant createdAt
+    ) {
+    }
 }

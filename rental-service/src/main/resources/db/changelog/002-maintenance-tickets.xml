@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="002-maintenance-tickets" author="tokenrealty">
+        <createTable tableName="maintenance_tickets">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lease_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="flat_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="tenant_id" type="uuid"><constraints nullable="false"/></column>
+            <column name="title" type="varchar(200)"><constraints nullable="false"/></column>
+            <column name="description" type="varchar(2000)"><constraints nullable="false"/></column>
+            <column name="status" type="varchar(20)"><constraints nullable="false"/></column>
+            <column name="created_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="updated_at" type="timestamptz"><constraints nullable="false"/></column>
+            <column name="version" type="bigint" defaultValueNumeric="0"><constraints nullable="false"/></column>
+        </createTable>
+        <createIndex tableName="maintenance_tickets" indexName="idx_maintenance_tickets_lease_id">
+            <column name="lease_id"/>
+        </createIndex>
+        <createIndex tableName="maintenance_tickets" indexName="idx_maintenance_tickets_tenant_id">
+            <column name="tenant_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
