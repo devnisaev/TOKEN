@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileCheck, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -49,17 +50,29 @@ export function DocumentReviewsPage() {
                 </div>
                 <span className="rounded-md bg-secondary px-2 py-1 text-xs font-medium">{doc.status}</span>
               </CardHeader>
-              <CardContent className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Building {doc.buildingId.slice(0, 8)}…</span>
-                {!doc.isVerified && (
-                  <Button
-                    size="sm"
-                    disabled={verifyMutation.isPending}
-                    onClick={() => verifyMutation.mutate(doc.documentId)}
+              <CardContent className="space-y-2 text-sm">
+                <div className="flex flex-wrap gap-3 text-muted-foreground">
+                  <Link
+                    to={`/buildings/${doc.buildingId}`}
+                    className="text-primary underline-offset-4 hover:underline"
                   >
-                    Approve document
-                  </Button>
-                )}
+                    Building {doc.buildingId.slice(0, 8)}…
+                  </Link>
+                  {doc.flatId && <span>Flat {doc.flatId.slice(0, 8)}…</span>}
+                  {doc.uploadedAt && <span>Uploaded {doc.uploadedAt.slice(0, 10)}</span>}
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs">{doc.documentId}</span>
+                  {!doc.isVerified && (
+                    <Button
+                      size="sm"
+                      disabled={verifyMutation.isPending}
+                      onClick={() => verifyMutation.mutate(doc.documentId)}
+                    >
+                      Approve document
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </li>

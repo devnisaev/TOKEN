@@ -81,9 +81,19 @@ export function PortfolioPage() {
                 <p className="text-sm text-muted-foreground">No token holdings yet — buy on a listing to start</p>
               ) : (
                 balance.tokenHoldings.map((h) => (
-                  <div key={h.contractId} className="flex justify-between text-sm">
+                  <div key={h.contractId} className="flex items-center justify-between text-sm">
                     <span className="font-medium">{h.tokenSymbol}</span>
-                    <span>{h.balance.toLocaleString()} tokens</span>
+                    <div className="flex items-center gap-3">
+                      <span>{h.balance.toLocaleString()} tokens</span>
+                      {h.flatId && h.balance > 0 && (
+                        <Link
+                          to={`/portfolio/sell/${h.contractId}`}
+                          className="text-xs text-primary underline-offset-4 hover:underline"
+                        >
+                          Sell
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 ))
               )}

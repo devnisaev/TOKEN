@@ -1,8 +1,13 @@
+import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+
+const STATUS_FILTERS = ['ALL', 'PENDING', 'APPROVED', 'REJECTED', 'EXPIRED', 'REVOKED'] as const;
+type StatusFilter = (typeof STATUS_FILTERS)[number];
 
 function expiryOneYear(): string {
   const d = new Date();
@@ -12,10 +17,12 @@ function expiryOneYear(): string {
 
 export function CompliancePage() {
   const queryClient = useQueryClient();
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('PENDING');
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['compliance'],
-    queryFn: () => api.listCompliance(),
+    queryKey: ['compliance', statusFilter],
+    queryFn: () =>
+      statusFilter === 'ALL' ? api.listCompliance() : api.listCompliance(statusFilter),
   });
 
   const verifyMutation = useMutation({
@@ -28,6 +35,19 @@ export function CompliancePage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">KYC compliance</h1>
         <p className="text-muted-foreground">Review and approve investor whitelist records</p>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {STATUS_FILTERS.map((status) => (
+          <Button
+            key={status}
+            size="sm"
+            variant={statusFilter === status ? 'default' : 'outline'}
+            onClick={() => setStatusFilter(status)}
+          >
+            {status === 'ALL' ? 'All' : status}
+          </Button>
+        ))}
       </div>
 
       {isLoading && (
@@ -50,7 +70,16 @@ export function CompliancePage() {
                   <CardTitle className="text-base">{record.fullName ?? record.investorId}</CardTitle>
                   <p className="font-mono text-xs text-muted-foreground">{record.walletAddress}</p>
                 </div>
-                <span className="rounded-md bg-secondary px-2 py-1 text-xs font-medium">{record.status}</span>
+                <span
+                  className={cn(
+                    'rounded-md px-2 py-1 text-xs font-medium',
+                    record.status === 'APPROVED' && 'bg-green-100 text-green-800',
+                    record.status === 'PENDING' && 'bg-secondary',
+                    record.status === 'REJECTED' && 'bg-destructive/10 text-destructive',
+                  )}
+                >
+                  {record.status}
+                </span>
               </CardHeader>
               <CardContent className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">{record.countryCode ?? '—'}</span>
@@ -70,7 +99,7 @@ export function CompliancePage() {
       </ul>
 
       {data?.content.length === 0 && !isLoading && (
-        <p className="text-muted-foreground">No compliance records found.</p>
+        <p className="text-muted-foreground">No compliance records for this filter.</p>
       )}
     </div>
   );

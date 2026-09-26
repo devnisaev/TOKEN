@@ -9,6 +9,7 @@ import type {
   DocumentReview,
   Flat,
   Order,
+  SettleTradeRequest,
   Trade,
   SpringPage,
   TokenResponse,
@@ -128,5 +129,12 @@ export const api = {
 
   getOrderTrade(orderId: string) {
     return request<Trade>(`/v1/orders/${orderId}/trade`);
+  },
+
+  settleOrder(orderId: string, body: SettleTradeRequest) {
+    return request<Trade>(`/v1/orders/${orderId}/settle`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    });
   },
 };

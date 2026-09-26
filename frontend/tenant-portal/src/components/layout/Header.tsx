@@ -2,13 +2,7 @@ import { Home, LogOut } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth';
-import { cn } from '@/lib/utils';
-
-const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  cn(
-    'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-    isActive ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground',
-  );
+import { navLinkClass } from '@tokenrealty/shared-ui';
 
 export function Header() {
   const { user, logout } = useAuth();
@@ -21,7 +15,7 @@ export function Header() {
           TokenRealty Tenant
         </Link>
         <nav className="flex items-center gap-1">
-          <NavLink to="/" end className={navLinkClass}>
+          <NavLink to="/" end className={({ isActive }) => navLinkClass(isActive)}>
             My lease
           </NavLink>
         </nav>

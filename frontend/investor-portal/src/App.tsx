@@ -8,6 +8,7 @@ import { OrderStatusPage } from '@/pages/OrderStatusPage';
 import { OrdersPage } from '@/pages/OrdersPage';
 import { DividendsPage } from '@/pages/DividendsPage';
 import { PortfolioPage } from '@/pages/PortfolioPage';
+import { SellTokensPage } from '@/pages/SellTokensPage';
 
 export function App() {
   return (
@@ -26,6 +27,7 @@ export function App() {
           <Route path="orders" element={<OrdersPage />} />
           <Route path="orders/:orderId" element={<OrderStatusPage />} />
           <Route path="portfolio" element={<PortfolioPage />} />
+          <Route path="portfolio/sell/:contractId" element={<SellTokensPage />} />
           <Route path="dividends" element={<DividendsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

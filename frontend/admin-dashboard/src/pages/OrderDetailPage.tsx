@@ -1,8 +1,12 @@
+import { FormEvent, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 async function fetchTrade(orderId: string) {
   try {
@@ -14,6 +18,9 @@ async function fetchTrade(orderId: string) {
 
 export function OrderDetailPage() {
   const { orderId } = useParams<{ orderId: string }>();
+  const queryClient = useQueryClient();
+  const [paymentId, setPaymentId] = useState('');
+  const [transferId, setTransferId] = useState('');
 
   const orderQuery = useQuery({
     queryKey: ['admin-order', orderId],
@@ -27,8 +34,35 @@ export function OrderDetailPage() {
     enabled: !!orderId,
   });
 
+  const settleMutation = useMutation({
+    mutationFn: () =>
+      api.settleOrder(orderId!, {
+        paymentId,
+        transferId,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-order', orderId] });
+      queryClient.invalidateQueries({ queryKey: ['admin-order-trade', orderId] });
+    },
+  });
+
   const order = orderQuery.data;
   const trade = tradeQuery.data;
+  const canSettle = order && order.status !== 'SETTLED' && trade && trade.status !== 'SETTLED';
+
+  useEffect(() => {
+    if (trade?.paymentId) {
+      setPaymentId(trade.paymentId);
+    }
+    if (trade?.transferId) {
+      setTransferId(trade.transferId);
+    }
+  }, [trade?.paymentId, trade?.transferId]);
+
+  function onSettle(e: FormEvent) {
+    e.preventDefault();
+    settleMutation.mutate();
+  }
 
   if (orderQuery.isLoading) {
     return (
@@ -97,7 +131,7 @@ export function OrderDetailPage() {
         <CardHeader>
           <CardTitle className="text-lg">Trade</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           {!trade ? (
             <p className="text-sm text-muted-foreground">No trade record yet.</p>
           ) : (
@@ -123,6 +157,47 @@ export function OrderDetailPage() {
                 </div>
               )}
             </div>
+          )}
+
+          {canSettle && (
+            <form onSubmit={onSettle} className="space-y-3 border-t pt-4">
+              <p className="text-sm text-muted-foreground">
+                Mark settled after payment confirmed and on-chain transfer completed.
+              </p>
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="paymentId">Payment ID</Label>
+                  <Input
+                    id="paymentId"
+                    value={paymentId}
+                    onChange={(e) => setPaymentId(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="transferId">Transfer ID</Label>
+                  <Input
+                    id="transferId"
+                    value={transferId}
+                    onChange={(e) => setTransferId(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              {settleMutation.error && (
+                <p className="text-sm text-destructive">
+                  {settleMutation.error instanceof Error
+                    ? settleMutation.error.message
+                    : 'Settle failed'}
+                </p>
+              )}
+              {settleMutation.isSuccess && (
+                <p className="text-sm text-green-600">Order marked settled.</p>
+              )}
+              <Button type="submit" disabled={settleMutation.isPending}>
+                {settleMutation.isPending ? 'Settling…' : 'Mark settled'}
+              </Button>
+            </form>
           )}
         </CardContent>
       </Card>

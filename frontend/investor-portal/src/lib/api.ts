@@ -6,6 +6,7 @@ import type {
   ListingDetailResponse,
   Order,
   PlaceOrderRequest,
+  PlaceSellOrderRequest,
   PortfolioBffDetail,
   SpringPage,
   TokenResponse,
@@ -60,6 +61,13 @@ export const api = {
 
   placeBuyOrder(body: PlaceOrderRequest) {
     return request<Order>('/v1/orders', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
+
+  placeSellOrder(body: PlaceSellOrderRequest) {
+    return request<Order>('/v1/orders/sell', {
       method: 'POST',
       body: JSON.stringify(body),
     });

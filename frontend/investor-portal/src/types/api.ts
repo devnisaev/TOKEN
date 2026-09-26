@@ -4,6 +4,7 @@ export type {
   ListingDetailResponse,
   ListingSummary,
   PlaceOrderRequest,
+  PlaceSellOrderRequest,
   SpringPage,
   TokenContractSummary,
   TokenResponse,

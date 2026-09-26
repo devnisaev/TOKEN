@@ -3,6 +3,7 @@ export type {
   BuildingBffDetail,
   CreateBuildingRequest,
   CreateFlatRequest,
+  SettleTradeRequest,
   SpringPage,
   TokenResponse,
   UpdateBuildingRequest,
