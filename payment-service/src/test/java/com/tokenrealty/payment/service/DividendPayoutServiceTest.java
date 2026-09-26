@@ -37,9 +37,9 @@ class DividendPayoutServiceTest {
                 "2025-09",
                 List.of(
                         new DividendDistributedCommand.HolderPayout(
-                                UUID.randomUUID(), "0xA", BigDecimal.TEN),
+                                UUID.randomUUID(), UUID.randomUUID(), "0xA", BigDecimal.TEN),
                         new DividendDistributedCommand.HolderPayout(
-                                UUID.randomUUID(), "0xB", BigDecimal.ONE)));
+                                UUID.randomUUID(), UUID.randomUUID(), "0xB", BigDecimal.ONE)));
 
         when(payoutService.create(any())).thenReturn(
                 PayoutResponse.builder().id(UUID.randomUUID()).status(Payout.PayoutStatus.COMPLETED).build());

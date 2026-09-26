@@ -1,0 +1,12 @@
+tokenrealty:
+  kafka:
+    enabled: true
+
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+blockchain:
+  network: local
+  rpc-url: http://localhost:8545
+  chain-id: 31337

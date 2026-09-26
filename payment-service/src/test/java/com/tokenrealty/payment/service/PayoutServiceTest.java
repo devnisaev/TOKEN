@@ -3,6 +3,7 @@ package com.tokenrealty.payment.service;
 import com.tokenrealty.payment.blockchain.PaymentBlockchainService;
 import com.tokenrealty.payment.dto.PaymentDtos.*;
 import com.tokenrealty.payment.entity.*;
+import com.tokenrealty.payment.kafka.port.PayoutCompletedPublisher;
 import com.tokenrealty.payment.kafka.port.RentCollectedPublisher;
 import com.tokenrealty.payment.mapper.PaymentMapper;
 import com.tokenrealty.payment.repository.PayoutRepository;
@@ -27,6 +28,7 @@ class PayoutServiceTest {
     @Mock PayoutRepository payoutRepository;
     @Mock PaymentMapper mapper;
     @Mock RentCollectedPublisher rentCollectedPublisher;
+    @Mock PayoutCompletedPublisher payoutCompletedPublisher;
     @Mock PaymentBlockchainService paymentBlockchainService;
     @InjectMocks PayoutService payoutService;
 
@@ -63,5 +65,41 @@ class PayoutServiceTest {
 
         assertThat(response.status()).isEqualTo(Payout.PayoutStatus.COMPLETED);
         verify(rentCollectedPublisher).publishRentCollected(any());
+    }
+
+    @Test
+    @DisplayName("create dividend payout publishes payout completed event")
+    void createDividendPayout() {
+        UUID dividendPaymentId = UUID.randomUUID();
+        CreatePayoutRequest request = CreatePayoutRequest.builder()
+                .recipientInvestorId(UUID.randomUUID())
+                .recipientWallet("0xRecipient")
+                .amount(new BigDecimal("25.00"))
+                .currency(PaymentCurrency.USDC)
+                .purpose(Payout.PayoutPurpose.DIVIDEND)
+                .referenceId(UUID.randomUUID())
+                .dividendPaymentId(dividendPaymentId)
+                .period("2025-09")
+                .build();
+
+        Payout saved = Payout.builder()
+                .recipientInvestorId(request.recipientInvestorId())
+                .amount(request.amount())
+                .currency(request.currency())
+                .referenceId(request.referenceId())
+                .dividendPaymentId(dividendPaymentId)
+                .purpose(Payout.PayoutPurpose.DIVIDEND)
+                .status(Payout.PayoutStatus.COMPLETED)
+                .build();
+        saved.setId(UUID.randomUUID());
+
+        when(paymentBlockchainService.isEnabled()).thenReturn(false);
+        when(payoutRepository.save(any())).thenReturn(saved);
+        when(mapper.toPayoutResponse(saved)).thenReturn(
+                PayoutResponse.builder().id(saved.getId()).status(Payout.PayoutStatus.COMPLETED).build());
+
+        payoutService.create(request);
+
+        verify(payoutCompletedPublisher).publishPayoutCompleted(any());
     }
 }

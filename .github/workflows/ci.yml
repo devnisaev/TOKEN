@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  java-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Install shared libraries
+        run: ./token-realty-app/mvnw -f pom.xml -pl tokenrealty-security,tokenrealty-web,tokenrealty-jpa,tokenrealty-kafka,tokenrealty-events,tokenrealty-outbox install -q
+
+      - name: Run Java tests (core services)
+        run: |
+          ./token-realty-app/mvnw -f pom.xml -pl token-realty-app,token-issuance-service,payment-service,compliance-service,marketplace-service,rental-service test -q
+
+  hardhat-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: token-issuance-service/hardhat/package-lock.json
+
+      - name: Install Hardhat dependencies
+        working-directory: token-issuance-service/hardhat
+        run: npm ci
+
+      - name: Run Hardhat contract tests
+        working-directory: token-issuance-service/hardhat
+        run: npm test

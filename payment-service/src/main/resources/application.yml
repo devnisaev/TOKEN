@@ -54,6 +54,7 @@ tokenrealty:
       rent-collected: tokenrealty.payment.rent.collected.v1
       order-matched: tokenrealty.marketplace.order.matched.v1
       dividend-distributed: tokenrealty.issuance.dividend.distributed.v1
+      payout-completed: tokenrealty.payment.payout.completed.v1
   payment:
     blockchain:
       enabled: ${PAYMENT_BLOCKCHAIN_ENABLED:false}

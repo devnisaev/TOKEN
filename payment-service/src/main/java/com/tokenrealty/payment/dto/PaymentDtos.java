@@ -73,7 +73,8 @@ public final class PaymentDtos {
             UUID referenceId,
             UUID flatId,
             UUID tenantId,
-            @Size(max = 20) String period
+            @Size(max = 20) String period,
+            UUID dividendPaymentId
     ) {
     }
 

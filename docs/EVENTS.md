@@ -281,11 +281,43 @@
   "totalAmount": { "value": "5000.00", "currency": "USDC" },
   "period": "2025-09",
   "holderPayouts": [
-    { "investorId": "uuid", "walletAddress": "0x...", "amount": "250.00", "ownershipPct": "5.00" }
+    {
+      "dividendPaymentId": "uuid",
+      "investorId": "uuid",
+      "walletAddress": "0x...",
+      "amount": "250.00",
+      "ownershipPct": "5.00"
+    }
   ],
   "distributedAt": "2025-09-25T16:00:00Z"
 }
 ```
+
+---
+
+### `tokenrealty.payment.payout.completed.v1`
+
+| | |
+|---|---|
+| **Publisher** | Payment Service (outbox after DIVIDEND payout) |
+| **Consumers** | Token Issuance |
+| **Partition key** | `payoutId` |
+
+**Payload:**
+
+```json
+{
+  "payoutId": "uuid",
+  "dividendPaymentId": "uuid",
+  "recipientInvestorId": "uuid",
+  "recipientWallet": "0x...",
+  "purpose": "DIVIDEND",
+  "txHash": "0x...",
+  "completedAt": "2025-09-25T16:00:00Z"
+}
+```
+
+Issuance updates `DividendPayment.txHash` and status `PAID` on consume.
 
 ---
 

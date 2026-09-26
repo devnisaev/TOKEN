@@ -1,5 +1,7 @@
 package com.tokenrealty.issuance.blockchain;
 
+import com.tokenrealty.issuance.blockchain.encode.ComplianceRegistryEncoder;
+import com.tokenrealty.issuance.blockchain.encode.PropertyTokenEncoder;
 import com.tokenrealty.issuance.config.BlockchainProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -12,17 +14,11 @@ import org.web3j.tx.TransactionManager;
 import org.web3j.tx.gas.ContractGasProvider;
 
 import java.math.BigInteger;
-import java.util.List;
 
 /**
- * BlockchainConnector — low-level Web3j operations.
- *
- * All contract ABIs are called via dynamic ABI encoding since we don't
- * generate Java wrappers here (that requires a separate codegen step).
- * The service layer calls these methods and maps the results.
- *
- * For full web3j wrapper generation, run:
- *   web3j generate solidity -a artifacts/PropertyToken.json -o ../src/main/java -p com.tokenrealty.issuance.blockchain.wrapper
+ * Low-level Web3j operations. ABI encoding delegates to {@code *Encoder} helpers
+ * (Web3j {@link org.web3j.abi.FunctionEncoder}) — run {@code npm run generate-wrappers}
+ * in hardhat/ for optional full contract wrapper classes.
  */
 @Component
 @Slf4j
@@ -43,8 +39,6 @@ public class BlockchainConnector {
         this.props = props;
         this.txManager = new RawTransactionManager(web3j, credentials, props.getChainId());
     }
-
-    // ─── Network info ────────────────────────────────────────────────────────
 
     public String getConnectedNetwork() {
         try {
@@ -76,8 +70,6 @@ public class BlockchainConnector {
         }
     }
 
-    // ─── Transaction receipt ─────────────────────────────────────────────────
-
     public TransactionReceipt waitForReceipt(String txHash) throws Exception {
         int attempts = 0;
         int maxAttempts = 40;
@@ -102,15 +94,9 @@ public class BlockchainConnector {
     }
 
     public boolean isTransactionSuccessful(TransactionReceipt receipt) {
-        // EIP-658: status "0x1" = success, "0x0" = failure
         return "0x1".equals(receipt.getStatus());
     }
 
-    // ─── Raw function calls (ABI-encoded) ───────────────────────────────────
-
-    /**
-     * Call a read-only (view/pure) contract function.
-     */
     public String callContractFunction(String contractAddress, String encodedData) {
         try {
             org.web3j.protocol.core.methods.request.Transaction tx =
@@ -127,10 +113,6 @@ public class BlockchainConnector {
         }
     }
 
-    /**
-     * Send a state-changing transaction to a contract.
-     * Returns the tx hash immediately (does not wait for confirmation).
-     */
     public String sendContractTransaction(String contractAddress,
                                           String encodedData,
                                           BigInteger valueWei) throws Exception {
@@ -153,77 +135,57 @@ public class BlockchainConnector {
         return txHash;
     }
 
-    // ─── ABI function encoders ───────────────────────────────────────────────
-
-    /**
-     * Encodes: enableTransfers()
-     */
     public static String encodeEnableTransfers() {
-        return "0xaf35c6c7";
+        return PropertyTokenEncoder.encodeEnableTransfers();
     }
 
-    /**
-     * Encodes: suspendTransfers()
-     */
     public static String encodeSuspendTransfers() {
-        return "0xf7f33ff4";
+        return PropertyTokenEncoder.encodeSuspendTransfers();
     }
 
-    /**
-     * Encodes: balanceOf(address)
-     */
     public static String encodeBalanceOf(String address) {
-        // keccak256("balanceOf(address)") = 0x70a08231
-        String paddedAddress = padLeft(address.replace("0x", ""), 64);
-        return "0x70a08231" + paddedAddress;
+        return PropertyTokenEncoder.encodeBalanceOf(address);
     }
 
-    /**
-     * Encodes: transfersEnabled()
-     */
     public static String encodeTransfersEnabled() {
-        return "0xbef97c87";
+        return PropertyTokenEncoder.encodeTransfersEnabled();
     }
 
-    /**
-     * Encodes: operatorTransfer(address from, address to, uint256 amount)
-     */
     public static String encodeOperatorTransfer(String fromAddress, String toAddress, Long amount) {
-        String paddedFrom = padLeft(fromAddress.replace("0x", ""), 64);
-        String paddedTo = padLeft(toAddress.replace("0x", ""), 64);
-        String paddedAmount = padLeft(Long.toHexString(amount), 64);
-        return "0x0d1af103" + paddedFrom + paddedTo + paddedAmount;
+        return PropertyTokenEncoder.encodeOperatorTransfer(fromAddress, toAddress, amount);
     }
 
-    /**
-     * Encodes: isWhitelisted(address) — for ComplianceRegistry
-     */
     public static String encodeIsWhitelisted(String address) {
-        // keccak256("isWhitelisted(address)") first 4 bytes = 0x3af32abf
-        String paddedAddress = padLeft(address.replace("0x", ""), 64);
-        return "0x3af32abf" + paddedAddress;
-    }
-
-    // ─── Helpers ─────────────────────────────────────────────────────────────
-
-    private static String padLeft(String value, int length) {
-        StringBuilder sb = new StringBuilder(value);
-        while (sb.length() < length) sb.insert(0, '0');
-        return sb.toString();
+        return ComplianceRegistryEncoder.encodeIsWhitelisted(address);
     }
 
     public static BigInteger decodeUint256(String hexResult) {
-        if (hexResult == null || hexResult.equals("0x")) return BigInteger.ZERO;
+        if (hexResult == null || hexResult.equals("0x")) {
+            return BigInteger.ZERO;
+        }
         return new BigInteger(hexResult.replace("0x", ""), 16);
     }
 
     public static boolean decodeBool(String hexResult) {
-        if (hexResult == null || hexResult.equals("0x")) return false;
+        if (hexResult == null || hexResult.equals("0x")) {
+            return false;
+        }
         return !hexResult.replace("0x", "").replaceAll("0", "").isEmpty();
     }
 
-    public Web3j getWeb3j() { return web3j; }
-    public Credentials getCredentials() { return credentials; }
-    public TransactionManager getTxManager() { return txManager; }
-    public ContractGasProvider getGasProvider() { return gasProvider; }
+    public Web3j getWeb3j() {
+        return web3j;
+    }
+
+    public Credentials getCredentials() {
+        return credentials;
+    }
+
+    public TransactionManager getTxManager() {
+        return txManager;
+    }
+
+    public ContractGasProvider getGasProvider() {
+        return gasProvider;
+    }
 }

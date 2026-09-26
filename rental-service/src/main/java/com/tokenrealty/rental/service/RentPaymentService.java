@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,11 @@ public class RentPaymentService {
     private final RentalMapper mapper;
 
     @Transactional
+    public RentSummaryResponse summarize(UUID flatId, String period) {
+        return new RentSummaryResponse(
+                flatId, period, rentPaymentRepository.sumAmountByFlatIdAndPeriod(flatId, period));
+    }
+
     public RentPaymentResponse record(RecordRentPaymentRequest request) {
         Lease lease = leaseService.getLease(request.leaseId());
         if (lease.getStatus() != Lease.LeaseStatus.ACTIVE) {

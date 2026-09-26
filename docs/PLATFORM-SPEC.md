@@ -71,13 +71,13 @@ TokenRealty tokenizes real estate assets (buildings, flats, and other property t
 
 - [x] **Smart contracts** — `PropertyToken.sol`, `ComplianceRegistry.sol`, `MockUSDC.sol` in `hardhat/contracts/` (compliance-gated ERC-20 MVP)
 - [x] **Per-flat deploy script** — `hardhat/scripts/deployFlat.js` wired to `ContractDeployer`
-- [ ] **On-chain dividends** — Issuance publishes `dividend.distributed`; Payment on-chain USDC when enabled; Issuance DB txHash callback pending
+- [x] **On-chain dividends** — Issuance `dividend.distributed` → Payment USDC → `payout.completed` → Issuance `DividendPayment` PAID
 - [x] **Inter-service auth** — JWT via `tokenrealty-security`; service tokens on RestClient
 - [ ] **Liquibase** — disabled; Hibernate `ddl-auto: update` used instead
 - [ ] **Issuance Liquibase** — referenced in config but no migration files exist
 - [x] **Kafka** — outbox relay + consumers in Marketplace, Payment, Issuance, Compliance, Rental
 - [x] **Auth service** — JWT MVP; registry/issuance/marketplace validate Bearer tokens
-- [ ] **IPFS upload** — `ipfsCid` field stored, no upload client
+- [x] **IPFS upload** — Document Service multipart → IPFS → Registry CID
 - [x] **Payment** — MVP (escrow, confirm, release, payouts, outbox stub)
 - [x] **Rental** — MVP (leases, rent-payments, occupancy; Kafka rent → dividend pipeline)
 - [ ] **Wallet** — not started
@@ -423,9 +423,9 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 ### 9.4 Dividend implementation
 
 - [x] Dividend calculation in Issuance → `dividend.distributed` → Payment on-chain USDC payouts (when `PAYMENT_BLOCKCHAIN_ENABLED=true`)
-- [ ] Replace simulated dividend `txHash` in Issuance DB with Payment payout callback
-- [ ] Implement `@Scheduled` monthly dividend job (currently skeleton)
-- [ ] Replace hardcoded `MATIC_USD_RATE = 0.85` with price oracle or config
+- [x] Replace simulated dividend `txHash` in Issuance DB with Payment `payout.completed` callback
+- [x] Implement `@Scheduled` monthly dividend job (Rental Service rent summary)
+- [x] Replace hardcoded `MATIC_USD_RATE = 0.85` with price oracle or config — N/A (USDC-only payouts; MATIC rate removed from scope)
 
 ### 9.5 Business logic gaps
 
@@ -433,7 +433,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 - [x] Primary token transfer via `operatorTransfer` (custodial operator signs for SPV wallet)
 - [x] Hardhat contract tests (`hardhat/test/` — PropertyToken, ComplianceRegistry, MockUSDC)
 - [x] Web3j wrapper generation script (`npm run generate-wrappers`)
-- [ ] Migrate `BlockchainConnector` to generated Web3j wrappers
+- [x] Migrate `BlockchainConnector` to Web3j `FunctionEncoder` helpers (`*Encoder` classes; optional `npm run generate-wrappers` for full wrappers)
 
 ### 9.6 Documentation
 

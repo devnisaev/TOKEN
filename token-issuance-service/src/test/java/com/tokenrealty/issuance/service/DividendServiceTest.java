@@ -6,6 +6,7 @@ import com.tokenrealty.issuance.entity.TokenContract;
 import com.tokenrealty.issuance.entity.TokenHolder;
 import com.tokenrealty.web.exception.ConflictException;
 import com.tokenrealty.web.exception.ResourceNotFoundException;
+import com.tokenrealty.issuance.client.RentalClient;
 import com.tokenrealty.issuance.kafka.port.DividendDistributedPublisher;
 import com.tokenrealty.issuance.repository.DividendPaymentRepository;
 import com.tokenrealty.issuance.repository.TokenContractRepository;
@@ -36,6 +37,7 @@ class DividendServiceTest {
     @Mock TokenContractRepository contractRepository;
     @Mock TokenHolderRepository holderRepository;
     @Mock DividendDistributedPublisher dividendDistributedPublisher;
+    @Mock RentalClient rentalClient;
 
     @InjectMocks DividendService service;
 
@@ -177,5 +179,24 @@ class DividendServiceTest {
 
         // Only holder1 should receive dividends
         assertThat(result.recipientCount()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("markPaid sets txHash and PAID status")
+    void markPaid_updatesDividendPayment() {
+        UUID paymentId = UUID.randomUUID();
+        DividendPayment payment = DividendPayment.builder()
+                .status(DividendPayment.PaymentStatus.PENDING)
+                .build();
+        payment.setId(paymentId);
+
+        when(dividendRepository.findById(paymentId)).thenReturn(Optional.of(payment));
+        when(dividendRepository.save(payment)).thenReturn(payment);
+
+        service.markPaid(paymentId, "0xabc123", java.time.Instant.parse("2025-09-25T16:00:00Z"));
+
+        assertThat(payment.getStatus()).isEqualTo(DividendPayment.PaymentStatus.PAID);
+        assertThat(payment.getTxHash()).isEqualTo("0xabc123");
+        assertThat(payment.getPaidAt()).isNotNull();
     }
 }

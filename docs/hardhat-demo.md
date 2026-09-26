@@ -4,6 +4,8 @@ End-to-end on-chain flow on a local Hardhat node (chain ID 31337).
 
 **Prerequisites:** PostgreSQL, Java 21, Node.js, Kafka (`docker compose --profile kafka up -d` from repo root when using event-driven settlement).
 
+**Local profile:** run services with `--spring.profiles.active=local` (Document, Registry, Compliance, Notification, Payment, Issuance) to enable Kafka consumers/outbox relay.
+
 ---
 
 ## 0. Contract tests (CI / pre-deploy)

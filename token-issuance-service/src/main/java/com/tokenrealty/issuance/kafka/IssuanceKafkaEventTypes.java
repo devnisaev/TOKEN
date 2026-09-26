@@ -8,6 +8,7 @@ public final class IssuanceKafkaEventTypes {
     public static final String DIVIDEND_DISTRIBUTED = "tokenrealty.issuance.dividend.distributed.v1";
     public static final String KYC_APPROVED = "tokenrealty.compliance.investor.kyc-approved.v1";
     public static final String KYC_REVOKED = "tokenrealty.compliance.investor.kyc-revoked.v1";
+    public static final String PAYOUT_COMPLETED = "tokenrealty.payment.payout.completed.v1";
 
     private IssuanceKafkaEventTypes() {
     }

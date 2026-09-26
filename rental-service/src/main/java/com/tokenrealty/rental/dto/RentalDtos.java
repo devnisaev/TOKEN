@@ -48,6 +48,13 @@ public final class RentalDtos {
     ) {
     }
 
+    public record RentSummaryResponse(
+            UUID flatId,
+            String period,
+            java.math.BigDecimal totalAmount
+    ) {
+    }
+
     public record RentPaymentResponse(
             UUID id,
             UUID leaseId,

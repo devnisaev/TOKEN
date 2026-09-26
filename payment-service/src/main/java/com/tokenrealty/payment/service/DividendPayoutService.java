@@ -26,7 +26,8 @@ public class DividendPayoutService {
                     command.contractId(),
                     command.flatId(),
                     null,
-                    command.period()));
+                    command.period(),
+                    holder.dividendPaymentId()));
         }
     }
 }

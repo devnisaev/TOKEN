@@ -23,6 +23,7 @@ public class OutboxDividendDistributedPublisher implements DividendDistributedPu
     public void publishDividendDistributed(DividendDistributedEvent event) {
         List<Map<String, Object>> holderPayouts = event.holderPayouts().stream()
                 .map(holder -> Map.<String, Object>of(
+                        "dividendPaymentId", holder.dividendPaymentId(),
                         "investorId", holder.investorId(),
                         "walletAddress", holder.walletAddress(),
                         "amount", holder.amount().toPlainString(),

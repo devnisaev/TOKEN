@@ -40,6 +40,9 @@ public class Payout extends BaseEntity {
     @Column(name = "reference_id")
     private UUID referenceId;
 
+    @Column(name = "dividend_payment_id")
+    private UUID dividendPaymentId;
+
     @Column(name = "flat_id")
     private UUID flatId;
 

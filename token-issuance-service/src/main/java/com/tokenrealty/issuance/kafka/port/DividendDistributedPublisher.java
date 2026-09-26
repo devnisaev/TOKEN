@@ -20,6 +20,7 @@ public interface DividendDistributedPublisher {
     }
 
     record HolderPayout(
+            UUID dividendPaymentId,
             UUID investorId,
             String walletAddress,
             BigDecimal amount,

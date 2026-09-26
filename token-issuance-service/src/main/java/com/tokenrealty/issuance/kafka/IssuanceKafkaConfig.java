@@ -40,4 +40,10 @@ public class IssuanceKafkaConfig {
             @Value("${tokenrealty.kafka.topic.dividend-distributed}") String topic) {
         return new NewTopic(topic, PARTITIONS, REPLICAS);
     }
+
+    @Bean
+    NewTopic payoutCompletedTopic(
+            @Value("${tokenrealty.kafka.topic.payout-completed}") String topic) {
+        return new NewTopic(topic, PARTITIONS, REPLICAS);
+    }
 }

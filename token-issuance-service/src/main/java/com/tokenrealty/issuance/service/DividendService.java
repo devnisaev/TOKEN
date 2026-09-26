@@ -7,6 +7,7 @@ import com.tokenrealty.issuance.entity.TokenHolder;
 import com.tokenrealty.web.exception.ConflictException;
 import com.tokenrealty.web.exception.ResourceNotFoundException;
 import com.tokenrealty.issuance.kafka.port.DividendDistributedPublisher;
+import com.tokenrealty.issuance.client.RentalClient;
 import com.tokenrealty.issuance.repository.DividendPaymentRepository;
 import com.tokenrealty.issuance.repository.TokenContractRepository;
 import com.tokenrealty.issuance.repository.TokenHolderRepository;
@@ -35,15 +36,18 @@ public class DividendService {
     private final TokenContractRepository contractRepository;
     private final TokenHolderRepository holderRepository;
     private final DividendDistributedPublisher dividendDistributedPublisher;
+    private final RentalClient rentalClient;
 
     public DividendService(DividendPaymentRepository dividendRepository,
                            TokenContractRepository contractRepository,
                            TokenHolderRepository holderRepository,
-                           DividendDistributedPublisher dividendDistributedPublisher) {
+                           DividendDistributedPublisher dividendDistributedPublisher,
+                           RentalClient rentalClient) {
         this.dividendRepository = dividendRepository;
         this.contractRepository = contractRepository;
         this.holderRepository = holderRepository;
         this.dividendDistributedPublisher = dividendDistributedPublisher;
+        this.rentalClient = rentalClient;
     }
 
     public Page<DividendPaymentResponse> findByContract(UUID contractId, Pageable pageable) {
@@ -131,6 +135,7 @@ public class DividendService {
                         totalDistributed,
                         payments.stream()
                                 .map(payment -> new DividendDistributedPublisher.HolderPayout(
+                                        payment.getId(),
                                         payment.getInvestorId(),
                                         payment.getInvestorWallet(),
                                         payment.getAmountUsd(),
@@ -149,10 +154,24 @@ public class DividendService {
         );
     }
 
+    @Transactional
+    public void markPaid(UUID dividendPaymentId, String txHash, Instant paidAt) {
+        DividendPayment payment = dividendRepository.findById(dividendPaymentId)
+                .orElseThrow(() -> new ResourceNotFoundException("DividendPayment", dividendPaymentId));
+        if (payment.getStatus() == DividendPayment.PaymentStatus.PAID) {
+            log.debug("Dividend payment {} already marked PAID", dividendPaymentId);
+            return;
+        }
+        payment.setTxHash(txHash);
+        payment.setPaidAt(paidAt);
+        payment.setStatus(DividendPayment.PaymentStatus.PAID);
+        dividendRepository.save(payment);
+        log.info("Dividend payment {} settled tx={}", dividendPaymentId, txHash);
+    }
+
     /**
      * Scheduled job — runs on the 1st of each month at 9:00 AM.
-     * In production, this would fetch rental income from a property
-     * management integration and trigger distribution automatically.
+     * Fetches collected rent from Rental Service for the prior calendar month.
      */
     @Scheduled(cron = "0 0 9 1 * *")
     public void monthlyDistributionJob() {
@@ -160,14 +179,25 @@ public class DividendService {
         LocalDate lastMonth = LocalDate.now().minusMonths(1);
         LocalDate periodStart = lastMonth.withDayOfMonth(1);
         LocalDate periodEnd = lastMonth.withDayOfMonth(lastMonth.lengthOfMonth());
+        String period = periodStart.format(DateTimeFormatter.ofPattern("yyyy-MM"));
 
         contractRepository.findAll().stream()
                 .filter(c -> c.getStatus() == TokenContract.ContractStatus.ACTIVE)
                 .forEach(contract -> {
-                    log.info("Processing dividends for contract {} flat={}",
-                            contract.getId(), contract.getFlatId());
-                    // In production: fetch actual rental income from property management system
-                    // For now: skip automatic processing until rental income source is connected
+                    try {
+                        BigDecimal rentCollected = rentalClient.getRentCollectedForPeriod(
+                                contract.getFlatId(), period);
+                        if (rentCollected == null || rentCollected.signum() <= 0) {
+                            log.info("No rent collected for flat {} period {} — skip dividend",
+                                    contract.getFlatId(), period);
+                            return;
+                        }
+                        distribute(contract.getId(), new DistributeDividendRequest(
+                                periodStart, periodEnd, rentCollected));
+                    } catch (Exception ex) {
+                        log.warn("Monthly dividend failed for contract {}: {}",
+                                contract.getId(), ex.getMessage());
+                    }
                 });
     }
 

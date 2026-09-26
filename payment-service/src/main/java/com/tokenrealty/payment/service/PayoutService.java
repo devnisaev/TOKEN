@@ -4,6 +4,8 @@ import com.tokenrealty.payment.blockchain.PaymentBlockchainService;
 import com.tokenrealty.payment.dto.PaymentDtos.*;
 import com.tokenrealty.payment.entity.Payout;
 import com.tokenrealty.payment.kafka.events.RentCollectedEvent;
+import com.tokenrealty.payment.kafka.events.PayoutCompletedEvent;
+import com.tokenrealty.payment.kafka.port.PayoutCompletedPublisher;
 import com.tokenrealty.payment.kafka.port.RentCollectedPublisher;
 import com.tokenrealty.payment.mapper.PaymentMapper;
 import com.tokenrealty.payment.repository.PayoutRepository;
@@ -24,6 +26,7 @@ public class PayoutService {
     private final PayoutRepository payoutRepository;
     private final PaymentMapper mapper;
     private final RentCollectedPublisher rentCollectedPublisher;
+    private final PayoutCompletedPublisher payoutCompletedPublisher;
     private final PaymentBlockchainService paymentBlockchainService;
 
     public Page<PayoutResponse> findAll(UUID recipientInvestorId, Pageable pageable) {
@@ -43,6 +46,7 @@ public class PayoutService {
                 .currency(request.currency())
                 .purpose(request.purpose())
                 .referenceId(request.referenceId())
+                .dividendPaymentId(request.dividendPaymentId())
                 .flatId(request.flatId())
                 .tenantId(request.tenantId())
                 .period(request.period())
@@ -51,6 +55,17 @@ public class PayoutService {
 
         Payout saved = payoutRepository.save(payout);
         completePayout(saved);
+        if (saved.getPurpose() == Payout.PayoutPurpose.DIVIDEND
+                && saved.getDividendPaymentId() != null) {
+            payoutCompletedPublisher.publishPayoutCompleted(new PayoutCompletedEvent(
+                    saved.getId(),
+                    saved.getDividendPaymentId(),
+                    saved.getRecipientInvestorId(),
+                    saved.getRecipientWallet(),
+                    saved.getPurpose(),
+                    saved.getTxHash(),
+                    saved.getCompletedAt()));
+        }
         if (saved.getPurpose() == Payout.PayoutPurpose.RENT) {
             UUID tenantId = saved.getTenantId() != null ? saved.getTenantId() : saved.getRecipientInvestorId();
             rentCollectedPublisher.publishRentCollected(new RentCollectedEvent(
