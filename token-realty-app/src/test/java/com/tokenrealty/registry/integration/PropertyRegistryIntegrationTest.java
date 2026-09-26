@@ -1,8 +1,10 @@
-/*package com.tokenrealty.registry.integration;
+package com.tokenrealty.registry.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tokenrealty.registry.dto.PropertyDtos.*;
+import com.tokenrealty.registry.entity.Building;
 import com.tokenrealty.registry.entity.PropertyDocument;
+import com.tokenrealty.registry.entity.SpvEntity;
 import com.tokenrealty.registry.entity.Valuation;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,6 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -36,7 +37,6 @@ class PropertyRegistryIntegrationTest {
     @Autowired WebApplicationContext context;
     @Autowired ObjectMapper objectMapper;
 
-    // Build MockMvc manually with springSecurity() configurer so that
     MockMvc mockMvc;
 
     static String buildingId;
@@ -53,23 +53,24 @@ class PropertyRegistryIntegrationTest {
                 .build();
     }
 
-    // ─── 1. Building ─────────────────────────────────────────────────────────
-
     @Test @Order(1)
-    @DisplayName("1. Create building → 201")
+    @DisplayName("1. Create building with metadata → 201")
     void step1_createBuilding() throws Exception {
         var req = new CreateBuildingRequest(
                 "Sunrise Tower", "1 Chui Ave", "Bishkek", "KG",
-                "720001", 12, 48, 2022, 4800.0, 42.8746, 74.5698);
+                "720001", 12, 48, 2022, 4800.0, 42.8746, 74.5698,
+                Building.PropertyCategory.RESIDENTIAL_FLAT, "KG-CAD-001",
+                "A+", "C-2", 2020);
 
         MvcResult result = mockMvc.perform(post("/v1/buildings")
                         .with(user("admin").roles("ADMIN")).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Sunrise Tower"))
                 .andExpect(jsonPath("$.status").value("PENDING_REVIEW"))
+                .andExpect(jsonPath("$.energyEfficiencyRating").value("A+"))
+                .andExpect(jsonPath("$.zoningCode").value("C-2"))
                 .andReturn();
 
         buildingId = objectMapper.readTree(result.getResponse().getContentAsString())
@@ -82,7 +83,8 @@ class PropertyRegistryIntegrationTest {
     void step2_duplicateBuildingConflict() throws Exception {
         var req = new CreateBuildingRequest(
                 "Another Tower", "1 Chui Ave", "Bishkek", "KG",
-                null, 5, 20, 2020, 1000.0, null, null);
+                null, 5, 20, 2020, 1000.0, null, null,
+                null, null, null, null, null);
 
         mockMvc.perform(post("/v1/buildings")
                         .with(user("admin").roles("ADMIN")).with(csrf())
@@ -96,17 +98,17 @@ class PropertyRegistryIntegrationTest {
     void step3_getBuildingById() throws Exception {
         mockMvc.perform(get("/v1/buildings/{id}", buildingId).with(user("user")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Sunrise Tower"));
+                .andExpect(jsonPath("$.name").value("Sunrise Tower"))
+                .andExpect(jsonPath("$.lastRenovationYear").value(2020));
     }
-
-    // ─── 2. SPV ───────────────────────────────────────────────────────────────
 
     @Test @Order(4)
     @DisplayName("4. Register SPV → 201, building becomes APPROVED")
     void step4_registerSpv() throws Exception {
         var req = new CreateSpvRequest(
                 "Sunrise Realty SPV LLC", "KG-2024-001", "KG",
-                LocalDate.of(2024, 1, 10), "1 Chui Ave, Bishkek", null, "TAX-KG-001");
+                LocalDate.of(2024, 1, 10), "1 Chui Ave, Bishkek", null, "TAX-KG-001",
+                null, SpvEntity.OwnershipType.SPV_SHARE_EQUITY);
 
         MvcResult result = mockMvc.perform(post("/v1/buildings/{id}/spv", buildingId)
                         .with(user("admin").roles("ADMIN")).with(csrf())
@@ -134,12 +136,10 @@ class PropertyRegistryIntegrationTest {
                 .andExpect(jsonPath("$.status").value("ACTIVE"));
     }
 
-    // ─── 3. Flat ──────────────────────────────────────────────────────────────
-
     @Test @Order(6)
     @DisplayName("6. Add flat → 201")
     void step6_addFlat() throws Exception {
-        var req = new CreateFlatRequest("1A", 1, 72.5, 3, 1);
+        var req = new CreateFlatRequest("1A", 1, 72.5, 3, 1, null, null);
 
         MvcResult result = mockMvc.perform(post("/v1/buildings/{id}/flats", buildingId)
                         .with(user("admin").roles("ADMIN")).with(csrf())
@@ -156,15 +156,13 @@ class PropertyRegistryIntegrationTest {
     @Test @Order(7)
     @DisplayName("7. Duplicate flat number → 409")
     void step7_duplicateFlatConflict() throws Exception {
-        var req = new CreateFlatRequest("1A", 1, 60.0, 2, 1);
+        var req = new CreateFlatRequest("1A", 1, 60.0, 2, 1, null, null);
         mockMvc.perform(post("/v1/buildings/{id}/flats", buildingId)
                         .with(user("admin").roles("ADMIN")).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isConflict());
     }
-
-    // ─── 4. Valuation ─────────────────────────────────────────────────────────
 
     @Test @Order(8)
     @DisplayName("8. Add valuation → 201")
@@ -175,7 +173,7 @@ class PropertyRegistryIntegrationTest {
                 BigDecimal.valueOf(7_565_000), "KGS",
                 "Aibek D.", "KG-APP-0042",
                 Valuation.ValuationMethod.COMPARABLE_SALES,
-                BigDecimal.valueOf(6_000), "Market analysis");
+                BigDecimal.valueOf(6_000), null, null, "Market analysis");
 
         MvcResult result = mockMvc.perform(post("/v1/flats/{id}/valuations", flatId)
                         .with(user("appraiser").roles("APPRAISER")).with(csrf())
@@ -196,8 +194,6 @@ class PropertyRegistryIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isCurrent").value(true));
     }
-
-    // ─── 5. Documents ─────────────────────────────────────────────────────────
 
     @Test @Order(10)
     @DisplayName("10. Register title deed → 201")
@@ -233,8 +229,6 @@ class PropertyRegistryIntegrationTest {
                 .andExpect(status().isConflict());
     }
 
-    // ─── 6. Tokenize ──────────────────────────────────────────────────────────
-
     @Test @Order(13)
     @DisplayName("13. Set token info → TOKENIZED")
     void step13_setTokenInfo() throws Exception {
@@ -246,8 +240,6 @@ class PropertyRegistryIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("TOKENIZED"));
     }
-
-    // ─── 7. Delete protection ─────────────────────────────────────────────────
 
     @Test @Order(14)
     @DisplayName("14. Delete TOKENIZED flat → 409")
@@ -263,8 +255,6 @@ class PropertyRegistryIntegrationTest {
                 .andExpect(status().isConflict());
     }
 
-    // ─── 8. Role enforcement ─────────────────────────────────────────────────
-
     @Test @Order(16)
     @DisplayName("16. INVESTOR can read flat → 200")
     void step16_investorCanReadFlat() throws Exception {
@@ -278,7 +268,8 @@ class PropertyRegistryIntegrationTest {
     void step17_investorCannotCreateBuilding() throws Exception {
         var req = new CreateBuildingRequest(
                 "Investor Tower", "99 Side St", "Bishkek", "KG",
-                null, 3, 10, 2023, 500.0, null, null);
+                null, 3, 10, 2023, 500.0, null, null,
+                null, null, null, null, null);
 
         mockMvc.perform(post("/v1/buildings")
                         .with(user("investor").roles("INVESTOR")).with(csrf())
@@ -286,4 +277,4 @@ class PropertyRegistryIntegrationTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isForbidden());
     }
-}*/
+}
