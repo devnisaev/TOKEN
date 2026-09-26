@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CheckCircle2, Loader2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
+import { EmptyState } from '@tokenrealty/shared-ui';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { formatUsd } from '@/lib/utils';
@@ -12,6 +13,10 @@ import { Label } from '@/components/ui/label';
 function currentPeriod(): string {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function isOverduePeriod(period: string): boolean {
+  return period < currentPeriod();
 }
 
 export function LeasePage() {
@@ -74,15 +79,19 @@ export function LeasePage() {
 
   if (!lease) {
     return (
-      <Card>
-        <CardContent className="py-10 text-center text-muted-foreground">
-          No active lease found. Contact your property manager.
-        </CardContent>
-      </Card>
+      <EmptyState
+        title="No active lease"
+        description="Contact your property manager if you expect a lease to appear here."
+      />
     );
   }
 
-  const paidThisPeriod = paymentsQuery.data?.some((p) => p.period === period && p.status !== 'FAILED');
+  const paidThisPeriod = paymentsQuery.data?.some(
+    (p) => p.period === period && p.status !== 'FAILED',
+  );
+  const currentMonth = currentPeriod();
+  const rentDueNow = period === currentMonth && !paidThisPeriod;
+  const overdue = isOverduePeriod(period) && !paidThisPeriod;
 
   return (
     <div className="space-y-6">
@@ -90,6 +99,27 @@ export function LeasePage() {
         <h1 className="text-3xl font-bold tracking-tight">My lease</h1>
         <p className="text-muted-foreground">Pay monthly rent to your SPV wallet</p>
       </div>
+
+      {rentDueNow && (
+        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+          <div>
+            <p className="font-medium">Rent due for {currentMonth}</p>
+            <p className="mt-0.5 text-amber-800">
+              {formatUsd(lease.monthlyRentUsd)} is due by the 1st of the month.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {overdue && (
+        <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+          <p>
+            Rent for <strong>{period}</strong> is overdue. Please pay as soon as possible.
+          </p>
+        </div>
+      )}
 
       {leases.length > 1 && (
         <div className="flex flex-wrap gap-2">
@@ -148,6 +178,7 @@ export function LeasePage() {
                   onChange={(e) => setPeriod(e.target.value)}
                   required
                 />
+                <p className="text-xs text-muted-foreground">Due by the 1st of each month</p>
               </div>
               {payMutation.error && (
                 <p className="text-sm text-destructive">
@@ -168,8 +199,12 @@ export function LeasePage() {
         </CardHeader>
         <CardContent>
           {paymentsQuery.isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
-          {paymentsQuery.data?.length === 0 && (
-            <p className="text-sm text-muted-foreground">No payments yet.</p>
+          {!paymentsQuery.isLoading && paymentsQuery.data?.length === 0 && (
+            <EmptyState
+              title="No payments yet"
+              description="Your rent payments will appear here after you pay."
+              className="py-6"
+            />
           )}
           <ul className="space-y-2">
             {paymentsQuery.data?.map((payment) => (
