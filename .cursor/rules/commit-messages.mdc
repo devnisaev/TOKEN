@@ -1,0 +1,42 @@
+---
+description: Commit message format — TOKEN-NNN change index prefix
+alwaysApply: true
+---
+
+# Commit Messages — TOKEN-NNN Index
+
+Every git commit in this repo must start with a **TOKEN-NNN** prefix (3-digit, zero-padded). These are local change indexes for tracking — not Jira/Linear tickets.
+
+## Format
+
+```text
+TOKEN-NNN: Imperative summary sentence.
+
+Optional body when the why is not obvious.
+```
+
+## Rules
+
+* Prefix is **required** on every commit the agent creates
+* One logical change per commit; new index for each commit
+* Before committing, run `git log --oneline -20` and use the next free number (max existing + 1). This batch starts at `TOKEN-001` if none exist yet
+* Summary: imperative mood, ≤72 chars after the prefix
+* Do not squash unrelated work under one TOKEN id
+
+## Examples
+
+```text
+TOKEN-001: Add shared outbound REST infrastructure in tokenrealty-web.
+
+TOKEN-002: Extend ServiceRestClientBuilder with timeout and trace propagation.
+
+TOKEN-003: Migrate marketplace PaymentClient to DownstreamRestClientSupport.
+```
+
+## When committing for the user
+
+1. Split staged work into logical commits
+2. Assign sequential TOKEN-NNN ids
+3. Push only when explicitly asked (user may ask commit + push together)
+
+Human doc: [docs/rules/commit-messages.md](../../docs/rules/commit-messages.md).

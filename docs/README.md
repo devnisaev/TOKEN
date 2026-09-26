@@ -34,6 +34,7 @@ Central documentation for the TokenRealty real-estate tokenization platform.
 | [rules/tenant-portal.md](rules/tenant-portal.md) | [tenant-portal.mdc](../.cursor/rules/tenant-portal.mdc) |
 | [rules/api-gateway-bff.md](rules/api-gateway-bff.md) | — (BFF aggregates on API Gateway) |
 | [rules/observability.md](rules/observability.md) | — (traceId, JSON logs, Prometheus) |
+| [rules/commit-messages.md](rules/commit-messages.md) | [commit-messages.mdc](../.cursor/rules/commit-messages.mdc) |
 
 Cursor skills (workflows — see [AGENTS.md](../AGENTS.md)):
 

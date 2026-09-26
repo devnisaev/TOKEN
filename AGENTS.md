@@ -28,8 +28,9 @@ Read and follow rules in `.cursor/rules/`:
 | [investor-portal.mdc](.cursor/rules/investor-portal.mdc) | React investor portal — Vite, gateway BFF, wagmi |
 | [admin-dashboard.mdc](.cursor/rules/admin-dashboard.mdc) | React admin dashboard — buildings, KYC review |
 | [tenant-portal.mdc](.cursor/rules/tenant-portal.mdc) | React tenant portal — lease view, rent payment |
+| [commit-messages.mdc](.cursor/rules/commit-messages.mdc) | **Every commit** — `TOKEN-NNN:` prefix (change index) |
 
-Human-readable expansions: [docs/rules/](docs/rules/) — tier-1 invariants in [BUSINESS_RULES.md](docs/BUSINESS_RULES.md); cross-service modules in [shared-libraries.md](docs/rules/shared-libraries.md)
+Human-readable expansions: [docs/rules/](docs/rules/) — incl. [commit-messages.md](docs/rules/commit-messages.md) — tier-1 invariants in [BUSINESS_RULES.md](docs/BUSINESS_RULES.md); cross-service modules in [shared-libraries.md](docs/rules/shared-libraries.md)
 
 ## Cursor skills (project)
 
