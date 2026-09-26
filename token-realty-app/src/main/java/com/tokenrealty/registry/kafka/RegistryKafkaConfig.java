@@ -28,4 +28,10 @@ public class RegistryKafkaConfig {
             @Value("${tokenrealty.kafka.topic.flat-tokenized}") String topic) {
         return new NewTopic(topic, PARTITIONS, REPLICAS);
     }
+
+    @Bean
+    NewTopic transferCompletedTopic(
+            @Value("${tokenrealty.kafka.topic.transfer-completed}") String topic) {
+        return new NewTopic(topic, PARTITIONS, REPLICAS);
+    }
 }

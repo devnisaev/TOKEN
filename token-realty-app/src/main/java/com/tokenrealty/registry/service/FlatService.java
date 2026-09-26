@@ -130,6 +130,21 @@ public class FlatService {
     }
 
     @Transactional
+    public void syncFromTransferCompleted(com.tokenrealty.registry.kafka.command.TransferCompletedCommand command) {
+        Flat flat = getOrThrow(command.flatId());
+        if (flat.getStatus() == Flat.FlatStatus.FULLY_SOLD) {
+            return;
+        }
+        if (flat.getStatus() == Flat.FlatStatus.TOKENIZED
+                && flat.getTotalTokens() != null
+                && command.tokenAmount() >= flat.getTotalTokens()) {
+            flat.setStatus(Flat.FlatStatus.FULLY_SOLD);
+            flatRepository.save(flat);
+            log.info("Flat {} marked FULLY_SOLD from transfer.completed", command.flatId());
+        }
+    }
+
+    @Transactional
     public void delete(UUID id) {
         Flat flat = getOrThrow(id);
         if (flat.getStatus() == Flat.FlatStatus.TOKENIZED || flat.getStatus() == Flat.FlatStatus.FULLY_SOLD) {
