@@ -731,8 +731,8 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] GET `/v1/integrations/deliveries` (ADMIN)
 - [x] Gateway route `/api/v1/integrations`
 - [x] Document storage webhook relay (`POST /v1/integrations/webhooks/storage/{provider}`)
-- [ ] Payment webhook migration; outbound adapter layer
-- [ ] Credential rotation via KMS
+- [x] Payment webhook relay (`POST /v1/integrations/webhooks/payment/{provider}`)
+- [x] Credential rotation via KMS/local encryption (`POST /v1/integrations/credentials/{type}/{provider}/rotate`)
 
 ---
 
@@ -1100,17 +1100,18 @@ Human-readable guide: [rules/phase-7-services.md](rules/phase-7-services.md).
 - [x] Audit Ledger consumes `settlement.recovered`, `valuation.approved`
 - [x] Kafka integration tests per consumer
 
-### 13.2 Tier 2 — Integrations (planned)
+### 13.2 Tier 2 — Integrations (implemented)
 
-- [ ] Integration Hub payment webhook relay
-- [ ] Search index enrichment from Property Registry (building name, city)
-- [ ] Document storage webhook processing (beyond ack stub)
+- [x] Integration Hub payment webhook relay (`POST /v1/integrations/webhooks/payment/{provider}`)
+- [x] Payment service webhook endpoint (`POST /v1/payments/webhooks/{provider}`)
+- [x] Search index enrichment from Property Registry (building name, city)
+- [x] Document storage webhook processing (`StorageWebhookEvent` persistence, digest dedupe)
 
-### 13.3 Tier 3 — Scale (planned)
+### 13.3 Tier 3 — Scale (implemented)
 
-- [ ] OpenSearch backend for Search service (profile-gated)
-- [ ] Integration Hub KMS credential rotation
-- [ ] Corporate Actions stock split implementation
+- [x] OpenSearch backend for Search service (`SEARCH_BACKEND=opensearch`, compose profile `opensearch`)
+- [x] Integration Hub KMS credential rotation (local AES default; `INTEGRATION_KMS_MODE=kms` for cloud KMS stub)
+- [x] Corporate Actions stock split (`POST /v1/corporate-actions/stock-splits`, `splitRatio` column)
 
 ### 13.4 Track backlog (starting 403)
 

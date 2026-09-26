@@ -35,6 +35,7 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/v1/integrations/webhooks/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/integrations/deliveries/**").hasRole("ADMIN")
+                        .requestMatchers("/v1/integrations/credentials/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

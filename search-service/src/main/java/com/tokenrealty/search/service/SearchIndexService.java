@@ -23,6 +23,8 @@ public class SearchIndexService {
 
     private final ListingIndexRepository listingIndexRepository;
     private final BuildingIndexRepository buildingIndexRepository;
+    private final BuildingEnrichmentService buildingEnrichmentService;
+    private final OptionalSearchIndexSync optionalSearchIndexSync;
     private final Clock clock;
 
     @Transactional
@@ -39,6 +41,7 @@ public class SearchIndexService {
         index.setSourceEventId(command.eventId());
         index.setIndexedAt(indexedAt);
         listingIndexRepository.save(index);
+        optionalSearchIndexSync.syncListing(index);
     }
 
     @Transactional
@@ -58,16 +61,19 @@ public class SearchIndexService {
                         .build());
 
         index.setApprovedAt(command.approvedAt());
+        buildingEnrichmentService.enrichBuilding(index, command.buildingId());
         index.setSearchText(buildBuildingSearchText(index));
         index.setSourceEventId(command.eventId());
         index.setIndexedAt(indexedAt);
         buildingIndexRepository.save(index);
+        optionalSearchIndexSync.syncBuilding(index);
     }
 
     @Transactional
     public void onValuationUpdated(ValuationUpdatedCommand command) {
         Instant indexedAt = clock.instant();
         List<ListingIndex> listings = listingIndexRepository.findByFlatId(command.flatId());
+        buildingEnrichmentService.enrichListings(listings, command.buildingId());
         for (ListingIndex listing : listings) {
             listing.setBuildingId(command.buildingId());
             listing.setNavPerTokenUsd(command.navPerTokenUsd());
@@ -75,6 +81,7 @@ public class SearchIndexService {
             listing.setIndexedAt(indexedAt);
         }
         listingIndexRepository.saveAll(listings);
+        listings.forEach(optionalSearchIndexSync::syncListing);
 
         BuildingIndex building = buildingIndexRepository.findByBuildingId(command.buildingId())
                 .orElseGet(() -> BuildingIndex.builder()
@@ -82,14 +89,17 @@ public class SearchIndexService {
                         .flatCount(0)
                         .build());
         building.setLatestNavPerTokenUsd(command.navPerTokenUsd());
+        buildingEnrichmentService.enrichBuilding(building, command.buildingId());
         building.setSearchText(buildBuildingSearchText(building));
         building.setSourceEventId(command.eventId());
         building.setIndexedAt(indexedAt);
         buildingIndexRepository.save(building);
+        optionalSearchIndexSync.syncBuilding(building);
     }
 
     private void enrichListingsFromFlatTokenized(FlatTokenizedCommand command, Instant indexedAt) {
         List<ListingIndex> listings = listingIndexRepository.findByFlatId(command.flatId());
+        buildingEnrichmentService.enrichListings(listings, command.buildingId());
         for (ListingIndex listing : listings) {
             listing.setBuildingId(command.buildingId());
             if (listing.getPriceUsd() == null) {
@@ -99,6 +109,7 @@ public class SearchIndexService {
             listing.setIndexedAt(indexedAt);
         }
         listingIndexRepository.saveAll(listings);
+        listings.forEach(optionalSearchIndexSync::syncListing);
     }
 
     private void upsertBuildingFromFlatTokenized(FlatTokenizedCommand command, Instant indexedAt) {
@@ -110,10 +121,12 @@ public class SearchIndexService {
 
         building.setFlatCount(building.getFlatCount() + 1);
         building.setLatestTokenPriceUsd(command.tokenPriceUsd());
+        buildingEnrichmentService.enrichBuilding(building, command.buildingId());
         building.setSearchText(buildBuildingSearchText(building));
         building.setSourceEventId(command.eventId());
         building.setIndexedAt(indexedAt);
         buildingIndexRepository.save(building);
+        optionalSearchIndexSync.syncBuilding(building);
     }
 
     static String buildListingSearchText(ListingIndex index) {
@@ -121,6 +134,8 @@ public class SearchIndexService {
                 index.getListingId(),
                 index.getFlatId(),
                 index.getBuildingId(),
+                index.getBuildingName(),
+                index.getCity(),
                 index.getListingType(),
                 index.getPriceUsd(),
                 index.getNavPerTokenUsd());
@@ -129,6 +144,8 @@ public class SearchIndexService {
     static String buildBuildingSearchText(BuildingIndex index) {
         return join(
                 index.getBuildingId(),
+                index.getBuildingName(),
+                index.getCity(),
                 index.getApprovedAt(),
                 index.getFlatCount(),
                 index.getLatestTokenPriceUsd(),

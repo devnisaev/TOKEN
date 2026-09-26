@@ -32,6 +32,12 @@ public class ListingIndex extends BaseEntity {
     @Column(name = "building_id")
     private UUID buildingId;
 
+    @Column(name = "building_name", length = 200)
+    private String buildingName;
+
+    @Column(length = 100)
+    private String city;
+
     @Column(name = "listing_type", length = 20)
     private String listingType;
 

@@ -20,8 +20,8 @@ public class OutboxDocumentUploadedPublisher implements DocumentUploadedPublishe
     public void publishDocumentUploaded(DocumentUploadedEvent event) {
         OutboxPayload.start()
                 .put("documentId", event.documentId())
-                .put("buildingId", event.buildingId())
-                .put("flatId", event.flatId())
+                .putIfPresent("buildingId", event.buildingId())
+                .putIfPresent("flatId", event.flatId())
                 .put("documentType", event.documentType())
                 .putIfPresent("ipfsCid", event.ipfsCid())
                 .putIfPresent("storageUrl", event.storageUrl())

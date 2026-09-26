@@ -1,6 +1,6 @@
 # Phase 7 — Event Mesh & Production Integrations
 
-**Status:** In progress (tracks 403+). Phase 6 scaffolded seven services and Tier 4 hardening; Phase 7 **completes the Kafka event mesh** and expands Integration Hub for production ops.
+**Status:** Complete (tracks 403–477). Phase 6 scaffolded seven services and Tier 4 hardening; Phase 7 **completes the Kafka event mesh**, production integrations, and scale paths.
 
 Master spec: [PLATFORM-SPEC.md §13](../PLATFORM-SPEC.md#13-phase-7--event-mesh--production-integrations) · Phase 6: [phase-6-services.md](phase-6-services.md)
 
@@ -52,7 +52,7 @@ Master spec: [PLATFORM-SPEC.md §13](../PLATFORM-SPEC.md#13-phase-7--event-mesh-
 
 ---
 
-## Tier 2 — Integrations (P2)
+## Tier 2 — Integrations (P2) — implemented
 
 | Area | Deliverable |
 |------|-------------|
@@ -62,13 +62,13 @@ Master spec: [PLATFORM-SPEC.md §13](../PLATFORM-SPEC.md#13-phase-7--event-mesh-
 
 ---
 
-## Tier 3 — Scale (P3)
+## Tier 3 — Scale (P3) — implemented
 
 | Area | Deliverable |
 |------|-------------|
-| Search | OpenSearch/Elasticsearch backend (profile-gated) |
-| Integration Hub | KMS-backed credential rotation per provider |
-| Corporate Actions | Stock split implementation (schema exists) |
+| Search | OpenSearch backend (`tokenrealty.search.backend=opensearch`, compose profile `opensearch`) |
+| Integration Hub | KMS-backed credential rotation (`POST /v1/integrations/credentials/{type}/{provider}/rotate`) |
+| Corporate Actions | Stock split (`POST /v1/corporate-actions/stock-splits`) |
 
 ---
 
@@ -80,6 +80,11 @@ Master spec: [PLATFORM-SPEC.md §13](../PLATFORM-SPEC.md#13-phase-7--event-mesh-
 | `SettlementStuckReportingIntegrationTest` | reporting-service |
 | `SettlementNotificationIntegrationTest` | notification-service |
 | Extend `AuditKafkaIntegrationTest` | audit-ledger-service |
+| `WebhookRelayIntegrationTest` (payment path) | integration-hub-service |
+| `StorageWebhookIntegrationTest` | document-service |
+| `SearchKafkaIntegrationTest` (Registry enrichment) | search-service |
+| `IntegrationCredentialIntegrationTest` | integration-hub-service |
+| `StockSplitIntegrationTest` | corporate-actions-service |
 
 CI: add to `kafka-integration-tests` job in `.github/workflows/ci.yml`.
 

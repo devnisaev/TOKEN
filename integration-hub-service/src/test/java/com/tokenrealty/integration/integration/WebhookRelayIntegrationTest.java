@@ -2,6 +2,7 @@ package com.tokenrealty.integration.integration;
 
 import com.tokenrealty.integration.client.ComplianceClient;
 import com.tokenrealty.integration.client.DocumentClient;
+import com.tokenrealty.integration.client.PaymentClient;
 import com.tokenrealty.integration.entity.IntegrationDelivery;
 import com.tokenrealty.integration.entity.IntegrationDeliveryStatus;
 import com.tokenrealty.integration.entity.IntegrationType;
@@ -40,6 +41,7 @@ class WebhookRelayIntegrationTest {
 
     @MockitoBean ComplianceClient complianceClient;
     @MockitoBean DocumentClient documentClient;
+    @MockitoBean PaymentClient paymentClient;
 
     @BeforeEach
     void cleanDeliveries() {
@@ -127,6 +129,25 @@ class WebhookRelayIntegrationTest {
         assertThat(delivery.getStatus()).isEqualTo(IntegrationDeliveryStatus.FAILED);
         assertThat(delivery.getAttempts()).isEqualTo(1);
         assertThat(delivery.getLastError()).contains("Document service unavailable");
+    }
+
+    @Test
+    void paymentWebhook_relaysToPaymentAndMarksDelivered() throws Exception {
+        String body = "{\"paymentId\":\"550e8400-e29b-41d4-a716-446655440000\",\"txHash\":\"0xabc123\"}";
+
+        mockMvc.perform(post("/v1/integrations/webhooks/payment/stripe")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-Payload-Digest", "pay-digest")
+                        .header("X-Signature", "pay-sig")
+                        .content(body))
+                .andExpect(status().isNoContent());
+
+        verify(paymentClient).forwardPaymentWebhook("stripe", body, "pay-digest", "pay-sig");
+
+        IntegrationDelivery delivery = deliveryRepository.findAll().getFirst();
+        assertThat(delivery.getIntegrationType()).isEqualTo(IntegrationType.PAYMENT);
+        assertThat(delivery.getProvider()).isEqualTo("stripe");
+        assertThat(delivery.getStatus()).isEqualTo(IntegrationDeliveryStatus.DELIVERED);
     }
 
     @Test

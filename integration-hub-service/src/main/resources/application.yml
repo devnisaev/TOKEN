@@ -21,6 +21,8 @@ services:
     url: ${COMPLIANCE_URL:http://localhost:8087/api}
   document:
     url: ${DOCUMENT_URL:http://localhost:8088/api}
+  payment:
+    url: ${PAYMENT_URL:http://localhost:8085/api}
 
 tokenrealty:
   jwt:
@@ -31,6 +33,10 @@ tokenrealty:
       max-attempts: 5
       base-backoff-seconds: 30
       poll-ms: 5000
+    kms:
+      mode: ${INTEGRATION_KMS_MODE:local}
+      local-key: ${INTEGRATION_KMS_LOCAL_KEY:dev-integration-kms-key-change-me}
+      key-id: ${INTEGRATION_KMS_KEY_ID:alias/tokenrealty-integration}
 
 management:
   endpoints:

@@ -40,6 +40,9 @@ public class CorporateAction extends BaseEntity {
     @Column(name = "gross_amount_usd", nullable = false, precision = 19, scale = 2)
     private BigDecimal grossAmountUsd;
 
+    @Column(name = "split_ratio", precision = 10, scale = 4)
+    private BigDecimal splitRatio;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private CorporateActionStatus status;

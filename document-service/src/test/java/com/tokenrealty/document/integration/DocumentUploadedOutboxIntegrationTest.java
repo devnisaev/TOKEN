@@ -15,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -38,6 +39,7 @@ class DocumentUploadedOutboxIntegrationTest {
 
     @MockitoBean DocumentStorageRouter storageRouter;
     @MockitoBean PropertyRegistryClient registryClient;
+    @MockitoBean KafkaTemplate<String, String> kafkaTemplate;
 
     @BeforeEach
     void clearOutbox() {
@@ -54,13 +56,19 @@ class DocumentUploadedOutboxIntegrationTest {
 
         when(storageRouter.store(any(), eq("deed.pdf"), eq(DocumentType.TITLE_DEED)))
                 .thenReturn(new StorageResult("bafyOutboxCid", null));
-        when(registryClient.registerForBuilding(eq(buildingId), any(RegisterDocumentRequest.class)))
-                .thenReturn(DocumentResponse.builder()
-                        .id(documentId)
-                        .documentName("Title deed")
-                        .documentType(DocumentType.TITLE_DEED)
-                        .ipfsCid("bafyOutboxCid")
-                        .build());
+        when(registryClient.registerForBuilding(any(), any(RegisterDocumentRequest.class)))
+                .thenReturn(new DocumentResponse(
+                        documentId,
+                        "Title deed",
+                        DocumentType.TITLE_DEED,
+                        "bafyOutboxCid",
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null));
 
         documentUploadService.upload(file, "Title deed", DocumentType.TITLE_DEED, buildingId, null);
 

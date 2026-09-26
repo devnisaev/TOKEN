@@ -23,7 +23,17 @@ server:
   servlet:
     context-path: /api
 
+services:
+  property-registry:
+    url: ${PROPERTY_REGISTRY_URL:http://localhost:8081/api}
+
 tokenrealty:
+  search:
+    backend: ${SEARCH_BACKEND:postgres}
+    opensearch:
+      url: ${OPENSEARCH_URL:http://localhost:9200}
+      listings-index: tokenrealty-listings
+      buildings-index: tokenrealty-buildings
   jwt:
     secret: ${JWT_SECRET:dev-secret-change-in-production-min-32-chars!!}
     issuer: tokenrealty-auth

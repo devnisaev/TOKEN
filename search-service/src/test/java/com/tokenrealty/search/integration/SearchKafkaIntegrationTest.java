@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tokenrealty.events.EventEnvelope;
 import com.tokenrealty.kafka.consume.KafkaEventConsumer;
 import com.tokenrealty.search.kafka.SearchKafkaEventTypes;
+import com.tokenrealty.search.client.PropertyRegistryClient;
+import com.tokenrealty.search.client.PropertyRegistryClient.BuildingView;
 import com.tokenrealty.search.kafka.command.BuildingApprovedCommand;
 import com.tokenrealty.search.kafka.command.FlatTokenizedCommand;
 import com.tokenrealty.search.kafka.command.ListingCreatedCommand;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -27,6 +30,10 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import java.util.Optional;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -39,10 +46,13 @@ class SearchKafkaIntegrationTest {
     @Autowired BuildingIndexRepository buildingIndexRepository;
     @Autowired ObjectMapper objectMapper;
 
+    @MockitoBean PropertyRegistryClient propertyRegistryClient;
+
     @BeforeEach
     void clean() {
         listingIndexRepository.deleteAll();
         buildingIndexRepository.deleteAll();
+        when(propertyRegistryClient.findBuilding(any())).thenReturn(Optional.empty());
     }
 
     @Test
@@ -62,6 +72,8 @@ class SearchKafkaIntegrationTest {
     @DisplayName("building.approved and flat.tokenized update building index")
     void buildingApprovedAndFlatTokenized_indexBuilding() throws Exception {
         UUID buildingId = UUID.randomUUID();
+        when(propertyRegistryClient.findBuilding(buildingId))
+                .thenReturn(Optional.of(new BuildingView(buildingId, "Skyline Tower", "Dubai")));
         publishBuildingApproved(buildingId, UUID.randomUUID());
         publishFlatTokenized(UUID.randomUUID(), buildingId, UUID.randomUUID());
 
@@ -70,6 +82,11 @@ class SearchKafkaIntegrationTest {
         assertThat(building.getFlatCount()).isEqualTo(1);
         assertThat(building.getApprovedAt()).isNotNull();
         assertThat(building.getLatestTokenPriceUsd()).isEqualByComparingTo(new BigDecimal("100.00"));
+        assertThat(building.getBuildingName()).isEqualTo("Skyline Tower");
+        assertThat(building.getCity()).isEqualTo("Dubai");
+
+        var results = searchQueryService.searchBuildings("Skyline", Pageable.unpaged());
+        assertThat(results.getTotalElements()).isEqualTo(1);
     }
 
     @Test
