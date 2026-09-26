@@ -241,16 +241,32 @@ Run one test: `./mvnw test -Dtest=BuyFlowContainersIntegrationTest` (requires Do
 
 ---
 
-## Notification preferences (stub)
+## Notification preferences (JPA)
 
-Notification Service exposes in-memory preference storage (MVP):
+Notification Service persists per-user settings in `notification_preferences` (`NotificationPreference` entity):
 
 | Method | Path |
 |--------|------|
 | `GET` | `/v1/notifications/preferences/{userId}` |
 | `PATCH` | `/v1/notifications/preferences/{userId}` |
 
-Fields: `emailEnabled`, `tradeAlerts`, `dividendAlerts`, `rentReminders`. Replace with JPA entity when persisting per-user settings.
+Fields: `emailEnabled`, `tradeAlerts`, `dividendAlerts`, `rentReminders`. Missing rows return defaults (all `true`); `update` upserts by `userId`.
+
+Test: `NotificationPreferenceServiceTest` (H2, `@ActiveProfiles("test")`).
+
+---
+
+## WireMock downstream client tests
+
+Lightweight integration tests for `RestClient` wrappers without a full Spring context:
+
+| Test | Service | Verifies |
+|------|---------|----------|
+| `PropertyRegistryClientIntegrationTest` | token-issuance-service | `PATCH /v1/flats/{id}/token-info` callback to Registry |
+
+Pattern: start `WireMockServer` on a fixed port, build `RestClient` with `JdkClientHttpRequestFactory` (PATCH support), stub `/api/v1/flats/.+/token-info` when base URL includes `/api`.
+
+Run: `./mvnw test -Dtest=PropertyRegistryClientIntegrationTest` in `token-issuance-service/`.
 
 ---
 

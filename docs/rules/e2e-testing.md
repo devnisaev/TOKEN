@@ -28,8 +28,18 @@ Requires a live gateway and seeded demo data:
 ./scripts/seed-demo.sh
 
 export E2E_GATEWAY_URL=http://localhost:8080
+./scripts/e2e-run.sh
+```
+
+Or manually:
+
+```bash
+./scripts/wait-for-services.sh              # default: gateway + auth + registry + marketplace + payment
+SERVICES="8080" ./scripts/wait-for-services.sh --timeout 120   # gateway only
 cd frontend/e2e && npm run test:full
 ```
+
+`e2e-run.sh` waits for `:8080`, runs `npm ci`, installs Playwright Chromium, then `npm run test:full`. Pass `--no-wait` to skip the health check.
 
 Full specs skip automatically when `E2E_GATEWAY_URL` is unset.
 

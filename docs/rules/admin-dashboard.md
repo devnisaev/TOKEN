@@ -82,5 +82,6 @@ Gateway CORS allows `http://localhost:5174` (`tokenrealty.gateway.cors.allowed-o
 - [x] Order detail page with manual settle form (`SettleTradeRequest`)
 - [x] Compliance status filter tabs
 - [x] Document review drill-down (building link, metadata)
-- [ ] Trade timeline / event log per order
+- [x] Settlement timeline on order detail (`OrderStatusTimeline` from `@tokenrealty/shared-ui`)
+- [ ] Trade event log / audit trail per order
 - [x] E2E smoke + full KYC flow (`frontend/e2e/tests/full/admin-kyc-flow.spec.ts`)

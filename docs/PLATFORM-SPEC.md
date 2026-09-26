@@ -419,7 +419,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 
 - [x] Add service account credentials to Auth Service (`DevDataInitializer`)
 - [x] Configure `PropertyRegistryClient` / `TokenIssuanceClient` RestClient with Bearer service token
-- [ ] Test Issuance → Registry `PATCH /v1/flats/{id}/token-info` callback end-to-end
+- [x] Test Issuance → Registry `PATCH /v1/flats/{id}/token-info` callback end-to-end (`PropertyRegistryClientIntegrationTest`)
 - [x] Document service-to-service auth pattern (`tokenrealty-security` + `ServiceTokenProvider`)
 
 ### 9.3 Database schema management
