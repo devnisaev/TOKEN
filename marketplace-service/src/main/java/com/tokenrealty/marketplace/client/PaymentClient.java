@@ -1,22 +1,20 @@
 package com.tokenrealty.marketplace.client;
 
-import com.tokenrealty.web.exception.ValidationException;
+import com.tokenrealty.web.rest.DownstreamRestClientSupport;
+import com.tokenrealty.web.rest.DownstreamServices;
+import com.tokenrealty.web.rest.RestClientOperations;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientResponseException;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Component
-public class PaymentClient {
-
-    private final RestClient restClient;
+public class PaymentClient extends DownstreamRestClientSupport {
 
     public PaymentClient(@Qualifier("paymentRestClient") RestClient restClient) {
-        this.restClient = restClient;
+        super(restClient);
     }
 
     public InitiatePaymentResponse initiateTokenPurchase(
@@ -27,21 +25,16 @@ public class PaymentClient {
     ) {
         InitiatePaymentRequest body = new InitiatePaymentRequest(
                 orderId, payerId, payerWallet, amountUsd, "USDC", "TOKEN_PURCHASE");
-        try {
-            return restClient.post()
-                    .uri("/v1/payments")
-                    .header("Idempotency-Key", "marketplace-order-" + orderId)
-                    .body(body)
-                    .retrieve()
-                    .body(InitiatePaymentResponse.class);
-        } catch (RestClientResponseException ex) {
-            if (ex.getStatusCode().is5xxServerError()) {
-                throw new ValidationException("Payment service unavailable");
-            }
-            throw new ValidationException("Payment initiation failed: " + ex.getStatusText());
-        } catch (ResourceAccessException ex) {
-            throw new ValidationException("Payment service unavailable");
-        }
+        return post(
+                "/v1/payments",
+                body,
+                InitiatePaymentResponse.class,
+                DownstreamServices.PAYMENT,
+                RestClientOperations.idempotencyKey("marketplace-order-" + orderId));
+    }
+
+    public void releaseEscrow(UUID paymentId) {
+        patchVoid("/v1/payments/{id}/release", DownstreamServices.PAYMENT, paymentId);
     }
 
     public record InitiatePaymentRequest(
@@ -66,21 +59,5 @@ public class PaymentClient {
             String escrowWalletAddress,
             String status
     ) {
-    }
-
-    public void releaseEscrow(UUID paymentId) {
-        try {
-            restClient.patch()
-                    .uri("/v1/payments/{id}/release", paymentId)
-                    .retrieve()
-                    .toBodilessEntity();
-        } catch (RestClientResponseException ex) {
-            if (ex.getStatusCode().is5xxServerError()) {
-                throw new ValidationException("Payment service unavailable");
-            }
-            throw new ValidationException("Escrow release failed: " + ex.getStatusText());
-        } catch (ResourceAccessException ex) {
-            throw new ValidationException("Payment service unavailable");
-        }
     }
 }

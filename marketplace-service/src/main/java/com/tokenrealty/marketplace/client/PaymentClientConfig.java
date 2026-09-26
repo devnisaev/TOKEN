@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 
+import java.time.Duration;
+
 @Configuration
 public class PaymentClientConfig {
 
@@ -16,6 +18,6 @@ public class PaymentClientConfig {
             @Value("${services.payment.url}") String baseUrl,
             ObjectProvider<ServiceTokenProvider> serviceTokenProvider
     ) {
-        return ServiceRestClientBuilder.build(baseUrl, serviceTokenProvider);
+        return ServiceRestClientBuilder.build(baseUrl, Duration.ofSeconds(10), serviceTokenProvider);
     }
 }
