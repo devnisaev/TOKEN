@@ -86,6 +86,8 @@ export interface components {
       /** @enum {string} */
       currency: "USDC" | "USD" | "MATIC" | "ETH";
       paymentType?: string;
+      /** Format: uuid */
+      sellerRecipientId?: string | null;
     };
     ConfirmPaymentRequest: {
       txHash: string;

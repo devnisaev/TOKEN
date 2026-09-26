@@ -106,6 +106,7 @@ components:
         amount: { type: number }
         currency: { type: string, enum: [USDC, USD, MATIC, ETH] }
         paymentType: { type: string }
+        sellerRecipientId: { type: string, format: uuid, nullable: true }
     ConfirmPaymentRequest:
       type: object
       required: [txHash]
