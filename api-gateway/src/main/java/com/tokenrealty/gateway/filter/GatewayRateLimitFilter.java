@@ -1,6 +1,7 @@
 package com.tokenrealty.gateway.filter;
 
 import com.tokenrealty.gateway.config.GatewayRateLimitProperties;
+import com.tokenrealty.gateway.ratelimit.RateLimitCounterStore;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,16 +11,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.time.Instant;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @RequiredArgsConstructor
 public class GatewayRateLimitFilter extends OncePerRequestFilter {
 
     private final GatewayRateLimitProperties properties;
-    private final Map<String, WindowCounter> counters = new ConcurrentHashMap<>();
+    private final RateLimitCounterStore counterStore;
 
     @Override
     protected void doFilterInternal(
@@ -31,23 +28,13 @@ public class GatewayRateLimitFilter extends OncePerRequestFilter {
             return;
         }
 
-        String key = clientKey(request);
-        long windowStart = Instant.now().getEpochSecond() / 60;
-        WindowCounter counter = counters.computeIfAbsent(key, ignored -> new WindowCounter(windowStart));
-
-        synchronized (counter) {
-            if (counter.windowStart != windowStart) {
-                counter.windowStart = windowStart;
-                counter.count.set(0);
-            }
-            if (counter.count.incrementAndGet() > properties.getRequestsPerMinute()) {
-                response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-                response.setContentType("application/problem+json");
-                response.getWriter().write("""
-                        {"type":"about:blank","title":"Too Many Requests","status":429,\
-                        "detail":"Rate limit exceeded. Try again in a minute."}""");
-                return;
-            }
+        if (!counterStore.tryConsume(clientKey(request), properties.getRequestsPerMinute())) {
+            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+            response.setContentType("application/problem+json");
+            response.getWriter().write("""
+                    {"type":"about:blank","title":"Too Many Requests","status":429,\
+                    "detail":"Rate limit exceeded. Try again in a minute."}""");
+            return;
         }
 
         filterChain.doFilter(request, response);
@@ -64,14 +51,5 @@ public class GatewayRateLimitFilter extends OncePerRequestFilter {
             return forwarded.split(",")[0].trim();
         }
         return request.getRemoteAddr();
-    }
-
-    private static final class WindowCounter {
-        private long windowStart;
-        private final AtomicInteger count = new AtomicInteger();
-
-        private WindowCounter(long windowStart) {
-            this.windowStart = windowStart;
-        }
     }
 }

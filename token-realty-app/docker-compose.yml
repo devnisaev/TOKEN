@@ -54,6 +54,18 @@ services:
     profiles:
       - app   # only starts with: docker compose --profile app up
 
+  # ── Redis (gateway rate limiting, service caches) ─────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: tokenrealty-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # ── Kafka (KRaft single node) ───────────────────────────────────────────────
   kafka:
     image: bitnami/kafka:3.8

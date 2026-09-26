@@ -1,6 +1,10 @@
 spring:
   application:
     name: api-gateway
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
   cache:
     type: caffeine
     cache-names: bff-listings, bff-flats
@@ -40,6 +44,7 @@ tokenrealty:
     rate-limit:
       enabled: ${GATEWAY_RATE_LIMIT_ENABLED:true}
       requests-per-minute: ${GATEWAY_RATE_LIMIT_RPM:120}
+      backend: ${GATEWAY_RATE_LIMIT_BACKEND:memory}
     bff:
       cache:
         ttl-seconds: ${GATEWAY_BFF_CACHE_TTL:60}

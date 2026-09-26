@@ -1,0 +1,30 @@
+spring:
+  cache:
+    type: caffeine
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+
+services:
+  auth:
+    url: http://localhost:8083/api
+  property-registry:
+    url: http://localhost:8081/api
+  token-issuance:
+    url: http://localhost:8082/api
+  marketplace:
+    url: http://localhost:8084/api
+  wallet:
+    url: http://localhost:8090/api
+
+tokenrealty:
+  jwt:
+    secret: test-jwt-secret-min-32-characters-long!!
+    issuer: tokenrealty-auth
+  service-account:
+    client-id: api-gateway
+    client-secret: gateway-secret
+  gateway:
+    rate-limit:
+      backend: memory
