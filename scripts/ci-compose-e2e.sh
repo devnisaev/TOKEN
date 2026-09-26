@@ -44,8 +44,14 @@ export E2E_GATEWAY_URL=http://localhost:8080
 npx playwright test \
   tests/full/investor-login-flow.spec.ts \
   tests/full/investor-portfolio.spec.ts \
+  tests/full/investor-dividend-history.spec.ts \
+  tests/full/investor-notification-preferences.spec.ts \
+  tests/full/investor-secondary-buy-settled.spec.ts \
   tests/full/admin-kyc-flow.spec.ts \
+  tests/full/admin-building-detail.spec.ts \
+  tests/full/admin-document-review-flow.spec.ts \
   tests/full/tenant-maintenance-flow.spec.ts \
+  tests/full/tenant-rent-flow.spec.ts \
   tests/full/admin-maintenance-flow.spec.ts
 
-echo "==> Compose E2E subset passed."
+echo "==> Compose E2E subset passed (11 specs)."
