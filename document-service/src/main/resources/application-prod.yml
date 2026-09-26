@@ -5,6 +5,14 @@ spring:
   liquibase:
     enabled: true
 
+tokenrealty:
+  document:
+    ipfs:
+      # Production: set IPFS_MODE=pinata and PINATA_JWT from secrets manager.
+      mode: ${IPFS_MODE:pinata}
+      pinata:
+        jwt: ${PINATA_JWT}
+
 logging:
   level:
     com.tokenrealty: INFO

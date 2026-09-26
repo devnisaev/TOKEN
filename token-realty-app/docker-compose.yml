@@ -91,6 +91,29 @@ services:
     profiles:
       - kafka
 
+  # ── Document Service (optional — Pinata IPFS or MinIO private storage) ───────
+  # Start with: docker compose --profile ipfs up
+  # document-service:
+  #   build:
+  #     context: ../document-service
+  #     dockerfile: Dockerfile
+  #   container_name: tokenrealty-document-service
+  #   ports:
+  #     - "8088:8088"
+  #   environment:
+  #     DB_USERNAME: postgres
+  #     DB_PASSWORD: postgres
+  #     SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/document_service
+  #     IPFS_MODE: pinata          # simulated | pinata
+  #     PINATA_JWT: ${PINATA_JWT}   # required when IPFS_MODE=pinata
+  #     MINIO_MODE: simulated       # simulated | minio (use with --profile storage)
+  #     MINIO_ENDPOINT: http://minio:9000
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   profiles:
+  #     - ipfs
+
   # ── MinIO (optional private document storage) ─────────────────────────────────
   minio:
     image: minio/minio:RELEASE.2024-12-18T13-15-44Z

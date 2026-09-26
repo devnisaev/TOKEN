@@ -2,6 +2,7 @@ import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth';
 import { api } from '@/lib/api';
+import { walletConnectEnabled } from '@/lib/wagmi';
 import { useState } from 'react';
 
 export function ConnectWalletButton() {
@@ -45,8 +46,14 @@ export function ConnectWalletButton() {
     if (user) {
       await api.createConnectSession(user.id).catch(() => undefined);
     }
-    connect({ connector: connectors[0] });
+    const connector =
+      connectors.find((c) => c.id === 'walletConnect') ??
+      connectors.find((c) => c.id === 'injected') ??
+      connectors[0];
+    connect({ connector });
   }
+
+  const connectLabel = walletConnectEnabled ? 'Connect WalletConnect' : 'Connect MetaMask';
 
   return (
     <Button
@@ -55,7 +62,7 @@ export function ConnectWalletButton() {
       disabled={isPending || connectors.length === 0}
       onClick={() => void handleConnect()}
     >
-      {isPending ? 'Connecting…' : 'Connect MetaMask'}
+      {isPending ? 'Connecting…' : connectLabel}
     </Button>
   );
 }
