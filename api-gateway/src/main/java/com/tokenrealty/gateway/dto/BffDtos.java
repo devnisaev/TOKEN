@@ -1,9 +1,12 @@
 package com.tokenrealty.gateway.dto;
 
 import com.tokenrealty.gateway.client.PropertyRegistryClient;
+import com.tokenrealty.gateway.client.TokenIssuanceClient;
+import com.tokenrealty.gateway.client.WalletClient;
 import lombok.Builder;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 public final class BffDtos {
@@ -44,6 +47,13 @@ public final class BffDtos {
             Long totalSupply,
             BigDecimal tokenPriceUsd,
             String status
+    ) {
+    }
+
+    @Builder
+    public record PortfolioBffResponse(
+            WalletClient.AggregateBalanceView balance,
+            List<TokenIssuanceClient.DividendPaymentView> recentDividends
     ) {
     }
 

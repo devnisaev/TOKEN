@@ -8,6 +8,9 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -17,6 +20,20 @@ public class TokenIssuanceClient {
 
     public TokenIssuanceClient(@Qualifier("tokenIssuanceRestClient") RestClient restClient) {
         this.restClient = restClient;
+    }
+
+    public List<DividendPaymentView> listInvestorDividends(UUID investorId) {
+        try {
+            DividendPaymentView[] body = restClient.get()
+                    .uri("/v1/investors/{investorId}/dividends", investorId)
+                    .retrieve()
+                    .body(DividendPaymentView[].class);
+            return body == null ? List.of() : List.of(body);
+        } catch (RestClientResponseException ex) {
+            throw unavailable(ex);
+        } catch (ResourceAccessException ex) {
+            throw new ValidationException("Token Issuance service unavailable");
+        }
     }
 
     public TokenContractView getContractByFlatId(UUID flatId) {
@@ -40,6 +57,23 @@ public class TokenIssuanceClient {
             return new ValidationException("Token Issuance service unavailable");
         }
         return new ValidationException("Token Issuance request failed: " + ex.getStatusText());
+    }
+
+    public record DividendPaymentView(
+            UUID id,
+            UUID contractId,
+            UUID investorId,
+            String investorWallet,
+            LocalDate periodStart,
+            LocalDate periodEnd,
+            Long tokensHeld,
+            BigDecimal ownershipPct,
+            BigDecimal grossRentalIncomeUsd,
+            BigDecimal amountUsd,
+            String txHash,
+            Instant paidAt,
+            String status,
+            Instant createdAt) {
     }
 
     public record TokenContractView(

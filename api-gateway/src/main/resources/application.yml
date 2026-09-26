@@ -16,6 +16,8 @@ services:
     url: ${TOKEN_ISSUANCE_URL:http://localhost:8082/api}
   marketplace:
     url: ${MARKETPLACE_SERVICE_URL:http://localhost:8084/api}
+  wallet:
+    url: ${WALLET_SERVICE_URL:http://localhost:8090/api}
 
 tokenrealty:
   jwt:
