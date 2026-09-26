@@ -28,6 +28,20 @@ Central documentation for the TokenRealty real-estate tokenization platform.
 | [rules/investment-limits.md](rules/investment-limits.md) | [investment-limits.mdc](../.cursor/rules/investment-limits.mdc) |
 | [rules/business-rules.md](rules/business-rules.md) | [business-rules.mdc](../.cursor/rules/business-rules.mdc) |
 
+Cursor skills (workflows — see [AGENTS.md](../AGENTS.md)):
+
+| Skill | When |
+|-------|------|
+| [.cursor/skills/java-architect/](../.cursor/skills/java-architect/SKILL.md) | Service structure, plan before implementation |
+| [.cursor/skills/java-implementation/](../.cursor/skills/java-implementation/SKILL.md) | Production Java — endpoints, Kafka, refactors |
+| [.cursor/skills/java-code-review/](../.cursor/skills/java-code-review/SKILL.md) | Review PRs for layers, Kafka, exceptions |
+| [.cursor/skills/java-debugging/](../.cursor/skills/java-debugging/SKILL.md) | Diagnose failing tests and runtime errors |
+| [.cursor/skills/java-testing/](../.cursor/skills/java-testing/SKILL.md) | Write JUnit 5 / Mockito tests |
+| [.cursor/skills/solidity-smart-contract/](../.cursor/skills/solidity-smart-contract/SKILL.md) | Solidity, Hardhat, contract security |
+| [.cursor/skills/kafka-event-architect/](../.cursor/skills/kafka-event-architect/SKILL.md) | Topics, outbox, listeners |
+| [.cursor/skills/rwa-legal-compliance/](../.cursor/skills/rwa-legal-compliance/SKILL.md) | KYC, SPV, data room, jurisdiction |
+| [.cursor/skills/web3j-blockchain-integration/](../.cursor/skills/web3j-blockchain-integration/SKILL.md) | Web3j, RPC, on-chain transfers |
+
 Additional Cursor rules (no separate human doc yet):
 
 | Rule | Description |

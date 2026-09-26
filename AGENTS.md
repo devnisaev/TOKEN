@@ -28,6 +28,20 @@ Read and follow rules in `.cursor/rules/`:
 
 Human-readable expansions: [docs/rules/](docs/rules/) — tier-1 invariants in [BUSINESS_RULES.md](docs/BUSINESS_RULES.md); cross-service modules in [shared-libraries.md](docs/rules/shared-libraries.md)
 
+## Cursor skills (project)
+
+| Skill | When |
+|-------|------|
+| [.cursor/skills/java-architect/SKILL.md](.cursor/skills/java-architect/SKILL.md) | Structure a service slice, options, plan before coding |
+| [.cursor/skills/java-implementation/SKILL.md](.cursor/skills/java-implementation/SKILL.md) | Implement endpoints, Kafka, refactors — commands, outbox, exceptions |
+| [.cursor/skills/java-code-review/SKILL.md](.cursor/skills/java-code-review/SKILL.md) | PR/diff review — layers, Kafka, exceptions, invariants |
+| [.cursor/skills/java-debugging/SKILL.md](.cursor/skills/java-debugging/SKILL.md) | Red tests, Surefire/Mockito, Kafka parse, exception status mismatches |
+| [.cursor/skills/java-testing/SKILL.md](.cursor/skills/java-testing/SKILL.md) | JUnit 5 / Mockito — service, controller, Kafka consumer tests |
+| [.cursor/skills/solidity-smart-contract/SKILL.md](.cursor/skills/solidity-smart-contract/SKILL.md) | Solidity contracts, Hardhat deploy, security review |
+| [.cursor/skills/kafka-event-architect/SKILL.md](.cursor/skills/kafka-event-architect/SKILL.md) | Kafka topics, outbox, listeners, payload records |
+| [.cursor/skills/rwa-legal-compliance/SKILL.md](.cursor/skills/rwa-legal-compliance/SKILL.md) | KYC gates, SPV metadata, IPFS data room, jurisdiction |
+| [.cursor/skills/web3j-blockchain-integration/SKILL.md](.cursor/skills/web3j-blockchain-integration/SKILL.md) | Web3j, RPC, receipts, Payment/Issuance blockchain |
+
 ## Services
 
 | Service | Port | Package |

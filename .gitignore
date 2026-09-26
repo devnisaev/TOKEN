@@ -58,10 +58,12 @@ dist/
 atlassian-ide-plugin.xml
 *.hprof
 
-# VS Code / Cursor (keep shared agent rules)
+# VS Code / Cursor (keep shared agent rules and skills)
 .vscode/
 .cursor/*
 !.cursor/rules/
+!.cursor/skills/
+!.cursor/skills/**
 
 # OS junk
 .DS_Store
