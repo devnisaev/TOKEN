@@ -1,0 +1,42 @@
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+      - com.tokenrealty.security.config.ServiceTokenAutoConfiguration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+
+  cache:
+    type: none
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+blockchain:
+  network: hardhat
+  rpc-url: http://localhost:8545
+  chain-id: 31337
+  operator-private-key: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+  gas-limit: 500000
+  compliance-registry-address: "0x0000000000000000000000000000000000000000"
+
+services:
+  property-registry:
+    url: http://127.0.0.1:9999/api
+
+tokenrealty:
+  jwt:
+    secret: test-jwt-secret-min-32-characters-long!!
+    issuer: tokenrealty-auth
+  kafka:
+    enabled: false
