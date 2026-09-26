@@ -4,8 +4,10 @@ import com.tokenrealty.registry.dto.PropertyDtos.*;
 import com.tokenrealty.registry.entity.Building;
 import com.tokenrealty.registry.entity.Flat;
 import com.tokenrealty.registry.entity.PropertyDocument;
+import com.tokenrealty.registry.kafka.command.DocumentUploadedCommand;
 import com.tokenrealty.web.exception.ConflictException;
 import com.tokenrealty.web.exception.ResourceNotFoundException;
+import com.tokenrealty.web.exception.ValidationException;
 import com.tokenrealty.registry.mapper.PropertyMapper;
 import com.tokenrealty.registry.repository.BuildingRepository;
 import com.tokenrealty.registry.repository.FlatRepository;
@@ -20,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -138,6 +141,45 @@ class DocumentServiceTest {
         assertThatThrownBy(() -> documentService.registerForBuilding(buildingId, request))
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("ipfsCid or storageUrl");
+    }
+
+    @Test
+    @DisplayName("acknowledgeUpload is no-op when document CID already matches")
+    void acknowledgeUpload_noOpWhenCidMatches() {
+        document.setId(docId);
+        when(documentRepository.findById(docId)).thenReturn(Optional.of(document));
+
+        documentService.acknowledgeUpload(new DocumentUploadedCommand(
+                docId, buildingId, null, "TITLE_DEED", "Qm123456789", Instant.now()));
+
+        verify(documentRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("acknowledgeUpload backfills missing CID from event")
+    void acknowledgeUpload_backfillsMissingCid() {
+        document.setId(docId);
+        document.setIpfsCid(null);
+        when(documentRepository.findById(docId)).thenReturn(Optional.of(document));
+        when(documentRepository.save(document)).thenReturn(document);
+
+        documentService.acknowledgeUpload(new DocumentUploadedCommand(
+                docId, buildingId, null, "TITLE_DEED", "Qm123456789", Instant.now()));
+
+        assertThat(document.getIpfsCid()).isEqualTo("Qm123456789");
+        verify(documentRepository).save(document);
+    }
+
+    @Test
+    @DisplayName("acknowledgeUpload throws ValidationException on CID mismatch")
+    void acknowledgeUpload_throwsOnCidMismatch() {
+        document.setId(docId);
+        when(documentRepository.findById(docId)).thenReturn(Optional.of(document));
+
+        assertThatThrownBy(() -> documentService.acknowledgeUpload(new DocumentUploadedCommand(
+                docId, buildingId, null, "TITLE_DEED", "QmDifferent", Instant.now())))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining("CID mismatch");
     }
 
     @Test

@@ -296,7 +296,7 @@
 | | |
 |---|---|
 | **Publisher** | Document Service |
-| **Consumers** | Property Registry |
+| **Consumers** | Property Registry, Compliance, Notification |
 | **Partition key** | `documentId` |
 
 **Payload:**

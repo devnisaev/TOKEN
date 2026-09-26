@@ -384,7 +384,7 @@ com.tokenrealty.document/
     └── outbox/                            ← OutboxWriter, OutboxDocumentUploadedPublisher, relay
 ```
 
-Upload flow: multipart → IPFS pin → Registry `PropertyDocument` with `ipfsCid` → outbox `document.uploaded`.
+Upload flow: multipart → IPFS pin → Registry `PropertyDocument` with `ipfsCid` → outbox `document.uploaded` → Registry ack + Compliance review queue + Notification email.
 
 **Notification (implemented — consumer + email):**
 

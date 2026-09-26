@@ -2,8 +2,10 @@ package com.tokenrealty.registry.service;
 
 import com.tokenrealty.registry.dto.PropertyDtos.*;
 import com.tokenrealty.registry.entity.PropertyDocument;
+import com.tokenrealty.registry.kafka.command.DocumentUploadedCommand;
 import com.tokenrealty.web.exception.ConflictException;
 import com.tokenrealty.web.exception.ResourceNotFoundException;
+import com.tokenrealty.web.exception.ValidationException;
 import com.tokenrealty.registry.mapper.PropertyMapper;
 import com.tokenrealty.registry.repository.BuildingRepository;
 import com.tokenrealty.registry.repository.FlatRepository;
@@ -77,6 +79,21 @@ public class DocumentService {
         PropertyDocument saved = documentRepository.save(doc);
         log.info("Registered document id={} type={} for flat={}", saved.getId(), saved.getDocumentType(), flatId);
         return mapper.toDocumentResponse(saved);
+    }
+
+    @Transactional
+    public void acknowledgeUpload(DocumentUploadedCommand command) {
+        PropertyDocument doc = getOrThrow(command.documentId());
+        if (doc.getIpfsCid() != null && !doc.getIpfsCid().equals(command.ipfsCid())) {
+            throw new ValidationException(
+                    "IPFS CID mismatch for document " + command.documentId());
+        }
+        if (doc.getIpfsCid() == null) {
+            doc.setIpfsCid(command.ipfsCid());
+            documentRepository.save(doc);
+        }
+        log.info("Acknowledged document upload id={} type={} cid={}",
+                command.documentId(), command.documentType(), command.ipfsCid());
     }
 
     @Transactional

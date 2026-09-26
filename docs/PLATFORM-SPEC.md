@@ -71,7 +71,7 @@ TokenRealty tokenizes real estate assets (buildings, flats, and other property t
 
 - [x] **Smart contracts** — `PropertyToken.sol`, `ComplianceRegistry.sol`, `MockUSDC.sol` in `hardhat/contracts/` (compliance-gated ERC-20 MVP)
 - [x] **Per-flat deploy script** — `hardhat/scripts/deployFlat.js` wired to `ContractDeployer`
-- [ ] **On-chain dividends** — simulated (`txHash = "0xSIMULATED_..."`) in Issuance; Payment payouts use Web3j when `PAYMENT_BLOCKCHAIN_ENABLED=true`
+- [ ] **On-chain dividends** — Issuance publishes `dividend.distributed`; Payment on-chain USDC when enabled; Issuance DB txHash callback pending
 - [x] **Inter-service auth** — JWT via `tokenrealty-security`; service tokens on RestClient
 - [ ] **Liquibase** — disabled; Hibernate `ddl-auto: update` used instead
 - [ ] **Issuance Liquibase** — referenced in config but no migration files exist
@@ -340,7 +340,7 @@ Examples: `tokenrealty.registry.flat-tokenized`, `tokenrealty.marketplace.order-
 
 ### 6.3 Kafka setup TODO
 
-- [ ] Add Kafka + Zookeeper (or KRaft) to root `docker-compose.yml`
+- [x] Kafka (KRaft) in `docker-compose.yml` — `docker compose --profile kafka up -d` from repo root
 - [ ] Define shared event schema (Avro or JSON Schema in `docs/schemas/`)
 - [ ] Create `tokenrealty-events` shared library (Java records + serializers)
 - [ ] Add `@KafkaListener` stubs in each service as they are built
@@ -431,8 +431,9 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 
 - [x] Implement `FULLY_SOLD` flat status when all tokens distributed (Marketplace → Registry on primary sell-out)
 - [x] Primary token transfer via `operatorTransfer` (custodial operator signs for SPV wallet)
-- [ ] Complete ComplianceService on-chain ABI encoding (currently simplified/stub)
-- [ ] Generate Web3j contract wrappers (replace manual ABI encoding in `BlockchainConnector`)
+- [x] Hardhat contract tests (`hardhat/test/` — PropertyToken, ComplianceRegistry, MockUSDC)
+- [x] Web3j wrapper generation script (`npm run generate-wrappers`)
+- [ ] Migrate `BlockchainConnector` to generated Web3j wrappers
 
 ### 9.6 Documentation
 
@@ -559,7 +560,7 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 #### Phase 4b-2 — With Document Service (:8088)
 
 - [x] `POST /v1/documents/upload` → IPFS → register `PropertyDocument` with CID
-- [ ] Verify workflow links documents to building/flat/SPV
+- [x] Verify workflow links documents to building/flat/SPV (Compliance review queue + Registry verify)
 - [ ] Optional S3/MinIO for private KYC/legal docs (`storageUrl`)
 
 #### Phase 4b-3 — Deferred

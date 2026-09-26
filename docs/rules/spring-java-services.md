@@ -120,6 +120,15 @@ Routes in `application.yml` under `tokenrealty.gateway.routes`. Downstream servi
 
 Clients should call `http://localhost:8080/api/v1/...` instead of individual service ports.
 
+### Property Registry — document.uploaded consumer
+
+```text
+kafka/in/DocumentUploadedListener.java   ← ack CID + idempotent reconcile
+service/DocumentService.acknowledgeUpload()
+```
+
+Compliance consumes the same event for review queue; verify via `PATCH /v1/compliance/document-reviews/{documentId}/verify` → Registry `PATCH /v1/documents/{id}/verify`.
+
 ### Document Service (data room upload)
 
 Handles IPFS pinning and Registry registration — Registry stores metadata only (`PropertyDocument.ipfsCid`).

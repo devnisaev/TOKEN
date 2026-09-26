@@ -2,7 +2,26 @@
 
 End-to-end on-chain flow on a local Hardhat node (chain ID 31337).
 
-**Prerequisites:** PostgreSQL, Java 21, Node.js, Kafka (`docker compose --profile kafka up` from repo root when using event-driven settlement).
+**Prerequisites:** PostgreSQL, Java 21, Node.js, Kafka (`docker compose --profile kafka up -d` from repo root when using event-driven settlement).
+
+---
+
+## 0. Contract tests (CI / pre-deploy)
+
+```bash
+cd token-issuance-service/hardhat
+npm install
+npm test
+```
+
+Covers compliance-gated transfers, `operatorTransfer`, whitelist expiry, and MockUSDC mint.
+
+Optional — generate Web3j Java wrappers (requires [web3j CLI](https://docs.web3j.io/latest/getting_started/installing_web3j/)):
+
+```bash
+npm run compile
+npm run generate-wrappers
+```
 
 ---
 

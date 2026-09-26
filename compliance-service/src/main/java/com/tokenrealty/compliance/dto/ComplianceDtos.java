@@ -53,4 +53,19 @@ public final class ComplianceDtos {
             Instant expiresAt
     ) {
     }
+
+    public record DocumentReviewResponse(
+            UUID id,
+            UUID documentId,
+            UUID buildingId,
+            UUID flatId,
+            String documentType,
+            String ipfsCid,
+            com.tokenrealty.compliance.entity.DocumentReview.ReviewStatus status,
+            @JsonProperty("isVerified") boolean verified,
+            Instant uploadedAt,
+            Instant reviewedAt,
+            Instant createdAt
+    ) {
+    }
 }

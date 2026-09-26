@@ -65,6 +65,11 @@ public class NotificationEventListener {
         ingest(message, NotificationKafkaEventTypes.RENT_COLLECTED);
     }
 
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.document-uploaded}")
+    public void onDocumentUploaded(String message) {
+        ingest(message, NotificationKafkaEventTypes.DOCUMENT_UPLOADED);
+    }
+
     private void ingest(String message, String eventType) {
         eventConsumer.consume(message, eventType, "Notification processing failed",
                 event -> notificationLogService.logEvent(eventType, event));

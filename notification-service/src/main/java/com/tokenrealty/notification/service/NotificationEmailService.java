@@ -84,6 +84,7 @@ public class NotificationEmailService {
             case "tokenrealty.marketplace.order.matched.v1" -> "Order matched";
             case "tokenrealty.payment.payment.confirmed.v1" -> "Payment confirmed";
             case "tokenrealty.issuance.transfer.completed.v1" -> "Token transfer completed";
+            case "tokenrealty.document.document.uploaded.v1" -> "New data room document uploaded";
             default -> "TokenRealty notification: " + eventType;
         };
     }

@@ -50,6 +50,7 @@ tokenrealty:
       trade-settled: tokenrealty.marketplace.trade.settled.v1
       dividend-distributed: tokenrealty.issuance.dividend.distributed.v1
       rent-collected: tokenrealty.payment.rent.collected.v1
+      document-uploaded: tokenrealty.document.document.uploaded.v1
   notification:
     email:
       enabled: ${NOTIFICATION_EMAIL_ENABLED:true}

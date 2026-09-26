@@ -41,8 +41,9 @@ Human-readable expansions: [docs/rules/](docs/rules/)
 ## Local startup order
 
 ```bash
-# 1. PostgreSQL
-cd token-realty-app && docker compose up postgres -d
+# 1. PostgreSQL (+ optional Kafka for event flows)
+docker compose up postgres -d
+docker compose --profile kafka up -d   # when testing Kafka consumers/outbox
 
 # 2. Create databases (once)
 psql -U postgres -c "CREATE DATABASE property_registry;"

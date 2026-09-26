@@ -1,0 +1,11 @@
+# TokenRealty platform infrastructure (Postgres, Kafka, optional pgAdmin).
+#
+# Usage:
+#   docker compose --profile kafka up -d          # Kafka only
+#   docker compose up -d postgres                 # Registry DB
+#   docker compose --profile kafka --profile tools up -d
+#
+# Service apps run locally via ./mvnw (see docs/hardhat-demo.md, AGENTS.md).
+
+include:
+  - path: token-realty-app/docker-compose.yml

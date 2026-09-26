@@ -31,6 +31,11 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: property-registry
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 server:
   port: 8081
@@ -49,6 +54,7 @@ tokenrealty:
       max-retries: 5
     topic:
       flat-tokenized: tokenrealty.registry.flat.tokenized.v1
+      document-uploaded: tokenrealty.document.document.uploaded.v1
 
 jackson2:
   serialization:

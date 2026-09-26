@@ -12,6 +12,7 @@ public final class NotificationKafkaEventTypes {
     public static final String TRADE_SETTLED = "tokenrealty.marketplace.trade.settled.v1";
     public static final String DIVIDEND_DISTRIBUTED = "tokenrealty.issuance.dividend.distributed.v1";
     public static final String RENT_COLLECTED = "tokenrealty.payment.rent.collected.v1";
+    public static final String DOCUMENT_UPLOADED = "tokenrealty.document.document.uploaded.v1";
 
     private NotificationKafkaEventTypes() {
     }
