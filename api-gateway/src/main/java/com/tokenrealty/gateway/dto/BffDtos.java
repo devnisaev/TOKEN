@@ -77,4 +77,7 @@ public final class BffDtos {
             String title
     ) {
     }
+
+    public record OrderStatusEvent(UUID orderId, String orderStatus, String tradeStatus) {
+    }
 }

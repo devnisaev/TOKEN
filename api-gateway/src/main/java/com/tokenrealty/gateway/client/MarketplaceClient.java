@@ -1,67 +1,62 @@
 package com.tokenrealty.gateway.client;
 
-import com.tokenrealty.web.exception.ValidationException;
+import com.tokenrealty.web.rest.DownstreamRestClientSupport;
+import com.tokenrealty.web.rest.DownstreamServices;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientResponseException;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
 @Component
-public class MarketplaceClient {
-
-    private final RestClient restClient;
+public class MarketplaceClient extends DownstreamRestClientSupport {
 
     public MarketplaceClient(@Qualifier("marketplaceRestClient") RestClient restClient) {
-        this.restClient = restClient;
+        super(restClient);
     }
 
     public ListingView getListing(UUID listingId) {
-        try {
-            return restClient.get()
-                    .uri("/v1/listings/{id}", listingId)
-                    .retrieve()
-                    .body(ListingView.class);
-        } catch (RestClientResponseException ex) {
-            throw unavailable(ex);
-        } catch (ResourceAccessException ex) {
-            throw new ValidationException("Marketplace service unavailable");
-        }
+        return get(
+                "/v1/listings/{id}",
+                ListingView.class,
+                DownstreamServices.MARKETPLACE,
+                listingId);
+    }
+
+    public OrderView getOrder(UUID orderId) {
+        return get(
+                "/v1/orders/{id}",
+                OrderView.class,
+                DownstreamServices.MARKETPLACE,
+                orderId);
+    }
+
+    public TradeView getTrade(UUID orderId) {
+        return getAllowNotFound(
+                "/v1/orders/{id}/trade",
+                TradeView.class,
+                DownstreamServices.MARKETPLACE,
+                orderId);
     }
 
     public ListingView findActiveListingByFlatId(UUID flatId) {
-        try {
-            var page = restClient.get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("/v1/listings")
-                            .queryParam("flatId", flatId)
-                            .queryParam("status", "ACTIVE")
-                            .queryParam("size", 1)
-                            .build())
-                    .retrieve()
-                    .body(new ParameterizedTypeReference<SpringPage<ListingView>>() {
-                    });
-            if (page == null || page.content().isEmpty()) {
-                return null;
-            }
-            return page.content().getFirst();
-        } catch (RestClientResponseException ex) {
-            throw unavailable(ex);
-        } catch (ResourceAccessException ex) {
-            throw new ValidationException("Marketplace service unavailable");
+        SpringPage<ListingView> page = get(
+                uriBuilder -> uriBuilder
+                        .path("/v1/listings")
+                        .queryParam("flatId", flatId)
+                        .queryParam("status", "ACTIVE")
+                        .queryParam("size", 1)
+                        .build(),
+                new ParameterizedTypeReference<>() {
+                },
+                DownstreamServices.MARKETPLACE);
+        if (page == null || page.content().isEmpty()) {
+            return null;
         }
-    }
-
-    private static ValidationException unavailable(RestClientResponseException ex) {
-        if (ex.getStatusCode().is5xxServerError()) {
-            return new ValidationException("Marketplace service unavailable");
-        }
-        return new ValidationException("Marketplace request failed: " + ex.getStatusText());
+        return page.content().getFirst();
     }
 
     public record SpringPage<T>(List<T> content) {
@@ -79,5 +74,11 @@ public class MarketplaceClient {
             long minInvestmentTokens,
             String title
     ) {
+    }
+
+    public record OrderView(UUID id, String status) {
+    }
+
+    public record TradeView(UUID id, String status) {
     }
 }
