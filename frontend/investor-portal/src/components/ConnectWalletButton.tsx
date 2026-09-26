@@ -41,13 +41,19 @@ export function ConnectWalletButton() {
     );
   }
 
-  // WalletConnect v2: call POST /v1/wallets/connect-session for sessionTopic/uri before WC connector.
+  async function handleConnect() {
+    if (user) {
+      await api.createConnectSession(user.id).catch(() => undefined);
+    }
+    connect({ connector: connectors[0] });
+  }
+
   return (
     <Button
       size="sm"
       variant="outline"
       disabled={isPending || connectors.length === 0}
-      onClick={() => connect({ connector: connectors[0] })}
+      onClick={() => void handleConnect()}
     >
       {isPending ? 'Connecting…' : 'Connect MetaMask'}
     </Button>

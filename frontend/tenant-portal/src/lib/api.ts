@@ -1,9 +1,12 @@
 import { createApiClient, resolveApiBaseUrl } from '@tokenrealty/shared-api-client';
 import type {
+  CreateMaintenanceTicketRequest,
   Lease,
+  MaintenanceTicket,
   RecordRentPaymentRequest,
   RentPayment,
   TenantLeaseBffResponse,
+  TenantMaintenanceBffResponse,
   TokenResponse,
   UserProfile,
 } from '@/types/api';
@@ -57,6 +60,21 @@ export const api = {
 
   payRent(body: RecordRentPaymentRequest) {
     return request<RentPayment>('/v1/rent-payments', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
+
+  listTenantMaintenanceBff(tenantId: string) {
+    return request<TenantMaintenanceBffResponse[]>(`/v1/bff/tenants/${tenantId}/maintenance`);
+  },
+
+  listMaintenanceTickets(tenantId: string) {
+    return request<MaintenanceTicket[]>(`/v1/maintenance-tickets?tenantId=${tenantId}`);
+  },
+
+  createMaintenanceTicket(body: CreateMaintenanceTicketRequest) {
+    return request<MaintenanceTicket>('/v1/maintenance-tickets', {
       method: 'POST',
       body: JSON.stringify(body),
     });

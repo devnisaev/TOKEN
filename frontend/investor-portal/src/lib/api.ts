@@ -97,6 +97,16 @@ export const api = {
     return request<DividendPayment[]>(`/v1/investors/${investorId}/dividends`);
   },
 
+  createConnectSession(investorId: string) {
+    return request<{ sessionTopic: string; uri: string; relayUrl: string; expiresAt: string }>(
+      '/v1/wallets/connect-session',
+      {
+        method: 'POST',
+        body: JSON.stringify({ investorId }),
+      },
+    );
+  },
+
   linkWallet(investorId: string, walletAddress: string) {
     return request('/v1/wallets/link', {
       method: 'POST',

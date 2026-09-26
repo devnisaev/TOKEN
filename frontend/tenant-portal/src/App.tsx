@@ -3,6 +3,7 @@ import { TenantRoute } from '@/components/TenantRoute';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { LeasePage } from '@/pages/LeasePage';
 import { LoginPage } from '@/pages/LoginPage';
+import { MaintenancePage } from '@/pages/MaintenancePage';
 
 export function App() {
   return (
@@ -17,6 +18,7 @@ export function App() {
           }
         >
           <Route index element={<LeasePage />} />
+          <Route path="maintenance" element={<MaintenancePage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

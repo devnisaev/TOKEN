@@ -30,6 +30,9 @@ export function Header() {
           <NavLink to="/document-reviews" className={({ isActive }) => navLinkClass(isActive)}>
             Documents
           </NavLink>
+          <NavLink to="/maintenance" className={({ isActive }) => navLinkClass(isActive)}>
+            Maintenance
+          </NavLink>
         </nav>
         <div className="flex items-center gap-3">
           {user && (

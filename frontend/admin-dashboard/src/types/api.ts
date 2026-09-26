@@ -1,11 +1,13 @@
 export type {
   ApiError,
   CreateFlatRequest,
+  MaintenanceTicket,
   SettleTradeRequest,
   SpringPage,
   TokenResponse,
   UpdateBuildingRequest,
   UpdateFlatRequest,
+  UpdateMaintenanceTicketRequest,
 } from '@tokenrealty/shared-api-client';
 
 import type { CreateBuildingRequest as BaseCreateBuildingRequest, UserRole } from '@tokenrealty/shared-api-client';

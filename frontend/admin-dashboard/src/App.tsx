@@ -10,6 +10,7 @@ import { DocumentReviewsPage } from '@/pages/DocumentReviewsPage';
 import { FlatFormPage } from '@/pages/FlatFormPage';
 import { FlatTokenizePage } from '@/pages/FlatTokenizePage';
 import { LoginPage } from '@/pages/LoginPage';
+import { MaintenanceTicketsPage } from '@/pages/MaintenanceTicketsPage';
 import { OrderDetailPage } from '@/pages/OrderDetailPage';
 import { OrdersPage } from '@/pages/OrdersPage';
 
@@ -37,6 +38,7 @@ export function App() {
           <Route path="orders/:orderId" element={<OrderDetailPage />} />
           <Route path="compliance" element={<CompliancePage />} />
           <Route path="document-reviews" element={<DocumentReviewsPage />} />
+          <Route path="maintenance" element={<MaintenanceTicketsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

@@ -1,6 +1,9 @@
 export type {
   ApiError,
+  CreateMaintenanceTicketRequest,
+  MaintenanceTicket,
   RecordRentPaymentRequest,
+  TenantMaintenanceBffResponse,
   TokenResponse,
 } from '@tokenrealty/shared-api-client';
 

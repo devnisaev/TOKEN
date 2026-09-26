@@ -16,7 +16,9 @@ import type {
   UpdateBuildingRequest,
   UpdateFlatRequest,
   IssueTokenRequest,
+  MaintenanceTicket,
   TokenContract,
+  UpdateMaintenanceTicketRequest,
   UserProfile,
 } from '@/types/api';
 
@@ -144,6 +146,17 @@ export const api = {
   issueTokens(body: IssueTokenRequest) {
     return request<TokenContract>('/v1/tokens', {
       method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
+
+  listMaintenanceTickets() {
+    return request<MaintenanceTicket[]>('/v1/maintenance-tickets');
+  },
+
+  updateMaintenanceTicket(id: string, body: UpdateMaintenanceTicketRequest) {
+    return request<MaintenanceTicket>(`/v1/maintenance-tickets/${id}`, {
+      method: 'PATCH',
       body: JSON.stringify(body),
     });
   },

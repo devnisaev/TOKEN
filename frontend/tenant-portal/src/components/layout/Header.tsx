@@ -1,4 +1,4 @@
-import { Home, LogOut } from 'lucide-react';
+import { Home, LogOut, Wrench } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth';
@@ -17,6 +17,10 @@ export function Header() {
         <nav className="flex items-center gap-1">
           <NavLink to="/" end className={({ isActive }) => navLinkClass(isActive)}>
             My lease
+          </NavLink>
+          <NavLink to="/maintenance" className={({ isActive }) => navLinkClass(isActive)}>
+            <Wrench className="mr-1 inline h-4 w-4" />
+            Maintenance
           </NavLink>
         </nav>
         <div className="flex items-center gap-3">
