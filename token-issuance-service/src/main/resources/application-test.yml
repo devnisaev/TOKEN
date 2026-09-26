@@ -37,7 +37,7 @@ blockchain:
 
 services:
   property-registry:
-    url: http://localhost:9999
+    url: http://127.0.0.1:9999/api
 
 tokenrealty:
   jwt:
