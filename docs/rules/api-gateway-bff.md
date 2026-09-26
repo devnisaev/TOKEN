@@ -11,7 +11,7 @@ Related: [investor-portal.md](investor-portal.md) · [spring-java-services.md](s
 ## Architecture
 
 ```text
-Browser (:5173)
+Browser (:5173 investor, :5174 admin)
     ↓  /api/v1/bff/**
 API Gateway (:8080)
     ├─ BffController        ← handled locally (not proxied)

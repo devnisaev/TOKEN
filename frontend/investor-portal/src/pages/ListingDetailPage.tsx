@@ -1,7 +1,7 @@
 import { FormEvent, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, CheckCircle2, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { formatUsd } from '@/lib/utils';
@@ -14,12 +14,12 @@ import { useAccount } from 'wagmi';
 
 export function ListingDetailPage() {
   const { listingId } = useParams<{ listingId: string }>();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { address } = useAccount();
   const queryClient = useQueryClient();
 
   const [tokenAmount, setTokenAmount] = useState('');
-  const [orderSuccess, setOrderSuccess] = useState<string | null>(null);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['bff-listing', listingId],
@@ -45,15 +45,15 @@ export function ListingDetailPage() {
       });
     },
     onSuccess: (order) => {
-      setOrderSuccess(order.id);
       queryClient.invalidateQueries({ queryKey: ['bff-listing', listingId] });
       queryClient.invalidateQueries({ queryKey: ['portfolio'] });
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      navigate(`/orders/${order.id}`);
     },
   });
 
   function onBuy(e: FormEvent) {
     e.preventDefault();
-    setOrderSuccess(null);
     buyMutation.mutate();
   }
 
@@ -123,19 +123,7 @@ export function ListingDetailPage() {
           <CardContent className="space-y-4">
             <ConnectWalletButton />
 
-            {orderSuccess ? (
-              <div className="flex items-start gap-2 rounded-md bg-accent p-3 text-sm text-accent-foreground">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
-                <div>
-                  <p className="font-medium">Order placed</p>
-                  <p className="text-xs opacity-80">Order ID: {orderSuccess}</p>
-                  <p className="mt-1 text-xs opacity-80">
-                    Payment and on-chain transfer continue via Kafka when services are running.
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={onBuy} className="space-y-4">
+            <form onSubmit={onBuy} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="amount">Token amount</Label>
                   <Input
@@ -161,7 +149,6 @@ export function ListingDetailPage() {
                   {buyMutation.isPending ? 'Placing order…' : 'Place buy order'}
                 </Button>
               </form>
-            )}
           </CardContent>
         </Card>
       </div>

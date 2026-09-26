@@ -1,0 +1,74 @@
+# Admin Dashboard — TokenRealty Frontend
+
+**Status:** MVP implemented in `frontend/admin-dashboard/` (dev URL **http://localhost:5174**).
+
+React admin app — buildings overview, KYC compliance review. All API traffic goes through **API Gateway** `:8080`.
+
+Related: [investor-portal.md](investor-portal.md) · [api-gateway-bff.md](api-gateway-bff.md) · [investment-limits.md](investment-limits.md)
+
+---
+
+## Stack
+
+| Layer | Technology |
+|-------|------------|
+| Framework | React 19 + TypeScript |
+| Build | Vite 6 (`:5174`) |
+| Routing | React Router 7 |
+| Server state | TanStack Query |
+| UI | Tailwind CSS + shadcn-style components |
+| Auth | JWT via Auth Service (separate sessionStorage key) |
+
+---
+
+## Run
+
+```bash
+cd frontend/admin-dashboard
+npm install
+npm run dev
+```
+
+Vite proxies `/api` → `http://localhost:8080`. Production: set `VITE_API_BASE_URL` to the gateway URL.
+
+---
+
+## Pages & routes
+
+| Route | Page | Backend calls |
+|-------|------|---------------|
+| `/login` | Admin sign in | `POST /v1/auth/login` |
+| `/` | Dashboard | `GET /v1/buildings`, `GET /v1/compliance` |
+| `/buildings` | Building list | `GET /v1/buildings` |
+| `/compliance` | KYC queue + approve | `GET /v1/compliance`, `PATCH /v1/compliance/{id}/verify` |
+
+Protected routes require JWT and role `ADMIN`, `COMPLIANCE`, or `PROPERTY_MANAGER` (`AdminRoute`).
+
+KYC verify requires `ADMIN` or `COMPLIANCE` on the backend — property managers see buildings only.
+
+---
+
+## Auth
+
+- Session key: `tokenrealty.admin.auth` (separate from investor portal)
+- Demo: `admin@tokenrealty.com` / `admin123`
+
+Gateway CORS allows `http://localhost:5174` (`tokenrealty.gateway.cors.allowed-origins`).
+
+---
+
+## Conventions
+
+- **Never** call service ports directly from the browser — always gateway `:8080/api`
+- Types in `src/types/api.ts` — update when backend DTOs change
+- Errors: parse RFC 7807 `detail` from ProblemDetail responses
+- No secrets in frontend env — JWT from login only
+
+---
+
+## Pending / future
+
+- [ ] Document review queue (`GET /v1/compliance/document-reviews/pending`)
+- [ ] Building create/edit forms
+- [ ] Order/trade monitoring for ops
+- [ ] E2E tests (Playwright)

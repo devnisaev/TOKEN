@@ -6,6 +6,7 @@ import type {
   ListingDetailResponse,
   Order,
   PlaceOrderRequest,
+  Trade,
   SpringPage,
   TokenResponse,
   UserProfile,
@@ -87,6 +88,20 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(body),
     });
+  },
+
+  listOrders(buyerId: string) {
+    return request<SpringPage<Order>>(
+      `/v1/orders?buyerId=${buyerId}&size=50&sort=createdAt,desc`,
+    );
+  },
+
+  getOrder(orderId: string) {
+    return request<Order>(`/v1/orders/${orderId}`);
+  },
+
+  getOrderTrade(orderId: string) {
+    return request<Trade>(`/v1/orders/${orderId}/trade`);
   },
 
   getPortfolio(investorId: string) {

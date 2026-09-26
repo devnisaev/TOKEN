@@ -42,6 +42,8 @@ Vite proxies `/api` → `http://localhost:8080` (see `vite.config.ts`). Producti
 | `/login` | Sign in | `POST /v1/auth/login` |
 | `/` | Listings grid | `GET /v1/listings?status=ACTIVE` |
 | `/listings/:id` | Detail + buy | `GET /v1/bff/listings/{id}`, `POST /v1/orders` |
+| `/orders` | Order list | `GET /v1/orders?buyerId=…` |
+| `/orders/:id` | Order status (polls 3s) | `GET /v1/orders/{id}`, `GET /v1/orders/{id}/trade` |
 | `/portfolio` | Balances + holdings | `GET /v1/wallets/{investorId}/balance` |
 
 Protected routes require JWT (`ProtectedRoute` + `AuthProvider`).
@@ -57,7 +59,7 @@ frontend/investor-portal/src/
 │   ├── auth.tsx         ← AuthProvider, sessionStorage tokens
 │   └── wagmi.ts         ← Hardhat + Polygon Amoy chains
 ├── types/api.ts         ← TypeScript mirrors of backend DTOs
-├── pages/               ← Login, Listings, ListingDetail, Portfolio
+├── pages/               ← Login, Listings, ListingDetail, Orders, OrderStatus, Portfolio
 ├── components/
 │   ├── ui/              ← Button, Card, Input, Label
 │   ├── layout/          ← Header, AppLayout
@@ -93,11 +95,12 @@ Hardhat demo investor: `11111111-1111-1111-1111-111111111111`, wallet `0x7099797
 1. User opens /listings/:id  → BFF aggregate (flat + token + listing)
 2. Connect MetaMask (optional) or use profile walletAddress
 3. POST /v1/orders { listingId, buyerId, buyerWallet, tokenAmount }
-4. Marketplace → KYC check → escrow (Payment) → Kafka settlement (when enabled)
-5. Portfolio refreshes via GET /v1/wallets/{id}/balance
+4. Redirect to /orders/{id} — polls order + trade until SETTLED
+5. Marketplace → KYC check → escrow (Payment) → Kafka settlement (when enabled)
+6. Portfolio refreshes via GET /v1/wallets/{id}/balance
 ```
 
-KYC must pass before order match ([investment-limits.md](investment-limits.md)). UI shows order ID on success; payment/transfer progress is async via Kafka.
+KYC must pass before order match ([investment-limits.md](investment-limits.md)). Order status page polls every 3s until terminal state (SETTLED / CANCELLED / FAILED).
 
 ---
 
@@ -131,9 +134,8 @@ Gateway CORS allows `http://localhost:5173` (`tokenrealty.gateway.cors.allowed-o
 
 ## Pending / future
 
-- [ ] Admin dashboard (`frontend/admin-dashboard/`)
 - [ ] Tenant portal (rent pay)
-- [ ] Order status polling / WebSocket after buy
+- [ ] WebSocket push for order status (replace polling)
 - [ ] Refresh token rotation before access expiry
 - [ ] openapi-typescript codegen from springdoc
 - [ ] Dividend history page

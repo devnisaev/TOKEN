@@ -23,6 +23,7 @@ Cursor rule: [`.cursor/rules/spring-java-services.mdc`](../../.cursor/rules/spri
 | [wallet-service.md](wallet-service.md) | Custodial wallets, encryption, aggregate balance |
 | [blockchain-indexer.md](blockchain-indexer.md) | On-chain event poll, balance reconciliation |
 | [investor-portal.md](investor-portal.md) | React investor UI (Vite, TanStack Query, wagmi) |
+| [admin-dashboard.md](admin-dashboard.md) | React admin UI (buildings, KYC review) |
 | [api-gateway-bff.md](api-gateway-bff.md) | Gateway BFF aggregate endpoints |
 
 ---

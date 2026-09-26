@@ -4,6 +4,8 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { ListingDetailPage } from '@/pages/ListingDetailPage';
 import { ListingsPage } from '@/pages/ListingsPage';
 import { LoginPage } from '@/pages/LoginPage';
+import { OrderStatusPage } from '@/pages/OrderStatusPage';
+import { OrdersPage } from '@/pages/OrdersPage';
 import { PortfolioPage } from '@/pages/PortfolioPage';
 
 export function App() {
@@ -20,6 +22,8 @@ export function App() {
         >
           <Route index element={<ListingsPage />} />
           <Route path="listings/:listingId" element={<ListingDetailPage />} />
+          <Route path="orders" element={<OrdersPage />} />
+          <Route path="orders/:orderId" element={<OrderStatusPage />} />
           <Route path="portfolio" element={<PortfolioPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

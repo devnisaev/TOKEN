@@ -26,7 +26,7 @@ tokenrealty:
     client-secret: ${SERVICE_ACCOUNT_SECRET:gateway-secret}
   gateway:
     cors:
-      allowed-origins: ${GATEWAY_CORS_ORIGINS:http://localhost:3000,http://localhost:5173}
+      allowed-origins: ${GATEWAY_CORS_ORIGINS:http://localhost:3000,http://localhost:5173,http://localhost:5174}
     routes:
       - id: auth
         target: http://localhost:8083

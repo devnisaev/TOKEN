@@ -1,0 +1,37 @@
+---
+description: TokenRealty React admin dashboard — Vite, TanStack Query, KYC review, buildings
+globs: "frontend/admin-dashboard/**/*.{ts,tsx,css,html,json}"
+alwaysApply: false
+---
+
+# Admin Dashboard — TokenRealty Frontend
+
+Human docs: [docs/rules/admin-dashboard.md](../../docs/rules/admin-dashboard.md).
+
+## Stack
+
+React 19 + TypeScript, Vite (`:5174`), TanStack Query, React Router, Tailwind.
+
+## Rules
+
+- All API calls through gateway — `VITE_API_BASE_URL` or Vite proxy `/api` → `:8080`
+- JWT in `AuthProvider` / sessionStorage key `tokenrealty.admin.auth` (separate from investor portal)
+- Admin roles: `ADMIN`, `COMPLIANCE`, `PROPERTY_MANAGER` — enforce in `AdminRoute`
+- KYC verify: `PATCH /v1/compliance/{id}/verify` with `{ kycExpiresAt }` — backend requires ADMIN/COMPLIANCE
+- Buildings: `GET /v1/buildings` — any authenticated role
+- Types in `src/types/api.ts` — keep aligned with Java DTOs
+- No wagmi — admin app has no wallet connection
+
+## Do not
+
+- Call microservice ports directly from browser code
+- Reuse investor portal sessionStorage key
+- Add Redux — TanStack Query + Auth context is enough
+
+## Run
+
+```bash
+cd frontend/admin-dashboard && npm install && npm run dev
+```
+
+Gateway `:8080` must be up. Demo login: `admin@tokenrealty.com` / `admin123`.

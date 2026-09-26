@@ -30,6 +30,7 @@ Central documentation for the TokenRealty real-estate tokenization platform.
 | [rules/wallet-service.md](rules/wallet-service.md) | — (custodial wallets, Web3j signing) |
 | [rules/blockchain-indexer.md](rules/blockchain-indexer.md) | — (on-chain event poll, reconciliation) |
 | [rules/investor-portal.md](rules/investor-portal.md) | [investor-portal.mdc](../.cursor/rules/investor-portal.mdc) |
+| [rules/admin-dashboard.md](rules/admin-dashboard.md) | [admin-dashboard.mdc](../.cursor/rules/admin-dashboard.mdc) |
 | [rules/api-gateway-bff.md](rules/api-gateway-bff.md) | — (BFF aggregates on API Gateway) |
 
 Cursor skills (workflows — see [AGENTS.md](../AGENTS.md)):
@@ -75,8 +76,9 @@ Additional Cursor rules (no separate human doc yet):
 | App | Folder | Dev URL |
 |-----|--------|---------|
 | Investor Portal | [frontend/investor-portal/](../frontend/investor-portal/) | http://localhost:5173 |
+| Admin Dashboard | [frontend/admin-dashboard/](../frontend/admin-dashboard/) | http://localhost:5174 |
 
-See [rules/investor-portal.md](rules/investor-portal.md).
+See [rules/investor-portal.md](rules/investor-portal.md), [rules/admin-dashboard.md](rules/admin-dashboard.md).
 
 ## Diagrams (PlantUML)
 

@@ -15,7 +15,7 @@ public class GatewayCorsConfig {
 
     @Bean
     CorsConfigurationSource corsConfigurationSource(
-            @Value("${tokenrealty.gateway.cors.allowed-origins:http://localhost:3000,http://localhost:5173}")
+            @Value("${tokenrealty.gateway.cors.allowed-origins:http://localhost:3000,http://localhost:5173,http://localhost:5174}")
             String allowedOrigins) {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));

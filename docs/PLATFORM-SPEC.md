@@ -641,13 +641,12 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 
 ### 11.5 Frontend
 
-- [x] Investor portal MVP (`frontend/investor-portal/`, `:5173`) — login, listings, BFF detail, buy order, portfolio
-- [ ] Admin dashboard (manage properties, KYC review, token issuance)
+- [x] Investor portal MVP (`frontend/investor-portal/`, `:5173`) — login, listings, BFF detail, buy order, portfolio, order status polling
+- [x] Admin dashboard MVP (`frontend/admin-dashboard/`, `:5174`) — login, buildings list, KYC verify
 - [ ] Tenant portal (pay rent, view lease)
-- [ ] Order status UI after buy (poll trade / payment state)
 - [ ] openapi-typescript codegen from springdoc
 
-See [docs/rules/investor-portal.md](rules/investor-portal.md), [docs/rules/api-gateway-bff.md](rules/api-gateway-bff.md).
+See [docs/rules/investor-portal.md](rules/investor-portal.md), [docs/rules/admin-dashboard.md](rules/admin-dashboard.md), [docs/rules/api-gateway-bff.md](rules/api-gateway-bff.md).
 
 ---
 

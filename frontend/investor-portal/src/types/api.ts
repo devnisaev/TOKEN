@@ -91,18 +91,6 @@ export interface PlaceOrderRequest {
   tokenAmount: number;
 }
 
-export interface Order {
-  id: string;
-  listingId: string;
-  flatId: string;
-  contractId: string;
-  orderType: string;
-  status: string;
-  buyerId: string;
-  tokenAmount: number;
-  totalPriceUsd: number;
-}
-
 export interface FiatBalance {
   currency: string;
   available: number;
@@ -121,6 +109,42 @@ export interface AggregateBalance {
   primaryWalletAddress: string | null;
   fiatBalances: FiatBalance[];
   tokenHoldings: TokenHolding[];
+}
+
+export interface Order {
+  id: string;
+  listingId: string;
+  flatId: string;
+  contractId: string;
+  orderType: string;
+  status: string;
+  buyerId: string;
+  sellerId?: string;
+  buyerWallet: string;
+  sellerWallet?: string;
+  listingType: string;
+  tokenAmount: number;
+  totalPriceUsd: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Trade {
+  id: string;
+  orderId: string;
+  listingId: string;
+  flatId: string;
+  contractId: string;
+  buyerId: string;
+  sellerId?: string;
+  buyerWallet: string;
+  listingType: string;
+  tokenAmount: number;
+  totalPriceUsd: number;
+  status: string;
+  paymentId?: string;
+  transferId?: string;
+  createdAt?: string;
 }
 
 export interface ApiError {
