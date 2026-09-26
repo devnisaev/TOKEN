@@ -16,7 +16,7 @@ Related: [investor-portal.md](investor-portal.md) · [api-gateway-bff.md](api-ga
 | Build | Vite 6 (`:5174`) |
 | Routing | React Router 7 |
 | Server state | TanStack Query |
-| UI | Tailwind CSS + `@tokenrealty/shared-ui` (AppShell, shadcn primitives) |
+| UI | Tailwind CSS + `@tokenrealty/shared-ui` (AppShell, `StatusBadge`, shadcn primitives) |
 | Auth | JWT via Auth Service (separate sessionStorage key) |
 
 ---

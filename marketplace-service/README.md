@@ -64,11 +64,13 @@ JWT Bearer from Auth Service (:8083). Example: login as `investor@tokenrealty.co
 | GET | `/v1/listings/{id}` | Any | Get listing |
 | POST | `/v1/listings` | ADMIN, PROPERTY_MANAGER | Create listing |
 | PATCH | `/v1/listings/{id}/cancel` | ADMIN, PROPERTY_MANAGER | Cancel listing |
-| GET | `/v1/orders` | Any | List orders |
+| GET | `/v1/orders` | Any | List orders (`?buyerId=`, `?listingId=`, `?status=`) |
 | GET | `/v1/orders/{id}` | Any | Get order |
 | POST | `/v1/orders` | INVESTOR, ADMIN | Place buy order |
+| POST | `/v1/orders/sell` | INVESTOR, ADMIN | Place secondary sell order (creates listing) |
 | GET | `/v1/orders/{id}/trade` | Any | Get trade for order |
-| PATCH | `/v1/orders/{id}/settle` | ADMIN | Mark settled (interim — until Payment auto-flow) |
+| PATCH | `/v1/orders/{id}/settle` | ADMIN | Mark settled (fallback when Kafka auto-settle disabled) |
+| POST | `/v1/listings/secondary` | INVESTOR, ADMIN | Create secondary listing for held tokens |
 
 ## Buy flow (MVP)
 
@@ -104,7 +106,7 @@ JWT Bearer from Auth Service (:8083). Example: login as `investor@tokenrealty.co
 - [x] Consumer: `flat.tokenized` auto-create listing
 - [x] Payment Service integration — `PaymentClient` initiates escrow on order match
 - [x] Consume `payment.confirmed` + `transfer.completed` to auto-settle trades
-- [ ] Secondary market sell orders
+- [x] Secondary market sell orders (`POST /v1/orders/sell`, `POST /v1/listings/secondary`)
 
 ## Conventions
 

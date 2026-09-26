@@ -448,7 +448,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 
 - [x] Tier-1 business invariants doc ([docs/BUSINESS_RULES.md](BUSINESS_RULES.md) + `.cursor/rules/business-rules.mdc`)
 - [x] Create root `README.md` with platform overview and startup order
-- [ ] Sync API tables in service READMEs with actual controllers
+- [ ] Sync API tables in service READMEs with actual controllers (marketplace + notification synced — see [rules/service-readmes.md](rules/service-readmes.md))
 - [x] Update Property Registry "Next Steps" (Issuance token-info callback + Kafka + JWT done)
 
 ---
