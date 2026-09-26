@@ -1,0 +1,59 @@
+openapi: 3.0.3
+info:
+  title: TokenRealty Auth API
+  version: 1.0.0
+paths:
+  /v1/auth/login:
+    post:
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+  /v1/users/me:
+    get:
+      operationId: getProfile
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string }
+        password: { type: string }
+    TokenResponse:
+      type: object
+      required: [accessToken, refreshToken, tokenType, expiresInSeconds, userId, email, role]
+      properties:
+        accessToken: { type: string }
+        refreshToken: { type: string }
+        tokenType: { type: string }
+        expiresInSeconds: { type: integer }
+        userId: { type: string, format: uuid }
+        email: { type: string }
+        role:
+          type: string
+          enum: [ADMIN, INVESTOR, PROPERTY_MANAGER, COMPLIANCE, APPRAISER, TENANT]
+    UserProfile:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string }
+        role: { type: string }
+        walletAddress: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }

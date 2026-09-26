@@ -1,0 +1,94 @@
+openapi: 3.0.3
+info:
+  title: TokenRealty Rental API
+  version: 1.0.0
+paths:
+  /v1/leases:
+    get:
+      operationId: listLeases
+      parameters:
+        - name: tenantId
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lease'
+  /v1/leases/{id}:
+    get:
+      operationId: getLease
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lease'
+  /v1/rent-payments:
+    get:
+      operationId: listRentPayments
+      parameters:
+        - name: leaseId
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RentPayment'
+    post:
+      operationId: recordRentPayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordRentPaymentRequest'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentPayment'
+components:
+  schemas:
+    Lease:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        flatId: { type: string, format: uuid }
+        tenantId: { type: string, format: uuid }
+        tenantWallet: { type: string }
+        monthlyRentUsd: { type: number }
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date }
+        status: { type: string }
+    RecordRentPaymentRequest:
+      type: object
+      required: [leaseId, period, amount]
+      properties:
+        leaseId: { type: string, format: uuid }
+        period: { type: string, pattern: '^\\d{4}-\\d{2}$' }
+        amount: { type: number }
+    RentPayment:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        leaseId: { type: string, format: uuid }
+        period: { type: string }
+        amount: { type: number }
+        status: { type: string }
+        paidAt: { type: string, format: date-time }

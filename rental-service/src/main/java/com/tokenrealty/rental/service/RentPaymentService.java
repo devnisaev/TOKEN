@@ -5,6 +5,7 @@ import com.tokenrealty.rental.dto.RentalDtos.*;
 import com.tokenrealty.rental.entity.Lease;
 import com.tokenrealty.rental.entity.RentPayment;
 import com.tokenrealty.web.exception.ConflictException;
+import com.tokenrealty.web.exception.ValidationException;
 import com.tokenrealty.rental.mapper.RentalMapper;
 import com.tokenrealty.rental.repository.RentPaymentRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -30,8 +32,18 @@ public class RentPaymentService {
                 flatId, period, rentPaymentRepository.sumAmountByFlatIdAndPeriod(flatId, period));
     }
 
-    public RentPaymentResponse record(RecordRentPaymentRequest request) {
+    public List<RentPaymentResponse> listByLeaseId(UUID leaseId) {
+        leaseService.getLease(leaseId);
+        return rentPaymentRepository.findByLeaseIdOrderByPeriodDesc(leaseId).stream()
+                .map(mapper::toRentPaymentResponse)
+                .toList();
+    }
+
+    public RentPaymentResponse record(RecordRentPaymentRequest request, UUID callerUserId, boolean tenantCaller) {
         Lease lease = leaseService.getLease(request.leaseId());
+        if (tenantCaller && !lease.getTenantId().equals(callerUserId)) {
+            throw new ValidationException("Tenants may only pay rent on their own lease");
+        }
         if (lease.getStatus() != Lease.LeaseStatus.ACTIVE) {
             throw new ConflictException("Lease is not active");
         }

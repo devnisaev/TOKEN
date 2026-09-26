@@ -1,0 +1,95 @@
+openapi: 3.0.3
+info:
+  title: TokenRealty Compliance API
+  version: 1.0.0
+paths:
+  /v1/compliance:
+    get:
+      operationId: listCompliance
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompliancePage'
+  /v1/compliance/{id}/verify:
+    patch:
+      operationId: verifyCompliance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComplianceVerifyRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplianceRecord'
+  /v1/compliance/document-reviews/pending:
+    get:
+      operationId: listPendingDocumentReviews
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DocumentReview'
+  /v1/compliance/document-reviews/{documentId}/verify:
+    patch:
+      operationId: verifyDocumentReview
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentReview'
+components:
+  schemas:
+    CompliancePage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComplianceRecord'
+        totalElements: { type: integer }
+    ComplianceVerifyRequest:
+      type: object
+      required: [kycExpiresAt]
+      properties:
+        kycExpiresAt: { type: string, format: date-time }
+    ComplianceRecord:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        investorId: { type: string, format: uuid }
+        walletAddress: { type: string }
+        fullName: { type: string }
+        countryCode: { type: string }
+        status: { type: string }
+    DocumentReview:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        documentId: { type: string, format: uuid }
+        buildingId: { type: string, format: uuid }
+        flatId: { type: string, format: uuid, nullable: true }
+        documentType: { type: string }
+        ipfsCid: { type: string }
+        status: { type: string }
+        isVerified: { type: boolean }
+        uploadedAt: { type: string, format: date-time }

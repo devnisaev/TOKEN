@@ -12,10 +12,15 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class DevDataInitializer implements ApplicationRunner {
+
+    public static final UUID DEMO_TENANT_ID = UUID.fromString("22222222-2222-2222-2222-222222222222");
+    private static final String DEMO_TENANT_WALLET = "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC";
 
     private final UserRepository userRepository;
     private final ServiceAccountRepository serviceAccountRepository;
@@ -34,6 +39,7 @@ public class DevDataInitializer implements ApplicationRunner {
         seedUser("appraiser@tokenrealty.com", "appraiser123", User.UserRole.APPRAISER);
         seedUser("compliance@tokenrealty.com", "compliance123", User.UserRole.COMPLIANCE);
         seedUser("investor@tokenrealty.com", "investor123", User.UserRole.INVESTOR);
+        seedUser("tenant@tokenrealty.com", "tenant123", User.UserRole.TENANT, DEMO_TENANT_ID, DEMO_TENANT_WALLET);
         seedServiceAccount("token-issuance", "issuance-secret", User.UserRole.ADMIN);
         seedServiceAccount("marketplace", "marketplace-secret", User.UserRole.ADMIN);
         seedServiceAccount("rental", "rental-secret", User.UserRole.ADMIN);
@@ -45,15 +51,24 @@ public class DevDataInitializer implements ApplicationRunner {
     }
 
     private void seedUser(String email, String password, User.UserRole role) {
+        seedUser(email, password, role, null, null);
+    }
+
+    private void seedUser(String email, String password, User.UserRole role, UUID id, String walletAddress) {
         if (userRepository.existsByEmailIgnoreCase(email)) {
             return;
         }
-        userRepository.save(User.builder()
+        User user = User.builder()
                 .email(email)
                 .passwordHash(passwordEncoder.encode(password))
                 .role(role)
+                .walletAddress(walletAddress)
                 .enabled(true)
-                .build());
+                .build();
+        if (id != null) {
+            user.setId(id);
+        }
+        userRepository.save(user);
         log.info("Seeded dev user {}", email);
     }
 

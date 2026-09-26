@@ -1,1 +1,2 @@
 com.tokenrealty.web.config.TokenRealtyWebAutoConfiguration
+com.tokenrealty.web.config.TokenRealtyObservabilityAutoConfiguration

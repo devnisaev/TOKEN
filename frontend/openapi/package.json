@@ -1,0 +1,13 @@
+{
+  "name": "tokenrealty-openapi",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "codegen": "node codegen.mjs",
+    "fetch-specs": "node fetch-specs.mjs"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.6.1"
+  }
+}

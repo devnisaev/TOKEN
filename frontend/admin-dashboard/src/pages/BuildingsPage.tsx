@@ -1,6 +1,8 @@
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Plus } from 'lucide-react';
 import { api } from '@/lib/api';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export function BuildingsPage() {
@@ -11,9 +13,17 @@ export function BuildingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Buildings</h1>
-        <p className="text-muted-foreground">Property registry catalog</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Buildings</h1>
+          <p className="text-muted-foreground">Property registry catalog</p>
+        </div>
+        <Link to="/buildings/new">
+          <Button>
+            <Plus className="mr-1 h-4 w-4" />
+            Add building
+          </Button>
+        </Link>
       </div>
 
       {isLoading && (
@@ -36,9 +46,14 @@ export function BuildingsPage() {
                 {b.city}, {b.country}
               </p>
             </CardHeader>
-            <CardContent className="flex justify-between text-sm">
+            <CardContent className="flex items-center justify-between text-sm">
               <span>{b.flatCount} flats</span>
-              <span className="rounded-md bg-secondary px-2 py-0.5 text-xs font-medium">{b.status}</span>
+              <div className="flex items-center gap-2">
+                <span className="rounded-md bg-secondary px-2 py-0.5 text-xs font-medium">{b.status}</span>
+                <Link to={`/buildings/${b.id}/edit`} className="text-xs text-primary underline-offset-4 hover:underline">
+                  Edit
+                </Link>
+              </div>
             </CardContent>
           </Card>
         ))}

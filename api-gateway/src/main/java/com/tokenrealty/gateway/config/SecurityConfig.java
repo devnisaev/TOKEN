@@ -1,5 +1,6 @@
 package com.tokenrealty.gateway.config;
 
+import com.tokenrealty.security.ActuatorSecurityPaths;
 import com.tokenrealty.security.JwtAuthenticationFilter;
 import com.tokenrealty.security.config.TokenRealtyJwtAutoConfiguration;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,8 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health", "/actuator/info", "/actuator/platform-health")
+                        .requestMatchers("/actuator/platform-health").permitAll()
+                        .requestMatchers(ActuatorSecurityPaths.PUBLIC)
                         .permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login",
                                 "/api/v1/auth/refresh").permitAll()

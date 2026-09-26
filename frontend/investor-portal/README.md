@@ -53,6 +53,8 @@ Hardhat demo wallet (account #1): `0x70997970c51812dc3a010c724d1afe6fc599aa84`
 | `/login` | JWT sign-in |
 | `/` | Active listings grid |
 | `/listings/:id` | BFF detail + buy order form |
+| `/orders` | Buy order list |
+| `/orders/:id` | Order status (polls until settled) |
 | `/portfolio` | Wallet aggregate balance (USDC + tokens) |
 
 ## Environment

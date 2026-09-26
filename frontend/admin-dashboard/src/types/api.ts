@@ -35,6 +35,40 @@ export interface Building {
   propertyCategory?: string;
 }
 
+export interface BuildingDetail extends Building {
+  postalCode?: string;
+  totalFloors?: number;
+  constructionYear?: number;
+  totalAreaSqm?: number;
+  cadastralReference?: string;
+}
+
+export interface CreateBuildingRequest {
+  name: string;
+  address: string;
+  city: string;
+  country: string;
+  postalCode?: string;
+  totalFloors?: number;
+  totalFlats?: number;
+  constructionYear?: number;
+  totalAreaSqm?: number;
+  propertyCategory?: string;
+  cadastralReference?: string;
+}
+
+export interface UpdateBuildingRequest {
+  name?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  postalCode?: string;
+  totalFloors?: number;
+  totalAreaSqm?: number;
+  propertyCategory?: string;
+  cadastralReference?: string;
+}
+
 export interface ComplianceRecord {
   id: string;
   investorId: string;
@@ -44,6 +78,19 @@ export interface ComplianceRecord {
   status: string;
   kycVerifiedAt?: string;
   kycExpiresAt?: string;
+}
+
+export interface DocumentReview {
+  id: string;
+  documentId: string;
+  buildingId: string;
+  flatId?: string;
+  documentType: string;
+  ipfsCid: string;
+  status: string;
+  isVerified: boolean;
+  uploadedAt?: string;
+  reviewedAt?: string;
 }
 
 export interface ApiError {

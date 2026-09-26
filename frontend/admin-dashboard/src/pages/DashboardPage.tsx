@@ -1,15 +1,20 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Building2, ShieldCheck } from 'lucide-react';
+import { Building2, FileCheck, ShieldCheck } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export function DashboardPage() {
   const buildings = useQuery({ queryKey: ['buildings'], queryFn: () => api.listBuildings() });
   const compliance = useQuery({ queryKey: ['compliance'], queryFn: () => api.listCompliance() });
+  const docReviews = useQuery({
+    queryKey: ['document-reviews', 'pending'],
+    queryFn: () => api.listPendingDocumentReviews(),
+  });
 
   const pendingKyc =
     compliance.data?.content.filter((r) => r.status === 'PENDING').length ?? '—';
+  const pendingDocs = docReviews.data?.length ?? '—';
 
   return (
     <div className="space-y-6">
@@ -17,7 +22,7 @@ export function DashboardPage() {
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">TokenRealty platform overview</p>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-3">
         <Link to="/buildings">
           <Card className="transition-shadow hover:shadow-md">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -38,6 +43,18 @@ export function DashboardPage() {
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">{pendingKyc}</p>
+              <p className="text-xs text-muted-foreground">Awaiting review</p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link to="/document-reviews">
+          <Card className="transition-shadow hover:shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Documents pending</CardTitle>
+              <FileCheck className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">{pendingDocs}</p>
               <p className="text-xs text-muted-foreground">Awaiting review</p>
             </CardContent>
           </Card>

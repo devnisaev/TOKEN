@@ -1,0 +1,120 @@
+openapi: 3.0.3
+info:
+  title: TokenRealty Marketplace API
+  version: 1.0.0
+paths:
+  /v1/listings:
+    get:
+      operationId: listListings
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListingPage'
+  /v1/orders:
+    get:
+      operationId: listOrders
+      parameters:
+        - name: buyerId
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderPage'
+    post:
+      operationId: placeOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlaceOrderRequest'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+  /v1/orders/{id}:
+    get:
+      operationId: getOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+  /v1/orders/{id}/trade:
+    get:
+      operationId: getOrderTrade
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trade'
+components:
+  schemas:
+    ListingPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Listing'
+        totalElements: { type: integer }
+    Listing:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        flatId: { type: string, format: uuid }
+        status: { type: string }
+        priceUsd: { type: number }
+        tokensAvailable: { type: integer }
+        title: { type: string }
+    PlaceOrderRequest:
+      type: object
+      required: [listingId, buyerId, buyerWallet, tokenAmount]
+      properties:
+        listingId: { type: string, format: uuid }
+        buyerId: { type: string, format: uuid }
+        buyerWallet: { type: string }
+        tokenAmount: { type: integer }
+    OrderPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+    Order:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        listingId: { type: string, format: uuid }
+        status: { type: string }
+        buyerId: { type: string, format: uuid }
+        tokenAmount: { type: integer }
+        totalPriceUsd: { type: number }
+    Trade:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        orderId: { type: string, format: uuid }
+        status: { type: string }
+        paymentId: { type: string, format: uuid }
+        transferId: { type: string, format: uuid }

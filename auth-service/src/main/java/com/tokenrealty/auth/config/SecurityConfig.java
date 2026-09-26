@@ -1,5 +1,6 @@
 package com.tokenrealty.auth.config;
 
+import com.tokenrealty.security.ActuatorSecurityPaths;
 import com.tokenrealty.security.JwtAuthenticationFilter;
 import com.tokenrealty.security.config.TokenRealtyJwtAutoConfiguration;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers(ActuatorSecurityPaths.PUBLIC).permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/v1/auth/register", "/v1/auth/login",
                                 "/v1/auth/refresh", "/v1/auth/service-token").permitAll()

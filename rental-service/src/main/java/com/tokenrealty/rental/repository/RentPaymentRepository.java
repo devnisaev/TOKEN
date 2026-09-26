@@ -6,11 +6,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 public interface RentPaymentRepository extends JpaRepository<RentPayment, UUID> {
 
     boolean existsByLeaseIdAndPeriod(UUID leaseId, String period);
+
+    List<RentPayment> findByLeaseIdOrderByPeriodDesc(UUID leaseId);
 
     @Query("SELECT COALESCE(SUM(r.amount), 0) FROM RentPayment r "
             + "WHERE r.flatId = :flatId AND r.period = :period")

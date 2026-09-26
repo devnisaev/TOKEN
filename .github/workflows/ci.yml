@@ -22,9 +22,9 @@ jobs:
       - name: Install shared libraries
         run: ./token-realty-app/mvnw -f pom.xml -pl tokenrealty-security,tokenrealty-web,tokenrealty-jpa,tokenrealty-kafka,tokenrealty-events,tokenrealty-outbox install -q
 
-      - name: Run Java tests (core services)
+      - name: Run Java tests (all services)
         run: |
-          ./token-realty-app/mvnw -f pom.xml -pl token-realty-app,token-issuance-service,payment-service,compliance-service,marketplace-service,rental-service,notification-service,document-service,wallet-service,blockchain-indexer-service,api-gateway test -q
+          ./token-realty-app/mvnw -f pom.xml test -q
 
   hardhat-tests:
     runs-on: ubuntu-latest
@@ -45,3 +45,41 @@ jobs:
       - name: Run Hardhat contract tests
         working-directory: token-issuance-service/hardhat
         run: npm test
+
+  frontend-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [investor-portal, admin-dashboard, tenant-portal]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build ${{ matrix.app }}
+        working-directory: frontend/${{ matrix.app }}
+        run: |
+          npm ci
+          npm run build
+
+  openapi-codegen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/openapi/package-lock.json
+
+      - name: Verify OpenAPI codegen
+        working-directory: frontend/openapi
+        run: |
+          npm ci
+          npm run codegen
+          git diff --exit-code ../shared-api-types/

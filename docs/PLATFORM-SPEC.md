@@ -46,15 +46,22 @@ TokenRealty tokenizes real estate assets (buildings, flats, and other property t
 
 ## 2. Current State
 
-### Existing services
+### Existing services (12 backend microservices)
 
 | Service | Folder | Port | Database | Status |
 |---------|--------|------|----------|--------|
-| Property Registry | `token-realty-app/` | 8081 | `property_registry` | Implemented (REST, tests, Liquibase defined) |
-| Token Issuance | `token-issuance-service/` | 8082 | `token_issuance` | Implemented (REST, tests; blockchain stubbed) |
-| Marketplace | `marketplace-service/` | 8084 | `marketplace_service` | **MVP implemented** (listings, buy orders, outbox stub) |
-| Auth | `auth-service/` | 8083 | `auth_service` | **MVP implemented** (JWT, refresh, service accounts) |
-| Payment | `payment-service/` | 8085 | `payment_service` | **MVP implemented** (escrow, payouts, ledger stub) |
+| API Gateway | `api-gateway/` | 8080 | — | Implemented (proxy + BFF) |
+| Property Registry | `token-realty-app/` | 8081 | `property_registry` | Implemented |
+| Token Issuance | `token-issuance-service/` | 8082 | `token_issuance` | Implemented (Hardhat + Web3j) |
+| Auth | `auth-service/` | 8083 | `auth_service` | Implemented (JWT) |
+| Marketplace | `marketplace-service/` | 8084 | `marketplace_service` | Implemented |
+| Payment | `payment-service/` | 8085 | `payment_service` | Implemented |
+| Rental | `rental-service/` | 8086 | `rental_service` | Implemented |
+| Compliance | `compliance-service/` | 8087 | `compliance_service` | Implemented |
+| Document | `document-service/` | 8088 | `document_service` | Implemented |
+| Notification | `notification-service/` | 8089 | `notification_service` | Implemented |
+| Wallet | `wallet-service/` | 8090 | `wallet_service` | Implemented |
+| Blockchain Indexer | `blockchain-indexer-service/` | 8091 | `blockchain_indexer` | Implemented |
 
 ### What works today
 
@@ -80,10 +87,11 @@ TokenRealty tokenizes real estate assets (buildings, flats, and other property t
 - [x] **IPFS upload** — Document Service multipart → IPFS → Registry CID
 - [x] **Payment** — MVP (escrow, confirm, release, payouts, outbox stub)
 - [x] **Rental** — MVP (leases, rent-payments, occupancy; Kafka rent → dividend pipeline)
-- [ ] **Wallet** — not started
-- [x] **Marketplace** — MVP done; Payment integration and Kafka relay wired
+- [x] **Wallet** — custodial wallets, aggregate balance, Payment sync
+- [x] **Blockchain Indexer** — on-chain event poll + reconciliation
+- [x] **API Gateway** — reverse proxy + BFF aggregates
 - [x] **Root README / platform docs** — [README.md](../README.md), [AGENTS.md](../AGENTS.md), Cursor rules
-- [ ] **`FULLY_SOLD` status** — enum exists, no service logic sets it
+- [x] **`FULLY_SOLD` status** — Marketplace → Registry on primary sell-out
 
 ### Key file references
 
@@ -627,15 +635,15 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 
 ### 11.3 Observability
 
-- [ ] Structured logging (JSON) with `traceId` across services
-- [ ] Micrometer + Prometheus metrics
-- [ ] Distributed tracing (OpenTelemetry / Zipkin)
-- [ ] Health checks: `/actuator/health` on all services
+- [x] Structured logging (JSON) with `traceId` via `tokenrealty-web` (`TraceIdFilter`, logback-spring.xml)
+- [x] Micrometer + Prometheus metrics (`/actuator/prometheus` on all services)
+- [ ] Distributed tracing (OpenTelemetry / Zipkin export)
+- [x] Health checks: `/actuator/health` on all services
 
 ### 11.4 CI/CD
 
-- [ ] GitHub Actions: build + test per service
-- [ ] Contract compile + test in CI
+- [x] GitHub Actions: Java tests (all services), Hardhat tests, frontend builds, OpenAPI codegen check
+- [x] Contract compile + test in CI (Hardhat job)
 - [ ] Docker image build per service
 - [ ] Integration test suite with Testcontainers (PostgreSQL, Kafka)
 
@@ -643,8 +651,8 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 
 - [x] Investor portal MVP (`frontend/investor-portal/`, `:5173`) — login, listings, BFF detail, buy order, portfolio, order status polling
 - [x] Admin dashboard MVP (`frontend/admin-dashboard/`, `:5174`) — login, buildings list, KYC verify
-- [ ] Tenant portal (pay rent, view lease)
-- [ ] openapi-typescript codegen from springdoc
+- [x] Tenant portal MVP (`frontend/tenant-portal/`, `:5175`) — login, lease view, pay rent
+- [x] openapi-typescript codegen (`frontend/openapi/` → `frontend/shared-api-types/`)
 
 See [docs/rules/investor-portal.md](rules/investor-portal.md), [docs/rules/admin-dashboard.md](rules/admin-dashboard.md), [docs/rules/api-gateway-bff.md](rules/api-gateway-bff.md).
 

@@ -15,7 +15,7 @@
     <artifactId>tokenrealty-web</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>tokenrealty-web</name>
-    <description>TokenRealty shared web exceptions and RFC 7807 ProblemDetail handling</description>
+    <description>TokenRealty shared web exceptions, RFC 7807, observability</description>
 
     <properties>
         <java.version>21</java.version>
@@ -37,6 +37,15 @@
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>8.0</version>
         </dependency>
 
         <dependency>

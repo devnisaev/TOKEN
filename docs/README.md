@@ -31,7 +31,9 @@ Central documentation for the TokenRealty real-estate tokenization platform.
 | [rules/blockchain-indexer.md](rules/blockchain-indexer.md) | — (on-chain event poll, reconciliation) |
 | [rules/investor-portal.md](rules/investor-portal.md) | [investor-portal.mdc](../.cursor/rules/investor-portal.mdc) |
 | [rules/admin-dashboard.md](rules/admin-dashboard.md) | [admin-dashboard.mdc](../.cursor/rules/admin-dashboard.mdc) |
+| [rules/tenant-portal.md](rules/tenant-portal.md) | [tenant-portal.mdc](../.cursor/rules/tenant-portal.mdc) |
 | [rules/api-gateway-bff.md](rules/api-gateway-bff.md) | — (BFF aggregates on API Gateway) |
+| [rules/observability.md](rules/observability.md) | — (traceId, JSON logs, Prometheus) |
 
 Cursor skills (workflows — see [AGENTS.md](../AGENTS.md)):
 
@@ -56,20 +58,20 @@ Additional Cursor rules (no separate human doc yet):
 
 ## Services
 
-| Service | README | Port |
-|---------|--------|------|
-| Property Registry | [token-realty-app/README.md](../token-realty-app/README.md) | 8081 |
-| Token Issuance | [token-issuance-service/README.md](../token-issuance-service/README.md) | 8082 |
-| Auth | [auth-service/README.md](../auth-service/README.md) | 8083 |
-| Marketplace | [marketplace-service/README.md](../marketplace-service/README.md) | 8084 |
-| Payment | [payment-service/README.md](../payment-service/README.md) | 8085 |
-| Rental | [rental-service/README.md](../rental-service/README.md) | 8086 |
-| Compliance | — | 8087 |
-| Document | — | 8088 |
-| Notification | — | 8089 |
-| Wallet | — | 8090 |
-| Blockchain Indexer | — | 8091 |
-| API Gateway | — | 8080 |
+| Service | README | Port | Status |
+|---------|--------|------|--------|
+| API Gateway | [api-gateway/README.md](../api-gateway/README.md) | 8080 | Implemented |
+| Property Registry | [token-realty-app/README.md](../token-realty-app/README.md) | 8081 | Implemented |
+| Token Issuance | [token-issuance-service/README.md](../token-issuance-service/README.md) | 8082 | Implemented |
+| Auth | [auth-service/README.md](../auth-service/README.md) | 8083 | Implemented |
+| Marketplace | [marketplace-service/README.md](../marketplace-service/README.md) | 8084 | Implemented |
+| Payment | [payment-service/README.md](../payment-service/README.md) | 8085 | Implemented |
+| Rental | [rental-service/README.md](../rental-service/README.md) | 8086 | Implemented |
+| Compliance | [compliance-service/README.md](../compliance-service/README.md) | 8087 | Implemented |
+| Document | [document-service/README.md](../document-service/README.md) | 8088 | Implemented |
+| Notification | [notification-service/README.md](../notification-service/README.md) | 8089 | Implemented |
+| Wallet | [wallet-service/README.md](../wallet-service/README.md) | 8090 | Implemented |
+| Blockchain Indexer | [blockchain-indexer-service/README.md](../blockchain-indexer-service/README.md) | 8091 | Implemented |
 
 ## Frontend
 
@@ -77,8 +79,11 @@ Additional Cursor rules (no separate human doc yet):
 |-----|--------|---------|
 | Investor Portal | [frontend/investor-portal/](../frontend/investor-portal/) | http://localhost:5173 |
 | Admin Dashboard | [frontend/admin-dashboard/](../frontend/admin-dashboard/) | http://localhost:5174 |
+| Tenant Portal | [frontend/tenant-portal/](../frontend/tenant-portal/) | http://localhost:5175 |
 
-See [rules/investor-portal.md](rules/investor-portal.md), [rules/admin-dashboard.md](rules/admin-dashboard.md).
+**12 backend services** · **3 frontend apps** · **6 shared libraries** — see [../README.md](../README.md).
+
+See [rules/investor-portal.md](rules/investor-portal.md), [rules/admin-dashboard.md](rules/admin-dashboard.md), [rules/tenant-portal.md](rules/tenant-portal.md).
 
 ## Diagrams (PlantUML)
 

@@ -1,5 +1,6 @@
 package com.tokenrealty.rental.config;
 
+import com.tokenrealty.security.ActuatorSecurityPaths;
 import com.tokenrealty.security.JwtAuthenticationFilter;
 import com.tokenrealty.security.config.TokenRealtyJwtAutoConfiguration;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +31,13 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers(ActuatorSecurityPaths.PUBLIC).permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/v1/leases/**")
+                        .hasAnyRole("ADMIN", "PROPERTY_MANAGER")
+                        .requestMatchers(HttpMethod.POST, "/v1/rent-payments")
+                        .hasAnyRole("ADMIN", "PROPERTY_MANAGER", "TENANT")
                         .requestMatchers(HttpMethod.POST, "/v1/**")
                         .hasAnyRole("ADMIN", "PROPERTY_MANAGER")
                         .anyRequest().authenticated()

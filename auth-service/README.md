@@ -46,6 +46,7 @@ http://localhost:8083/api/swagger-ui.html
 | appraiser@tokenrealty.com | appraiser123 | APPRAISER |
 | compliance@tokenrealty.com | compliance123 | COMPLIANCE |
 | investor@tokenrealty.com | investor123 | INVESTOR |
+| tenant@tokenrealty.com | tenant123 | TENANT |
 
 ## Service accounts (dev)
 

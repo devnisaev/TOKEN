@@ -1,0 +1,30 @@
+---
+description: TokenRealty React tenant portal — lease view, rent payment
+globs: "frontend/tenant-portal/**/*.{ts,tsx,css,html,json}"
+alwaysApply: false
+---
+
+# Tenant Portal — TokenRealty Frontend
+
+Human docs: [docs/rules/tenant-portal.md](../../docs/rules/tenant-portal.md).
+
+## Stack
+
+React 19 + TypeScript, Vite (`:5175`), TanStack Query, React Router, Tailwind.
+
+## Rules
+
+- All API via gateway — session key `tokenrealty.tenant.auth`
+- TENANT role only — `TenantRoute` guard
+- Leases: `GET /v1/leases?tenantId={userId}`
+- Pay rent: `POST /v1/rent-payments` with `{ leaseId, period, amount }`
+- History: `GET /v1/rent-payments?leaseId=…`
+- Period format: `YYYY-MM`
+
+## Run
+
+```bash
+cd frontend/tenant-portal && npm install && npm run dev
+```
+
+Demo: `tenant@tokenrealty.com` / `tenant123`.

@@ -1,8 +1,12 @@
 import type {
   Building,
+  BuildingDetail,
   ComplianceRecord,
+  CreateBuildingRequest,
+  DocumentReview,
   SpringPage,
   TokenResponse,
+  UpdateBuildingRequest,
   UserProfile,
 } from '@/types/api';
 
@@ -58,6 +62,24 @@ export const api = {
     return request<SpringPage<Building>>('/v1/buildings?size=50&sort=name,asc');
   },
 
+  getBuilding(id: string) {
+    return request<BuildingDetail>(`/v1/buildings/${id}`);
+  },
+
+  createBuilding(body: CreateBuildingRequest) {
+    return request<Building>('/v1/buildings', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
+
+  updateBuilding(id: string, body: UpdateBuildingRequest) {
+    return request<Building>(`/v1/buildings/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(body),
+    });
+  },
+
   listCompliance(status?: string) {
     const q = status ? `&status=${status}` : '';
     return request<SpringPage<ComplianceRecord>>(`/v1/compliance?size=50${q}`);
@@ -67,6 +89,16 @@ export const api = {
     return request<ComplianceRecord>(`/v1/compliance/${id}/verify`, {
       method: 'PATCH',
       body: JSON.stringify({ kycExpiresAt }),
+    });
+  },
+
+  listPendingDocumentReviews() {
+    return request<DocumentReview[]>('/v1/compliance/document-reviews/pending');
+  },
+
+  verifyDocumentReview(documentId: string) {
+    return request<DocumentReview>(`/v1/compliance/document-reviews/${documentId}/verify`, {
+      method: 'PATCH',
     });
   },
 };

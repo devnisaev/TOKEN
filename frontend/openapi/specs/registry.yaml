@@ -1,0 +1,120 @@
+openapi: 3.0.3
+info:
+  title: TokenRealty Property Registry API
+  version: 1.0.0
+paths:
+  /v1/buildings:
+    get:
+      operationId: listBuildings
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuildingPage'
+    post:
+      operationId: createBuilding
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBuildingRequest'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuildingResponse'
+  /v1/buildings/{id}:
+    get:
+      operationId: getBuilding
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuildingDetailResponse'
+    put:
+      operationId: updateBuilding
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBuildingRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuildingResponse'
+components:
+  schemas:
+    BuildingPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/BuildingResponse'
+        totalElements: { type: integer }
+    BuildingResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        address: { type: string }
+        city: { type: string }
+        country: { type: string }
+        status: { type: string }
+        flatCount: { type: integer }
+        propertyCategory: { type: string }
+    BuildingDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/BuildingResponse'
+        - type: object
+          properties:
+            postalCode: { type: string }
+            totalFloors: { type: integer }
+            totalFlats: { type: integer }
+            constructionYear: { type: integer }
+            totalAreaSqm: { type: number }
+            cadastralReference: { type: string }
+    CreateBuildingRequest:
+      type: object
+      required: [name, address, city, country]
+      properties:
+        name: { type: string }
+        address: { type: string }
+        city: { type: string }
+        country: { type: string }
+        postalCode: { type: string }
+        totalFloors: { type: integer }
+        totalFlats: { type: integer }
+        constructionYear: { type: integer }
+        totalAreaSqm: { type: number }
+        propertyCategory: { type: string }
+        cadastralReference: { type: string }
+    UpdateBuildingRequest:
+      type: object
+      properties:
+        name: { type: string }
+        address: { type: string }
+        city: { type: string }
+        country: { type: string }
+        postalCode: { type: string }
+        totalFloors: { type: integer }
+        totalAreaSqm: { type: number }
+        propertyCategory: { type: string }
+        cadastralReference: { type: string }

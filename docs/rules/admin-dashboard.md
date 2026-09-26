@@ -41,6 +41,9 @@ Vite proxies `/api` → `http://localhost:8080`. Production: set `VITE_API_BASE_
 | `/` | Dashboard | `GET /v1/buildings`, `GET /v1/compliance` |
 | `/buildings` | Building list | `GET /v1/buildings` |
 | `/compliance` | KYC queue + approve | `GET /v1/compliance`, `PATCH /v1/compliance/{id}/verify` |
+| `/document-reviews` | Data room doc queue | `GET /v1/compliance/document-reviews/pending`, `PATCH …/verify` |
+| `/buildings/new` | Register building | `POST /v1/buildings` |
+| `/buildings/:id/edit` | Edit building | `GET /v1/buildings/{id}`, `PUT /v1/buildings/{id}` |
 
 Protected routes require JWT and role `ADMIN`, `COMPLIANCE`, or `PROPERTY_MANAGER` (`AdminRoute`).
 
@@ -68,7 +71,6 @@ Gateway CORS allows `http://localhost:5174` (`tokenrealty.gateway.cors.allowed-o
 
 ## Pending / future
 
-- [ ] Document review queue (`GET /v1/compliance/document-reviews/pending`)
-- [ ] Building create/edit forms
+- [ ] Flat create/edit within building detail
 - [ ] Order/trade monitoring for ops
 - [ ] E2E tests (Playwright)

@@ -27,6 +27,7 @@ Read and follow rules in `.cursor/rules/`:
 | [business-rules.mdc](.cursor/rules/business-rules.mdc) | Tier-1 invariants — read before money/Kafka features |
 | [investor-portal.mdc](.cursor/rules/investor-portal.mdc) | React investor portal — Vite, gateway BFF, wagmi |
 | [admin-dashboard.mdc](.cursor/rules/admin-dashboard.mdc) | React admin dashboard — buildings, KYC review |
+| [tenant-portal.mdc](.cursor/rules/tenant-portal.mdc) | React tenant portal — lease view, rent payment |
 
 Human-readable expansions: [docs/rules/](docs/rules/) — tier-1 invariants in [BUSINESS_RULES.md](docs/BUSINESS_RULES.md); cross-service modules in [shared-libraries.md](docs/rules/shared-libraries.md)
 
@@ -69,15 +70,17 @@ New services: copy structure from `marketplace-service/` or `auth-service/`.
 |-----|--------|---------|
 | Investor Portal | `frontend/investor-portal/` | http://localhost:5173 |
 | Admin Dashboard | `frontend/admin-dashboard/` | http://localhost:5174 |
+| Tenant Portal | `frontend/tenant-portal/` | http://localhost:5175 |
 
 Stack: React 19, TypeScript, Vite, TanStack Query, wagmi (investor only), Tailwind. All API via gateway `:8080`.
 
-Docs: [docs/rules/investor-portal.md](docs/rules/investor-portal.md), [docs/rules/admin-dashboard.md](docs/rules/admin-dashboard.md), [docs/rules/api-gateway-bff.md](docs/rules/api-gateway-bff.md).  
-Cursor rules: [investor-portal.mdc](.cursor/rules/investor-portal.mdc), [admin-dashboard.mdc](.cursor/rules/admin-dashboard.mdc).
+Docs: [docs/rules/investor-portal.md](docs/rules/investor-portal.md), [docs/rules/admin-dashboard.md](docs/rules/admin-dashboard.md), [docs/rules/tenant-portal.md](docs/rules/tenant-portal.md), [docs/rules/api-gateway-bff.md](docs/rules/api-gateway-bff.md).  
+Cursor rules: [investor-portal.mdc](.cursor/rules/investor-portal.mdc), [admin-dashboard.mdc](.cursor/rules/admin-dashboard.mdc), [tenant-portal.mdc](.cursor/rules/tenant-portal.mdc).
 
 ```bash
 cd frontend/investor-portal && npm install && npm run dev
 cd frontend/admin-dashboard && npm install && npm run dev
+cd frontend/tenant-portal && npm install && npm run dev
 ```
 
 ## Run tests
@@ -87,7 +90,9 @@ cd frontend/admin-dashboard && npm install && npm run dev
 ./mvnw test                    # inside each service folder (after security lib installed)
 ```
 
-Shared libs: `tokenrealty-security/` (JWT, `ServiceRestClientBuilder`), `tokenrealty-web/` (exceptions, RFC 7807 handler), `tokenrealty-jpa/` (`BaseEntity`, auditing), `tokenrealty-kafka/` (`KafkaEventConsumer`, processed-event idempotency), `tokenrealty-events/` (envelope, `KafkaJsonEvent`), `tokenrealty-outbox/` (`OutboxWriter`, `OutboxRelay`, `OutboxPayload`) — `./token-realty-app/mvnw -pl tokenrealty-security,tokenrealty-web,tokenrealty-jpa,tokenrealty-kafka,tokenrealty-events,tokenrealty-outbox install`
+Shared libs: `tokenrealty-security/` (JWT, `ServiceRestClientBuilder`), `tokenrealty-web/` (exceptions, RFC 7807 handler), `tokenrealty-jpa/` (`BaseEntity`, auditing), `tokenrealty-kafka/` (`KafkaEventConsumer`, processed-event idempotency), `tokenrealty-events/` (envelope, `KafkaJsonEvent`), `tokenrealty-outbox/` (`OutboxWriter`, `OutboxRelay`, `OutboxPayload`) — `./token-realty-app/mvnw -pl tokenrealty-security,tokenrealty-web,tokenrealty-jpa,tokenrealty-kafka,tokenrealty-events,tokenrealty-outbox install
+
+OpenAPI codegen: `cd frontend/openapi && npm install && npm run codegen` → `frontend/shared-api-types/``
 
 ## Platform docs
 

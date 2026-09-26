@@ -18,7 +18,8 @@ React 19 + TypeScript, Vite (`:5174`), TanStack Query, React Router, Tailwind.
 - JWT in `AuthProvider` / sessionStorage key `tokenrealty.admin.auth` (separate from investor portal)
 - Admin roles: `ADMIN`, `COMPLIANCE`, `PROPERTY_MANAGER` — enforce in `AdminRoute`
 - KYC verify: `PATCH /v1/compliance/{id}/verify` with `{ kycExpiresAt }` — backend requires ADMIN/COMPLIANCE
-- Buildings: `GET /v1/buildings` — any authenticated role
+- Document reviews: `GET /v1/compliance/document-reviews/pending`, `PATCH …/{documentId}/verify`
+- Buildings: `GET/POST /v1/buildings`, `GET/PUT /v1/buildings/{id}`
 - Types in `src/types/api.ts` — keep aligned with Java DTOs
 - No wagmi — admin app has no wallet connection
 

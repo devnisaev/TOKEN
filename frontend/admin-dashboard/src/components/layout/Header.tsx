@@ -30,6 +30,9 @@ export function Header() {
           <NavLink to="/compliance" className={navLinkClass}>
             KYC
           </NavLink>
+          <NavLink to="/document-reviews" className={navLinkClass}>
+            Documents
+          </NavLink>
         </nav>
         <div className="flex items-center gap-3">
           {user && (
