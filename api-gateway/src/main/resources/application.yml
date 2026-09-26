@@ -1,6 +1,10 @@
 spring:
   application:
     name: api-gateway
+  graphql:
+    path: /graphql
+    graphiql:
+      enabled: ${GRAPHQL_GRAPHIQL_ENABLED:false}
   data:
     redis:
       host: ${REDIS_HOST:localhost}

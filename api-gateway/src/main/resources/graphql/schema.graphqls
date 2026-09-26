@@ -1,0 +1,123 @@
+type Query {
+    flatDetail(flatId: ID!): FlatDetail
+    listingDetail(listingId: ID!): ListingDetail
+    investorPortfolio(investorId: ID!): Portfolio
+    tenantLeases(tenantId: ID!): [TenantLease]
+    tenantMaintenance(tenantId: ID!): [TenantMaintenance]
+}
+
+type FlatDetail {
+    flatId: ID!
+    buildingId: ID!
+    buildingName: String
+    flatNumber: String
+    floor: Int
+    areaSqm: Float
+    status: String
+    tokenContract: TokenContractSummary
+    listing: ListingSummary
+}
+
+type ListingDetail {
+    flatId: ID!
+    buildingName: String
+    flatNumber: String
+    flatStatus: String
+    listing: ListingSummary!
+    tokenContract: TokenContractSummary
+}
+
+type ListingSummary {
+    listingId: ID!
+    listingType: String
+    status: String
+    priceUsd: String
+    tokensAvailable: String
+    tokensTotal: String
+    minInvestmentTokens: String
+    title: String
+}
+
+type TokenContractSummary {
+    contractId: ID!
+    contractAddress: String
+    tokenSymbol: String
+    totalSupply: String
+    tokenPriceUsd: String
+    status: String
+}
+
+type Portfolio {
+    balance: PortfolioBalance!
+    recentDividends: [DividendPayment]
+}
+
+type PortfolioBalance {
+    investorId: ID!
+    primaryWalletAddress: String
+    fiatBalances: [FiatBalance]
+    tokenHoldings: [TokenHolding]
+}
+
+type FiatBalance {
+    currency: String
+    available: String
+    held: String
+}
+
+type TokenHolding {
+    contractId: ID!
+    tokenSymbol: String
+    walletAddress: String
+    balance: String
+    tokenPriceUsd: String
+}
+
+type DividendPayment {
+    id: ID!
+    contractId: ID
+    amountUsd: String
+    status: String
+    paidAt: String
+}
+
+type TenantLease {
+    lease: LeaseView!
+    flat: TenantFlatSummary!
+    rentDue: Boolean!
+}
+
+type TenantMaintenance {
+    lease: LeaseView!
+    flat: TenantFlatSummary!
+    openTickets: [MaintenanceTicket]
+}
+
+type LeaseView {
+    id: ID!
+    flatId: ID!
+    tenantId: ID!
+    monthlyRentUsd: String
+    startDate: String
+    endDate: String
+    status: String
+}
+
+type TenantFlatSummary {
+    flatId: ID!
+    buildingId: ID!
+    buildingName: String
+    flatNumber: String
+    floor: Int
+    areaSqm: Float
+    status: String
+}
+
+type MaintenanceTicket {
+    id: ID!
+    leaseId: ID!
+    title: String
+    description: String
+    status: String
+    createdAt: String
+}
