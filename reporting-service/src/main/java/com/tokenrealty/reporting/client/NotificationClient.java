@@ -14,9 +14,29 @@ import java.util.Map;
 public class NotificationClient extends DownstreamRestClientSupport {
 
     private static final String OPERATOR_ALERT_EVENT = "tokenrealty.reporting.operator.alert.v1";
+    private static final String OPERATOR_DIGEST_EVENT = "tokenrealty.reporting.operator.digest.v1";
 
     public NotificationClient(@Qualifier("notificationRestClient") RestClient restClient) {
         super(restClient);
+    }
+
+    public void sendOperatorDigest(
+            long openAlerts, long criticalAlerts, long decliningHealth, String avgHealthScore) {
+        try {
+            postVoid(
+                    "/v1/notifications/send",
+                    Map.of(
+                            "eventType", OPERATOR_DIGEST_EVENT,
+                            "payload", Map.of(
+                                    "openAlerts", openAlerts,
+                                    "criticalAlerts", criticalAlerts,
+                                    "decliningHealth", decliningHealth,
+                                    "averageHealthScore", avgHealthScore)),
+                    DownstreamServices.NOTIFICATION,
+                    Map.of());
+        } catch (RuntimeException ex) {
+            log.warn("Skipping operator digest notification: {}", ex.getMessage());
+        }
     }
 
     public void sendOperatorAlert(String alertType, String severity, String message) {

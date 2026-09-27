@@ -12,6 +12,8 @@ public class OperatorAutomationScheduler {
 
     private final OperatorAlertService operatorAlertService;
     private final OperatorKpiSnapshotService operatorKpiSnapshotService;
+    private final OperationsReportService operationsReportService;
+    private final com.tokenrealty.reporting.client.NotificationClient notificationClient;
 
     @Scheduled(cron = "${tokenrealty.reporting.alert-generation-cron:0 0 6,18 * * *}")
     public void generateOperatorAlerts() {
@@ -23,5 +25,16 @@ public class OperatorAutomationScheduler {
     public void recordKpiSnapshot() {
         operatorKpiSnapshotService.recordNow();
         log.debug("Scheduled KPI snapshot recorded");
+    }
+
+    @Scheduled(cron = "${tokenrealty.reporting.operator-digest-cron:0 0 8 * * MON}")
+    public void sendWeeklyOperatorDigest() {
+        var report = operationsReportService.export();
+        notificationClient.sendOperatorDigest(
+                report.alertSummary().openAlertCount(),
+                report.alertSummary().criticalOpenCount(),
+                report.decliningHealthCount(),
+                report.kpis().averageHealthScore().toPlainString());
+        log.debug("Weekly operator digest sent");
     }
 }

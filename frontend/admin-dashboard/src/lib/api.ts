@@ -27,6 +27,7 @@ import type {
   InsuranceExpiryAlert,
   GenerateOperatorAlertsResponse,
   BuildingHealthItem,
+  OperationsExportResponse,
   OperatorAlertItem,
   OperatorKpiResponse,
   OperatorKpiSnapshotItem,
@@ -288,6 +289,10 @@ export const api = {
 
   getBuildingHealth(buildingId: string) {
     return request<BuildingHealthItem>(`/v1/reports/building-health/${buildingId}`);
+  },
+
+  getOperationsExport() {
+    return request<OperationsExportResponse>('/v1/reports/operations-export');
   },
 
   generateOperatorAlerts(insuranceWithinDays = 30) {

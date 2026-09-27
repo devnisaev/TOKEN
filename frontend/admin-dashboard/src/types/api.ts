@@ -149,6 +149,35 @@ export interface AssetHealthScoreItem {
   computedAt: string;
 }
 
+export interface AlertTypeCount {
+  alertType: string;
+  count: number;
+}
+
+export interface OperatorAlertSummaryResponse {
+  openAlertCount: number;
+  criticalOpenCount: number;
+  byType: AlertTypeCount[];
+  generatedAt: string;
+}
+
+export interface HealthTrendItem {
+  flatId: string;
+  buildingId: string;
+  previousScore: number;
+  latestScore: number;
+  delta: number;
+  latestAt: string;
+}
+
+export interface OperationsExportResponse {
+  kpis: OperatorKpiResponse;
+  alertSummary: OperatorAlertSummaryResponse;
+  decliningHealthCount: number;
+  decliningHealth: HealthTrendItem[];
+  generatedAt: string;
+}
+
 export interface BuildingHealthItem {
   buildingId: string;
   averageHealthScore: number;

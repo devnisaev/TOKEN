@@ -66,6 +66,9 @@ export function Header() {
           <NavLink to="/reports/compliance" className={({ isActive }) => navLinkClass(isActive)}>
             Compliance
           </NavLink>
+          <NavLink to="/reports/operations" className={({ isActive }) => navLinkClass(isActive)}>
+            Ops
+          </NavLink>
         </nav>
         <div className="flex items-center gap-3">
           {user && (

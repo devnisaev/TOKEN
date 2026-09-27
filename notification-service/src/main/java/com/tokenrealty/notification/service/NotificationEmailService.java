@@ -92,6 +92,7 @@ public class NotificationEmailService {
             case "tokenrealty.settlement.recovered.v1" -> "Settlement saga recovered";
             case "tokenrealty.valuation.approved.v1" -> "Property valuation approved";
             case "tokenrealty.reporting.operator.alert.v1" -> "Critical operator alert";
+            case "tokenrealty.reporting.operator.digest.v1" -> "Weekly operator digest";
             default -> "TokenRealty notification: " + eventType;
         };
     }
@@ -243,6 +244,22 @@ public class NotificationEmailService {
                     textOr(payload, "alertType", "n/a"),
                     textOr(payload, "severity", "n/a"),
                     textOr(payload, "message", "n/a"));
+            case "tokenrealty.reporting.operator.digest.v1" -> """
+                    Weekly operator digest
+
+                    Open alerts: %s
+                    Critical alerts: %s
+                    Declining health assets: %s
+                    Average health score: %s%%
+
+                    Review the admin operations reports dashboard.
+
+                    — TokenRealty
+                    """.formatted(
+                    textOr(payload, "openAlerts", "0"),
+                    textOr(payload, "criticalAlerts", "0"),
+                    textOr(payload, "decliningHealth", "0"),
+                    textOr(payload, "averageHealthScore", "0"));
             default -> "Event: " + eventType + "\n\nDetails:\n" + payload;
         };
     }

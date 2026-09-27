@@ -187,4 +187,34 @@ public final class ReportingDtos {
             BigDecimal occupancyFactor
     ) {
     }
+
+    public record AlertTypeCount(String alertType, long count) {
+    }
+
+    public record OperatorAlertSummaryResponse(
+            long openAlertCount,
+            long criticalOpenCount,
+            List<AlertTypeCount> byType,
+            Instant generatedAt
+    ) {
+    }
+
+    public record HealthTrendItem(
+            UUID flatId,
+            UUID buildingId,
+            BigDecimal previousScore,
+            BigDecimal latestScore,
+            BigDecimal delta,
+            Instant latestAt
+    ) {
+    }
+
+    public record OperationsExportResponse(
+            OperatorKpiResponse kpis,
+            OperatorAlertSummaryResponse alertSummary,
+            long decliningHealthCount,
+            List<HealthTrendItem> decliningHealth,
+            Instant generatedAt
+    ) {
+    }
 }

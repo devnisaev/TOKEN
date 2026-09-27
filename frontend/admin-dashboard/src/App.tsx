@@ -26,6 +26,7 @@ import { EsgPage } from '@/pages/EsgPage';
 import { OperatorKpisPage } from '@/pages/OperatorKpisPage';
 import { OperatorAlertsPage } from '@/pages/OperatorAlertsPage';
 import { BuildingHealthPage } from '@/pages/BuildingHealthPage';
+import { OperationsReportsPage } from '@/pages/OperationsReportsPage';
 
 export function App() {
   return (
@@ -65,6 +66,7 @@ export function App() {
           <Route path="integrations" element={<IntegrationsPage />} />
           <Route path="integrations/deliveries" element={<IntegrationsDeliveriesPage />} />
           <Route path="reports/compliance" element={<ComplianceReportsPage />} />
+          <Route path="reports/operations" element={<OperationsReportsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

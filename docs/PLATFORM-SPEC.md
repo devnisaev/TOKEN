@@ -465,6 +465,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 | **Phase 20** | Operations automation ✅ | KPI snapshots, scheduled alerts, maintenance signals, health recompute (778–802) |
 | **Phase 21** | Portfolio health & notifications ✅ | Alert notifications, building rollups, investor portfolio health (803–827) |
 | **Phase 22** | Building operations UI ✅ | Health history, admin building health, sustainability scores (828–852) |
+| **Phase 23** | Operator reporting & trends ✅ | Alert summaries, health trends, operations export, weekly digest (853–877) |
 
 See diagrams: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml), [`diagrams/09-phase-12-asset-generalization.puml`](diagrams/09-phase-12-asset-generalization.puml), [`diagrams/10-phase-13-rwa-exchange.puml`](diagrams/10-phase-13-rwa-exchange.puml).
 
@@ -1770,7 +1771,33 @@ Guide: [rules/phase-22-services.md](rules/phase-22-services.md)
 
 ---
 
-## 29. Diagram Index
+## 29. Phase 23 — Operator Reporting & Trends
+
+**Status:** Complete (tracks 853–877). Alert summaries, declining health trends, operations export, weekly digest.
+
+Guide: [rules/phase-23-services.md](rules/phase-23-services.md)
+
+### 29.1 Goals
+
+- [x] Operator alert summary API
+- [x] Declining health trend detection
+- [x] Operations export endpoint
+- [x] Weekly operator digest notification
+- [x] Admin operations reports page
+
+### 29.2 Track backlog (853–877)
+
+| Track range | Focus |
+|-------------|-------|
+| 853–857 | Alert summary API |
+| 858–862 | Health trend detection |
+| 863–867 | Operations export |
+| 868–872 | Weekly digest scheduler |
+| 873–877 | Admin UI; tests |
+
+---
+
+## 30. Diagram Index
 
 | File | Description |
 |------|-------------|
@@ -1789,7 +1816,7 @@ Guide: [rules/phase-22-services.md](rules/phase-22-services.md)
 
 ---
 
-## 30. Open Questions & Decisions
+## 31. Open Questions & Decisions
 
 | # | Question | Options | Decision |
 |---|----------|---------|----------|
@@ -1814,7 +1841,7 @@ Guide: [rules/phase-22-services.md](rules/phase-22-services.md)
 
 ---
 
-## 31. Cursor Rules & Coding Standards
+## 32. Cursor Rules & Coding Standards
 
 Agent and IDE conventions live in `.cursor/rules/` (adapted from Titan fintech rules).
 

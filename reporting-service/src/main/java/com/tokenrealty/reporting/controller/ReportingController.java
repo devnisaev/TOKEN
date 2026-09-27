@@ -4,6 +4,9 @@ import com.tokenrealty.reporting.dto.ReportingDtos.*;
 import com.tokenrealty.reporting.service.AssetHealthRecomputeService;
 import com.tokenrealty.reporting.service.AssetHealthScoreService;
 import com.tokenrealty.reporting.service.BuildingHealthService;
+import com.tokenrealty.reporting.service.HealthTrendService;
+import com.tokenrealty.reporting.service.OperatorAlertSummaryService;
+import com.tokenrealty.reporting.service.OperationsReportService;
 import com.tokenrealty.reporting.service.EsgSnapshotService;
 import com.tokenrealty.reporting.service.OperatorAlertService;
 import com.tokenrealty.reporting.service.OperatorKpiService;
@@ -34,6 +37,9 @@ public class ReportingController {
     private final OperatorKpiSnapshotService operatorKpiSnapshotService;
     private final AssetHealthRecomputeService assetHealthRecomputeService;
     private final BuildingHealthService buildingHealthService;
+    private final OperatorAlertSummaryService operatorAlertSummaryService;
+    private final HealthTrendService healthTrendService;
+    private final OperationsReportService operationsReportService;
 
     @GetMapping("/trading-summary")
     public TradingSummaryResponse tradingSummary() {
@@ -164,5 +170,20 @@ public class ReportingController {
     @GetMapping("/portfolio-health")
     public List<PortfolioHealthItem> portfolioHealth(@RequestParam List<UUID> flatIds) {
         return buildingHealthService.portfolioHealth(flatIds);
+    }
+
+    @GetMapping("/operator-alert-summary")
+    public OperatorAlertSummaryResponse operatorAlertSummary() {
+        return operatorAlertSummaryService.summary();
+    }
+
+    @GetMapping("/health-trends/declining")
+    public List<HealthTrendItem> decliningHealthTrends() {
+        return healthTrendService.listDeclining();
+    }
+
+    @GetMapping("/operations-export")
+    public OperationsExportResponse operationsExport() {
+        return operationsReportService.export();
     }
 }
