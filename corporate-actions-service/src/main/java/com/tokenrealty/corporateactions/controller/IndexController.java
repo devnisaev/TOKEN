@@ -1,6 +1,9 @@
 package com.tokenrealty.corporateactions.controller;
 
+import com.tokenrealty.corporateactions.dto.CorporateActionDtos.IndexDefinitionResponse;
 import com.tokenrealty.corporateactions.dto.CorporateActionDtos.*;
+import com.tokenrealty.corporateactions.entity.IndexDividendAccrual;
+import com.tokenrealty.corporateactions.repository.IndexDividendAccrualRepository;
 import com.tokenrealty.corporateactions.service.IndexBasketService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,7 @@ import java.util.UUID;
 public class IndexController {
 
     private final IndexBasketService indexBasketService;
+    private final IndexDividendAccrualRepository indexDividendAccrualRepository;
 
     @GetMapping
     public List<IndexDefinitionResponse> list() {
@@ -47,5 +51,25 @@ public class IndexController {
     @PreAuthorize("hasRole('ADMIN')")
     public IndexDefinitionResponse activate(@PathVariable UUID id) {
         return indexBasketService.activate(id);
+    }
+
+    @GetMapping("/{id}/dividends")
+    public List<IndexDividendAccrualResponse> listDividendAccruals(@PathVariable UUID id) {
+        indexBasketService.findById(id);
+        return indexDividendAccrualRepository.findByIndexIdOrderByCreatedAtDesc(id).stream()
+                .map(this::toAccrualResponse)
+                .toList();
+    }
+
+    private IndexDividendAccrualResponse toAccrualResponse(IndexDividendAccrual accrual) {
+        return new IndexDividendAccrualResponse(
+                accrual.getId(),
+                accrual.getIndexId(),
+                accrual.getConstituentContractId(),
+                accrual.getSourcePayoutId(),
+                accrual.getConstituentPayoutUsd(),
+                accrual.getIndexShareUsd(),
+                accrual.getWeightBps(),
+                accrual.getCreatedAt());
     }
 }

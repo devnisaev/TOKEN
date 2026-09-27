@@ -26,6 +26,7 @@ import type {
   LiquidityPool,
   PropertyIndex,
   RfqRequest,
+  SurveillanceAlertItem,
   IntegrationCredential,
   IntegrationDelivery,
   MaintenanceTicket,
@@ -233,5 +234,9 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(body),
     });
+  },
+
+  listSurveillanceAlerts() {
+    return request<SpringPage<SurveillanceAlertItem>>('/v1/reporting/surveillance-alerts?size=50');
   },
 };

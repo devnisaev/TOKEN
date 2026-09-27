@@ -458,6 +458,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 | **Phase 13** | RWA order book (CLOB) ✅ | Limit orders, depth, NAV bands, market data; evolve Marketplace (603–627) |
 | **Phase 14** | AMM liquidity pools ✅ | Token/USDC pools, LP tokens, NAV circuit breakers (628–652) |
 | **Phase 15** | Institutional exchange ✅ | OTC/RFQ, REIT-style index baskets, token-collateral lending (653–677) |
+| **Phase 16** | Exchange completion ✅ | Index dividends, liquidation, surveillance, bridge (678–702) |
 
 See diagrams: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml), [`diagrams/09-phase-12-asset-generalization.puml`](diagrams/09-phase-12-asset-generalization.puml), [`diagrams/10-phase-13-rwa-exchange.puml`](diagrams/10-phase-13-rwa-exchange.puml).
 
@@ -1583,7 +1584,33 @@ Integration Hub + Issuance bridge — secondary chain listing for foreign invest
 
 ---
 
-## 22. Diagram Index
+## 22. Phase 16 — Institutional Exchange Completion
+
+**Status:** Complete (tracks 678–702). Completes deferred Phase 15 capabilities.
+
+Guide: [rules/phase-16-services.md](rules/phase-16-services.md)
+
+### 22.1 Goals
+
+- [x] Index dividend accrual on `payout.completed` (pro-rata by constituent weight)
+- [x] Loan liquidation API with collateral seizure and ledger entries
+- [x] Reporting `LARGE_TRADE` surveillance (≥ $500k notional on order matched)
+- [x] Index wrapper token registration in Issuance (`POST /v1/tokens/index`)
+- [x] Cross-chain bridge transfer MVP in Integration Hub
+
+### 22.2 Track backlog (678–702)
+
+| Track range | Focus |
+|-------------|-------|
+| 678–682 | Index dividend accrual; Corporate Actions consume |
+| 683–687 | Loan liquidation; Payment ledger |
+| 688–692 | Large-trade surveillance; admin alerts UI |
+| 693–697 | Index token issuance; link to index definition |
+| 698–702 | Cross-chain bridge API; E2E tests |
+
+---
+
+## 23. Diagram Index
 
 | File | Description |
 |------|-------------|

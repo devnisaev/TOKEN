@@ -38,6 +38,14 @@ public class LedgerService {
                 LedgerEntry.EntryType.CREDIT, amount, currency, loanId);
     }
 
+    public void recordLiquidation(UUID loanId, BigDecimal seizedValueUsd, PaymentCurrency currency) {
+        UUID transactionId = UUID.randomUUID();
+        saveEntry(transactionId, null, null, LedgerAccountCode.COLLATERAL,
+                LedgerEntry.EntryType.DEBIT, seizedValueUsd, currency, loanId);
+        saveEntry(transactionId, null, null, LedgerAccountCode.LOAN_PRINCIPAL,
+                LedgerEntry.EntryType.CREDIT, seizedValueUsd, currency, loanId);
+    }
+
     public void recordRepay(UUID loanId, BigDecimal principal, BigDecimal interest, PaymentCurrency currency) {
         UUID transactionId = UUID.randomUUID();
         BigDecimal total = principal.add(interest);

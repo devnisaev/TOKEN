@@ -21,6 +21,15 @@ public class IssuanceDtos {
             @NotBlank String spvWalletAddress
     ) {}
 
+    public record IssueIndexTokenRequest(
+            @NotNull UUID indexDefinitionId,
+            @NotBlank String tokenName,
+            @NotBlank @Size(max = 20) String tokenSymbol,
+            @NotNull @Min(1) Long totalSupply,
+            @NotNull @Positive BigDecimal tokenPriceUsd,
+            @NotBlank String spvWalletAddress
+    ) {}
+
     public record TokenContractResponse(
             UUID id,
             UUID flatId,

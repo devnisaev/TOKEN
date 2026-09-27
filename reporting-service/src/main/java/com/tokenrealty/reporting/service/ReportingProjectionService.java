@@ -89,6 +89,18 @@ public class ReportingProjectionService {
                     .detectedAt(event.occurredAt())
                     .build());
         }
+        BigDecimal notional = decimal(payload, "totalPriceUsd");
+        if (notional != null && notional.compareTo(new BigDecimal("500000")) >= 0) {
+            surveillanceAlertRecordRepository.save(SurveillanceAlertRecord.builder()
+                    .sourceEventId(UUID.nameUUIDFromBytes(
+                            (event.eventId().toString() + "-LARGE_TRADE").getBytes()))
+                    .orderId(uuid(payload, "orderId"))
+                    .buyerId(buyerId)
+                    .sellerId(sellerId)
+                    .alertType("LARGE_TRADE")
+                    .detectedAt(event.occurredAt())
+                    .build());
+        }
     }
 
     @Transactional

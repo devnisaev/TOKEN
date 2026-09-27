@@ -49,9 +49,10 @@ Real-estate tokenization platform — fractional property ownership, crypto paym
 | Phase 13 | Complete | 603–627 | [phase-13-services.md](docs/rules/phase-13-services.md) — RWA order book (CLOB) |
 | Phase 14 | Complete | 628–652 | [phase-14-services.md](docs/rules/phase-14-services.md) — AMM liquidity pools |
 | Phase 15 | Complete | 653–677 | [phase-15-services.md](docs/rules/phase-15-services.md) — OTC, indices, lending |
-| Phase 16 | In progress | 678–702 | [phase-16-services.md](docs/rules/phase-16-services.md) — exchange completion, liquidation, bridge |
+| Phase 16 | Complete | 678–702 | [phase-16-services.md](docs/rules/phase-16-services.md) — exchange completion, liquidation, bridge |
+| Phase 17 | In progress | 703–727 | [phase-17-services.md](docs/rules/phase-17-services.md) — ESG, IoT feeds, insurance |
 
-**Platform status:** Phases 0–15 complete (tracks 1–677). Phase 16 institutional exchange completion (678–702) in progress.
+**Platform status:** Phases 0–16 complete (tracks 1–702). Phase 17 ESG & asset operations (703–727) in progress.
 
 ## Shared libraries
 

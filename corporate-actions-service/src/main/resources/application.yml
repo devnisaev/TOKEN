@@ -51,6 +51,7 @@ tokenrealty:
       dividend-distribution-requested: tokenrealty.corporateactions.dividend.distribution-requested.v1
       stock-split-requested: tokenrealty.corporateactions.stock-split.requested.v1
       stock-split-completed: tokenrealty.issuance.stock-split.completed.v1
+      payout-completed: tokenrealty.payment.payout.completed.v1
 
 management:
   endpoints:

@@ -51,4 +51,13 @@ public class LendingController {
             @Valid @RequestBody RepayLoanRequest request) {
         return lendingService.repay(loanId, request);
     }
+
+    @PostMapping("/loans/{loanId}/liquidate")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Liquidate undercollateralized loan and seize collateral")
+    public LoanAccountResponse liquidate(
+            @PathVariable UUID loanId,
+            @Valid @RequestBody LiquidateLoanRequest request) {
+        return lendingService.liquidate(loanId, request);
+    }
 }

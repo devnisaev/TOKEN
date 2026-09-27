@@ -115,9 +115,13 @@ AMM liquidity pools in Marketplace — constant-product swaps, LP positions, NAV
 
 Institutional exchange: OTC/RFQ desk, REIT-style index baskets, token-collateral lending, market maker bulk API. See [docs/PLATFORM-SPEC.md §21](docs/PLATFORM-SPEC.md#21-phase-15--institutional-exchange-otc-indices-lending) and [docs/rules/phase-15-services.md](docs/rules/phase-15-services.md).
 
-### Phase 16 — in progress (roadmap)
+### Phase 16 — complete
 
-Institutional exchange completion: index dividend aggregation, loan liquidation, OTC surveillance, index token issuance, cross-chain bridge MVP. Tracks 678–702 — [phase-16-services.md](docs/rules/phase-16-services.md).
+Institutional exchange completion: index dividend aggregation, loan liquidation, OTC surveillance, index token issuance, cross-chain bridge MVP. See [docs/PLATFORM-SPEC.md §22](docs/PLATFORM-SPEC.md#22-phase-16--institutional-exchange-completion) and [docs/rules/phase-16-services.md](docs/rules/phase-16-services.md).
+
+### Phase 17 — in progress (roadmap)
+
+ESG metrics, IoT utilization feeds, insurance metadata, operator KPI dashboards. Tracks 703–727 — [phase-17-services.md](docs/rules/phase-17-services.md).
 
 **Do not spin out:** limits/policy service, config service, Payment escrow, Issuance deploy/transfer core.
 

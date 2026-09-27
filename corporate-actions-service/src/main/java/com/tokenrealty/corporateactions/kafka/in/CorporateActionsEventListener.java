@@ -3,8 +3,10 @@ package com.tokenrealty.corporateactions.kafka.in;
 import com.tokenrealty.corporateactions.kafka.CorporateActionsKafkaEventTypes;
 import com.tokenrealty.corporateactions.kafka.command.DividendDistributedCommand;
 import com.tokenrealty.corporateactions.kafka.command.RentCollectedCommand;
+import com.tokenrealty.corporateactions.kafka.command.PayoutCompletedCommand;
 import com.tokenrealty.corporateactions.kafka.command.StockSplitCompletedCommand;
 import com.tokenrealty.corporateactions.service.CorporateActionsService;
+import com.tokenrealty.corporateactions.service.IndexDividendService;
 import com.tokenrealty.events.kafka.KafkaJsonEvent;
 import com.tokenrealty.kafka.consume.KafkaEventConsumer;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ public class CorporateActionsEventListener {
 
     private final KafkaEventConsumer eventConsumer;
     private final CorporateActionsService corporateActionsService;
+    private final IndexDividendService indexDividendService;
 
     @KafkaListener(topics = "${tokenrealty.kafka.topic.rent-collected}")
     public void onRentCollected(String message) {
@@ -38,6 +41,12 @@ public class CorporateActionsEventListener {
     public void onStockSplitCompleted(String message) {
         ingest(message, CorporateActionsKafkaEventTypes.STOCK_SPLIT_COMPLETED,
                 event -> corporateActionsService.onStockSplitCompleted(StockSplitCompletedCommand.from(event)));
+    }
+
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.payout-completed}")
+    public void onPayoutCompleted(String message) {
+        ingest(message, CorporateActionsKafkaEventTypes.PAYOUT_COMPLETED,
+                event -> indexDividendService.onPayoutCompleted(PayoutCompletedCommand.from(event)));
     }
 
     private void ingest(String message, String eventType, Consumer<KafkaJsonEvent> handler) {

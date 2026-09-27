@@ -11,4 +11,6 @@ public interface IndexConstituentRepository extends JpaRepository<IndexConstitue
     List<IndexConstituent> findByIndexIdOrderByWeightBpsDesc(UUID indexId);
 
     void deleteByIndexId(UUID indexId);
+
+    List<IndexConstituent> findByContractId(UUID contractId);
 }

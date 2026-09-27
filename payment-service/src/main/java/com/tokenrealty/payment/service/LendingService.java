@@ -125,6 +125,29 @@ public class LendingService {
         return toLoanResponse(loanAccountRepository.save(loan));
     }
 
+    @Transactional
+    public LoanAccountResponse liquidate(UUID loanId, LiquidateLoanRequest request) {
+        LoanAccount loan = loanAccountRepository.findById(loanId)
+                .orElseThrow(() -> new ResourceNotFoundException("LoanAccount", loanId));
+        if (loan.getStatus() != LoanAccount.LoanStatus.ACTIVE) {
+            raiseValidation("Only active loans can be liquidated");
+        }
+        CollateralPosition collateral = collateralPositionRepository.findById(loan.getCollateralPositionId())
+                .orElseThrow(() -> new ResourceNotFoundException("CollateralPosition", loan.getCollateralPositionId()));
+        BigDecimal seizedValue = collateral.getNavPerTokenUsd()
+                .multiply(BigDecimal.valueOf(collateral.getTokenAmount()))
+                .setScale(2, RoundingMode.HALF_UP);
+
+        ledgerService.recordLiquidation(loan.getId(), seizedValue, PaymentCurrency.USDC);
+        loan.setStatus(LoanAccount.LoanStatus.LIQUIDATED);
+        loan.setOutstandingUsd(BigDecimal.ZERO);
+        loanAccountRepository.save(loan);
+
+        collateral.setStatus(CollateralPosition.CollateralStatus.LIQUIDATED);
+        collateralPositionRepository.save(collateral);
+        return toLoanResponse(loan);
+    }
+
     private void releaseCollateral(UUID collateralPositionId) {
         collateralPositionRepository.findById(collateralPositionId).ifPresent(c -> {
             c.setStatus(CollateralPosition.CollateralStatus.RELEASED);

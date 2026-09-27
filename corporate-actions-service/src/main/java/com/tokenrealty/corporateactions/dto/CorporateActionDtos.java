@@ -86,6 +86,18 @@ public final class CorporateActionDtos {
     ) {
     }
 
+    public record IndexDividendAccrualResponse(
+            UUID id,
+            UUID indexId,
+            UUID constituentContractId,
+            UUID sourcePayoutId,
+            BigDecimal constituentPayoutUsd,
+            BigDecimal indexShareUsd,
+            int weightBps,
+            Instant createdAt
+    ) {
+    }
+
     @Builder
     public record IndexDefinitionResponse(
             UUID id,

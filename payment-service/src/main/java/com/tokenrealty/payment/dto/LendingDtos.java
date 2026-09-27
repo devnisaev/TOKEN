@@ -36,6 +36,13 @@ public final class LendingDtos {
     }
 
     @Builder
+    public record LiquidateLoanRequest(
+            @NotNull UUID adminId,
+            @Size(max = 500) String reason
+    ) {
+    }
+
+    @Builder
     public record RepayLoanRequest(
             @NotNull UUID investorId,
             @NotNull @DecimalMin("0.01") BigDecimal principalUsd,
