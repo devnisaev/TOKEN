@@ -23,6 +23,7 @@ public class BuildingService {
 
     private final PropertyMapper mapper;
     private final BuildingRepository buildingRepository;
+    private final FlatService flatService;
 
     public Page<BuildingResponse> findAll(Pageable pageable) {
         return buildingRepository.findAll(pageable).map(mapper::toBuildingResponse);
@@ -40,6 +41,46 @@ public class BuildingService {
         Building building = buildingRepository.findByIdWithFlats(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Building: " + id));
         return mapper.toBuildingDetailResponse(building);
+    }
+
+    @Transactional
+    public StandaloneAssetResponse createStandaloneAsset(CreateStandaloneAssetRequest request) {
+        if (buildingRepository.existsByAddressAndCity(request.address(), request.city())) {
+            throw new ConflictException("Building already registered at this address in " + request.city());
+        }
+        CreateBuildingRequest buildingRequest = CreateBuildingRequest.builder()
+                .name(request.name())
+                .address(request.address())
+                .city(request.city())
+                .country(request.country())
+                .postalCode(request.postalCode())
+                .totalFloors(1)
+                .totalFlats(1)
+                .totalAreaSqm(request.areaSqm())
+                .latitude(request.latitude())
+                .longitude(request.longitude())
+                .propertyCategory(request.propertyCategory())
+                .cadastralReference(request.cadastralReference())
+                .build();
+        BuildingResponse building = create(buildingRequest);
+        CreateFlatRequest flatRequest = CreateFlatRequest.builder()
+                .flatNumber(request.unitLabel())
+                .floor(0)
+                .areaSqm(request.areaSqm())
+                .numRooms(1)
+                .numBathrooms(1)
+                .cadastralReference(request.cadastralReference())
+                .operatingModel(request.operatingModel())
+                .liquidityTier(request.liquidityTier())
+                .developmentStage(request.developmentStage())
+                .environmentalRiskTier(request.environmentalRiskTier())
+                .licenseTypes(request.licenseTypes())
+                .occupancyOrUtilization(request.occupancyOrUtilization())
+                .build();
+        AssetUnitResponse assetUnit = flatService.findAssetUnitById(
+                flatService.create(building.id(), flatRequest).id());
+        log.info("Created standalone asset building={} unit={}", building.id(), assetUnit.id());
+        return new StandaloneAssetResponse(building, assetUnit);
     }
 
     @Transactional

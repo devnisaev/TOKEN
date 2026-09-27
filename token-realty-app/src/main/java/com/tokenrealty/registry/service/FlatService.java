@@ -16,6 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.tokenrealty.registry.entity.Building;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,6 +64,19 @@ public class FlatService {
                 .toList();
     }
 
+    public Page<AssetUnitResponse> findAssetUnits(
+            Flat.OperatingModel operatingModel,
+            Flat.LiquidityTier liquidityTier,
+            Building.PropertyCategory propertyCategory,
+            Pageable pageable) {
+        return flatRepository.findAssetUnits(operatingModel, liquidityTier, propertyCategory, pageable)
+                .map(mapper::toAssetUnitResponse);
+    }
+
+    public AssetUnitResponse findAssetUnitById(UUID id) {
+        return mapper.toAssetUnitResponse(getOrThrow(id));
+    }
+
     @Transactional
     public FlatResponse create(UUID buildingId, CreateFlatRequest request) {
         Building building = buildingRepository.findById(buildingId)
@@ -76,6 +92,7 @@ public class FlatService {
 
         Flat flat = mapper.toFlat(request);
         flat.setBuilding(building);
+        applyAssetMetadata(flat, request.licenseTypes());
         Flat saved = flatRepository.save(flat);
 
         log.info("Created flat id={} number={} in building={}", saved.getId(), saved.getFlatNumber(), buildingId);
@@ -89,6 +106,10 @@ public class FlatService {
             throw new ConflictException("Cannot update a tokenized flat — changes must go through governance");
         }
         mapper.updateFlatFromRequest(request, flat);
+        if (request.licenseTypes() != null) {
+            flat.getLicenseTypes().clear();
+            flat.getLicenseTypes().addAll(request.licenseTypes());
+        }
         return mapper.toFlatResponse(flatRepository.save(flat));
     }
 
@@ -162,6 +183,18 @@ public class FlatService {
     private void ensureBuildingExists(UUID buildingId) {
         if (!buildingRepository.existsById(buildingId)) {
             throw new ResourceNotFoundException("Building", buildingId);
+        }
+    }
+
+    private static void applyAssetMetadata(Flat flat, List<String> licenseTypes) {
+        if (flat.getOperatingModel() == null) {
+            flat.setOperatingModel(Flat.OperatingModel.PURE_RENT);
+        }
+        if (flat.getLiquidityTier() == null) {
+            flat.setLiquidityTier(Flat.LiquidityTier.TIER_1);
+        }
+        if (licenseTypes != null && !licenseTypes.isEmpty()) {
+            flat.setLicenseTypes(new HashSet<>(licenseTypes));
         }
     }
 }

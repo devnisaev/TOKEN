@@ -25,6 +25,8 @@ services:
     url: ${PAYMENT_URL:http://localhost:8085/api}
   valuation:
     url: ${VALUATION_URL:http://localhost:8095/api}
+  rental:
+    url: ${RENTAL_URL:http://localhost:8086/api}
 
 tokenrealty:
   jwt:

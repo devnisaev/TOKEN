@@ -55,4 +55,12 @@ public class WebhookController {
             @RequestBody String rawBody) {
         webhookRelayService.acceptValuationFeedWebhook(provider, rawBody);
     }
+
+    @PostMapping("/operator-revenue/{provider}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void receiveOperatorRevenueWebhook(
+            @PathVariable String provider,
+            @RequestBody String rawBody) {
+        webhookRelayService.acceptOperatorRevenueWebhook(provider, rawBody);
+    }
 }

@@ -5,5 +5,6 @@ public enum IntegrationType {
     DOCUMENT,
     PAYMENT,
     VALUATION_FEED,
+    OPERATOR_REVENUE,
     CUSTODY
 }

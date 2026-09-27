@@ -1,6 +1,6 @@
 # Phase 12 — Universal Asset Tokenization
 
-**Status:** Planned (tracks 578–602). Generalizes the platform from **Building → Flat** to **any tokenizable real-estate asset** — private houses, land, gyms, pools, service stations, warehouses, hospitality.
+**Status:** Complete (tracks 578–602). Generalizes the platform from **Building → Flat** to **any tokenizable real-estate asset** — private houses, land, gyms, pools, service stations, warehouses, hospitality.
 
 Master spec: [PLATFORM-SPEC.md §18](../PLATFORM-SPEC.md#18-phase-12--universal-asset-tokenization) · Diagram: [09-phase-12-asset-generalization.puml](../diagrams/09-phase-12-asset-generalization.puml)
 

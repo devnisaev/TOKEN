@@ -63,9 +63,26 @@ public interface PropertyMapper {
             expression = "java(flat.getBuilding() != null ? flat.getBuilding().getId() : null)")
     @Mapping(target = "buildingName",
             expression = "java(flat.getBuilding() != null ? flat.getBuilding().getName() : null)")
+    @Mapping(target = "propertyCategory",
+            expression = "java(flat.getBuilding() != null ? flat.getBuilding().getPropertyCategory() : null)")
+    @Mapping(target = "licenseTypes",
+            expression = "java(flat.getLicenseTypes() != null ? java.util.List.copyOf(flat.getLicenseTypes()) : java.util.List.of())")
     @Mapping(target = "currentValuation",
             expression = "java(flat.getValuations() != null ? flat.getValuations().stream().filter(v -> Boolean.TRUE.equals(v.getIsCurrent())).findFirst().map(this::toValuationResponse).orElse(null) : null)")
     FlatResponse toFlatResponse(Flat flat);
+
+    @BeanMapping(builder = @Builder(disableBuilder = true))
+    @Mapping(target = "buildingId",
+            expression = "java(flat.getBuilding() != null ? flat.getBuilding().getId() : null)")
+    @Mapping(target = "buildingName",
+            expression = "java(flat.getBuilding() != null ? flat.getBuilding().getName() : null)")
+    @Mapping(target = "propertyCategory",
+            expression = "java(flat.getBuilding() != null ? flat.getBuilding().getPropertyCategory() : null)")
+    @Mapping(target = "licenseTypes",
+            expression = "java(flat.getLicenseTypes() != null ? java.util.List.copyOf(flat.getLicenseTypes()) : java.util.List.of())")
+    @Mapping(target = "currentValuation",
+            expression = "java(flat.getValuations() != null ? flat.getValuations().stream().filter(v -> Boolean.TRUE.equals(v.getIsCurrent())).findFirst().map(this::toValuationResponse).orElse(null) : null)")
+    AssetUnitResponse toAssetUnitResponse(Flat flat);
 
     @BeanMapping(builder = @Builder(disableBuilder = true))
     FlatSummary toFlatSummary(Flat flat);

@@ -6,6 +6,8 @@ import type {
   ComplianceRecord,
   CreateBuildingRequest,
   CreateFlatRequest,
+  CreateStandaloneAssetRequest,
+  StandaloneAssetResponse,
   DocumentReview,
   Flat,
   Order,
@@ -72,6 +74,13 @@ export const api = {
 
   createBuilding(body: CreateBuildingRequest) {
     return request<Building>('/v1/buildings', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
+
+  createStandaloneAsset(body: CreateStandaloneAssetRequest) {
+    return request<StandaloneAssetResponse>('/v1/buildings/standalone-assets', {
       method: 'POST',
       body: JSON.stringify(body),
     });

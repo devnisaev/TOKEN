@@ -53,6 +53,9 @@ public class OpenSearchIndexSync implements SearchIndexSyncPort {
         document.put("buildingName", listing.getBuildingName());
         document.put("city", listing.getCity());
         document.put("listingType", listing.getListingType());
+        document.put("propertyCategory", listing.getPropertyCategory());
+        document.put("operatingModel", listing.getOperatingModel());
+        document.put("liquidityTier", listing.getLiquidityTier());
         document.put("priceUsd", listing.getPriceUsd());
         document.put("navPerTokenUsd", listing.getNavPerTokenUsd());
         document.put("searchText", listing.getSearchText());

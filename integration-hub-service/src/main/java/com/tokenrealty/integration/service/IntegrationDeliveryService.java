@@ -64,6 +64,11 @@ public class IntegrationDeliveryService {
         return createPendingDelivery(IntegrationType.VALUATION_FEED, provider, rawBody, null, null);
     }
 
+    @Transactional
+    public UUID createPendingOperatorRevenueDelivery(String provider, String rawBody) {
+        return createPendingDelivery(IntegrationType.OPERATOR_REVENUE, provider, rawBody, null, null);
+    }
+
     private UUID createPendingDelivery(
             IntegrationType integrationType,
             String provider,

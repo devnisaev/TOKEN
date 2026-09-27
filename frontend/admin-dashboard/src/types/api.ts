@@ -1,3 +1,49 @@
+export type AssetOperatingModel =
+  | 'PURE_RENT'
+  | 'OPERATOR_REVENUE_SHARE'
+  | 'MEMBERSHIP'
+  | 'DEVELOPMENT';
+
+export type AssetLiquidityTier = 'TIER_1' | 'TIER_2' | 'TIER_3';
+
+export type AssetPropertyCategory =
+  | 'RESIDENTIAL_FLAT'
+  | 'COMMERCIAL_BUILDING'
+  | 'SINGLE_FAMILY_HOUSE'
+  | 'LAND_PARCEL'
+  | 'INDUSTRIAL_WAREHOUSE'
+  | 'GYM'
+  | 'SWIMMING_POOL'
+  | 'SERVICE_STATION'
+  | 'HOSPITALITY'
+  | 'CAR_WASH';
+
+export interface AssetFlatFields {
+  operatingModel?: AssetOperatingModel;
+  liquidityTier?: AssetLiquidityTier;
+  occupancyOrUtilization?: number;
+}
+
+export interface CreateStandaloneAssetRequest {
+  name: string;
+  address: string;
+  city: string;
+  country: string;
+  postalCode?: string;
+  propertyCategory: AssetPropertyCategory;
+  unitLabel: string;
+  areaSqm: number;
+  cadastralReference?: string;
+  operatingModel?: AssetOperatingModel;
+  liquidityTier?: AssetLiquidityTier;
+  occupancyOrUtilization?: number;
+}
+
+export interface StandaloneAssetResponse {
+  building: Building;
+  assetUnit: Flat & AssetFlatFields;
+}
+
 export type {
   ApiError,
   CreateFlatRequest,

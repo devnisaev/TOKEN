@@ -99,11 +99,14 @@ Institutional expansion (Gemini roadmap adaptation). See [docs/PLATFORM-SPEC.md 
 
 Institutional UI & BFF. See [docs/PLATFORM-SPEC.md §17](docs/PLATFORM-SPEC.md#17-phase-11--institutional-ui--bff) and [docs/rules/phase-11-services.md](docs/rules/phase-11-services.md).
 
-### Phases 12–15 — planned (roadmap)
+### Phase 12 — complete
+
+Universal asset tokenization (`AssetUnit` API, operating models, liquidity tiers). See [docs/PLATFORM-SPEC.md §18](docs/PLATFORM-SPEC.md#18-phase-12--universal-asset-tokenization) and [docs/rules/phase-12-services.md](docs/rules/phase-12-services.md).
+
+### Phases 13–15 — planned (roadmap)
 
 | Phase | Focus | Tracks | Guide |
 |-------|-------|--------|-------|
-| 12 | Universal asset tokenization (houses, land, gyms, stations) | 578–602 | [phase-12-services.md](docs/rules/phase-12-services.md) |
 | 13 | RWA order book (CLOB) — evolve Marketplace | 603–627 | [phase-13-services.md](docs/rules/phase-13-services.md) |
 | 14 | AMM liquidity pools + NAV circuit breakers | 628–652 | [phase-14-services.md](docs/rules/phase-14-services.md) |
 | 15 | OTC/RFQ, index baskets, token-collateral lending | 653–677 | [phase-15-services.md](docs/rules/phase-15-services.md) |

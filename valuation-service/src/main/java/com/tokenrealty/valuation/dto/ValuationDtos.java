@@ -1,6 +1,7 @@
 package com.tokenrealty.valuation.dto;
 
 import com.tokenrealty.valuation.entity.ValuationRequestStatus;
+import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -21,7 +22,9 @@ public final class ValuationDtos {
             @NotNull UUID flatId,
             @NotNull @DecimalMin("0.01") BigDecimal valueUsd,
             @Min(1) long totalTokens,
-            @Size(max = 1000) String notes
+            @Size(max = 1000) String notes,
+            @DecimalMin("0") @DecimalMax("100") BigDecimal operatingUtilizationPct,
+            @Min(0) Integer memberCountKpi
     ) {
     }
 
@@ -43,6 +46,8 @@ public final class ValuationDtos {
             String rejectionReason,
             Instant reviewedAt,
             UUID navSnapshotId,
+            BigDecimal operatingUtilizationPct,
+            Integer memberCountKpi,
             Instant createdAt
     ) {
     }

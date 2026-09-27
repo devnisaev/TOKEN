@@ -25,6 +25,9 @@ public class MarketplaceMapper {
                 .description(listing.getDescription())
                 .sellerInvestorId(listing.getSellerInvestorId())
                 .sellerWallet(listing.getSellerWallet())
+                .propertyCategory(listing.getPropertyCategory())
+                .operatingModel(listing.getOperatingModel())
+                .liquidityTier(listing.getLiquidityTier())
                 .createdAt(listing.getCreatedAt())
                 .updatedAt(listing.getUpdatedAt())
                 .build();

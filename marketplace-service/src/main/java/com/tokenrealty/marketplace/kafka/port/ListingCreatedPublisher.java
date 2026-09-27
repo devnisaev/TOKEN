@@ -12,7 +12,10 @@ public interface ListingCreatedPublisher {
             UUID flatId,
             String listingType,
             BigDecimal priceUsd,
-            long tokensAvailable
+            long tokensAvailable,
+            String propertyCategory,
+            String operatingModel,
+            String liquidityTier
     ) {
     }
 }

@@ -29,8 +29,12 @@ public class ListingController {
     public Page<ListingResponse> list(
             @RequestParam(required = false) Listing.ListingStatus status,
             @RequestParam(required = false) UUID flatId,
+            @RequestParam(required = false) String propertyCategory,
+            @RequestParam(required = false) String operatingModel,
+            @RequestParam(required = false) String liquidityTier,
             @PageableDefault(size = 20) Pageable pageable) {
-        return listingService.findAll(status, flatId, pageable);
+        return listingService.findAll(
+                status, flatId, propertyCategory, operatingModel, liquidityTier, pageable);
     }
 
     @GetMapping("/{id}")

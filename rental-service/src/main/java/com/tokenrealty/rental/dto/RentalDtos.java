@@ -99,4 +99,28 @@ public final class RentalDtos {
             @NotNull com.tokenrealty.rental.entity.MaintenanceTicket.TicketStatus status
     ) {
     }
+
+    public record IngestOperatorRevenueRequest(
+            @NotNull UUID buildingId,
+            @NotNull UUID flatId,
+            @NotNull LocalDate periodStart,
+            @NotNull LocalDate periodEnd,
+            @NotNull @DecimalMin("0.01") BigDecimal grossRevenueUsd,
+            @Size(max = 200) String operatorName
+    ) {
+    }
+
+    public record OperatorRevenueResponse(
+            UUID id,
+            UUID buildingId,
+            UUID flatId,
+            LocalDate periodStart,
+            LocalDate periodEnd,
+            BigDecimal grossRevenueUsd,
+            String operatorName,
+            String sourceProvider,
+            Instant ingestedAt,
+            Instant createdAt
+    ) {
+    }
 }

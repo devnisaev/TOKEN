@@ -94,7 +94,7 @@ class FlatServiceTest {
     @Test
     @DisplayName("create saves flat under the correct building")
     void create_savesFlat() {
-        var request = new CreateFlatRequest("101", 1, 65.0, 2, 1, null, null);
+        var request = new CreateFlatRequest("101", 1, 65.0, 2, 1, null, null, null, null, null, null, null, null);
 
         when(buildingRepository.findById(buildingId)).thenReturn(Optional.of(building));
         when(flatRepository.existsByBuildingIdAndFlatNumber(buildingId, "101")).thenReturn(false);
@@ -112,7 +112,7 @@ class FlatServiceTest {
     @Test
     @DisplayName("create throws ConflictException when flat number duplicate")
     void create_throwsConflict_whenDuplicateFlatNumber() {
-        var request = new CreateFlatRequest("101", 1, 65.0, 2, 1, null, null);
+        var request = new CreateFlatRequest("101", 1, 65.0, 2, 1, null, null, null, null, null, null, null, null);
         when(buildingRepository.findById(buildingId)).thenReturn(Optional.of(building));
         when(flatRepository.existsByBuildingIdAndFlatNumber(buildingId, "101")).thenReturn(true);
 
@@ -127,7 +127,7 @@ class FlatServiceTest {
     @DisplayName("create throws ConflictException when building is SUSPENDED")
     void create_throwsConflict_whenBuildingSuspended() {
         building.setStatus(Building.BuildingStatus.SUSPENDED);
-        var request = new CreateFlatRequest("102", 2, 50.0, 1, 1, null, null);
+        var request = new CreateFlatRequest("102", 2, 50.0, 1, 1, null, null, null, null, null, null, null, null);
         when(buildingRepository.findById(buildingId)).thenReturn(Optional.of(building));
 
         assertThatThrownBy(() -> flatService.create(buildingId, request))
@@ -141,7 +141,8 @@ class FlatServiceTest {
         flat.setStatus(Flat.FlatStatus.TOKENIZED);
         when(flatRepository.findById(flatId)).thenReturn(Optional.of(flat));
 
-        var request = new UpdateFlatRequest("101A", null, null, null, null, null, null);
+        var request = new UpdateFlatRequest(
+                "101A", null, null, null, null, null, null, null, null, null, null, null, null);
 
         assertThatThrownBy(() -> flatService.update(flatId, request))
                 .isInstanceOf(ConflictException.class)
@@ -156,14 +157,17 @@ class FlatServiceTest {
         when(flatRepository.findById(flatId)).thenReturn(Optional.of(flat));
         when(flatRepository.save(flat)).thenReturn(flat);
         when(mapper.toFlatResponse(flat)).thenReturn(
-                new FlatResponse(
-                        flatResponse.id(), flatResponse.buildingId(), flatResponse.buildingName(),
-                        flatResponse.flatNumber(), flatResponse.floor(), flatResponse.areaSqm(),
-                        flatResponse.netUsableAreaSqm(), flatResponse.cadastralReference(),
-                        flatResponse.numRooms(), flatResponse.numBathrooms(),
-                        Flat.FlatStatus.TOKENIZED, "0xABC123", 1000L,
-                        flatResponse.tokenPriceUsd(), flatResponse.currentValuation(),
-                        flatResponse.createdAt(), flatResponse.updatedAt()));
+                FlatResponse.builder()
+                        .id(flatResponse.id())
+                        .buildingId(flatResponse.buildingId())
+                        .buildingName(flatResponse.buildingName())
+                        .flatNumber(flatResponse.flatNumber())
+                        .floor(flatResponse.floor())
+                        .areaSqm(flatResponse.areaSqm())
+                        .status(Flat.FlatStatus.TOKENIZED)
+                        .tokenContractAddress("0xABC123")
+                        .totalTokens(1000L)
+                        .build());
 
         var result = flatService.setTokenInfo(flatId, "0xABC123", 1000L, BigDecimal.valueOf(50.00));
 

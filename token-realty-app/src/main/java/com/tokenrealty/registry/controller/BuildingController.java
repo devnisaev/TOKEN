@@ -55,6 +55,15 @@ public class BuildingController {
         return buildingService.create(request);
     }
 
+    @PostMapping("/standalone-assets")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROPERTY_MANAGER')")
+    @Operation(summary = "Register a standalone asset (1:1 building + unit wrapper)")
+    public StandaloneAssetResponse createStandaloneAsset(
+            @Valid @RequestBody CreateStandaloneAssetRequest request) {
+        return buildingService.createStandaloneAsset(request);
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROPERTY_MANAGER')")
     @Operation(summary = "Update building details")

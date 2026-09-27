@@ -5,7 +5,9 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.tokenrealty.jpa.entity.BaseEntity;
 @Entity
@@ -47,6 +49,33 @@ public class Flat extends BaseEntity {
     @Builder.Default
     private FlatStatus status = FlatStatus.AVAILABLE;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "operating_model", length = 40)
+    @Builder.Default
+    private OperatingModel operatingModel = OperatingModel.PURE_RENT;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "liquidity_tier", length = 20)
+    @Builder.Default
+    private LiquidityTier liquidityTier = LiquidityTier.TIER_1;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "development_stage", length = 30)
+    private DevelopmentStage developmentStage;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "environmental_risk_tier", length = 20)
+    private EnvironmentalRiskTier environmentalRiskTier;
+
+    @ElementCollection
+    @CollectionTable(name = "flat_license_types", joinColumns = @JoinColumn(name = "flat_id"))
+    @Column(name = "license_type", length = 80)
+    @Builder.Default
+    private Set<String> licenseTypes = new HashSet<>();
+
+    @Column(name = "occupancy_or_utilization", precision = 8, scale = 4)
+    private BigDecimal occupancyOrUtilization;
+
     // Tokenization info — populated once tokens are issued
     @Column(name = "token_contract_address")
     private String tokenContractAddress;
@@ -70,5 +99,31 @@ public class Flat extends BaseEntity {
         TOKENIZED,        // Token contract deployed
         FULLY_SOLD,       // All tokens sold
         SUSPENDED         // Temporarily halted
+    }
+
+    public enum OperatingModel {
+        PURE_RENT,
+        OPERATOR_REVENUE_SHARE,
+        MEMBERSHIP,
+        DEVELOPMENT
+    }
+
+    public enum LiquidityTier {
+        TIER_1,
+        TIER_2,
+        TIER_3
+    }
+
+    public enum DevelopmentStage {
+        RAW,
+        PERMITTED,
+        UNDER_CONSTRUCTION,
+        STABILIZED
+    }
+
+    public enum EnvironmentalRiskTier {
+        LOW,
+        MEDIUM,
+        HIGH
     }
 }

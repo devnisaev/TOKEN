@@ -45,6 +45,8 @@ public class ValuationService {
                 .status(ValuationRequestStatus.PENDING)
                 .submittedBy(submittedBy)
                 .notes(request.notes())
+                .operatingUtilizationPct(request.operatingUtilizationPct())
+                .memberCountKpi(request.memberCountKpi())
                 .build();
         return toResponse(valuationRequestRepository.save(entity));
     }
@@ -159,6 +161,8 @@ public class ValuationService {
                 request.getRejectionReason(),
                 request.getReviewedAt(),
                 request.getNavSnapshotId(),
+                request.getOperatingUtilizationPct(),
+                request.getMemberCountKpi(),
                 request.getCreatedAt());
     }
 

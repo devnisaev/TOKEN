@@ -46,6 +46,9 @@ public final class MarketplaceDtos {
             String description,
             UUID sellerInvestorId,
             String sellerWallet,
+            String propertyCategory,
+            String operatingModel,
+            String liquidityTier,
             Instant createdAt,
             Instant updatedAt
     ) {

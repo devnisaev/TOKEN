@@ -24,6 +24,9 @@ public class OutboxListingCreatedPublisher implements ListingCreatedPublisher {
                 .put("listingType", event.listingType())
                 .put("priceUsd", event.priceUsd())
                 .put("tokensAvailable", event.tokensAvailable())
+                .put("propertyCategory", event.propertyCategory())
+                .put("operatingModel", event.operatingModel())
+                .put("liquidityTier", event.liquidityTier())
                 .enqueue(outboxWriter, listingCreatedTopic, event.listingId());
     }
 }

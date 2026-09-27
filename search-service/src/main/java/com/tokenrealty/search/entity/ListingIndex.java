@@ -41,6 +41,15 @@ public class ListingIndex extends BaseEntity {
     @Column(name = "listing_type", length = 20)
     private String listingType;
 
+    @Column(name = "property_category", length = 40)
+    private String propertyCategory;
+
+    @Column(name = "operating_model", length = 40)
+    private String operatingModel;
+
+    @Column(name = "liquidity_tier", length = 20)
+    private String liquidityTier;
+
     @Column(name = "price_usd", precision = 19, scale = 2)
     private BigDecimal priceUsd;
 

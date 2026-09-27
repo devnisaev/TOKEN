@@ -35,6 +35,9 @@ public class SearchIndexService {
 
         index.setFlatId(command.flatId());
         index.setListingType(command.listingType());
+        index.setPropertyCategory(command.propertyCategory());
+        index.setOperatingModel(command.operatingModel());
+        index.setLiquidityTier(command.liquidityTier());
         index.setPriceUsd(command.priceUsd());
         index.setTokensAvailable(command.tokensAvailable());
         index.setSearchText(buildListingSearchText(index));
@@ -137,6 +140,9 @@ public class SearchIndexService {
                 index.getBuildingName(),
                 index.getCity(),
                 index.getListingType(),
+                index.getPropertyCategory(),
+                index.getOperatingModel(),
+                index.getLiquidityTier(),
                 index.getPriceUsd(),
                 index.getNavPerTokenUsd());
     }

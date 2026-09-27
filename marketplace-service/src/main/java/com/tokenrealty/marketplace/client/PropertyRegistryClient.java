@@ -46,10 +46,13 @@ public class PropertyRegistryClient extends DownstreamRestClientSupport {
             UUID id,
             UUID buildingId,
             String buildingName,
+            String propertyCategory,
             String flatNumber,
             Integer floor,
             Double areaSqm,
-            String status
+            String status,
+            String operatingModel,
+            String liquidityTier
     ) {
     }
 

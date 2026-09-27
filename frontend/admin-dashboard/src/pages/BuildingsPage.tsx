@@ -18,12 +18,17 @@ export function BuildingsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Buildings</h1>
           <p className="text-muted-foreground">Property registry catalog</p>
         </div>
-        <Link to="/buildings/new">
-          <Button>
-            <Plus className="mr-1 h-4 w-4" />
-            Add building
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link to="/buildings/standalone/new">
+            <Button variant="outline">Standalone asset</Button>
+          </Link>
+          <Link to="/buildings/new">
+            <Button>
+              <Plus className="mr-1 h-4 w-4" />
+              Add building
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {isLoading && (

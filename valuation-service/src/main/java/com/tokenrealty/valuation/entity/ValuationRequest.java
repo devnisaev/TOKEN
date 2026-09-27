@@ -51,4 +51,10 @@ public class ValuationRequest extends BaseEntity {
 
     @Column(name = "nav_snapshot_id")
     private UUID navSnapshotId;
+
+    @Column(name = "operating_utilization_pct", precision = 8, scale = 4)
+    private BigDecimal operatingUtilizationPct;
+
+    @Column(name = "member_count_kpi")
+    private Integer memberCountKpi;
 }

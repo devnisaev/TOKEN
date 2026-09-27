@@ -22,12 +22,18 @@ public interface ListingIndexRepository extends JpaRepository<ListingIndex, UUID
             SELECT l FROM ListingIndex l
             WHERE (:q IS NULL OR :q = '' OR LOWER(l.searchText) LIKE LOWER(CONCAT('%', :q, '%')))
               AND (:listingType IS NULL OR :listingType = '' OR l.listingType = :listingType)
+              AND (:propertyCategory IS NULL OR :propertyCategory = '' OR l.propertyCategory = :propertyCategory)
+              AND (:operatingModel IS NULL OR :operatingModel = '' OR l.operatingModel = :operatingModel)
+              AND (:liquidityTier IS NULL OR :liquidityTier = '' OR l.liquidityTier = :liquidityTier)
               AND (:minPrice IS NULL OR l.priceUsd >= :minPrice)
               AND (:maxPrice IS NULL OR l.priceUsd <= :maxPrice)
             """)
     Page<ListingIndex> search(
             @Param("q") String q,
             @Param("listingType") String listingType,
+            @Param("propertyCategory") String propertyCategory,
+            @Param("operatingModel") String operatingModel,
+            @Param("liquidityTier") String liquidityTier,
             @Param("minPrice") BigDecimal minPrice,
             @Param("maxPrice") BigDecimal maxPrice,
             Pageable pageable);

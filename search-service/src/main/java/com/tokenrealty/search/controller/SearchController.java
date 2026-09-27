@@ -25,10 +25,14 @@ public class SearchController {
     public Page<ListingSearchResult> searchListings(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String listingType,
+            @RequestParam(required = false) String propertyCategory,
+            @RequestParam(required = false) String operatingModel,
+            @RequestParam(required = false) String liquidityTier,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
             @PageableDefault(size = 20) Pageable pageable) {
-        return queryService.searchListings(q, listingType, minPrice, maxPrice, pageable)
+        return queryService.searchListings(
+                        q, listingType, propertyCategory, operatingModel, liquidityTier, minPrice, maxPrice, pageable)
                 .map(ListingSearchResult::from);
     }
 

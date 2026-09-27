@@ -9,12 +9,27 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-const emptyForm: CreateFlatRequest = {
+const OPERATING_MODELS = [
+  'PURE_RENT',
+  'OPERATOR_REVENUE_SHARE',
+  'MEMBERSHIP',
+  'DEVELOPMENT',
+] as const;
+
+const LIQUIDITY_TIERS = ['TIER_1', 'TIER_2', 'TIER_3'] as const;
+
+const emptyForm: CreateFlatRequest & {
+  operatingModel?: string;
+  liquidityTier?: string;
+  occupancyOrUtilization?: number;
+} = {
   flatNumber: '',
   floor: 1,
   areaSqm: 50,
   numRooms: 2,
   numBathrooms: 1,
+  operatingModel: 'PURE_RENT',
+  liquidityTier: 'TIER_1',
 };
 
 export function FlatFormPage() {
@@ -40,6 +55,9 @@ export function FlatFormPage() {
         numBathrooms: f.numBathrooms ?? 1,
         cadastralReference: f.cadastralReference,
         netUsableAreaSqm: f.netUsableAreaSqm,
+        operatingModel: (f as { operatingModel?: string }).operatingModel ?? 'PURE_RENT',
+        liquidityTier: (f as { liquidityTier?: string }).liquidityTier ?? 'TIER_1',
+        occupancyOrUtilization: (f as { occupancyOrUtilization?: number }).occupancyOrUtilization,
       });
     }
   }, [flatQuery.data]);
@@ -117,6 +135,55 @@ export function FlatFormPage() {
                   onChange={(e) => setField('areaSqm', Number(e.target.value))}
                 />
               </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="operatingModel">Operating model</Label>
+                <select
+                  id="operatingModel"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  value={form.operatingModel ?? 'PURE_RENT'}
+                  onChange={(e) => setField('operatingModel' as keyof CreateFlatRequest, e.target.value)}
+                >
+                  {OPERATING_MODELS.map((m) => (
+                    <option key={m} value={m}>
+                      {m.replace(/_/g, ' ')}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="liquidityTier">Liquidity tier</Label>
+                <select
+                  id="liquidityTier"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  value={form.liquidityTier ?? 'TIER_1'}
+                  onChange={(e) => setField('liquidityTier' as keyof CreateFlatRequest, e.target.value)}
+                >
+                  {LIQUIDITY_TIERS.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="occupancyOrUtilization">Occupancy / utilization (%)</Label>
+              <Input
+                id="occupancyOrUtilization"
+                type="number"
+                step="0.1"
+                min={0}
+                max={100}
+                value={form.occupancyOrUtilization ?? ''}
+                onChange={(e) =>
+                  setField(
+                    'occupancyOrUtilization' as keyof CreateFlatRequest,
+                    e.target.value ? Number(e.target.value) : undefined,
+                  )
+                }
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">

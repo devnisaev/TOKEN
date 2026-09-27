@@ -17,6 +17,7 @@ import { IntegrationsDeliveriesPage } from '@/pages/IntegrationsDeliveriesPage';
 import { ComplianceReportsPage } from '@/pages/ComplianceReportsPage';
 import { OrderDetailPage } from '@/pages/OrderDetailPage';
 import { OrdersPage } from '@/pages/OrdersPage';
+import { StandaloneAssetFormPage } from '@/pages/StandaloneAssetFormPage';
 
 export function App() {
   return (
@@ -33,6 +34,7 @@ export function App() {
           <Route index element={<DashboardPage />} />
           <Route path="buildings" element={<BuildingsPage />} />
           <Route path="buildings/new" element={<BuildingFormPage />} />
+          <Route path="buildings/standalone/new" element={<StandaloneAssetFormPage />} />
           <Route path="buildings/:buildingId/edit" element={<BuildingFormPage />} />
           <Route path="buildings/:buildingId/flats/new" element={<FlatFormPage />} />
           <Route path="buildings/:buildingId/flats/:flatId/edit" element={<FlatFormPage />} />

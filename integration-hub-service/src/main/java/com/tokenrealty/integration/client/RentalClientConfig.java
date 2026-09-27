@@ -1,0 +1,19 @@
+package com.tokenrealty.integration.client;
+
+import com.tokenrealty.security.client.ServiceRestClientBuilder;
+import com.tokenrealty.security.client.ServiceTokenProvider;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
+
+@Configuration
+public class RentalClientConfig {
+
+    @Bean("rentalRestClient")
+    RestClient rentalRestClient(
+            @Value("${services.rental.url}") String baseUrl,
+            ServiceTokenProvider serviceTokenProvider) {
+        return ServiceRestClientBuilder.build(baseUrl, serviceTokenProvider);
+    }
+}

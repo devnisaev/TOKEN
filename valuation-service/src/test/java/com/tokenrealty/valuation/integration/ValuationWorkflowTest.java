@@ -54,7 +54,8 @@ class ValuationWorkflowTest {
         UUID flatId = UUID.randomUUID();
 
         ValuationRequestResponse submitted = valuationService.submit(
-                new SubmitValuationRequest(buildingId, flatId, new BigDecimal("1000000.00"), 1000L, "Annual appraisal"),
+                new SubmitValuationRequest(
+                        buildingId, flatId, new BigDecimal("1000000.00"), 1000L, "Annual appraisal", null, null),
                 appraiserId);
 
         assertThat(submitted.status()).isEqualTo(ValuationRequestStatus.PENDING);

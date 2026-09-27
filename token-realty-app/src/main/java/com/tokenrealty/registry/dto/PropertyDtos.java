@@ -115,7 +115,13 @@ public class PropertyDtos {
             @Min(1) Integer numRooms,
             @Min(1) Integer numBathrooms,
             @Size(max = 100) String cadastralReference,
-            @Positive Double netUsableAreaSqm
+            @Positive Double netUsableAreaSqm,
+            Flat.OperatingModel operatingModel,
+            Flat.LiquidityTier liquidityTier,
+            Flat.DevelopmentStage developmentStage,
+            Flat.EnvironmentalRiskTier environmentalRiskTier,
+            List<@Size(max = 80) String> licenseTypes,
+            @DecimalMin("0") @DecimalMax("100") BigDecimal occupancyOrUtilization
     ) {}
 
     @Builder
@@ -126,7 +132,13 @@ public class PropertyDtos {
             Integer numRooms,
             Integer numBathrooms,
             String cadastralReference,
-            Double netUsableAreaSqm
+            Double netUsableAreaSqm,
+            Flat.OperatingModel operatingModel,
+            Flat.LiquidityTier liquidityTier,
+            Flat.DevelopmentStage developmentStage,
+            Flat.EnvironmentalRiskTier environmentalRiskTier,
+            List<@Size(max = 80) String> licenseTypes,
+            @DecimalMin("0") @DecimalMax("100") BigDecimal occupancyOrUtilization
     ) {}
 
     @Builder
@@ -134,6 +146,7 @@ public class PropertyDtos {
             UUID id,
             UUID buildingId,
             String buildingName,
+            Building.PropertyCategory propertyCategory,
             String flatNumber,
             Integer floor,
             Double areaSqm,
@@ -142,6 +155,41 @@ public class PropertyDtos {
             Integer numRooms,
             Integer numBathrooms,
             Flat.FlatStatus status,
+            Flat.OperatingModel operatingModel,
+            Flat.LiquidityTier liquidityTier,
+            Flat.DevelopmentStage developmentStage,
+            Flat.EnvironmentalRiskTier environmentalRiskTier,
+            List<String> licenseTypes,
+            BigDecimal occupancyOrUtilization,
+            String tokenContractAddress,
+            Long totalTokens,
+            BigDecimal tokenPriceUsd,
+            ValuationResponse currentValuation,
+            Instant createdAt,
+            Instant updatedAt
+    ) {}
+
+    /** Alias for FlatResponse — universal asset unit API (Phase 12). */
+    @Builder
+    public record AssetUnitResponse(
+            UUID id,
+            UUID buildingId,
+            String buildingName,
+            Building.PropertyCategory propertyCategory,
+            String flatNumber,
+            Integer floor,
+            Double areaSqm,
+            Double netUsableAreaSqm,
+            String cadastralReference,
+            Integer numRooms,
+            Integer numBathrooms,
+            Flat.FlatStatus status,
+            Flat.OperatingModel operatingModel,
+            Flat.LiquidityTier liquidityTier,
+            Flat.DevelopmentStage developmentStage,
+            Flat.EnvironmentalRiskTier environmentalRiskTier,
+            List<String> licenseTypes,
+            BigDecimal occupancyOrUtilization,
             String tokenContractAddress,
             Long totalTokens,
             BigDecimal tokenPriceUsd,
@@ -157,7 +205,36 @@ public class PropertyDtos {
             Integer floor,
             Double areaSqm,
             Flat.FlatStatus status,
+            Flat.OperatingModel operatingModel,
+            Flat.LiquidityTier liquidityTier,
             BigDecimal tokenPriceUsd
+    ) {}
+
+    @Builder
+    public record CreateStandaloneAssetRequest(
+            @NotBlank String name,
+            @NotBlank String address,
+            @NotBlank String city,
+            @NotBlank String country,
+            String postalCode,
+            @NotNull Building.PropertyCategory propertyCategory,
+            @NotBlank String unitLabel,
+            @Positive Double areaSqm,
+            @Size(max = 100) String cadastralReference,
+            Double latitude,
+            Double longitude,
+            Flat.OperatingModel operatingModel,
+            Flat.LiquidityTier liquidityTier,
+            Flat.DevelopmentStage developmentStage,
+            Flat.EnvironmentalRiskTier environmentalRiskTier,
+            List<@Size(max = 80) String> licenseTypes,
+            @DecimalMin("0") @DecimalMax("100") BigDecimal occupancyOrUtilization
+    ) {}
+
+    @Builder
+    public record StandaloneAssetResponse(
+            BuildingResponse building,
+            AssetUnitResponse assetUnit
     ) {}
 
     // ─── SPV ────────────────────────────────────────────────────────────────

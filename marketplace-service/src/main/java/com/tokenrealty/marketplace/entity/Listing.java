@@ -62,6 +62,15 @@ public class Listing extends BaseEntity {
     @Builder.Default
     private InstrumentType instrumentType = InstrumentType.EQUITY;
 
+    @Column(name = "property_category", length = 40)
+    private String propertyCategory;
+
+    @Column(name = "operating_model", length = 40)
+    private String operatingModel;
+
+    @Column(name = "liquidity_tier", length = 20)
+    private String liquidityTier;
+
     public enum InstrumentType {
         EQUITY,
         PROFIT_SHARING,

@@ -32,6 +32,11 @@ const PROPERTY_CATEGORIES = [
   'SINGLE_FAMILY_HOUSE',
   'LAND_PARCEL',
   'INDUSTRIAL_WAREHOUSE',
+  'GYM',
+  'SWIMMING_POOL',
+  'SERVICE_STATION',
+  'HOSPITALITY',
+  'CAR_WASH',
 ] as const;
 
 export function BuildingFormPage() {

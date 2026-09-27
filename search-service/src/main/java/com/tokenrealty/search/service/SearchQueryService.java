@@ -26,6 +26,9 @@ public class SearchQueryService {
     public Page<ListingIndex> searchListings(
             String q,
             String listingType,
+            String propertyCategory,
+            String operatingModel,
+            String liquidityTier,
             BigDecimal minPrice,
             BigDecimal maxPrice,
             Pageable pageable) {
@@ -40,6 +43,9 @@ public class SearchQueryService {
         return listingIndexRepository.search(
                 normalizeQuery(q),
                 normalizeFilter(listingType),
+                normalizeFilter(propertyCategory),
+                normalizeFilter(operatingModel),
+                normalizeFilter(liquidityTier),
                 minPrice,
                 maxPrice,
                 pageable);

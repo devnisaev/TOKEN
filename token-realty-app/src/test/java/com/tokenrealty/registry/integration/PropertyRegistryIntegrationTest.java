@@ -139,7 +139,7 @@ class PropertyRegistryIntegrationTest {
     @Test @Order(6)
     @DisplayName("6. Add flat → 201")
     void step6_addFlat() throws Exception {
-        var req = new CreateFlatRequest("1A", 1, 72.5, 3, 1, null, null);
+        var req = new CreateFlatRequest("1A", 1, 72.5, 3, 1, null, null, null, null, null, null, null, null);
 
         MvcResult result = mockMvc.perform(post("/v1/buildings/{id}/flats", buildingId)
                         .with(user("admin").roles("ADMIN")).with(csrf())
@@ -156,7 +156,7 @@ class PropertyRegistryIntegrationTest {
     @Test @Order(7)
     @DisplayName("7. Duplicate flat number → 409")
     void step7_duplicateFlatConflict() throws Exception {
-        var req = new CreateFlatRequest("1A", 1, 60.0, 2, 1, null, null);
+        var req = new CreateFlatRequest("1A", 1, 60.0, 2, 1, null, null, null, null, null, null, null, null);
         mockMvc.perform(post("/v1/buildings/{id}/flats", buildingId)
                         .with(user("admin").roles("ADMIN")).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)

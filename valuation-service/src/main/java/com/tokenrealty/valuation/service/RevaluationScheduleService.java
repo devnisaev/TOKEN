@@ -111,7 +111,9 @@ public class RevaluationScheduleService {
                 nav.getFlatId(),
                 nav.getValueUsd(),
                 nav.getTotalTokens(),
-                SCHEDULED_NOTES);
+                SCHEDULED_NOTES,
+                null,
+                null);
     }
 
     private SubmitValuationRequest toSubmitRequest(ValuationRequest request) {
@@ -120,7 +122,9 @@ public class RevaluationScheduleService {
                 request.getFlatId(),
                 request.getValueUsd(),
                 request.getTotalTokens(),
-                SCHEDULED_NOTES);
+                SCHEDULED_NOTES,
+                request.getOperatingUtilizationPct(),
+                request.getMemberCountKpi());
     }
 
     private Instant plusMonths(Instant instant, int months) {

@@ -38,7 +38,8 @@ class RevaluationScheduleTest {
         UUID flatId = UUID.randomUUID();
 
         valuationService.submit(
-                new SubmitValuationRequest(buildingId, flatId, new BigDecimal("500000.00"), 500L, "Initial"),
+                new SubmitValuationRequest(
+                        buildingId, flatId, new BigDecimal("500000.00"), 500L, "Initial", null, null),
                 adminId);
         valuationService.findByBuilding(buildingId).stream()
                 .filter(request -> request.status() == ValuationRequestStatus.PENDING)

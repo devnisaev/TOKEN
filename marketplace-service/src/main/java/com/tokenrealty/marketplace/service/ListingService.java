@@ -38,7 +38,18 @@ public class ListingService {
     private final ComplianceClient complianceClient;
     private final PropertyRegistryClient propertyRegistryClient;
 
-    public Page<ListingResponse> findAll(Listing.ListingStatus status, UUID flatId, Pageable pageable) {
+    public Page<ListingResponse> findAll(
+            Listing.ListingStatus status,
+            UUID flatId,
+            String propertyCategory,
+            String operatingModel,
+            String liquidityTier,
+            Pageable pageable) {
+        if (propertyCategory != null || operatingModel != null || liquidityTier != null) {
+            return listingRepository.search(
+                            status, flatId, propertyCategory, operatingModel, liquidityTier, pageable)
+                    .map(mapper::toListingResponse);
+        }
         if (flatId != null) {
             return listingRepository.findByFlatId(flatId, pageable).map(mapper::toListingResponse);
         }
@@ -63,6 +74,7 @@ public class ListingService {
                     });
         }
 
+        var flatView = propertyRegistryClient.getFlat(request.flatId());
         Listing listing = Listing.builder()
                 .flatId(request.flatId())
                 .contractId(request.contractId())
@@ -77,6 +89,9 @@ public class ListingService {
                 .description(request.description())
                 .sellerInvestorId(request.sellerInvestorId())
                 .sellerWallet(request.sellerWallet())
+                .propertyCategory(flatView.propertyCategory())
+                .operatingModel(flatView.operatingModel())
+                .liquidityTier(flatView.liquidityTier())
                 .build();
 
         Listing saved = listingRepository.save(listing);
@@ -85,7 +100,10 @@ public class ListingService {
                 saved.getFlatId(),
                 saved.getListingType().name(),
                 saved.getPriceUsd(),
-                saved.getTokensAvailable()));
+                saved.getTokensAvailable(),
+                saved.getPropertyCategory(),
+                saved.getOperatingModel(),
+                saved.getLiquidityTier()));
         return mapper.toListingResponse(saved);
     }
 

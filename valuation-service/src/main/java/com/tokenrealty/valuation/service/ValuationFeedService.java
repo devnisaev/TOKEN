@@ -36,8 +36,13 @@ public class ValuationFeedService {
             if (payload.hasNonNull("notes")) {
                 notes = payload.get("notes").asText();
             }
+            BigDecimal operatingUtilizationPct = payload.hasNonNull("operatingUtilizationPct")
+                    ? new BigDecimal(payload.get("operatingUtilizationPct").asText()) : null;
+            Integer memberCountKpi = payload.hasNonNull("memberCountKpi")
+                    ? payload.get("memberCountKpi").asInt() : null;
             return valuationService.submit(new SubmitValuationRequest(
-                    buildingId, flatId, valueUsd, totalTokens, notes), SYSTEM_FEED_ACTOR);
+                    buildingId, flatId, valueUsd, totalTokens, notes,
+                    operatingUtilizationPct, memberCountKpi), SYSTEM_FEED_ACTOR);
         } catch (ValidationException ex) {
             throw ex;
         } catch (Exception ex) {

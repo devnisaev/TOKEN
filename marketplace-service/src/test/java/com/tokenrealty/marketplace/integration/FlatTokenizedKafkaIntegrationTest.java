@@ -52,7 +52,9 @@ class FlatTokenizedKafkaIntegrationTest {
 
     private void stubEquityFlat(UUID flatId, UUID buildingId) {
         when(propertyRegistryClient.getFlat(flatId)).thenReturn(
-                new PropertyRegistryClient.FlatView(flatId, buildingId, "Tower", "101", 1, 50.0, "TOKENIZED"));
+                new PropertyRegistryClient.FlatView(
+                        flatId, buildingId, "Tower", "RESIDENTIAL_FLAT", "101", 1, 50.0, "TOKENIZED",
+                        "PURE_RENT", "TIER_1"));
         when(propertyRegistryClient.getSpvByBuilding(buildingId)).thenReturn(
                 new PropertyRegistryClient.SpvView(
                         UUID.randomUUID(), buildingId, "SPV", "REG-1", "0xspv",
