@@ -52,9 +52,10 @@ Real-estate tokenization platform — fractional property ownership, crypto paym
 | Phase 16 | Complete | 678–702 | [phase-16-services.md](docs/rules/phase-16-services.md) — exchange completion, liquidation, bridge |
 | Phase 17 | Complete | 703–727 | [phase-17-services.md](docs/rules/phase-17-services.md) — ESG, IoT feeds, insurance |
 | Phase 18 | Complete | 728–752 | [phase-18-services.md](docs/rules/phase-18-services.md) — operator KPIs, asset health |
-| Phase 19 | In progress | 753–777 | [phase-19-services.md](docs/rules/phase-19-services.md) — operator alerts, expiry automation |
+| Phase 19 | Complete | 753–777 | [phase-19-services.md](docs/rules/phase-19-services.md) — operator alerts, expiry automation |
+| Phase 20 | In progress | 778–802 | [phase-20-services.md](docs/rules/phase-20-services.md) — KPI snapshots, alert automation |
 
-**Platform status:** Phases 0–18 complete (tracks 1–752). Phase 19 operations alerting (753–777) in progress.
+**Platform status:** Phases 0–19 complete (tracks 1–777). Phase 20 operations automation (778–802) in progress.
 
 ## Shared libraries
 

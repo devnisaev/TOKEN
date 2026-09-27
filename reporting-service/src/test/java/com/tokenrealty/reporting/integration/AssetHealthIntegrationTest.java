@@ -44,5 +44,6 @@ class AssetHealthIntegrationTest {
         assertThat(kpis.trackedAssetCount()).isEqualTo(1);
         assertThat(kpis.averageHealthScore()).isEqualByComparingTo("84.25");
         assertThat(kpis.averageOccupancyPct()).isEqualByComparingTo("85.0");
+        assertThat(kpis.openOperatorAlertCount()).isGreaterThanOrEqualTo(0);
     }
 }

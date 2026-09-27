@@ -39,6 +39,9 @@ export function Header() {
           <NavLink to="/operator-kpis" className={({ isActive }) => navLinkClass(isActive)}>
             KPIs
           </NavLink>
+          <NavLink to="/operator-alerts" className={({ isActive }) => navLinkClass(isActive)}>
+            Alerts
+          </NavLink>
           <NavLink to="/indices/manage" className={({ isActive }) => navLinkClass(isActive)}>
             Indices
           </NavLink>

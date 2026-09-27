@@ -104,7 +104,25 @@ export interface OperatorKpiResponse {
   trackedAssetCount: number;
   atRiskAssetCount: number;
   esgSnapshotCount: number;
+  openOperatorAlertCount: number;
   generatedAt: string;
+}
+
+export interface OperatorAlertItem {
+  id: string;
+  alertType: string;
+  severity: string;
+  status: string;
+  referenceId: string | null;
+  buildingId: string | null;
+  flatId: string | null;
+  message: string;
+  detectedAt: string;
+}
+
+export interface GenerateOperatorAlertsResponse {
+  alertsCreated: number;
+  openAlertCount: number;
 }
 
 export interface AssetHealthScoreItem {

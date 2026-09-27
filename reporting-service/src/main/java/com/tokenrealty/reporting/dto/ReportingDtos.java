@@ -130,7 +130,27 @@ public final class ReportingDtos {
             long trackedAssetCount,
             long atRiskAssetCount,
             long esgSnapshotCount,
+            long openOperatorAlertCount,
             Instant generatedAt
+    ) {
+    }
+
+    public record OperatorAlertItem(
+            UUID id,
+            String alertType,
+            String severity,
+            String status,
+            UUID referenceId,
+            UUID buildingId,
+            UUID flatId,
+            String message,
+            Instant detectedAt
+    ) {
+    }
+
+    public record GenerateOperatorAlertsResponse(
+            int alertsCreated,
+            long openAlertCount
     ) {
     }
 }

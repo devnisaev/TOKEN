@@ -127,9 +127,13 @@ ESG metrics, IoT utilization feeds, insurance metadata, reporting ESG snapshots,
 
 Operator KPI dashboards, asset health scores, insurance expiry alerts. See [docs/PLATFORM-SPEC.md §24](docs/PLATFORM-SPEC.md#24-phase-18--operator-analytics) and [docs/rules/phase-18-services.md](docs/rules/phase-18-services.md).
 
-### Phase 19 — in progress (roadmap)
+### Phase 19 — complete
 
-Operations alerting and automation: operator alert records, scheduled insurance expiry sweep, alert generation from health/ESG/insurance signals. Tracks 753–777 — [phase-19-services.md](docs/rules/phase-19-services.md).
+Operations alerting and automation: operator alert records, scheduled insurance expiry sweep, alert generation from health/ESG/insurance signals. See [docs/PLATFORM-SPEC.md §25](docs/PLATFORM-SPEC.md#25-phase-19--operations-alerting--automation) and [docs/rules/phase-19-services.md](docs/rules/phase-19-services.md).
+
+### Phase 20 — in progress (roadmap)
+
+KPI snapshot history, scheduled alert generation, maintenance ticket signals, auto health recompute. Tracks 778–802 — [phase-20-services.md](docs/rules/phase-20-services.md).
 
 **Do not spin out:** limits/policy service, config service, Payment escrow, Issuance deploy/transfer core.
 

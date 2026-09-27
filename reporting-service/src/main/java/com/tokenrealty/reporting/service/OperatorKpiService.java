@@ -24,6 +24,7 @@ public class OperatorKpiService {
 
     private final EsgSnapshotRecordRepository esgSnapshotRecordRepository;
     private final AssetHealthScoreRecordRepository assetHealthScoreRecordRepository;
+    private final OperatorAlertService operatorAlertService;
     private final Clock clock;
 
     public OperatorKpiResponse dashboard() {
@@ -52,6 +53,7 @@ public class OperatorKpiService {
                 healthScores.size(),
                 atRiskCount,
                 esgSnapshots.size(),
+                operatorAlertService.countOpen(),
                 now);
     }
 

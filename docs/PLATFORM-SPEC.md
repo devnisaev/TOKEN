@@ -461,6 +461,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 | **Phase 16** | Exchange completion ✅ | Index dividends, liquidation, surveillance, bridge (678–702) |
 | **Phase 17** | ESG & asset operations ✅ | IoT feeds, insurance, ESG profiles (703–727) |
 | **Phase 18** | Operator analytics ✅ | KPI dashboards, asset health scores, insurance expiry alerts (728–752) |
+| **Phase 19** | Operations alerting ✅ | Operator alert records, expiry scheduler, alert generation (753–777) |
 
 See diagrams: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml), [`diagrams/09-phase-12-asset-generalization.puml`](diagrams/09-phase-12-asset-generalization.puml), [`diagrams/10-phase-13-rwa-exchange.puml`](diagrams/10-phase-13-rwa-exchange.puml).
 
@@ -1664,7 +1665,32 @@ Guide: [rules/phase-18-services.md](rules/phase-18-services.md)
 
 ---
 
-## 25. Diagram Index
+## 25. Phase 19 — Operations Alerting & Automation
+
+**Status:** Complete (tracks 753–777). Operator alert records, scheduled insurance expiry sweep, alert generation from health/ESG/insurance signals.
+
+Guide: [rules/phase-19-services.md](rules/phase-19-services.md)
+
+### 25.1 Goals
+
+- [x] Operator alert records (`/v1/reports/operator-alerts`)
+- [x] Alert generation scan (`POST /v1/reports/operator-alerts/generate`)
+- [x] Insurance expiry scheduler in Registry
+- [x] Admin operator alerts page (`/operator-alerts`)
+
+### 25.2 Track backlog (753–777)
+
+| Track range | Focus |
+|-------------|-------|
+| 753–757 | Operator alert entity + API in Reporting |
+| 758–762 | Registry client for insurance expiry ingest |
+| 763–767 | Scheduled insurance expiry sweep |
+| 768–772 | Admin alerts UI; KPI open-alert count |
+| 773–777 | Integration tests; docs |
+
+---
+
+## 26. Diagram Index
 
 | File | Description |
 |------|-------------|
@@ -1683,7 +1709,7 @@ Guide: [rules/phase-18-services.md](rules/phase-18-services.md)
 
 ---
 
-## 26. Open Questions & Decisions
+## 27. Open Questions & Decisions
 
 | # | Question | Options | Decision |
 |---|----------|---------|----------|
@@ -1708,7 +1734,7 @@ Guide: [rules/phase-18-services.md](rules/phase-18-services.md)
 
 ---
 
-## 27. Cursor Rules & Coding Standards
+## 28. Cursor Rules & Coding Standards
 
 Agent and IDE conventions live in `.cursor/rules/` (adapted from Titan fintech rules).
 

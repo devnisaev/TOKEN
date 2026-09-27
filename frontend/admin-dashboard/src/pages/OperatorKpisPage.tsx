@@ -31,7 +31,7 @@ export function OperatorKpisPage() {
 
       {kpisQuery.isLoading && <p className="text-muted-foreground">Loading KPIs…</p>}
       {kpis && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -72,6 +72,16 @@ export function OperatorKpisPage() {
               <p className="text-2xl font-semibold">
                 {kpis.atRiskAssetCount} / {kpis.trackedAssetCount}
               </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Open alerts
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-semibold">{kpis.openOperatorAlertCount}</p>
             </CardContent>
           </Card>
         </div>

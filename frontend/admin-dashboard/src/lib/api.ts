@@ -25,6 +25,8 @@ import type {
   AssetHealthScoreItem,
   EsgProfile,
   InsuranceExpiryAlert,
+  GenerateOperatorAlertsResponse,
+  OperatorAlertItem,
   OperatorKpiResponse,
   GovernanceProposal,
   LiquidityPool,
@@ -258,5 +260,22 @@ export const api = {
 
   listInsuranceExpiryAlerts(withinDays = 30) {
     return request<InsuranceExpiryAlert[]>(`/v1/insurance/expiring?withinDays=${withinDays}`);
+  },
+
+  listOperatorAlerts() {
+    return request<SpringPage<OperatorAlertItem>>('/v1/reports/operator-alerts?size=50');
+  },
+
+  generateOperatorAlerts(insuranceWithinDays = 30) {
+    return request<GenerateOperatorAlertsResponse>(
+      `/v1/reports/operator-alerts/generate?insuranceWithinDays=${insuranceWithinDays}`,
+      { method: 'POST' },
+    );
+  },
+
+  acknowledgeOperatorAlert(id: string) {
+    return request<OperatorAlertItem>(`/v1/reports/operator-alerts/${id}/acknowledge`, {
+      method: 'PATCH',
+    });
   },
 };

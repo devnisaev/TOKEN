@@ -24,6 +24,7 @@ import { IndicesManagePage } from '@/pages/IndicesManagePage';
 import { SurveillancePage } from '@/pages/SurveillancePage';
 import { EsgPage } from '@/pages/EsgPage';
 import { OperatorKpisPage } from '@/pages/OperatorKpisPage';
+import { OperatorAlertsPage } from '@/pages/OperatorAlertsPage';
 
 export function App() {
   return (
@@ -53,6 +54,7 @@ export function App() {
           <Route path="surveillance" element={<SurveillancePage />} />
           <Route path="esg" element={<EsgPage />} />
           <Route path="operator-kpis" element={<OperatorKpisPage />} />
+          <Route path="operator-alerts" element={<OperatorAlertsPage />} />
           <Route path="orders/:orderId" element={<OrderDetailPage />} />
           <Route path="compliance" element={<CompliancePage />} />
           <Route path="document-reviews" element={<DocumentReviewsPage />} />

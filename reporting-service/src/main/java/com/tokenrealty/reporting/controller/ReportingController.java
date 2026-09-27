@@ -3,6 +3,7 @@ package com.tokenrealty.reporting.controller;
 import com.tokenrealty.reporting.dto.ReportingDtos.*;
 import com.tokenrealty.reporting.service.AssetHealthScoreService;
 import com.tokenrealty.reporting.service.EsgSnapshotService;
+import com.tokenrealty.reporting.service.OperatorAlertService;
 import com.tokenrealty.reporting.service.OperatorKpiService;
 import com.tokenrealty.reporting.service.ReportingQueryService;
 import jakarta.validation.Valid;
@@ -26,6 +27,7 @@ public class ReportingController {
     private final EsgSnapshotService esgSnapshotService;
     private final AssetHealthScoreService assetHealthScoreService;
     private final OperatorKpiService operatorKpiService;
+    private final OperatorAlertService operatorAlertService;
 
     @GetMapping("/trading-summary")
     public TradingSummaryResponse tradingSummary() {
@@ -95,5 +97,23 @@ public class ReportingController {
     public AssetHealthScoreItem recordAssetHealthScore(
             @Valid @RequestBody RecordAssetHealthScoreRequest request) {
         return assetHealthScoreService.record(request);
+    }
+
+    @GetMapping("/operator-alerts")
+    public Page<OperatorAlertItem> operatorAlerts(@PageableDefault(size = 20) Pageable pageable) {
+        return operatorAlertService.listOpen(pageable);
+    }
+
+    @PostMapping("/operator-alerts/generate")
+    @PreAuthorize("hasRole('ADMIN')")
+    public GenerateOperatorAlertsResponse generateOperatorAlerts(
+            @RequestParam(defaultValue = "30") int insuranceWithinDays) {
+        return operatorAlertService.generate(insuranceWithinDays);
+    }
+
+    @PatchMapping("/operator-alerts/{id}/acknowledge")
+    @PreAuthorize("hasRole('ADMIN')")
+    public OperatorAlertItem acknowledgeOperatorAlert(@PathVariable UUID id) {
+        return operatorAlertService.acknowledge(id);
     }
 }
