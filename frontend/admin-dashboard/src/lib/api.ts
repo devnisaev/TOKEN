@@ -22,7 +22,10 @@ import type {
   CreateGovernanceProposalRequest,
   CreateIndexRequest,
   CreateLiquidityPoolRequest,
+  AssetHealthScoreItem,
   EsgProfile,
+  InsuranceExpiryAlert,
+  OperatorKpiResponse,
   GovernanceProposal,
   LiquidityPool,
   PropertyIndex,
@@ -243,5 +246,17 @@ export const api = {
 
   listEsgProfiles() {
     return request<EsgProfile[]>('/v1/esg');
+  },
+
+  getOperatorKpis() {
+    return request<OperatorKpiResponse>('/v1/reports/operator-kpis');
+  },
+
+  listAssetHealthScores() {
+    return request<AssetHealthScoreItem[]>('/v1/reports/asset-health-scores');
+  },
+
+  listInsuranceExpiryAlerts(withinDays = 30) {
+    return request<InsuranceExpiryAlert[]>(`/v1/insurance/expiring?withinDays=${withinDays}`);
   },
 };

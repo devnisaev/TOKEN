@@ -18,6 +18,12 @@ public class InsuranceController {
 
     private final InsuranceService insuranceService;
 
+    @GetMapping("/expiring")
+    public List<InsuranceExpiryAlertItem> listExpiring(
+            @RequestParam(defaultValue = "30") int withinDays) {
+        return insuranceService.findExpiringWithinDays(withinDays);
+    }
+
     @GetMapping("/by-building/{buildingId}")
     public List<InsurancePolicyResponse> listByBuilding(@PathVariable UUID buildingId) {
         return insuranceService.findByBuilding(buildingId);

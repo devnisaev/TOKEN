@@ -50,4 +50,20 @@ class EsgIntegrationTest {
                 .build());
         assertThat(policy.status()).isEqualTo(com.tokenrealty.registry.entity.InsurancePolicy.PolicyStatus.ACTIVE);
     }
+
+    @Test
+    @DisplayName("List insurance policies expiring within window")
+    void insuranceExpiryAlerts() {
+        UUID buildingId = UUID.randomUUID();
+        insuranceService.create(CreateInsurancePolicyRequest.builder()
+                .buildingId(buildingId)
+                .provider("Expiring Cover")
+                .policyNumber("POL-EXP-001")
+                .coverageUsd(new BigDecimal("1000000.00"))
+                .expiresAt(Instant.now().plus(14, ChronoUnit.DAYS))
+                .build());
+
+        assertThat(insuranceService.findExpiringWithinDays(30)).hasSize(1);
+        assertThat(insuranceService.findExpiringWithinDays(7)).isEmpty();
+    }
 }

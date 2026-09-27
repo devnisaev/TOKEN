@@ -97,6 +97,38 @@ export interface EsgProfile {
   createdAt: string;
 }
 
+export interface OperatorKpiResponse {
+  averageOccupancyPct: number;
+  averageCarbonScore: number;
+  averageHealthScore: number;
+  trackedAssetCount: number;
+  atRiskAssetCount: number;
+  esgSnapshotCount: number;
+  generatedAt: string;
+}
+
+export interface AssetHealthScoreItem {
+  id: string;
+  flatId: string | null;
+  buildingId: string;
+  healthScore: number;
+  esgFactor: number;
+  occupancyFactor: number;
+  insuranceFactor: number;
+  computedAt: string;
+}
+
+export interface InsuranceExpiryAlert {
+  id: string;
+  flatId: string | null;
+  buildingId: string;
+  provider: string;
+  policyNumber: string;
+  coverageUsd: number;
+  expiresAt: string;
+  daysUntilExpiry: number;
+}
+
 export interface CreateIndexRequest {
   name: string;
   symbol: string;

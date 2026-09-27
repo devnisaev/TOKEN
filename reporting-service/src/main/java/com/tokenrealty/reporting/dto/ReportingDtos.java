@@ -101,4 +101,36 @@ public final class ReportingDtos {
             Instant snapshotAt
     ) {
     }
+
+    public record RecordAssetHealthScoreRequest(
+            UUID flatId,
+            UUID buildingId,
+            BigDecimal esgFactor,
+            BigDecimal occupancyFactor,
+            BigDecimal insuranceFactor
+    ) {
+    }
+
+    public record AssetHealthScoreItem(
+            UUID id,
+            UUID flatId,
+            UUID buildingId,
+            BigDecimal healthScore,
+            BigDecimal esgFactor,
+            BigDecimal occupancyFactor,
+            BigDecimal insuranceFactor,
+            Instant computedAt
+    ) {
+    }
+
+    public record OperatorKpiResponse(
+            BigDecimal averageOccupancyPct,
+            BigDecimal averageCarbonScore,
+            BigDecimal averageHealthScore,
+            long trackedAssetCount,
+            long atRiskAssetCount,
+            long esgSnapshotCount,
+            Instant generatedAt
+    ) {
+    }
 }

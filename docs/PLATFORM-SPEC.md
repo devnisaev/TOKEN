@@ -460,6 +460,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 | **Phase 15** | Institutional exchange ✅ | OTC/RFQ, REIT-style index baskets, token-collateral lending (653–677) |
 | **Phase 16** | Exchange completion ✅ | Index dividends, liquidation, surveillance, bridge (678–702) |
 | **Phase 17** | ESG & asset operations ✅ | IoT feeds, insurance, ESG profiles (703–727) |
+| **Phase 18** | Operator analytics ✅ | KPI dashboards, asset health scores, insurance expiry alerts (728–752) |
 
 See diagrams: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml), [`diagrams/09-phase-12-asset-generalization.puml`](diagrams/09-phase-12-asset-generalization.puml), [`diagrams/10-phase-13-rwa-exchange.puml`](diagrams/10-phase-13-rwa-exchange.puml).
 
@@ -1638,7 +1639,32 @@ Guide: [rules/phase-17-services.md](rules/phase-17-services.md)
 
 ---
 
-## 24. Diagram Index
+## 24. Phase 18 — Operator Analytics
+
+**Status:** Complete (tracks 728–752). Operator KPI dashboards, asset health composite scores, insurance expiry alerts.
+
+Guide: [rules/phase-18-services.md](rules/phase-18-services.md)
+
+### 24.1 Goals
+
+- [x] Insurance expiry alerts (`GET /v1/insurance/expiring?withinDays=30`)
+- [x] Asset health score record/list (`/v1/reports/asset-health-scores`)
+- [x] Operator KPI dashboard API (`GET /v1/reports/operator-kpis`)
+- [x] Admin operator KPI page (`/operator-kpis`)
+
+### 24.2 Track backlog (728–752)
+
+| Track range | Focus |
+|-------------|-------|
+| 728–732 | Insurance expiry query in Property Registry |
+| 733–737 | Asset health score entity + API in Reporting |
+| 738–742 | Operator KPI aggregation service |
+| 743–747 | Admin operator KPI dashboard UI |
+| 748–752 | Integration tests; docs |
+
+---
+
+## 25. Diagram Index
 
 | File | Description |
 |------|-------------|
@@ -1657,7 +1683,7 @@ Guide: [rules/phase-17-services.md](rules/phase-17-services.md)
 
 ---
 
-## 23. Open Questions & Decisions
+## 26. Open Questions & Decisions
 
 | # | Question | Options | Decision |
 |---|----------|---------|----------|
@@ -1682,7 +1708,7 @@ Guide: [rules/phase-17-services.md](rules/phase-17-services.md)
 
 ---
 
-## 24. Cursor Rules & Coding Standards
+## 27. Cursor Rules & Coding Standards
 
 Agent and IDE conventions live in `.cursor/rules/` (adapted from Titan fintech rules).
 

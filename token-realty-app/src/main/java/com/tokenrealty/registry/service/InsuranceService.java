@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,6 +29,17 @@ public class InsuranceService {
 
     public InsurancePolicyResponse findById(UUID id) {
         return toResponse(getById(id));
+    }
+
+    public List<InsuranceExpiryAlertItem> findExpiringWithinDays(int withinDays) {
+        Instant now = Instant.now();
+        Instant cutoff = now.plus(withinDays, ChronoUnit.DAYS);
+        return insurancePolicyRepository
+                .findByStatusAndExpiresAtBetween(InsurancePolicy.PolicyStatus.ACTIVE, now, cutoff)
+                .stream()
+                .map(policy -> toExpiryAlert(policy, now))
+                .sorted(Comparator.comparingLong(InsuranceExpiryAlertItem::daysUntilExpiry))
+                .toList();
     }
 
     @Transactional
@@ -57,6 +70,19 @@ public class InsuranceService {
     private InsurancePolicy getById(UUID id) {
         return insurancePolicyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("InsurancePolicy", id));
+    }
+
+    private InsuranceExpiryAlertItem toExpiryAlert(InsurancePolicy policy, Instant now) {
+        long days = ChronoUnit.DAYS.between(now, policy.getExpiresAt());
+        return new InsuranceExpiryAlertItem(
+                policy.getId(),
+                policy.getFlatId(),
+                policy.getBuildingId(),
+                policy.getProvider(),
+                policy.getPolicyNumber(),
+                policy.getCoverageUsd(),
+                policy.getExpiresAt(),
+                Math.max(days, 0));
     }
 
     private InsurancePolicyResponse toResponse(InsurancePolicy policy) {

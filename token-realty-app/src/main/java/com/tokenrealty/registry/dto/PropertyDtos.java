@@ -387,6 +387,17 @@ public class PropertyDtos {
             Instant createdAt
     ) {}
 
+    public record InsuranceExpiryAlertItem(
+            UUID id,
+            UUID flatId,
+            UUID buildingId,
+            String provider,
+            String policyNumber,
+            BigDecimal coverageUsd,
+            Instant expiresAt,
+            long daysUntilExpiry
+    ) {}
+
     public record UpdateOccupancyRequest(
             @NotNull @DecimalMin("0") @DecimalMax("100") BigDecimal occupancyOrUtilization
     ) {}

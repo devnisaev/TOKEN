@@ -1,7 +1,9 @@
 package com.tokenrealty.reporting.controller;
 
 import com.tokenrealty.reporting.dto.ReportingDtos.*;
+import com.tokenrealty.reporting.service.AssetHealthScoreService;
 import com.tokenrealty.reporting.service.EsgSnapshotService;
+import com.tokenrealty.reporting.service.OperatorKpiService;
 import com.tokenrealty.reporting.service.ReportingQueryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,8 @@ public class ReportingController {
 
     private final ReportingQueryService queryService;
     private final EsgSnapshotService esgSnapshotService;
+    private final AssetHealthScoreService assetHealthScoreService;
+    private final OperatorKpiService operatorKpiService;
 
     @GetMapping("/trading-summary")
     public TradingSummaryResponse tradingSummary() {
@@ -70,5 +74,26 @@ public class ReportingController {
     @PreAuthorize("hasRole('ADMIN')")
     public EsgSnapshotItem recordEsgSnapshot(@Valid @RequestBody RecordEsgSnapshotRequest request) {
         return esgSnapshotService.record(request);
+    }
+
+    @GetMapping("/operator-kpis")
+    public OperatorKpiResponse operatorKpis() {
+        return operatorKpiService.dashboard();
+    }
+
+    @GetMapping("/asset-health-scores")
+    public List<AssetHealthScoreItem> assetHealthScores(
+            @RequestParam(required = false) UUID buildingId) {
+        return buildingId != null
+                ? assetHealthScoreService.listByBuilding(buildingId)
+                : assetHealthScoreService.listAll();
+    }
+
+    @PostMapping("/asset-health-scores")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
+    public AssetHealthScoreItem recordAssetHealthScore(
+            @Valid @RequestBody RecordAssetHealthScoreRequest request) {
+        return assetHealthScoreService.record(request);
     }
 }
