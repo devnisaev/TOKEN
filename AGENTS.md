@@ -147,9 +147,13 @@ Building health admin UI, asset health history, investor sustainability health s
 
 Operator alert summaries, health trend detection, operations export, weekly digest. See [docs/PLATFORM-SPEC.md §29](docs/PLATFORM-SPEC.md#29-phase-23--operator-reporting--trends) and [docs/rules/phase-23-services.md](docs/rules/phase-23-services.md).
 
-### Phase 24 — in progress (roadmap)
+### Phase 24 — complete
 
-Lease coverage signals, vacancy risk alerts, rental-Reporting integration. Tracks 878–902 — [phase-24-services.md](docs/rules/phase-24-services.md).
+Lease coverage signals, vacancy risk alerts, rental-Reporting integration. See [docs/PLATFORM-SPEC.md §30](docs/PLATFORM-SPEC.md#30-phase-24--lease-coverage--vacancy-alerts) and [docs/rules/phase-24-services.md](docs/rules/phase-24-services.md).
+
+### Phase 25 — in progress (roadmap)
+
+Maintenance backlog alerts, lease expiry alerts, rent collection summary. Tracks 903–927 — [phase-25-services.md](docs/rules/phase-25-services.md).
 
 **Do not spin out:** limits/policy service, config service, Payment escrow, Issuance deploy/transfer core.
 

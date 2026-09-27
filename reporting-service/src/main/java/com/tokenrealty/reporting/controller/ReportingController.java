@@ -6,6 +6,7 @@ import com.tokenrealty.reporting.service.AssetHealthScoreService;
 import com.tokenrealty.reporting.service.BuildingHealthService;
 import com.tokenrealty.reporting.service.HealthTrendService;
 import com.tokenrealty.reporting.service.OperatorAlertSummaryService;
+import com.tokenrealty.reporting.service.LeaseCoverageService;
 import com.tokenrealty.reporting.service.OperationsReportService;
 import com.tokenrealty.reporting.service.EsgSnapshotService;
 import com.tokenrealty.reporting.service.OperatorAlertService;
@@ -40,6 +41,7 @@ public class ReportingController {
     private final OperatorAlertSummaryService operatorAlertSummaryService;
     private final HealthTrendService healthTrendService;
     private final OperationsReportService operationsReportService;
+    private final LeaseCoverageService leaseCoverageService;
 
     @GetMapping("/trading-summary")
     public TradingSummaryResponse tradingSummary() {
@@ -185,5 +187,11 @@ public class ReportingController {
     @GetMapping("/operations-export")
     public OperationsExportResponse operationsExport() {
         return operationsReportService.export();
+    }
+
+    @GetMapping("/lease-coverage")
+    public LeaseCoverageSummary leaseCoverage(
+            @RequestParam(defaultValue = "30") int expiringWithinDays) {
+        return leaseCoverageService.summary(expiringWithinDays);
     }
 }

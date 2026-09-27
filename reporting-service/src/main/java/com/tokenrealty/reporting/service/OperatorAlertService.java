@@ -41,6 +41,7 @@ public class OperatorAlertService {
     private final EsgSnapshotRecordRepository esgSnapshotRecordRepository;
     private final PropertyRegistryClient propertyRegistryClient;
     private final NotificationClient notificationClient;
+    private final LeaseCoverageService leaseCoverageService;
     private final Clock clock;
 
     public Page<OperatorAlertItem> listOpen(Pageable pageable) {
@@ -68,6 +69,7 @@ public class OperatorAlertService {
         created += generateHealthAlerts(now);
         created += generateOccupancyAlerts(now);
         created += generateInsuranceAlerts(now, insuranceWithinDays);
+        created += generateVacancyRiskAlerts(now);
         return new GenerateOperatorAlertsResponse(created, operatorAlertRecordRepository.countByStatus(AlertStatus.OPEN));
     }
 
@@ -115,6 +117,31 @@ public class OperatorAlertService {
                     snapshot.getBuildingId(),
                     snapshot.getFlatId(),
                     "Occupancy " + occupancy + "% below " + LOW_OCCUPANCY_THRESHOLD + "%",
+                    now)) {
+                created++;
+            }
+        }
+        return created;
+    }
+
+    private int generateVacancyRiskAlerts(Instant now) {
+        int created = 0;
+        for (UUID flatId : leaseCoverageService.vacancyRiskFlatIds()) {
+            EsgSnapshotRecord snapshot = esgSnapshotRecordRepository.findAll().stream()
+                    .filter(record -> flatId.equals(record.getFlatId()))
+                    .max(java.util.Comparator.comparing(EsgSnapshotRecord::getSnapshotAt))
+                    .orElse(null);
+            if (snapshot == null) {
+                continue;
+            }
+            if (upsertAlert(
+                    "VACANCY_RISK:" + flatId,
+                    "VACANCY_RISK",
+                    AlertSeverity.WARNING,
+                    snapshot.getId(),
+                    snapshot.getBuildingId(),
+                    flatId,
+                    "Low occupancy " + snapshot.getOccupancyPct() + "% with no active lease",
                     now)) {
                 created++;
             }

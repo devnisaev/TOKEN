@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,6 +32,34 @@ public class LeaseService {
         return leaseRepository.findByTenantIdOrderByStartDateDesc(tenantId).stream()
                 .map(mapper::toLeaseResponse)
                 .toList();
+    }
+
+    public List<LeaseResponse> listActive() {
+        return leaseRepository.findByStatus(Lease.LeaseStatus.ACTIVE).stream()
+                .map(mapper::toLeaseResponse)
+                .toList();
+    }
+
+    public List<LeaseExpiryAlertItem> listExpiringWithinDays(int withinDays) {
+        LocalDate today = LocalDate.now();
+        LocalDate cutoff = today.plusDays(withinDays);
+        return leaseRepository
+                .findByStatusAndEndDateBetween(Lease.LeaseStatus.ACTIVE, today, cutoff)
+                .stream()
+                .filter(lease -> lease.getEndDate() != null)
+                .map(lease -> toExpiryAlert(lease, today))
+                .sorted(Comparator.comparingLong(LeaseExpiryAlertItem::daysUntilExpiry))
+                .toList();
+    }
+
+    private LeaseExpiryAlertItem toExpiryAlert(Lease lease, LocalDate today) {
+        long days = ChronoUnit.DAYS.between(today, lease.getEndDate());
+        return new LeaseExpiryAlertItem(
+                lease.getId(),
+                lease.getFlatId(),
+                lease.getTenantId(),
+                lease.getEndDate(),
+                Math.max(days, 0));
     }
 
     public OccupancyResponse getOccupancy(UUID flatId) {

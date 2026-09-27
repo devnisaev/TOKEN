@@ -170,11 +170,28 @@ export interface HealthTrendItem {
   latestAt: string;
 }
 
+export interface LeaseExpiryItem {
+  leaseId: string;
+  flatId: string;
+  tenantId: string;
+  endDate: string;
+  daysUntilExpiry: number;
+}
+
+export interface LeaseCoverageSummary {
+  activeLeaseCount: number;
+  expiringLeaseCount: number;
+  vacancyRiskCount: number;
+  expiringLeases: LeaseExpiryItem[];
+  generatedAt: string;
+}
+
 export interface OperationsExportResponse {
   kpis: OperatorKpiResponse;
   alertSummary: OperatorAlertSummaryResponse;
   decliningHealthCount: number;
   decliningHealth: HealthTrendItem[];
+  leaseCoverage: LeaseCoverageSummary;
   generatedAt: string;
 }
 

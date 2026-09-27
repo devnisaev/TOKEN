@@ -19,5 +19,7 @@ public interface LeaseRepository extends JpaRepository<Lease, UUID> {
 
     List<Lease> findByStatusAndEndDateBefore(LeaseStatus status, LocalDate endDate);
 
+    List<Lease> findByStatusAndEndDateBetween(LeaseStatus status, LocalDate start, LocalDate end);
+
     List<Lease> findByTenantIdOrderByStartDateDesc(UUID tenantId);
 }

@@ -2,6 +2,7 @@ package com.tokenrealty.reporting.dto;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -209,11 +210,30 @@ public final class ReportingDtos {
     ) {
     }
 
+    public record LeaseExpiryItem(
+            UUID leaseId,
+            UUID flatId,
+            UUID tenantId,
+            LocalDate endDate,
+            long daysUntilExpiry
+    ) {
+    }
+
+    public record LeaseCoverageSummary(
+            long activeLeaseCount,
+            long expiringLeaseCount,
+            long vacancyRiskCount,
+            List<LeaseExpiryItem> expiringLeases,
+            Instant generatedAt
+    ) {
+    }
+
     public record OperationsExportResponse(
             OperatorKpiResponse kpis,
             OperatorAlertSummaryResponse alertSummary,
             long decliningHealthCount,
             List<HealthTrendItem> decliningHealth,
+            LeaseCoverageSummary leaseCoverage,
             Instant generatedAt
     ) {
     }

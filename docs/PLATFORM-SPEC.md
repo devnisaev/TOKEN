@@ -466,6 +466,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 | **Phase 21** | Portfolio health & notifications ✅ | Alert notifications, building rollups, investor portfolio health (803–827) |
 | **Phase 22** | Building operations UI ✅ | Health history, admin building health, sustainability scores (828–852) |
 | **Phase 23** | Operator reporting & trends ✅ | Alert summaries, health trends, operations export, weekly digest (853–877) |
+| **Phase 24** | Lease coverage & vacancy alerts ✅ | Active/expiring leases, vacancy risk alerts (878–902) |
 
 See diagrams: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml), [`diagrams/09-phase-12-asset-generalization.puml`](diagrams/09-phase-12-asset-generalization.puml), [`diagrams/10-phase-13-rwa-exchange.puml`](diagrams/10-phase-13-rwa-exchange.puml).
 
@@ -1797,7 +1798,33 @@ Guide: [rules/phase-23-services.md](rules/phase-23-services.md)
 
 ---
 
-## 30. Diagram Index
+## 30. Phase 24 — Lease Coverage & Vacancy Alerts
+
+**Status:** Complete (tracks 878–902). Active/expiring lease APIs, lease coverage summary, vacancy risk alerts.
+
+Guide: [rules/phase-24-services.md](rules/phase-24-services.md)
+
+### 30.1 Goals
+
+- [x] Active/expiring lease APIs in Rental
+- [x] Lease coverage summary in Reporting
+- [x] Vacancy risk alert generation
+- [x] Operations export lease section
+- [x] Admin UI lease coverage cards
+
+### 30.2 Track backlog (878–902)
+
+| Track range | Focus |
+|-------------|-------|
+| 878–882 | Active/expiring lease APIs |
+| 883–887 | Lease coverage service |
+| 888–892 | Vacancy risk alerts |
+| 893–897 | Operations export extension |
+| 898–902 | Admin UI; tests |
+
+---
+
+## 31. Diagram Index
 
 | File | Description |
 |------|-------------|
@@ -1816,7 +1843,7 @@ Guide: [rules/phase-23-services.md](rules/phase-23-services.md)
 
 ---
 
-## 31. Open Questions & Decisions
+## 32. Open Questions & Decisions
 
 | # | Question | Options | Decision |
 |---|----------|---------|----------|
@@ -1841,7 +1868,7 @@ Guide: [rules/phase-23-services.md](rules/phase-23-services.md)
 
 ---
 
-## 32. Cursor Rules & Coding Standards
+## 33. Cursor Rules & Coding Standards
 
 Agent and IDE conventions live in `.cursor/rules/` (adapted from Titan fintech rules).
 

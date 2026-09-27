@@ -34,6 +34,19 @@ public class LeaseController {
         return leaseService.listByTenantId(tenantId);
     }
 
+    @GetMapping("/active")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROPERTY_MANAGER')")
+    public List<LeaseResponse> listActive() {
+        return leaseService.listActive();
+    }
+
+    @GetMapping("/expiring")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROPERTY_MANAGER')")
+    public List<LeaseExpiryAlertItem> listExpiring(
+            @RequestParam(defaultValue = "30") int withinDays) {
+        return leaseService.listExpiringWithinDays(withinDays);
+    }
+
     @GetMapping("/{id}")
     public LeaseResponse findById(@PathVariable UUID id) {
         return leaseService.findById(id);

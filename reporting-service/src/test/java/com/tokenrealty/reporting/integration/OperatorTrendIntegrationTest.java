@@ -63,5 +63,6 @@ class OperatorTrendIntegrationTest {
         var export = operationsReportService.export();
         assertThat(export.decliningHealthCount()).isEqualTo(1);
         assertThat(export.alertSummary().byType()).isNotEmpty();
+        assertThat(export.leaseCoverage()).isNotNull();
     }
 }

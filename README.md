@@ -57,9 +57,10 @@ Real-estate tokenization platform — fractional property ownership, crypto paym
 | Phase 21 | Complete | 803–827 | [phase-21-services.md](docs/rules/phase-21-services.md) — alert notifications, building health |
 | Phase 22 | Complete | 828–852 | [phase-22-services.md](docs/rules/phase-22-services.md) — building health UI, health history |
 | Phase 23 | Complete | 853–877 | [phase-23-services.md](docs/rules/phase-23-services.md) — operator trends, operations reports |
-| Phase 24 | In progress | 878–902 | [phase-24-services.md](docs/rules/phase-24-services.md) — lease coverage, vacancy alerts |
+| Phase 24 | Complete | 878–902 | [phase-24-services.md](docs/rules/phase-24-services.md) — lease coverage, vacancy alerts |
+| Phase 25 | In progress | 903–927 | [phase-25-services.md](docs/rules/phase-25-services.md) — maintenance backlog, lease expiry alerts |
 
-**Platform status:** Phases 0–23 complete (tracks 1–877). Phase 24 lease operations (878–902) in progress.
+**Platform status:** Phases 0–24 complete (tracks 1–902). Phase 25 rent & maintenance ops (903–927) in progress.
 
 ## Shared libraries
 

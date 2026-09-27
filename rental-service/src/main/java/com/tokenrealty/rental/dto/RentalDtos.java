@@ -76,6 +76,15 @@ public final class RentalDtos {
     ) {
     }
 
+    public record LeaseExpiryAlertItem(
+            UUID id,
+            UUID flatId,
+            UUID tenantId,
+            LocalDate endDate,
+            long daysUntilExpiry
+    ) {
+    }
+
     public record CreateMaintenanceTicketRequest(
             @NotNull UUID leaseId,
             @NotBlank @Size(max = 200) String title,

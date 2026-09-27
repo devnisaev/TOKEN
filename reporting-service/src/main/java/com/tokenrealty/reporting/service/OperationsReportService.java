@@ -13,16 +13,19 @@ public class OperationsReportService {
     private final OperatorKpiService operatorKpiService;
     private final OperatorAlertSummaryService operatorAlertSummaryService;
     private final HealthTrendService healthTrendService;
+    private final LeaseCoverageService leaseCoverageService;
 
     public OperationsExportResponse export() {
         var kpis = operatorKpiService.dashboard();
         var alertSummary = operatorAlertSummaryService.summary();
         var declining = healthTrendService.listDeclining();
+        var leaseCoverage = leaseCoverageService.summary(30);
         return new OperationsExportResponse(
                 kpis,
                 alertSummary,
                 declining.size(),
                 declining,
+                leaseCoverage,
                 kpis.generatedAt());
     }
 }

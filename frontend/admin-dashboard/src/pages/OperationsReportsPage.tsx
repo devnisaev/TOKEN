@@ -52,6 +52,30 @@ export function OperationsReportsPage() {
           </div>
 
           <section className="space-y-3">
+            <h2 className="text-lg font-medium">Lease coverage</h2>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <Card>
+                <CardContent className="py-4 text-sm">
+                  <p className="text-muted-foreground">Active leases</p>
+                  <p className="text-xl font-semibold">{data.leaseCoverage.activeLeaseCount}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="py-4 text-sm">
+                  <p className="text-muted-foreground">Expiring (30d)</p>
+                  <p className="text-xl font-semibold">{data.leaseCoverage.expiringLeaseCount}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="py-4 text-sm">
+                  <p className="text-muted-foreground">Vacancy risk</p>
+                  <p className="text-xl font-semibold">{data.leaseCoverage.vacancyRiskCount}</p>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
+          <section className="space-y-3">
             <h2 className="text-lg font-medium">Alerts by type</h2>
             <div className="grid gap-2">
               {data.alertSummary.byType.map((item) => (
