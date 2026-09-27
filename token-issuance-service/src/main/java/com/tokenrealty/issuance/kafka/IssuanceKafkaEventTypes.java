@@ -6,6 +6,9 @@ public final class IssuanceKafkaEventTypes {
     public static final String RENT_COLLECTED = "tokenrealty.payment.rent.collected.v1";
     public static final String DIVIDEND_DISTRIBUTION_REQUESTED =
             "tokenrealty.corporateactions.dividend.distribution-requested.v1";
+    public static final String STOCK_SPLIT_REQUESTED =
+            "tokenrealty.corporateactions.stock-split.requested.v1";
+    public static final String STOCK_SPLIT_COMPLETED = "tokenrealty.issuance.stock-split.completed.v1";
     public static final String TRANSFER_COMPLETED = "tokenrealty.issuance.transfer.completed.v1";
     public static final String DIVIDEND_DISTRIBUTED = "tokenrealty.issuance.dividend.distributed.v1";
     public static final String KYC_APPROVED = "tokenrealty.compliance.investor.kyc-approved.v1";

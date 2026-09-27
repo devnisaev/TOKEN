@@ -5,8 +5,10 @@ import com.tokenrealty.corporateactions.client.TokenIssuanceClient;
 import com.tokenrealty.corporateactions.entity.CorporateActionStatus;
 import com.tokenrealty.corporateactions.entity.CorporateActionType;
 import com.tokenrealty.corporateactions.kafka.CorporateActionsKafkaEventTypes;
+import com.tokenrealty.corporateactions.dto.CorporateActionDtos.RequestStockSplitRequest;
 import com.tokenrealty.corporateactions.kafka.command.DividendDistributedCommand;
 import com.tokenrealty.corporateactions.kafka.command.RentCollectedCommand;
+import com.tokenrealty.corporateactions.kafka.command.StockSplitCompletedCommand;
 import com.tokenrealty.corporateactions.repository.CorporateActionRepository;
 import com.tokenrealty.corporateactions.service.CorporateActionsService;
 import com.tokenrealty.events.EventEnvelope;
@@ -76,6 +78,20 @@ class CorporateActionsKafkaIntegrationTest {
     }
 
     @Test
+    @DisplayName("stock-split.completed marks matching action COMPLETED")
+    void stockSplitCompleted_marksCompleted() {
+        UUID flatId = UUID.randomUUID();
+        corporateActionsService.requestStockSplit(new RequestStockSplitRequest(
+                flatId, new BigDecimal("2.0000"), "2025-Q3"));
+
+        publishStockSplitCompleted(flatId, "2025-Q3");
+
+        var action = repository.findAll().getFirst();
+        assertThat(action.getType()).isEqualTo(CorporateActionType.STOCK_SPLIT);
+        assertThat(action.getStatus()).isEqualTo(CorporateActionStatus.COMPLETED);
+    }
+
+    @Test
     @DisplayName("dividend.distributed marks matching action COMPLETED")
     void dividendDistributed_marksCompleted() throws Exception {
         UUID flatId = UUID.randomUUID();
@@ -98,6 +114,24 @@ class CorporateActionsKafkaIntegrationTest {
                 "txHash", "0xRentCollected");
         publish(CorporateActionsKafkaEventTypes.RENT_COLLECTED, eventId, payload,
                 event -> corporateActionsService.onRentCollected(RentCollectedCommand.from(event)));
+    }
+
+    private void publishStockSplitCompleted(UUID flatId, String period) {
+        Map<String, Object> payload = Map.of(
+                "corporateActionId", repository.findAll().getFirst().getId().toString(),
+                "contractId", UUID.randomUUID().toString(),
+                "flatId", flatId.toString(),
+                "period", period,
+                "splitRatio", "2.0000",
+                "newTotalSupply", 2000,
+                "newTokenPriceUsd", "50.00",
+                "completedAt", "2025-09-25T20:00:00Z");
+        try {
+            publish(CorporateActionsKafkaEventTypes.STOCK_SPLIT_COMPLETED, UUID.randomUUID(), payload,
+                    event -> corporateActionsService.onStockSplitCompleted(StockSplitCompletedCommand.from(event)));
+        } catch (Exception ex) {
+            throw new IllegalStateException(ex);
+        }
     }
 
     private void publishDividendDistributed(UUID flatId, String period) throws Exception {

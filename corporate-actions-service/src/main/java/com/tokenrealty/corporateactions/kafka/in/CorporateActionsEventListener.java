@@ -3,6 +3,7 @@ package com.tokenrealty.corporateactions.kafka.in;
 import com.tokenrealty.corporateactions.kafka.CorporateActionsKafkaEventTypes;
 import com.tokenrealty.corporateactions.kafka.command.DividendDistributedCommand;
 import com.tokenrealty.corporateactions.kafka.command.RentCollectedCommand;
+import com.tokenrealty.corporateactions.kafka.command.StockSplitCompletedCommand;
 import com.tokenrealty.corporateactions.service.CorporateActionsService;
 import com.tokenrealty.events.kafka.KafkaJsonEvent;
 import com.tokenrealty.kafka.consume.KafkaEventConsumer;
@@ -31,6 +32,12 @@ public class CorporateActionsEventListener {
     public void onDividendDistributed(String message) {
         ingest(message, CorporateActionsKafkaEventTypes.DIVIDEND_DISTRIBUTED,
                 event -> corporateActionsService.onDividendDistributed(DividendDistributedCommand.from(event)));
+    }
+
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.stock-split-completed}")
+    public void onStockSplitCompleted(String message) {
+        ingest(message, CorporateActionsKafkaEventTypes.STOCK_SPLIT_COMPLETED,
+                event -> corporateActionsService.onStockSplitCompleted(StockSplitCompletedCommand.from(event)));
     }
 
     private void ingest(String message, String eventType, Consumer<KafkaJsonEvent> handler) {

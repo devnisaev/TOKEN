@@ -7,8 +7,10 @@ public final class ReportingKafkaEventTypes {
     public static final String DIVIDEND_DISTRIBUTED = "tokenrealty.issuance.dividend.distributed.v1";
     public static final String RENT_COLLECTED = "tokenrealty.payment.rent.collected.v1";
     public static final String FLAT_TOKENIZED = "tokenrealty.registry.flat.tokenized.v1";
+    public static final String BUILDING_APPROVED = "tokenrealty.registry.building.approved.v1";
     public static final String SETTLEMENT_STUCK = "tokenrealty.settlement.stuck.v1";
     public static final String VALUATION_APPROVED = "tokenrealty.valuation.approved.v1";
+    public static final String STOCK_SPLIT_COMPLETED = "tokenrealty.issuance.stock-split.completed.v1";
 
     private ReportingKafkaEventTypes() {
     }

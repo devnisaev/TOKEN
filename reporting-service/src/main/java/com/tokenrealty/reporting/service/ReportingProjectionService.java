@@ -2,17 +2,21 @@ package com.tokenrealty.reporting.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.tokenrealty.events.kafka.KafkaJsonEvent;
+import com.tokenrealty.reporting.entity.BuildingApprovedRecord;
 import com.tokenrealty.reporting.entity.DividendRecord;
 import com.tokenrealty.reporting.entity.FlatTokenizedRecord;
 import com.tokenrealty.reporting.entity.OrderMatchedRecord;
 import com.tokenrealty.reporting.entity.RentCollectedRecord;
+import com.tokenrealty.reporting.entity.StockSplitRecord;
 import com.tokenrealty.reporting.entity.StuckSagaRecord;
 import com.tokenrealty.reporting.entity.TradeSettledRecord;
 import com.tokenrealty.reporting.entity.ValuationApprovedRecord;
+import com.tokenrealty.reporting.repository.BuildingApprovedRecordRepository;
 import com.tokenrealty.reporting.repository.DividendRecordRepository;
 import com.tokenrealty.reporting.repository.FlatTokenizedRecordRepository;
 import com.tokenrealty.reporting.repository.OrderMatchedRecordRepository;
 import com.tokenrealty.reporting.repository.RentCollectedRecordRepository;
+import com.tokenrealty.reporting.repository.StockSplitRecordRepository;
 import com.tokenrealty.reporting.repository.StuckSagaRecordRepository;
 import com.tokenrealty.reporting.repository.TradeSettledRecordRepository;
 import com.tokenrealty.reporting.repository.ValuationApprovedRecordRepository;
@@ -35,6 +39,8 @@ public class ReportingProjectionService {
     private final FlatTokenizedRecordRepository flatTokenizedRecordRepository;
     private final StuckSagaRecordRepository stuckSagaRecordRepository;
     private final ValuationApprovedRecordRepository valuationApprovedRecordRepository;
+    private final BuildingApprovedRecordRepository buildingApprovedRecordRepository;
+    private final StockSplitRecordRepository stockSplitRecordRepository;
 
     @Transactional
     public void onTradeSettled(KafkaJsonEvent event) {
@@ -130,6 +136,33 @@ public class ReportingProjectionService {
                 .orderId(uuid(payload, "orderId"))
                 .currentStep(text(payload, "currentStep"))
                 .stuckAt(parseInstant(payload, "stuckAt", event.occurredAt()))
+                .build());
+    }
+
+    @Transactional
+    public void onBuildingApproved(KafkaJsonEvent event) {
+        JsonNode payload = event.payload();
+        buildingApprovedRecordRepository.save(BuildingApprovedRecord.builder()
+                .sourceEventId(event.eventId())
+                .buildingId(uuid(payload, "buildingId"))
+                .approvedBy(uuid(payload, "approvedBy"))
+                .approvedAt(parseInstant(payload, "approvedAt", event.occurredAt()))
+                .build());
+    }
+
+    @Transactional
+    public void onStockSplitCompleted(KafkaJsonEvent event) {
+        JsonNode payload = event.payload();
+        stockSplitRecordRepository.save(StockSplitRecord.builder()
+                .sourceEventId(event.eventId())
+                .corporateActionId(uuid(payload, "corporateActionId"))
+                .flatId(uuid(payload, "flatId"))
+                .contractId(uuid(payload, "contractId"))
+                .period(text(payload, "period"))
+                .splitRatio(decimal(payload, "splitRatio"))
+                .newTotalSupply(longValue(payload, "newTotalSupply"))
+                .newTokenPriceUsd(decimal(payload, "newTokenPriceUsd"))
+                .completedAt(parseInstant(payload, "completedAt", event.occurredAt()))
                 .build());
     }
 

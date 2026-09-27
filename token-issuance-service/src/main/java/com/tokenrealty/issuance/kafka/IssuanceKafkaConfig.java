@@ -52,4 +52,16 @@ public class IssuanceKafkaConfig {
             @Value("${tokenrealty.kafka.topic.dividend-distribution-requested}") String topic) {
         return new NewTopic(topic, PARTITIONS, REPLICAS);
     }
+
+    @Bean
+    NewTopic stockSplitRequestedTopic(
+            @Value("${tokenrealty.kafka.topic.stock-split-requested}") String topic) {
+        return new NewTopic(topic, PARTITIONS, REPLICAS);
+    }
+
+    @Bean
+    NewTopic stockSplitCompletedTopic(
+            @Value("${tokenrealty.kafka.topic.stock-split-completed}") String topic) {
+        return new NewTopic(topic, PARTITIONS, REPLICAS);
+    }
 }

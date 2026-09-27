@@ -17,4 +17,16 @@ public class CorporateActionsKafkaConfig {
             @Value("${tokenrealty.kafka.topic.dividend-distribution-requested}") String topic) {
         return new NewTopic(topic, 3, (short) 1);
     }
+
+    @Bean
+    NewTopic stockSplitRequestedTopic(
+            @Value("${tokenrealty.kafka.topic.stock-split-requested}") String topic) {
+        return new NewTopic(topic, 3, (short) 1);
+    }
+
+    @Bean
+    NewTopic stockSplitCompletedTopic(
+            @Value("${tokenrealty.kafka.topic.stock-split-completed}") String topic) {
+        return new NewTopic(topic, 3, (short) 1);
+    }
 }

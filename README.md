@@ -6,7 +6,7 @@ Real-estate tokenization platform — fractional property ownership, crypto paym
 
 | Layer | Count | Notes |
 |-------|-------|-------|
-| Backend microservices | **14** | Spring Boot 4 / Java 21 |
+| Backend microservices | **19** | Spring Boot 4 / Java 21 |
 | Frontend apps | **3** | React 19 + Vite (investor, admin, tenant) |
 | Shared Maven libraries | **6** | security, web, jpa, kafka, events, outbox |
 
@@ -34,13 +34,16 @@ Real-estate tokenization platform — fractional property ownership, crypto paym
 | Search | `search-service/` | 8098 | Implemented (Kafka search index) |
 | Integration Hub | `integration-hub-service/` | 8099 | Implemented (webhook relay + retries) |
 
-### Phase 6 — complete
+### Implementation phases
 
-All Phase 6 services implemented. See [docs/PLATFORM-SPEC.md §12](docs/PLATFORM-SPEC.md#12-phase-6--planned-services).
+| Phase | Status | Tracks | Guide |
+|-------|--------|--------|-------|
+| Phase 6 | Complete | 1–402 | [docs/PLATFORM-SPEC.md §12](docs/PLATFORM-SPEC.md#12-phase-6--planned-services) |
+| Phase 7 | Complete | 403–477 | [phase-7-services.md](docs/rules/phase-7-services.md) |
+| Phase 8 | Complete | 478–502 | [phase-8-services.md](docs/rules/phase-8-services.md) |
+| Phase 9 | Complete | 503–527 | [phase-9-services.md](docs/rules/phase-9-services.md) |
 
-### Phase 7 — in progress
-
-Event mesh wiring and production integrations. See [docs/PLATFORM-SPEC.md §13](docs/PLATFORM-SPEC.md#13-phase-7--event-mesh--production-integrations).
+**Platform status:** Phases 0–9 complete (tracks 1–527). Latest: stock-split consumer loop (Corporate Actions → Issuance → Reporting).
 
 ## Shared libraries
 

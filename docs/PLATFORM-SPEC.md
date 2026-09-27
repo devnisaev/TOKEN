@@ -2,7 +2,7 @@
 
 > **Version:** 1.3  
 > **Date:** 2026-09-26  
-> **Status:** Phases 0–8 complete (tracks 1–502)  
+> **Status:** Phases 0–9 complete (tracks 1–527)  
 > **Purpose:** Master specification and implementation backlog for the TokenRealty real-estate tokenization platform (buy, sell, rent with cryptocurrency).
 
 ---
@@ -23,9 +23,10 @@
 12. [Phase 6 — Planned Services](#12-phase-6--planned-services)
 13. [Phase 7 — Event Mesh & Production Integrations](#13-phase-7--event-mesh--production-integrations)
 14. [Phase 8 — Production Hardening & Platform Completion](#14-phase-8--production-hardening--platform-completion)
-15. [Diagram Index](#15-diagram-index)
-16. [Open Questions & Decisions](#16-open-questions--decisions)
-17. [Cursor Rules & Coding Standards](#17-cursor-rules--coding-standards)
+15. [Phase 9 — Downstream Consumer Completion](#15-phase-9--downstream-consumer-completion)
+16. [Diagram Index](#16-diagram-index)
+17. [Open Questions & Decisions](#17-open-questions--decisions)
+18. [Cursor Rules & Coding Standards](#18-cursor-rules--coding-standards)
 
 ---
 
@@ -442,6 +443,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 | **Phase 6** | Ops visibility & RWA depth | Reporting, Settlement Saga, Valuation/NAV, Audit Ledger, Corporate Actions; Search + Integration Hub |
 | **Phase 7** | Event mesh & production integrations | Wire Phase 6 publishers to consumers; Hub payment webhooks; OpenSearch (optional) |
 | **Phase 8** | Production hardening & platform completion | CI coverage; stock-split outbox; document verify; payment webhook HMAC; Reporting/Audit consumers |
+| **Phase 9** | Downstream consumer completion | Issuance stock-split consumer; completion outbox; Reporting building.approved + stock-split projections |
 
 See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml).
 
@@ -1157,7 +1159,39 @@ Human-readable guide: [rules/phase-8-services.md](rules/phase-8-services.md).
 
 ---
 
-## 15. Diagram Index
+## 15. Phase 9 — Downstream Consumer Completion
+
+Phase 8 published the stock-split outbox and hardened production paths. Phase 9 **closes the corporate-actions → issuance → reporting loop** and fills remaining read-model gaps. **No new microservices.**
+
+Human-readable guide: [rules/phase-9-services.md](rules/phase-9-services.md).
+
+### 15.1 Tier 1 — Issuance (implemented)
+
+- [x] Issuance consumes `stock-split.requested` → applies holder/contract ratio update
+- [x] Issuance outbox `stock-split.completed` on successful split
+
+### 15.2 Tier 2 — Corporate Actions & Reporting (implemented)
+
+- [x] Corporate Actions consumes `stock-split.completed` → marks action COMPLETED
+- [x] Reporting `BuildingApprovedRecord` from `building.approved`
+- [x] Reporting `StockSplitRecord` from `stock-split.completed`
+
+### 15.3 Tier 3 — Tests & CI (implemented)
+
+- [x] Issuance, Corporate Actions, and Reporting integration tests
+- [x] CI `kafka-integration-tests` extended
+
+### 15.4 Track backlog (503–527)
+
+| Track range | Focus |
+|-------------|-------|
+| 503–512 | Issuance stock-split consumer + completion outbox |
+| 513–522 | Corporate Actions completion; Reporting projections |
+| 523–527 | Integration tests, CI, docs |
+
+---
+
+## 16. Diagram Index
 
 | File | Description |
 |------|-------------|
@@ -1173,7 +1207,7 @@ Human-readable guide: [rules/phase-8-services.md](rules/phase-8-services.md).
 
 ---
 
-## 16. Open Questions & Decisions
+## 17. Open Questions & Decisions
 
 | # | Question | Options | Decision |
 |---|----------|---------|----------|
@@ -1193,7 +1227,7 @@ Human-readable guide: [rules/phase-8-services.md](rules/phase-8-services.md).
 
 ---
 
-## 17. Cursor Rules & Coding Standards
+## 18. Cursor Rules & Coding Standards
 
 Agent and IDE conventions live in `.cursor/rules/` (adapted from Titan fintech rules).
 

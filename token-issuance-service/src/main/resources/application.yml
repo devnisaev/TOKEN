@@ -102,6 +102,8 @@ tokenrealty:
       kyc-revoked: tokenrealty.compliance.investor.kyc-revoked.v1
       payout-completed: tokenrealty.payment.payout.completed.v1
       dividend-distribution-requested: tokenrealty.corporateactions.dividend.distribution-requested.v1
+      stock-split-requested: tokenrealty.corporateactions.stock-split.requested.v1
+      stock-split-completed: tokenrealty.issuance.stock-split.completed.v1
   dividend:
     rent-collected-listener-enabled: ${DIVIDEND_RENT_LISTENER_ENABLED:true}
 

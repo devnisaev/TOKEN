@@ -343,7 +343,7 @@ Issuance distributes pro-rata to token holders; `RentCollectedListener` is disab
 | | |
 |---|---|
 | **Publisher** | Corporate Actions (outbox) |
-| **Consumers** | Token Issuance (planned) |
+| **Consumers** | Token Issuance |
 | **Partition key** | `corporateActionId` |
 
 **Payload:**
@@ -358,7 +358,32 @@ Issuance distributes pro-rata to token holders; `RentCollectedListener` is disab
 }
 ```
 
-Emitted when admin requests a stock split via `POST /v1/corporate-actions/stock-splits`. Issuance will apply on-chain token ratio adjustment.
+Emitted when admin requests a stock split via `POST /v1/corporate-actions/stock-splits`. Issuance applies holder/contract ratio update and publishes `stock-split.completed`.
+
+---
+
+### `tokenrealty.issuance.stock-split.completed.v1`
+
+| | |
+|---|---|
+| **Publisher** | Token Issuance (outbox) |
+| **Consumers** | Corporate Actions, Reporting |
+| **Partition key** | `contractId` |
+
+**Payload:**
+
+```json
+{
+  "corporateActionId": "uuid",
+  "contractId": "uuid",
+  "flatId": "uuid",
+  "period": "2025-Q3",
+  "splitRatio": "2.0",
+  "newTotalSupply": 2000,
+  "newTokenPriceUsd": "50.00",
+  "completedAt": "2025-09-25T20:00:00Z"
+}
+```
 
 ---
 
@@ -512,7 +537,8 @@ See [PLATFORM-SPEC.md §12](PLATFORM-SPEC.md#12-phase-6--planned-services).
 |-------|-----------|-----------|--------|
 | `tokenrealty.valuation.updated.v1` | Valuation Service | Registry, Search, Reporting | Implemented (outbox) |
 | `tokenrealty.corporateactions.dividend.distribution-requested.v1` | Corporate Actions | Token Issuance | Implemented (outbox) |
-| `tokenrealty.corporateactions.stock-split.requested.v1` | Corporate Actions | Token Issuance | Implemented (outbox) |
+| `tokenrealty.corporateactions.stock-split.requested.v1` | Corporate Actions | Token Issuance | Implemented (outbox + consumer) |
+| `tokenrealty.issuance.stock-split.completed.v1` | Token Issuance | Corporate Actions, Reporting | Implemented (outbox + consumers) |
 | `tokenrealty.settlement.stuck.v1` | Settlement Service | Notification, Reporting | Implemented (outbox + consumers) |
 | `tokenrealty.settlement.recovered.v1` | Settlement Service | Audit Ledger, Notification | Implemented (outbox + consumers) |
 | `tokenrealty.valuation.approved.v1` | Valuation Service | Audit Ledger, Notification | Implemented (outbox + consumers) |

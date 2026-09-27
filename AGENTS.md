@@ -82,6 +82,10 @@ Event mesh & production integrations (no new services). See [docs/PLATFORM-SPEC.
 
 Production hardening & platform completion (no new services). See [docs/PLATFORM-SPEC.md §14](docs/PLATFORM-SPEC.md#14-phase-8--production-hardening--platform-completion) and [docs/rules/phase-8-services.md](docs/rules/phase-8-services.md).
 
+### Phase 9 — complete
+
+Downstream consumer completion (no new services). See [docs/PLATFORM-SPEC.md §15](docs/PLATFORM-SPEC.md#15-phase-9--downstream-consumer-completion) and [docs/rules/phase-9-services.md](docs/rules/phase-9-services.md).
+
 **Do not spin out:** limits/policy service, config service, Payment escrow, Issuance deploy/transfer core.
 
 New services: copy structure from `marketplace-service/` or `auth-service/`.

@@ -8,6 +8,7 @@ import com.tokenrealty.corporateactions.entity.CorporateActionStatus;
 import com.tokenrealty.corporateactions.entity.CorporateActionType;
 import com.tokenrealty.corporateactions.kafka.command.DividendDistributedCommand;
 import com.tokenrealty.corporateactions.kafka.command.RentCollectedCommand;
+import com.tokenrealty.corporateactions.kafka.command.StockSplitCompletedCommand;
 import com.tokenrealty.corporateactions.kafka.events.DividendDistributionRequestedEvent;
 import com.tokenrealty.corporateactions.kafka.events.StockSplitRequestedEvent;
 import com.tokenrealty.corporateactions.kafka.port.DividendDistributionRequestedPublisher;
@@ -51,6 +52,22 @@ public class CorporateActionsService {
                 action.getContractId(),
                 action.getPeriod(),
                 action.getGrossAmountUsd()));
+    }
+
+    @Transactional
+    public void onStockSplitCompleted(StockSplitCompletedCommand command) {
+        repository.findFirstByFlatIdAndPeriodAndTypeAndStatus(
+                        command.flatId(),
+                        command.period(),
+                        CorporateActionType.STOCK_SPLIT,
+                        CorporateActionStatus.REQUESTED)
+                .ifPresent(action -> {
+                    if (action.getContractId() == null && command.contractId() != null) {
+                        action.setContractId(command.contractId());
+                    }
+                    action.setStatus(CorporateActionStatus.COMPLETED);
+                    repository.save(action);
+                });
     }
 
     @Transactional

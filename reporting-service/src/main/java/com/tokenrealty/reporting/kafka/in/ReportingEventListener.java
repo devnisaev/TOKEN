@@ -46,6 +46,12 @@ public class ReportingEventListener {
                 projectionService::onFlatTokenized);
     }
 
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.building-approved}")
+    public void onBuildingApproved(String message) {
+        ingest(message, ReportingKafkaEventTypes.BUILDING_APPROVED,
+                projectionService::onBuildingApproved);
+    }
+
     @KafkaListener(topics = "${tokenrealty.kafka.topic.settlement-stuck}")
     public void onSettlementStuck(String message) {
         ingest(message, ReportingKafkaEventTypes.SETTLEMENT_STUCK,
@@ -56,6 +62,12 @@ public class ReportingEventListener {
     public void onValuationApproved(String message) {
         ingest(message, ReportingKafkaEventTypes.VALUATION_APPROVED,
                 projectionService::onValuationApproved);
+    }
+
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.stock-split-completed}")
+    public void onStockSplitCompleted(String message) {
+        ingest(message, ReportingKafkaEventTypes.STOCK_SPLIT_COMPLETED,
+                projectionService::onStockSplitCompleted);
     }
 
     private void ingest(String message, String eventType,

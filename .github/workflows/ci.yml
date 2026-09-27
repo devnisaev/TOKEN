@@ -180,7 +180,7 @@ jobs:
         run: |
           ./token-realty-app/mvnw -f notification-service/pom.xml test -Dtest=NotificationKafkaIntegrationTest -q
           ./token-realty-app/mvnw -f marketplace-service/pom.xml test -Dtest=FlatTokenizedKafkaIntegrationTest,BuildingApprovedKafkaIntegrationTest,BuyFlowKafkaIntegrationTest -q
-          ./token-realty-app/mvnw -f token-issuance-service/pom.xml test -Dtest=KycApprovedKafkaIntegrationTest,KycRevokedKafkaIntegrationTest,RentCollectedKafkaIntegrationTest,PaymentConfirmedKafkaIntegrationTest,PayoutCompletedKafkaIntegrationTest,RentDividendIntegrationTest -q
+          ./token-realty-app/mvnw -f token-issuance-service/pom.xml test -Dtest=KycApprovedKafkaIntegrationTest,KycRevokedKafkaIntegrationTest,RentCollectedKafkaIntegrationTest,PaymentConfirmedKafkaIntegrationTest,PayoutCompletedKafkaIntegrationTest,RentDividendIntegrationTest,DividendDistributionRequestedKafkaIntegrationTest,StockSplitRequestedKafkaIntegrationTest -q
           ./token-realty-app/mvnw -f payment-service/pom.xml test -Dtest=OrderMatchedKafkaIntegrationTest,DividendDistributedKafkaIntegrationTest -q
           ./token-realty-app/mvnw -f token-realty-app/pom.xml test -Dtest=DocumentUploadedKafkaIntegrationTest,TransferCompletedKafkaIntegrationTest -q
           ./token-realty-app/mvnw -f compliance-service/pom.xml test -Dtest=DocumentUploadedKafkaIntegrationTest,KycWebhookIntegrationTest -q
@@ -192,7 +192,7 @@ jobs:
           ./token-realty-app/mvnw -f search-service/pom.xml test -Dtest=SearchKafkaIntegrationTest -q
           ./token-realty-app/mvnw -f token-realty-app/pom.xml test -Dtest=ValuationUpdatedKafkaIntegrationTest -q
           ./token-realty-app/mvnw -f reporting-service/pom.xml test -Dtest=SettlementStuckReportingIntegrationTest -q
-          ./token-realty-app/mvnw -f reporting-service/pom.xml test -Dtest=ValuationApprovedReportingIntegrationTest -q
+          ./token-realty-app/mvnw -f reporting-service/pom.xml test -Dtest=ValuationApprovedReportingIntegrationTest,BuildingApprovedReportingIntegrationTest,StockSplitCompletedReportingIntegrationTest -q
           ./token-realty-app/mvnw -f corporate-actions-service/pom.xml test -Dtest=StockSplitOutboxIntegrationTest -q
           ./token-realty-app/mvnw -f payment-service/pom.xml test -Dtest=PaymentWebhookIntegrationTest -q
 
