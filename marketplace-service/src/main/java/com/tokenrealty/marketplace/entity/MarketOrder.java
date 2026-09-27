@@ -20,7 +20,7 @@ import com.tokenrealty.jpa.entity.BaseEntity;
 @Builder
 public class MarketOrder extends BaseEntity {
 
-    @Column(name = "listing_id", nullable = false)
+    @Column(name = "listing_id")
     private UUID listingId;
 
     @Column(name = "flat_id", nullable = false)

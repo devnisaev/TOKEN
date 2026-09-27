@@ -1,6 +1,6 @@
 # Phase 13 — RWA Order Book Exchange (CLOB)
 
-**Status:** Planned (tracks 603–627). Evolves Marketplace from **listing-take** model to a **central limit order book** for property tokens with NAV-aware guardrails.
+**Status:** Complete (tracks 603–627). Evolves Marketplace from **listing-take** model to a **central limit order book** for property tokens with NAV-aware guardrails.
 
 Master spec: [PLATFORM-SPEC.md §19](../PLATFORM-SPEC.md#19-phase-13--rwa-order-book-exchange-clob) · Diagram: [10-phase-13-rwa-exchange.puml](../diagrams/10-phase-13-rwa-exchange.puml)
 

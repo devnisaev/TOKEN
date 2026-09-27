@@ -51,6 +51,8 @@ services:
     url: ${PAYMENT_SERVICE_URL:http://localhost:8085/api}
   property-registry:
     url: ${PROPERTY_REGISTRY_URL:http://localhost:8081/api}
+  valuation:
+    url: ${VALUATION_URL:http://localhost:8095/api}
 
 tokenrealty:
   jwt:
@@ -79,6 +81,11 @@ tokenrealty:
       flat-tokenized: tokenrealty.registry.flat.tokenized.v1
       payment-confirmed: tokenrealty.payment.payment.confirmed.v1
       transfer-completed: tokenrealty.issuance.transfer.completed.v1
+      exchange-order-placed: tokenrealty.marketplace.order.placed.v1
+      exchange-order-cancelled: tokenrealty.marketplace.order.cancelled.v1
+      exchange-trade-executed: tokenrealty.marketplace.trade.executed.v1
+  exchange:
+    nav-band-enabled: ${EXCHANGE_NAV_BAND_ENABLED:true}
 
 jackson2:
   serialization:

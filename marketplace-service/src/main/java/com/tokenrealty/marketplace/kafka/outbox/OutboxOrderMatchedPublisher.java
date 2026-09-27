@@ -21,7 +21,7 @@ public class OutboxOrderMatchedPublisher implements OrderMatchedPublisher {
         OutboxPayload.start()
                 .put("orderId", event.orderId())
                 .put("tradeId", event.tradeId())
-                .put("listingId", event.listingId())
+                .putIfPresent("listingId", event.listingId())
                 .put("flatId", event.flatId())
                 .putIfPresent("contractId", event.contractId())
                 .put("buyerId", event.buyerId())

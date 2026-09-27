@@ -1,8 +1,8 @@
 # TokenRealty Platform — Implementation Spec & TODO
 
-> **Version:** 1.7  
+> **Version:** 1.8  
 > **Date:** 2026-09-27  
-> **Status:** Phases 0–12 complete (tracks 1–602); Phases 13–15 planned (603–677)  
+> **Status:** Phases 0–13 complete (tracks 1–627); Phases 14–15 planned (628–677)  
 > **Purpose:** Master specification and implementation backlog for the TokenRealty real-estate tokenization platform (buy, sell, rent, and exchange fractional property with cryptocurrency).
 
 ---
@@ -455,7 +455,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 | **Phase 10** | Institutional expansion | Hub adapters; NAV attestation; tax withholding; Governance `:8100`; surveillance (backend) |
 | **Phase 11** | Institutional UI & BFF | Portal governance, compliance reports, integrations admin; gateway proxies (553–577) — **complete** |
 | **Phase 12** | Universal asset tokenization ✅ | Houses, land, gyms, pools, stations; `AssetUnit`; operating models; liquidity tiers (578–602) |
-| **Phase 13** | RWA order book (CLOB) | Limit orders, depth, NAV bands, market data; evolve Marketplace (603–627) |
+| **Phase 13** | RWA order book (CLOB) ✅ | Limit orders, depth, NAV bands, market data; evolve Marketplace (603–627) |
 | **Phase 14** | AMM liquidity pools | Token/USDC pools, LP tokens, NAV circuit breakers (628–652) |
 | **Phase 15** | Institutional exchange | OTC/RFQ, REIT-style index baskets, token-collateral lending (653–677) |
 
@@ -1451,7 +1451,7 @@ Building (optional 1:1 wrapper for standalone assets)
 
 ## 19. Phase 13 — RWA Order Book Exchange (CLOB)
 
-**Status:** Planned (tracks 603–627). Evolve Marketplace from listing-take to **central limit order book** with NAV guardrails.
+**Status:** Complete (tracks 603–627). Evolve Marketplace from listing-take to **central limit order book** with NAV guardrails.
 
 Guide: [rules/phase-13-services.md](rules/phase-13-services.md) · Diagram: [diagrams/10-phase-13-rwa-exchange.puml](diagrams/10-phase-13-rwa-exchange.puml)
 

@@ -47,6 +47,56 @@ export type {
   TokenHolding,
 } from '@tokenrealty/shared-api-client';
 
+export interface BookLevel {
+  priceUsd: number;
+  totalQuantity: number;
+  orderCount: number;
+}
+
+export interface BookDepthResponse {
+  contractId: string;
+  bids: BookLevel[];
+  asks: BookLevel[];
+  asOf: string;
+}
+
+export interface ExchangeOrder {
+  id: string;
+  contractId: string;
+  flatId: string;
+  buildingId: string;
+  side: 'BID' | 'ASK';
+  limitPriceUsd: number;
+  originalQuantity: number;
+  filledQuantity: number;
+  remainingQuantity: number;
+  status: string;
+  investorId: string;
+  fillsOnPlacement?: number;
+}
+
+export interface ExchangeTicker {
+  contractId: string;
+  lastPriceUsd: number | null;
+  navPerTokenUsd: number | null;
+  navDeltaPct: number | null;
+  volume24hTokens: number;
+  notional24hUsd: number;
+  asOf: string;
+}
+
+export interface PlaceExchangeOrderRequest {
+  contractId: string;
+  flatId: string;
+  buildingId: string;
+  side: 'BID' | 'ASK';
+  limitPriceUsd: number;
+  quantity: number;
+  investorId: string;
+  walletAddress: string;
+  liquidityTier?: string;
+}
+
 export interface Order {
   id: string;
   listingId: string;

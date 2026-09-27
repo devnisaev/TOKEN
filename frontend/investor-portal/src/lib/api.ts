@@ -5,6 +5,10 @@ import type {
   Listing,
   ListingDetailResponse,
   Order,
+  BookDepthResponse,
+  ExchangeOrder,
+  ExchangeTicker,
+  PlaceExchangeOrderRequest,
   PlaceOrderRequest,
   PlaceSellOrderRequest,
   PortfolioBffDetail,
@@ -93,6 +97,33 @@ export const api = {
 
   getPortfolioBff(investorId: string) {
     return request<PortfolioBffDetail>(`/v1/bff/investors/${investorId}/portfolio`);
+  },
+
+  getExchangeBook(contractId: string) {
+    return request<BookDepthResponse>(`/v1/exchange/book/${contractId}`);
+  },
+
+  getExchangeTicker(contractId: string, flatId: string) {
+    return request<ExchangeTicker>(`/v1/exchange/ticker/${contractId}?flatId=${flatId}`);
+  },
+
+  listExchangeOrders(investorId: string) {
+    return request<SpringPage<ExchangeOrder>>(
+      `/v1/exchange/orders?investorId=${investorId}&size=20`,
+    );
+  },
+
+  placeExchangeOrder(body: PlaceExchangeOrderRequest) {
+    return request<ExchangeOrder>('/v1/exchange/orders', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
+
+  cancelExchangeOrder(orderId: string, investorId: string) {
+    return request<ExchangeOrder>(`/v1/exchange/orders/${orderId}?investorId=${investorId}`, {
+      method: 'DELETE',
+    });
   },
 
   listDividends(investorId: string) {

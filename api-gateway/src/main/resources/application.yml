@@ -107,6 +107,7 @@ tokenrealty:
         paths:
           - /api/v1/listings
           - /api/v1/orders
+          - /api/v1/exchange
       - id: payment
         target: http://localhost:8085
         paths:

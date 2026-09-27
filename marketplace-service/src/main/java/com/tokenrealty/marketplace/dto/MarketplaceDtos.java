@@ -6,8 +6,12 @@ import com.tokenrealty.marketplace.entity.Trade;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 
+import com.tokenrealty.marketplace.entity.ExchangeFill;
+import com.tokenrealty.marketplace.entity.ExchangeOrder;
+
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public final class MarketplaceDtos {
@@ -135,6 +139,91 @@ public final class MarketplaceDtos {
     public record SettleTradeRequest(
             UUID paymentId,
             UUID transferId
+    ) {
+    }
+
+    @Builder
+    public record PlaceExchangeOrderRequest(
+            @NotNull UUID contractId,
+            @NotNull UUID flatId,
+            @NotNull UUID buildingId,
+            @NotNull ExchangeOrder.OrderSide side,
+            @NotNull @DecimalMin("0.01") BigDecimal limitPriceUsd,
+            @NotNull @Min(1) Long quantity,
+            @NotNull UUID investorId,
+            @NotBlank @Size(max = 66) String walletAddress,
+            @Size(max = 20) String liquidityTier
+    ) {
+    }
+
+    @Builder
+    public record ExchangeOrderResponse(
+            UUID id,
+            UUID contractId,
+            UUID flatId,
+            UUID buildingId,
+            ExchangeOrder.OrderSide side,
+            BigDecimal limitPriceUsd,
+            long originalQuantity,
+            long filledQuantity,
+            long remainingQuantity,
+            ExchangeOrder.OrderStatus status,
+            UUID investorId,
+            String walletAddress,
+            String liquidityTier,
+            int fillsOnPlacement,
+            Instant createdAt,
+            Instant updatedAt
+    ) {
+    }
+
+    @Builder
+    public record BookLevel(
+            BigDecimal priceUsd,
+            long totalQuantity,
+            int orderCount
+    ) {
+    }
+
+    @Builder
+    public record BookDepthResponse(
+            UUID contractId,
+            List<BookLevel> bids,
+            List<BookLevel> asks,
+            Instant asOf
+    ) {
+    }
+
+    @Builder
+    public record ExchangeTradeResponse(
+            UUID fillId,
+            UUID contractId,
+            BigDecimal pricePerTokenUsd,
+            long tokenAmount,
+            BigDecimal totalPriceUsd,
+            Instant executedAt
+    ) {
+        public static ExchangeTradeResponse from(ExchangeFill fill) {
+            return ExchangeTradeResponse.builder()
+                    .fillId(fill.getId())
+                    .contractId(fill.getContractId())
+                    .pricePerTokenUsd(fill.getPricePerTokenUsd())
+                    .tokenAmount(fill.getTokenAmount())
+                    .totalPriceUsd(fill.getTotalPriceUsd())
+                    .executedAt(fill.getExecutedAt())
+                    .build();
+        }
+    }
+
+    @Builder
+    public record ExchangeTickerResponse(
+            UUID contractId,
+            BigDecimal lastPriceUsd,
+            BigDecimal navPerTokenUsd,
+            BigDecimal navDeltaPct,
+            long volume24hTokens,
+            BigDecimal notional24hUsd,
+            Instant asOf
     ) {
     }
 }

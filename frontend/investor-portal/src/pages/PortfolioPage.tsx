@@ -96,12 +96,20 @@ export function PortfolioPage() {
                     <div className="flex items-center gap-3">
                       <span>{h.balance.toLocaleString()} tokens</span>
                       {h.flatId && h.balance > 0 && (
-                        <Link
-                          to={`/portfolio/sell/${h.contractId}`}
-                          className="text-xs text-primary underline-offset-4 hover:underline"
-                        >
-                          Sell
-                        </Link>
+                        <>
+                          <Link
+                            to={`/exchange/${h.contractId}?flatId=${h.flatId}`}
+                            className="text-xs text-primary underline-offset-4 hover:underline"
+                          >
+                            Exchange
+                          </Link>
+                          <Link
+                            to={`/portfolio/sell/${h.contractId}`}
+                            className="text-xs text-primary underline-offset-4 hover:underline"
+                          >
+                            Sell
+                          </Link>
+                        </>
                       )}
                     </div>
                   </div>

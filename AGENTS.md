@@ -103,11 +103,14 @@ Institutional UI & BFF. See [docs/PLATFORM-SPEC.md §17](docs/PLATFORM-SPEC.md#1
 
 Universal asset tokenization (`AssetUnit` API, operating models, liquidity tiers). See [docs/PLATFORM-SPEC.md §18](docs/PLATFORM-SPEC.md#18-phase-12--universal-asset-tokenization) and [docs/rules/phase-12-services.md](docs/rules/phase-12-services.md).
 
-### Phases 13–15 — planned (roadmap)
+### Phase 13 — complete
+
+RWA order book (CLOB) in Marketplace — limit orders, matching engine, NAV bands, market data, investor exchange UI. See [docs/PLATFORM-SPEC.md §19](docs/PLATFORM-SPEC.md#19-phase-13--rwa-order-book-exchange-clob) and [docs/rules/phase-13-services.md](docs/rules/phase-13-services.md).
+
+### Phases 14–15 — planned (roadmap)
 
 | Phase | Focus | Tracks | Guide |
 |-------|-------|--------|-------|
-| 13 | RWA order book (CLOB) — evolve Marketplace | 603–627 | [phase-13-services.md](docs/rules/phase-13-services.md) |
 | 14 | AMM liquidity pools + NAV circuit breakers | 628–652 | [phase-14-services.md](docs/rules/phase-14-services.md) |
 | 15 | OTC/RFQ, index baskets, token-collateral lending | 653–677 | [phase-15-services.md](docs/rules/phase-15-services.md) |
 

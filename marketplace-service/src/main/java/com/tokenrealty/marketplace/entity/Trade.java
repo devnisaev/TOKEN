@@ -22,7 +22,7 @@ public class Trade extends BaseEntity {
     @Column(name = "order_id", nullable = false, unique = true)
     private UUID orderId;
 
-    @Column(name = "listing_id", nullable = false)
+    @Column(name = "listing_id")
     private UUID listingId;
 
     @Column(name = "flat_id", nullable = false)
