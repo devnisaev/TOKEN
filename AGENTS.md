@@ -151,9 +151,9 @@ Operator alert summaries, health trend detection, operations export, weekly dige
 
 Lease coverage signals, vacancy risk alerts, rental-Reporting integration. See [docs/PLATFORM-SPEC.md §30](docs/PLATFORM-SPEC.md#30-phase-24--lease-coverage--vacancy-alerts) and [docs/rules/phase-24-services.md](docs/rules/phase-24-services.md).
 
-### Phase 25 — in progress (roadmap)
+### Phase 25 — complete
 
-Maintenance backlog alerts, lease expiry alerts, rent collection summary. Tracks 903–927 — [phase-25-services.md](docs/rules/phase-25-services.md).
+Maintenance backlog alerts, lease expiry alerts, rent collection summary. See [docs/PLATFORM-SPEC.md §31](docs/PLATFORM-SPEC.md#31-phase-25--maintenance-backlog--rent-collection-ops) and [docs/rules/phase-25-services.md](docs/rules/phase-25-services.md).
 
 **Do not spin out:** limits/policy service, config service, Payment escrow, Issuance deploy/transfer core.
 

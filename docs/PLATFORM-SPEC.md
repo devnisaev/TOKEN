@@ -467,6 +467,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 | **Phase 22** | Building operations UI ✅ | Health history, admin building health, sustainability scores (828–852) |
 | **Phase 23** | Operator reporting & trends ✅ | Alert summaries, health trends, operations export, weekly digest (853–877) |
 | **Phase 24** | Lease coverage & vacancy alerts ✅ | Active/expiring leases, vacancy risk alerts (878–902) |
+| **Phase 25** | Maintenance backlog & rent collection ops ✅ | Backlog alerts, lease expiry alerts, rent summary (903–927) |
 
 See diagrams: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml), [`diagrams/09-phase-12-asset-generalization.puml`](diagrams/09-phase-12-asset-generalization.puml), [`diagrams/10-phase-13-rwa-exchange.puml`](diagrams/10-phase-13-rwa-exchange.puml).
 
@@ -1824,7 +1825,34 @@ Guide: [rules/phase-24-services.md](rules/phase-24-services.md)
 
 ---
 
-## 31. Diagram Index
+## 31. Phase 25 — Maintenance Backlog & Rent Collection Ops
+
+**Status:** Complete (tracks 903–927). Maintenance backlog summary, lease expiry alerts, rent collection summary.
+
+Guide: [rules/phase-25-services.md](rules/phase-25-services.md)
+
+### 31.1 Goals
+
+- [x] Maintenance backlog summary (flats with multiple open tickets)
+- [x] Lease expiry operator alerts
+- [x] Maintenance backlog operator alerts
+- [x] Rent collection summary from projections
+- [x] Operations export maintenance/rent sections
+- [x] Admin UI cards; tenant lease expiry banner
+
+### 31.2 Track backlog (903–927)
+
+| Track range | Focus |
+|-------------|-------|
+| 903–907 | Maintenance backlog service |
+| 908–912 | Lease expiry + backlog alerts |
+| 913–917 | Rent collection summary |
+| 918–922 | Operations export extension |
+| 923–927 | Admin/tenant UI; tests |
+
+---
+
+## 32. Diagram Index
 
 | File | Description |
 |------|-------------|

@@ -76,6 +76,50 @@ export function OperationsReportsPage() {
           </section>
 
           <section className="space-y-3">
+            <h2 className="text-lg font-medium">Maintenance backlog</h2>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <Card>
+                <CardContent className="py-4 text-sm">
+                  <p className="text-muted-foreground">Open tickets</p>
+                  <p className="text-xl font-semibold">{data.maintenanceBacklog.totalOpenTicketCount}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="py-4 text-sm">
+                  <p className="text-muted-foreground">Backlog flats</p>
+                  <p className="text-xl font-semibold">{data.maintenanceBacklog.backlogFlatCount}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="py-4 text-sm">
+                  <p className="text-muted-foreground">Rent collected</p>
+                  <p className="text-xl font-semibold">
+                    ${data.rentCollection.totalCollectedUsd.toLocaleString()}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-medium">Rent collection</h2>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Card>
+                <CardContent className="py-4 text-sm">
+                  <p className="text-muted-foreground">Collections recorded</p>
+                  <p className="text-xl font-semibold">{data.rentCollection.collectionCount}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="py-4 text-sm">
+                  <p className="text-muted-foreground">Flats with rent</p>
+                  <p className="text-xl font-semibold">{data.rentCollection.flatsWithRent}</p>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
+          <section className="space-y-3">
             <h2 className="text-lg font-medium">Alerts by type</h2>
             <div className="grid gap-2">
               {data.alertSummary.byType.map((item) => (

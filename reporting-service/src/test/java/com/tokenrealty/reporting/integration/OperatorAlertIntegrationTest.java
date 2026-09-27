@@ -43,11 +43,11 @@ class OperatorAlertIntegrationTest {
                 new BigDecimal("40.0"), new BigDecimal("45.0"), new BigDecimal("50.0")));
 
         var result = operatorAlertService.generate(30);
-        assertThat(result.alertsCreated()).isEqualTo(2);
-        assertThat(operatorAlertService.listOpen(PageRequest.of(0, 10)).getTotalElements()).isEqualTo(2);
+        assertThat(result.alertsCreated()).isEqualTo(3);
+        assertThat(operatorAlertService.listOpen(PageRequest.of(0, 10)).getTotalElements()).isEqualTo(3);
 
         UUID alertId = operatorAlertService.listOpen(PageRequest.of(0, 1)).getContent().getFirst().id();
         operatorAlertService.acknowledge(alertId);
-        assertThat(operatorAlertService.countOpen()).isEqualTo(1);
+        assertThat(operatorAlertService.countOpen()).isEqualTo(2);
     }
 }

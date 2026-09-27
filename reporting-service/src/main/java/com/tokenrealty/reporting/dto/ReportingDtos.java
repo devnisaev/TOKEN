@@ -228,12 +228,33 @@ public final class ReportingDtos {
     ) {
     }
 
+    public record MaintenanceBacklogItem(UUID flatId, int openTicketCount) {
+    }
+
+    public record MaintenanceBacklogSummary(
+            long backlogFlatCount,
+            long totalOpenTicketCount,
+            List<MaintenanceBacklogItem> backlogFlats,
+            Instant generatedAt
+    ) {
+    }
+
+    public record RentCollectionSummary(
+            BigDecimal totalCollectedUsd,
+            long collectionCount,
+            long flatsWithRent,
+            Instant generatedAt
+    ) {
+    }
+
     public record OperationsExportResponse(
             OperatorKpiResponse kpis,
             OperatorAlertSummaryResponse alertSummary,
             long decliningHealthCount,
             List<HealthTrendItem> decliningHealth,
             LeaseCoverageSummary leaseCoverage,
+            MaintenanceBacklogSummary maintenanceBacklog,
+            RentCollectionSummary rentCollection,
             Instant generatedAt
     ) {
     }

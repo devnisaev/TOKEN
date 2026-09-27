@@ -19,6 +19,20 @@ function isOverduePeriod(period: string): boolean {
   return period < currentPeriod();
 }
 
+function daysUntilEndDate(endDate: string | undefined): number | null {
+  if (!endDate) {
+    return null;
+  }
+  const end = new Date(endDate);
+  if (Number.isNaN(end.getTime())) {
+    return null;
+  }
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  end.setHours(0, 0, 0, 0);
+  return Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+}
+
 export function LeasePage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -95,6 +109,9 @@ export function LeasePage() {
   const currentMonth = currentPeriod();
   const rentDueNow = leaseItem?.rentDue && period === currentMonth && !paidThisPeriod;
   const overdue = isOverduePeriod(period) && !paidThisPeriod;
+  const daysUntilExpiry = daysUntilEndDate(lease.endDate);
+  const leaseExpiringSoon =
+    daysUntilExpiry !== null && daysUntilExpiry >= 0 && daysUntilExpiry <= 30;
 
   return (
     <div className="space-y-6">
@@ -102,6 +119,19 @@ export function LeasePage() {
         <h1 className="text-3xl font-bold tracking-tight">My lease</h1>
         <p className="text-muted-foreground">Pay monthly rent to your SPV wallet</p>
       </div>
+
+      {leaseExpiringSoon && (
+        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+          <div>
+            <p className="font-medium">Lease expiring soon</p>
+            <p className="mt-0.5 text-amber-800">
+              Your lease ends on {lease.endDate} ({daysUntilExpiry} day
+              {daysUntilExpiry === 1 ? '' : 's'} remaining). Contact your property manager to renew.
+            </p>
+          </div>
+        </div>
+      )}
 
       {rentDueNow && (
         <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">

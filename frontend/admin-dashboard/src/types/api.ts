@@ -186,12 +186,33 @@ export interface LeaseCoverageSummary {
   generatedAt: string;
 }
 
+export interface MaintenanceBacklogItem {
+  flatId: string;
+  openTicketCount: number;
+}
+
+export interface MaintenanceBacklogSummary {
+  backlogFlatCount: number;
+  totalOpenTicketCount: number;
+  backlogFlats: MaintenanceBacklogItem[];
+  generatedAt: string;
+}
+
+export interface RentCollectionSummary {
+  totalCollectedUsd: number;
+  collectionCount: number;
+  flatsWithRent: number;
+  generatedAt: string;
+}
+
 export interface OperationsExportResponse {
   kpis: OperatorKpiResponse;
   alertSummary: OperatorAlertSummaryResponse;
   decliningHealthCount: number;
   decliningHealth: HealthTrendItem[];
   leaseCoverage: LeaseCoverageSummary;
+  maintenanceBacklog: MaintenanceBacklogSummary;
+  rentCollection: RentCollectionSummary;
   generatedAt: string;
 }
 

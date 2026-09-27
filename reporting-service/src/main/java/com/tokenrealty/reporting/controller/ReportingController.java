@@ -7,7 +7,9 @@ import com.tokenrealty.reporting.service.BuildingHealthService;
 import com.tokenrealty.reporting.service.HealthTrendService;
 import com.tokenrealty.reporting.service.OperatorAlertSummaryService;
 import com.tokenrealty.reporting.service.LeaseCoverageService;
+import com.tokenrealty.reporting.service.MaintenanceBacklogService;
 import com.tokenrealty.reporting.service.OperationsReportService;
+import com.tokenrealty.reporting.service.RentCollectionSummaryService;
 import com.tokenrealty.reporting.service.EsgSnapshotService;
 import com.tokenrealty.reporting.service.OperatorAlertService;
 import com.tokenrealty.reporting.service.OperatorKpiService;
@@ -42,6 +44,8 @@ public class ReportingController {
     private final HealthTrendService healthTrendService;
     private final OperationsReportService operationsReportService;
     private final LeaseCoverageService leaseCoverageService;
+    private final MaintenanceBacklogService maintenanceBacklogService;
+    private final RentCollectionSummaryService rentCollectionSummaryService;
 
     @GetMapping("/trading-summary")
     public TradingSummaryResponse tradingSummary() {
@@ -193,5 +197,15 @@ public class ReportingController {
     public LeaseCoverageSummary leaseCoverage(
             @RequestParam(defaultValue = "30") int expiringWithinDays) {
         return leaseCoverageService.summary(expiringWithinDays);
+    }
+
+    @GetMapping("/maintenance-backlog")
+    public MaintenanceBacklogSummary maintenanceBacklog() {
+        return maintenanceBacklogService.summary();
+    }
+
+    @GetMapping("/rent-collection-summary")
+    public RentCollectionSummary rentCollectionSummary() {
+        return rentCollectionSummaryService.summary();
     }
 }

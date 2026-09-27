@@ -53,17 +53,23 @@ public class RentalClient extends DownstreamRestClientSupport {
         return listActiveLeases().stream().map(LeaseView::flatId).collect(Collectors.toSet());
     }
 
-    public long countOpenMaintenanceTickets() {
+    public List<MaintenanceTicketView> listOpenMaintenanceTickets() {
         try {
             List<MaintenanceTicketView> tickets = get(
                     uriBuilder -> uriBuilder.path("/v1/maintenance-tickets").build(),
                     new ParameterizedTypeReference<List<MaintenanceTicketView>>() {},
                     DownstreamServices.RENTAL);
-            return tickets.stream().filter(t -> "OPEN".equals(t.status()) || "IN_PROGRESS".equals(t.status())).count();
+            return tickets.stream()
+                    .filter(t -> "OPEN".equals(t.status()) || "IN_PROGRESS".equals(t.status()))
+                    .toList();
         } catch (RuntimeException ex) {
-            log.warn("Skipping maintenance ticket count: {}", ex.getMessage());
-            return 0L;
+            log.warn("Skipping maintenance ticket fetch: {}", ex.getMessage());
+            return List.of();
         }
+    }
+
+    public long countOpenMaintenanceTickets() {
+        return listOpenMaintenanceTickets().size();
     }
 
     public record LeaseView(

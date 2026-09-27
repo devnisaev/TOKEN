@@ -3,6 +3,9 @@ package com.tokenrealty.reporting.service;
 import com.tokenrealty.reporting.client.NotificationClient;
 import com.tokenrealty.reporting.client.PropertyRegistryClient;
 import com.tokenrealty.reporting.client.PropertyRegistryClient.InsuranceExpiryAlertView;
+import com.tokenrealty.reporting.client.RentalClient;
+import com.tokenrealty.reporting.client.RentalClient.LeaseExpiryView;
+import com.tokenrealty.reporting.dto.ReportingDtos.MaintenanceBacklogItem;
 import com.tokenrealty.reporting.dto.ReportingDtos.GenerateOperatorAlertsResponse;
 import com.tokenrealty.reporting.dto.ReportingDtos.OperatorAlertItem;
 import com.tokenrealty.reporting.entity.AssetHealthScoreRecord;
@@ -35,13 +38,18 @@ public class OperatorAlertService {
     private static final BigDecimal HEALTH_AT_RISK_THRESHOLD = new BigDecimal("50.00");
     private static final BigDecimal LOW_OCCUPANCY_THRESHOLD = new BigDecimal("60.00");
     private static final int INSURANCE_CRITICAL_DAYS = 7;
+    private static final int LEASE_CRITICAL_DAYS = 7;
+    private static final int LEASE_EXPIRY_WITHIN_DAYS = 30;
+    private static final int MAINTENANCE_BACKLOG_CRITICAL_COUNT = 3;
 
     private final OperatorAlertRecordRepository operatorAlertRecordRepository;
     private final AssetHealthScoreRecordRepository assetHealthScoreRecordRepository;
     private final EsgSnapshotRecordRepository esgSnapshotRecordRepository;
     private final PropertyRegistryClient propertyRegistryClient;
+    private final RentalClient rentalClient;
     private final NotificationClient notificationClient;
     private final LeaseCoverageService leaseCoverageService;
+    private final MaintenanceBacklogService maintenanceBacklogService;
     private final Clock clock;
 
     public Page<OperatorAlertItem> listOpen(Pageable pageable) {
@@ -70,6 +78,8 @@ public class OperatorAlertService {
         created += generateOccupancyAlerts(now);
         created += generateInsuranceAlerts(now, insuranceWithinDays);
         created += generateVacancyRiskAlerts(now);
+        created += generateLeaseExpiringAlerts(now);
+        created += generateMaintenanceBacklogAlerts(now);
         return new GenerateOperatorAlertsResponse(created, operatorAlertRecordRepository.countByStatus(AlertStatus.OPEN));
     }
 
@@ -145,6 +155,56 @@ public class OperatorAlertService {
                     now)) {
                 created++;
             }
+        }
+        return created;
+    }
+
+    private int generateLeaseExpiringAlerts(Instant now) {
+        int created = 0;
+        try {
+            for (LeaseExpiryView lease : rentalClient.listExpiringLeases(LEASE_EXPIRY_WITHIN_DAYS)) {
+                AlertSeverity severity = lease.daysUntilExpiry() <= LEASE_CRITICAL_DAYS
+                        ? AlertSeverity.CRITICAL
+                        : AlertSeverity.WARNING;
+                if (upsertAlert(
+                        "LEASE_EXPIRING:" + lease.id(),
+                        "LEASE_EXPIRING",
+                        severity,
+                        lease.id(),
+                        null,
+                        lease.flatId(),
+                        "Lease expires in " + lease.daysUntilExpiry() + " days",
+                        now)) {
+                    created++;
+                }
+            }
+        } catch (RuntimeException ex) {
+            log.warn("Skipping lease expiry alerts: {}", ex.getMessage());
+        }
+        return created;
+    }
+
+    private int generateMaintenanceBacklogAlerts(Instant now) {
+        int created = 0;
+        try {
+            for (MaintenanceBacklogItem item : maintenanceBacklogService.backlogFlatItems()) {
+                AlertSeverity severity = item.openTicketCount() >= MAINTENANCE_BACKLOG_CRITICAL_COUNT
+                        ? AlertSeverity.CRITICAL
+                        : AlertSeverity.WARNING;
+                if (upsertAlert(
+                        "MAINTENANCE_BACKLOG:" + item.flatId(),
+                        "MAINTENANCE_BACKLOG",
+                        severity,
+                        item.flatId(),
+                        null,
+                        item.flatId(),
+                        item.openTicketCount() + " open maintenance tickets on flat",
+                        now)) {
+                    created++;
+                }
+            }
+        } catch (RuntimeException ex) {
+            log.warn("Skipping maintenance backlog alerts: {}", ex.getMessage());
         }
         return created;
     }
