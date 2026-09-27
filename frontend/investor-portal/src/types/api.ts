@@ -97,6 +97,48 @@ export interface PlaceExchangeOrderRequest {
   liquidityTier?: string;
 }
 
+export interface LiquidityPool {
+  id: string;
+  contractId: string;
+  flatId: string;
+  buildingId: string;
+  tokenReserve: number;
+  usdcReserve: number;
+  totalLpShares: number;
+  spotPriceUsd: number;
+  feeBps: number;
+  navBreakPct: number;
+  liquidityTier: string;
+  status: string;
+  lastNavPerTokenUsd: number | null;
+  lastNavCheckedAt: string | null;
+  lpLockDays: number;
+  createdAt: string;
+}
+
+export interface SwapQuote {
+  poolId: string;
+  direction: 'USDC_TO_TOKEN' | 'TOKEN_TO_USDC';
+  amountIn: number;
+  amountOut: number;
+  feeUsd: number;
+  spotPriceAfterUsd: number;
+}
+
+export interface PoolSwap {
+  id: string;
+  poolId: string;
+  contractId: string;
+  swapDirection: string;
+  investorId: string;
+  amountIn: number;
+  amountOut: number;
+  feeUsd: number;
+  paymentId: string | null;
+  status: string;
+  createdAt: string;
+}
+
 export interface Order {
   id: string;
   listingId: string;

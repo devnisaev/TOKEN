@@ -84,11 +84,16 @@ export function ExchangePage() {
         Back to portfolio
       </Link>
 
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Exchange</h1>
-        <p className="text-muted-foreground">
-          CLOB · {flatQuery.data?.buildingName ?? contractId.slice(0, 8)}
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Exchange</h1>
+          <p className="text-muted-foreground">
+            CLOB · {flatQuery.data?.buildingName ?? contractId.slice(0, 8)}
+          </p>
+        </div>
+        <Link to={`/exchange/${contractId}/swap?flatId=${flatId}`}>
+          <Button variant="outline" size="sm">AMM swap</Button>
+        </Link>
       </div>
 
       {tickerQuery.data && (

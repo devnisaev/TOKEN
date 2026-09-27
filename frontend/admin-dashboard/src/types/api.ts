@@ -24,6 +24,35 @@ export interface AssetFlatFields {
   occupancyOrUtilization?: number;
 }
 
+export interface LiquidityPool {
+  id: string;
+  contractId: string;
+  flatId: string;
+  buildingId: string;
+  tokenReserve: number;
+  usdcReserve: number;
+  totalLpShares: number;
+  spotPriceUsd: number;
+  feeBps: number;
+  navBreakPct: number;
+  liquidityTier: string;
+  status: string;
+  lastNavPerTokenUsd: number | null;
+  lastNavCheckedAt: string | null;
+  lpLockDays: number;
+  createdAt: string;
+}
+
+export interface CreateLiquidityPoolRequest {
+  contractId: string;
+  flatId: string;
+  buildingId: string;
+  feeBps?: number;
+  navBreakPct?: number;
+  liquidityTier?: string;
+  lpLockDays?: number;
+}
+
 export interface CreateStandaloneAssetRequest {
   name: string;
   address: string;

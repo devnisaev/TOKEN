@@ -456,7 +456,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 | **Phase 11** | Institutional UI & BFF | Portal governance, compliance reports, integrations admin; gateway proxies (553–577) — **complete** |
 | **Phase 12** | Universal asset tokenization ✅ | Houses, land, gyms, pools, stations; `AssetUnit`; operating models; liquidity tiers (578–602) |
 | **Phase 13** | RWA order book (CLOB) ✅ | Limit orders, depth, NAV bands, market data; evolve Marketplace (603–627) |
-| **Phase 14** | AMM liquidity pools | Token/USDC pools, LP tokens, NAV circuit breakers (628–652) |
+| **Phase 14** | AMM liquidity pools ✅ | Token/USDC pools, LP tokens, NAV circuit breakers (628–652) |
 | **Phase 15** | Institutional exchange | OTC/RFQ, REIT-style index baskets, token-collateral lending (653–677) |
 
 See diagrams: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml), [`diagrams/09-phase-12-asset-generalization.puml`](diagrams/09-phase-12-asset-generalization.puml), [`diagrams/10-phase-13-rwa-exchange.puml`](diagrams/10-phase-13-rwa-exchange.puml).
@@ -1510,17 +1510,17 @@ Investor: `/exchange/{contractId}` — depth chart, order entry, open orders.
 
 ## 20. Phase 14 — AMM Liquidity Pools
 
-**Status:** Planned (tracks 628–652). **Automated market maker** pools (`PropertyToken ↔ USDC`) for `TIER_1` assets.
+**Status:** Complete (tracks 628–652). **Automated market maker** pools (`PropertyToken ↔ USDC`) for `TIER_1` assets.
 
 Guide: [rules/phase-14-services.md](rules/phase-14-services.md)
 
 ### 20.1 Goals
 
-- [ ] Pools per `TIER_1` contract (not raw land / pre-stabilization)
-- [ ] LP tokens; swap fees (protocol + optional SPV share)
-- [ ] **NAV circuit breaker** — pause when pool price diverges > Y% from attested NAV
-- [ ] Swaps via Payment escrow + Compliance KYC (same invariants)
-- [ ] Flash-loan protection hooks
+- [x] Pools per `TIER_1` contract (not raw land / pre-stabilization)
+- [x] LP tokens; swap fees (protocol + optional SPV share)
+- [x] **NAV circuit breaker** — pause when pool price diverges > Y% from attested NAV
+- [x] Swaps via Payment escrow + Compliance KYC (same invariants)
+- [ ] Flash-loan protection hooks (deferred)
 
 ### 20.2 Pool lifecycle
 

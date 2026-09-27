@@ -84,6 +84,7 @@ tokenrealty:
       exchange-order-placed: tokenrealty.marketplace.order.placed.v1
       exchange-order-cancelled: tokenrealty.marketplace.order.cancelled.v1
       exchange-trade-executed: tokenrealty.marketplace.trade.executed.v1
+      nav-attested: tokenrealty.valuation.nav.attested.v1
   exchange:
     nav-band-enabled: ${EXCHANGE_NAV_BAND_ENABLED:true}
 

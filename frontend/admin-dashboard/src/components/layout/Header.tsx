@@ -24,6 +24,9 @@ export function Header() {
           <NavLink to="/orders" className={({ isActive }) => navLinkClass(isActive)}>
             Orders
           </NavLink>
+          <NavLink to="/pools" className={({ isActive }) => navLinkClass(isActive)}>
+            Pools
+          </NavLink>
           <NavLink to="/compliance" className={({ isActive }) => navLinkClass(isActive)}>
             KYC
           </NavLink>

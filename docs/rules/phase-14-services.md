@@ -1,6 +1,6 @@
 # Phase 14 — AMM Liquidity Pools
 
-**Status:** Planned (tracks 628–652). Optional **automated market maker** pools for fractional property tokens (`PropertyToken ↔ USDC`) with **NAV circuit breakers**.
+**Status:** Complete (tracks 628–652). **Automated market maker** pools for fractional property tokens (`PropertyToken ↔ USDC`) with **NAV circuit breakers**.
 
 Master spec: [PLATFORM-SPEC.md §20](../PLATFORM-SPEC.md#20-phase-14--amm-liquidity-pools) · Diagram: [10-phase-13-rwa-exchange.puml](../diagrams/10-phase-13-rwa-exchange.puml)
 

@@ -20,7 +20,9 @@ import type {
   IssueTokenRequest,
   ComplianceReport,
   CreateGovernanceProposalRequest,
+  CreateLiquidityPoolRequest,
   GovernanceProposal,
+  LiquidityPool,
   IntegrationCredential,
   IntegrationDelivery,
   MaintenanceTicket,
@@ -202,5 +204,16 @@ export const api = {
 
   getComplianceReport() {
     return request<ComplianceReport>('/v1/bff/admin/reports/compliance');
+  },
+
+  listLiquidityPools() {
+    return request<LiquidityPool[]>('/v1/pools');
+  },
+
+  createLiquidityPool(body: CreateLiquidityPoolRequest) {
+    return request<LiquidityPool>('/v1/pools', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
   },
 };

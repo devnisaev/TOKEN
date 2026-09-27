@@ -8,7 +8,10 @@ import type {
   BookDepthResponse,
   ExchangeOrder,
   ExchangeTicker,
+  LiquidityPool,
+  PoolSwap,
   PlaceExchangeOrderRequest,
+  SwapQuote,
   PlaceOrderRequest,
   PlaceSellOrderRequest,
   PortfolioBffDetail,
@@ -123,6 +126,27 @@ export const api = {
   cancelExchangeOrder(orderId: string, investorId: string) {
     return request<ExchangeOrder>(`/v1/exchange/orders/${orderId}?investorId=${investorId}`, {
       method: 'DELETE',
+    });
+  },
+
+  getPoolByContract(contractId: string) {
+    return request<LiquidityPool>(`/v1/pools/by-contract/${contractId}`);
+  },
+
+  quotePoolSwap(poolId: string, body: { direction: string; amountIn: number }) {
+    return request<SwapQuote>(`/v1/pools/${poolId}/quote`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
+
+  executePoolSwap(
+    poolId: string,
+    body: { direction: string; amountIn: number; investorId: string; walletAddress: string },
+  ) {
+    return request<PoolSwap>(`/v1/pools/${poolId}/swaps`, {
+      method: 'POST',
+      body: JSON.stringify(body),
     });
   },
 

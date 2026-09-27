@@ -8,6 +8,8 @@ import lombok.Builder;
 
 import com.tokenrealty.marketplace.entity.ExchangeFill;
 import com.tokenrealty.marketplace.entity.ExchangeOrder;
+import com.tokenrealty.marketplace.entity.LiquidityPool;
+import com.tokenrealty.marketplace.entity.PoolSwap;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -224,6 +226,118 @@ public final class MarketplaceDtos {
             long volume24hTokens,
             BigDecimal notional24hUsd,
             Instant asOf
+    ) {
+    }
+
+    @Builder
+    public record CreateLiquidityPoolRequest(
+            @NotNull UUID contractId,
+            @NotNull UUID flatId,
+            @NotNull UUID buildingId,
+            @Min(0) @Max(500) Integer feeBps,
+            @DecimalMin("1") @DecimalMax("50") BigDecimal navBreakPct,
+            @Size(max = 20) String liquidityTier,
+            @Min(0) Integer lpLockDays
+    ) {
+    }
+
+    @Builder
+    public record SeedLiquidityPoolRequest(
+            @NotNull @Min(1) Long tokenAmount,
+            @NotNull @DecimalMin("0.01") BigDecimal usdcAmount,
+            @NotNull UUID investorId
+    ) {
+    }
+
+    @Builder
+    public record AddLiquidityRequest(
+            @NotNull @Min(1) Long tokenAmount,
+            @NotNull @DecimalMin("0.01") BigDecimal usdcAmount,
+            @NotNull UUID investorId
+    ) {
+    }
+
+    @Builder
+    public record WithdrawLiquidityRequest(
+            @NotNull UUID investorId,
+            @NotNull @DecimalMin("0.00000001") BigDecimal lpShares
+    ) {
+    }
+
+    @Builder
+    public record LiquidityPoolResponse(
+            UUID id,
+            UUID contractId,
+            UUID flatId,
+            UUID buildingId,
+            long tokenReserve,
+            BigDecimal usdcReserve,
+            BigDecimal totalLpShares,
+            BigDecimal spotPriceUsd,
+            int feeBps,
+            BigDecimal navBreakPct,
+            String liquidityTier,
+            LiquidityPool.PoolStatus status,
+            BigDecimal lastNavPerTokenUsd,
+            Instant lastNavCheckedAt,
+            int lpLockDays,
+            Instant createdAt
+    ) {
+    }
+
+    @Builder
+    public record LpPositionResponse(
+            UUID id,
+            UUID poolId,
+            UUID investorId,
+            BigDecimal lpShares,
+            long poolTokenReserve,
+            BigDecimal poolUsdcReserve,
+            BigDecimal poolTotalLpShares,
+            Instant depositedAt
+    ) {
+    }
+
+    @Builder
+    public record SwapQuoteRequest(
+            @NotNull PoolSwap.SwapDirection direction,
+            @NotNull @DecimalMin("0.00000001") BigDecimal amountIn
+    ) {
+    }
+
+    @Builder
+    public record SwapQuoteResponse(
+            UUID poolId,
+            PoolSwap.SwapDirection direction,
+            BigDecimal amountIn,
+            BigDecimal amountOut,
+            BigDecimal feeUsd,
+            BigDecimal spotPriceAfterUsd
+    ) {
+    }
+
+    @Builder
+    public record ExecuteSwapRequest(
+            @NotNull PoolSwap.SwapDirection direction,
+            @NotNull @DecimalMin("0.00000001") BigDecimal amountIn,
+            @NotNull UUID investorId,
+            @NotBlank @Size(max = 66) String walletAddress
+    ) {
+    }
+
+    @Builder
+    public record PoolSwapResponse(
+            UUID id,
+            UUID poolId,
+            UUID contractId,
+            PoolSwap.SwapDirection swapDirection,
+            UUID investorId,
+            BigDecimal amountIn,
+            BigDecimal amountOut,
+            BigDecimal feeUsd,
+            UUID paymentId,
+            PoolSwap.SwapStatus status,
+            Instant createdAt
     ) {
     }
 }
