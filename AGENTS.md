@@ -95,11 +95,14 @@ Institutional expansion (Gemini roadmap adaptation). See [docs/PLATFORM-SPEC.md 
 |---------|------|---------|
 | Governance | 8100 | `com.tokenrealty.governance` |
 
-### Phases 11–15 — planned (roadmap)
+### Phase 11 — complete
+
+Institutional UI & BFF. See [docs/PLATFORM-SPEC.md §17](docs/PLATFORM-SPEC.md#17-phase-11--institutional-ui--bff) and [docs/rules/phase-11-services.md](docs/rules/phase-11-services.md).
+
+### Phases 12–15 — planned (roadmap)
 
 | Phase | Focus | Tracks | Guide |
 |-------|-------|--------|-------|
-| 11 | Institutional UI & BFF | 553–577 | [phase-11-services.md](docs/rules/phase-11-services.md) |
 | 12 | Universal asset tokenization (houses, land, gyms, stations) | 578–602 | [phase-12-services.md](docs/rules/phase-12-services.md) |
 | 13 | RWA order book (CLOB) — evolve Marketplace | 603–627 | [phase-13-services.md](docs/rules/phase-13-services.md) |
 | 14 | AMM liquidity pools + NAV circuit breakers | 628–652 | [phase-14-services.md](docs/rules/phase-14-services.md) |

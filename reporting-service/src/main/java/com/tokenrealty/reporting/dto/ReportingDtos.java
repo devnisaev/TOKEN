@@ -58,4 +58,25 @@ public final class ReportingDtos {
             Instant generatedAt
     ) {
     }
+
+    public record TaxSummaryItem(
+            UUID id,
+            UUID payoutId,
+            UUID recipientInvestorId,
+            BigDecimal grossAmountUsd,
+            BigDecimal withholdingAmountUsd,
+            BigDecimal netAmountUsd,
+            Instant completedAt
+    ) {
+    }
+
+    public record SurveillanceAlertItem(
+            UUID id,
+            UUID orderId,
+            UUID buyerId,
+            UUID sellerId,
+            String alertType,
+            Instant detectedAt
+    ) {
+    }
 }

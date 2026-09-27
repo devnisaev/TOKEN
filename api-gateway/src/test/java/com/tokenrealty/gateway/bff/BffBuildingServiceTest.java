@@ -1,6 +1,7 @@
 package com.tokenrealty.gateway.bff;
 
 import com.tokenrealty.gateway.client.PropertyRegistryClient;
+import com.tokenrealty.gateway.client.ValuationClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,12 +21,14 @@ import static org.mockito.Mockito.when;
 class BffBuildingServiceTest {
 
     @Mock PropertyRegistryClient registryClient;
+    @Mock ValuationClient valuationClient;
     @InjectMocks BffBuildingService buildingService;
 
     @Test
     @DisplayName("getBuildingDetail counts tokenized and available flats")
     void getBuildingDetail_countsFlats() {
         UUID buildingId = UUID.randomUUID();
+        when(valuationClient.listByBuilding(buildingId)).thenReturn(List.of());
         when(registryClient.getBuilding(buildingId)).thenReturn(new PropertyRegistryClient.BuildingDetailView(
                 buildingId,
                 "Sunrise Tower",

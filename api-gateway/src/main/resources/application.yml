@@ -50,6 +50,8 @@ services:
     url: ${SEARCH_SERVICE_URL:http://localhost:8098/api}
   integration-hub:
     url: ${INTEGRATION_HUB_SERVICE_URL:http://localhost:8099/api}
+  governance:
+    url: ${GOVERNANCE_SERVICE_URL:http://localhost:8100/api}
 
 tokenrealty:
   jwt:
@@ -153,6 +155,10 @@ tokenrealty:
         target: http://localhost:8099
         paths:
           - /api/v1/integrations
+      - id: governance
+        target: http://localhost:8100
+        paths:
+          - /api/v1/governance
 
 management:
   tracing:

@@ -11,7 +11,9 @@ import type {
   SpringPage,
   TokenResponse,
   Trade,
+  GovernanceProposal,
   NotificationPreferences,
+  Payout,
   UpdateNotificationPreferencesRequest,
   UserProfile,
 } from '@/types/api';
@@ -95,6 +97,21 @@ export const api = {
 
   listDividends(investorId: string) {
     return request<DividendPayment[]>(`/v1/investors/${investorId}/dividends`);
+  },
+
+  listPayouts(investorId: string) {
+    return request<SpringPage<Payout>>(`/v1/payouts?recipientInvestorId=${investorId}&size=50&sort=completedAt,desc`);
+  },
+
+  listGovernanceProposals(investorId: string) {
+    return request<GovernanceProposal[]>(`/v1/bff/investors/${investorId}/governance-proposals`);
+  },
+
+  castGovernanceVote(proposalId: string, investorId: string, support: boolean) {
+    return request<GovernanceProposal>(`/v1/governance/proposals/${proposalId}/votes`, {
+      method: 'POST',
+      body: JSON.stringify({ investorId, support }),
+    });
   },
 
   createConnectSession(investorId: string) {

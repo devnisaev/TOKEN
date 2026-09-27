@@ -1,6 +1,6 @@
 # Phase 11 — Institutional UI & BFF
 
-**Status:** Planned (tracks 553–577). Exposes Phase 10 backend (governance, tax withholding, surveillance, Hub integrations) in the React portals and gateway BFF.
+**Status:** Complete (tracks 553–577). Exposes Phase 10 backend (governance, tax withholding, surveillance, Hub integrations) in the React portals and gateway BFF.
 
 Master spec: [PLATFORM-SPEC.md §17](../PLATFORM-SPEC.md#17-phase-11--institutional-ui--bff) · Phase 10: [phase-10-services.md](phase-10-services.md)
 

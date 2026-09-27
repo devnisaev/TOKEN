@@ -33,6 +33,15 @@ export function Header() {
           <NavLink to="/maintenance" className={({ isActive }) => navLinkClass(isActive)}>
             Maintenance
           </NavLink>
+          <NavLink to="/governance" className={({ isActive }) => navLinkClass(isActive)}>
+            Governance
+          </NavLink>
+          <NavLink to="/integrations" className={({ isActive }) => navLinkClass(isActive)}>
+            Integrations
+          </NavLink>
+          <NavLink to="/reports/compliance" className={({ isActive }) => navLinkClass(isActive)}>
+            Compliance
+          </NavLink>
         </nav>
         <div className="flex items-center gap-3">
           {user && (

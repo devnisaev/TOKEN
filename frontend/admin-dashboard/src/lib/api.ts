@@ -16,6 +16,11 @@ import type {
   UpdateBuildingRequest,
   UpdateFlatRequest,
   IssueTokenRequest,
+  ComplianceReport,
+  CreateGovernanceProposalRequest,
+  GovernanceProposal,
+  IntegrationCredential,
+  IntegrationDelivery,
   MaintenanceTicket,
   TokenContract,
   UpdateMaintenanceTicketRequest,
@@ -159,5 +164,34 @@ export const api = {
       method: 'PATCH',
       body: JSON.stringify(body),
     });
+  },
+
+  listGovernanceProposals() {
+    return request<SpringPage<GovernanceProposal>>('/v1/governance/proposals?size=50&sort=createdAt,desc');
+  },
+
+  createGovernanceProposal(body: CreateGovernanceProposalRequest) {
+    return request<GovernanceProposal>('/v1/governance/proposals', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
+
+  closeGovernanceProposal(proposalId: string) {
+    return request<GovernanceProposal>(`/v1/governance/proposals/${proposalId}/close`, {
+      method: 'POST',
+    });
+  },
+
+  listIntegrationCredentials() {
+    return request<SpringPage<IntegrationCredential>>('/v1/integrations/credentials?size=50');
+  },
+
+  listIntegrationDeliveries() {
+    return request<SpringPage<IntegrationDelivery>>('/v1/integrations/deliveries?size=50&sort=createdAt,desc');
+  },
+
+  getComplianceReport() {
+    return request<ComplianceReport>('/v1/bff/admin/reports/compliance');
   },
 };

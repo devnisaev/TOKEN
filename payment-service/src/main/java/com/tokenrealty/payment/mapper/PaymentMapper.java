@@ -46,6 +46,8 @@ public class PaymentMapper {
                 .recipientInvestorId(payout.getRecipientInvestorId())
                 .recipientWallet(payout.getRecipientWallet())
                 .amount(payout.getAmount())
+                .grossAmountUsd(payout.getGrossAmountUsd())
+                .withholdingAmountUsd(payout.getWithholdingAmountUsd())
                 .currency(payout.getCurrency())
                 .purpose(payout.getPurpose())
                 .referenceId(payout.getReferenceId())

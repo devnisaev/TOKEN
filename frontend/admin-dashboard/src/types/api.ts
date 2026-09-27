@@ -45,6 +45,74 @@ export interface BuildingBffDetail {
   building: BuildingDetail;
   tokenizedFlatCount: number;
   availableFlatCount: number;
+  approvedValuationCount?: number;
+  latestNavAttestedAt?: string | null;
+}
+
+export interface GovernanceProposal {
+  id: string;
+  flatId: string;
+  title: string;
+  description: string;
+  status: string;
+  quorumPct: number;
+  votesFor: number;
+  votesAgainst: number;
+  closesAt: string;
+  closedAt?: string | null;
+}
+
+export interface IntegrationCredential {
+  id: string;
+  integrationType: string;
+  provider: string;
+  version: number;
+  rotatedAt?: string | null;
+  createdAt?: string | null;
+}
+
+export interface IntegrationDelivery {
+  id: string;
+  integrationType: string;
+  provider: string;
+  status: string;
+  attempts: number;
+  lastError?: string | null;
+  createdAt?: string | null;
+}
+
+export interface ComplianceReport {
+  taxSummaries: TaxSummaryItem[];
+  taxSummaryTotal: number;
+  surveillanceAlerts: SurveillanceAlertItem[];
+  surveillanceAlertTotal: number;
+}
+
+export interface TaxSummaryItem {
+  id: string;
+  payoutId: string;
+  recipientInvestorId: string;
+  grossAmountUsd: number;
+  withholdingAmountUsd: number;
+  netAmountUsd: number;
+  completedAt: string;
+}
+
+export interface CreateGovernanceProposalRequest {
+  flatId: string;
+  title: string;
+  description: string;
+  quorumPct: number;
+  closesAt: string;
+}
+
+export interface SurveillanceAlertItem {
+  id: string;
+  orderId: string;
+  buyerId?: string | null;
+  sellerId?: string | null;
+  alertType: string;
+  detectedAt: string;
 }
 
 export interface BuildingDetail extends Building {

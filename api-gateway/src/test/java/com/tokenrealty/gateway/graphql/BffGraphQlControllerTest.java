@@ -50,6 +50,8 @@ class BffGraphQlControllerTest {
         when(buildingService.getBuildingDetail(buildingId)).thenReturn(BuildingBffDetailResponse.builder()
                 .tokenizedFlatCount(2)
                 .availableFlatCount(1)
+                .approvedValuationCount(1)
+                .latestNavAttestedAt(null)
                 .build());
 
         assertThat(controller.buildingDetail(buildingId.toString()).tokenizedFlatCount()).isEqualTo(2);

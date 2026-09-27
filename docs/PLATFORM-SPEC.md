@@ -1,8 +1,8 @@
 # TokenRealty Platform — Implementation Spec & TODO
 
-> **Version:** 1.5  
+> **Version:** 1.6  
 > **Date:** 2026-09-27  
-> **Status:** Phases 0–10 complete (tracks 1–552); Phases 11–15 planned (553–677)  
+> **Status:** Phases 0–11 complete (tracks 1–577); Phases 12–15 planned (578–677)  
 > **Purpose:** Master specification and implementation backlog for the TokenRealty real-estate tokenization platform (buy, sell, rent, and exchange fractional property with cryptocurrency).
 
 ---
@@ -453,7 +453,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 | **Phase 8** | Production hardening & platform completion | CI coverage; stock-split outbox; document verify; payment webhook HMAC; Reporting/Audit consumers |
 | **Phase 9** | Downstream consumer completion | Issuance stock-split consumer; completion outbox; Reporting building.approved + stock-split projections |
 | **Phase 10** | Institutional expansion | Hub adapters; NAV attestation; tax withholding; Governance `:8100`; surveillance (backend) |
-| **Phase 11** | Institutional UI & BFF | Portal governance, compliance reports, integrations admin; gateway proxies (553–577) |
+| **Phase 11** | Institutional UI & BFF | Portal governance, compliance reports, integrations admin; gateway proxies (553–577) — **complete** |
 | **Phase 12** | Universal asset tokenization | Houses, land, gyms, pools, stations; `AssetUnit`; operating models; liquidity tiers (578–602) |
 | **Phase 13** | RWA order book (CLOB) | Limit orders, depth, NAV bands, market data; evolve Marketplace (603–627) |
 | **Phase 14** | AMM liquidity pools | Token/USDC pools, LP tokens, NAV circuit breakers (628–652) |
@@ -905,7 +905,7 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] Admin building detail BFF + flat CRUD UI + order monitoring
 - [x] Investor portfolio BFF + dividend history page + JWT refresh rotation
 - [x] Playwright E2E smoke suite (`frontend/e2e/`) in CI
-- [ ] Phase 10 institutional UI — governance, tax/withholding, surveillance, integrations admin (see [§16.6](#166-frontend--bff-planned--ui-not-in-phase-10-scope))
+- [x] Phase 11 institutional UI — governance, tax/withholding, surveillance, integrations admin (see [§17](#17-phase-11--institutional-ui--bff))
 
 See [docs/rules/investor-portal.md](rules/investor-portal.md), [docs/rules/admin-dashboard.md](rules/admin-dashboard.md), [docs/rules/api-gateway-bff.md](rules/api-gateway-bff.md), [docs/rules/e2e-testing.md](rules/e2e-testing.md).
 
@@ -1322,17 +1322,17 @@ No Phase 10 UI changes — institutional features target investors and platform 
 
 ## 17. Phase 11 — Institutional UI & BFF
 
-**Status:** Planned (tracks 553–577). Exposes Phase 10 backend in React portals and gateway BFF.
+**Status:** Complete (tracks 553–577). Exposes Phase 10 backend in React portals and gateway BFF.
 
 Guide: [rules/phase-11-services.md](rules/phase-11-services.md)
 
 ### 17.1 Goals
 
-- [ ] Gateway proxy `/api/v1/governance/**` → Governance `:8100`
-- [ ] Reporting read APIs: tax summaries, surveillance alerts
-- [ ] Investor: dividends withholding, governance vote, self-trade UX
-- [ ] Admin: governance CRUD, Hub integrations, compliance reports, NAV badge
-- [ ] OpenAPI codegen + Playwright E2E
+- [x] Gateway proxy `/api/v1/governance/**` → Governance `:8100`
+- [x] Reporting read APIs: tax summaries, surveillance alerts
+- [x] Investor: dividends withholding, governance vote, self-trade UX
+- [x] Admin: governance CRUD, Hub integrations, compliance reports, NAV badge
+- [x] Playwright E2E smoke (governance, compliance reports)
 
 **No new microservices.**
 

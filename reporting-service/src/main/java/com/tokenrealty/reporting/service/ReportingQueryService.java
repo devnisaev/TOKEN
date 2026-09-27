@@ -5,7 +5,11 @@ import com.tokenrealty.reporting.dto.ReportingDtos.DividendsResponse;
 import com.tokenrealty.reporting.dto.ReportingDtos.OccupancyResponse;
 import com.tokenrealty.reporting.dto.ReportingDtos.RegulatoryExportItem;
 import com.tokenrealty.reporting.dto.ReportingDtos.RegulatoryExportResponse;
+import com.tokenrealty.reporting.dto.ReportingDtos.SurveillanceAlertItem;
+import com.tokenrealty.reporting.dto.ReportingDtos.TaxSummaryItem;
 import com.tokenrealty.reporting.dto.ReportingDtos.TradingSummaryResponse;
+import com.tokenrealty.reporting.entity.SurveillanceAlertRecord;
+import com.tokenrealty.reporting.entity.TaxSummaryRecord;
 import com.tokenrealty.reporting.entity.DividendRecord;
 import com.tokenrealty.reporting.entity.OrderMatchedRecord;
 import com.tokenrealty.reporting.entity.RentCollectedRecord;
@@ -14,10 +18,16 @@ import com.tokenrealty.reporting.repository.DividendRecordRepository;
 import com.tokenrealty.reporting.repository.FlatTokenizedRecordRepository;
 import com.tokenrealty.reporting.repository.OrderMatchedRecordRepository;
 import com.tokenrealty.reporting.repository.RentCollectedRecordRepository;
+import com.tokenrealty.reporting.repository.SurveillanceAlertRecordRepository;
+import com.tokenrealty.reporting.repository.TaxSummaryRecordRepository;
 import com.tokenrealty.reporting.repository.TradeSettledRecordRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -36,6 +46,8 @@ public class ReportingQueryService {
     private final DividendRecordRepository dividendRecordRepository;
     private final RentCollectedRecordRepository rentCollectedRecordRepository;
     private final FlatTokenizedRecordRepository flatTokenizedRecordRepository;
+    private final TaxSummaryRecordRepository taxSummaryRecordRepository;
+    private final SurveillanceAlertRecordRepository surveillanceAlertRecordRepository;
     private final Clock clock;
 
     @Transactional(readOnly = true)
@@ -122,5 +134,44 @@ public class ReportingQueryService {
 
         items.sort(Comparator.comparing(RegulatoryExportItem::occurredAt));
         return new RegulatoryExportResponse(format, items, clock.instant());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<TaxSummaryItem> taxSummaries(UUID recipientInvestorId, Pageable pageable) {
+        Page<TaxSummaryRecord> page = recipientInvestorId == null
+                ? taxSummaryRecordRepository.findAll(pageable)
+                : taxSummaryRecordRepository.findByRecipientInvestorId(recipientInvestorId, pageable);
+        return page.map(this::toTaxSummaryItem);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SurveillanceAlertItem> surveillanceAlerts(Pageable pageable) {
+        return surveillanceAlertRecordRepository.findAll(pageable).map(this::toSurveillanceAlertItem);
+    }
+
+    @Transactional(readOnly = true)
+    public long countSurveillanceAlerts() {
+        return surveillanceAlertRecordRepository.count();
+    }
+
+    private TaxSummaryItem toTaxSummaryItem(TaxSummaryRecord record) {
+        return new TaxSummaryItem(
+                record.getId(),
+                record.getPayoutId(),
+                record.getRecipientInvestorId(),
+                record.getGrossAmountUsd(),
+                record.getWithholdingAmountUsd(),
+                record.getNetAmountUsd(),
+                record.getCompletedAt());
+    }
+
+    private SurveillanceAlertItem toSurveillanceAlertItem(SurveillanceAlertRecord record) {
+        return new SurveillanceAlertItem(
+                record.getId(),
+                record.getOrderId(),
+                record.getBuyerId(),
+                record.getSellerId(),
+                record.getAlertType(),
+                record.getDetectedAt());
     }
 }

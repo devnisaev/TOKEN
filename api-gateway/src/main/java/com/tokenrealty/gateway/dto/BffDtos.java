@@ -82,7 +82,9 @@ public final class BffDtos {
     public record BuildingBffDetailResponse(
             PropertyRegistryClient.BuildingDetailView building,
             int tokenizedFlatCount,
-            int availableFlatCount
+            int availableFlatCount,
+            int approvedValuationCount,
+            java.time.Instant latestNavAttestedAt
     ) {
     }
 
@@ -140,7 +142,18 @@ public final class BffDtos {
             BigDecimal occupancyRate,
             BigDecimal totalDistributedUsd,
             int recentDividendCount,
+            long openSurveillanceAlerts,
+            BigDecimal ytdWithholdingUsd,
             java.time.Instant generatedAt
+    ) {
+    }
+
+    @Builder
+    public record AdminComplianceReportResponse(
+            java.util.List<com.tokenrealty.gateway.client.ReportingClient.TaxSummaryView> taxSummaries,
+            long taxSummaryTotal,
+            java.util.List<com.tokenrealty.gateway.client.ReportingClient.SurveillanceAlertView> surveillanceAlerts,
+            long surveillanceAlertTotal
     ) {
     }
 }

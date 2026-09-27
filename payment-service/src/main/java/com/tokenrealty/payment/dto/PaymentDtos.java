@@ -101,6 +101,8 @@ public final class PaymentDtos {
             UUID recipientInvestorId,
             String recipientWallet,
             BigDecimal amount,
+            BigDecimal grossAmountUsd,
+            BigDecimal withholdingAmountUsd,
             PaymentCurrency currency,
             Payout.PayoutPurpose purpose,
             UUID referenceId,

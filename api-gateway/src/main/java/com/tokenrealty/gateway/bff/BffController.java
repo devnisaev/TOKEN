@@ -1,6 +1,8 @@
 package com.tokenrealty.gateway.bff;
 
 import com.tokenrealty.gateway.client.RentalClient;
+import com.tokenrealty.gateway.client.GovernanceClient.ProposalView;
+import com.tokenrealty.gateway.dto.BffDtos.AdminComplianceReportResponse;
 import com.tokenrealty.gateway.dto.BffDtos.AdminReportsSummaryResponse;
 import com.tokenrealty.gateway.dto.BffDtos.BuildingBffDetailResponse;
 import com.tokenrealty.gateway.dto.BffDtos.FlatDetailResponse;
@@ -35,6 +37,8 @@ public class BffController {
     private final BffTenantMaintenanceService tenantMaintenanceService;
     private final BffAdminMaintenanceService adminMaintenanceService;
     private final BffAdminReportingService adminReportingService;
+    private final BffAdminComplianceService adminComplianceService;
+    private final BffGovernanceService governanceService;
     private final BffSearchService searchService;
 
     @GetMapping("/flats/{flatId}")
@@ -75,6 +79,19 @@ public class BffController {
     @GetMapping("/admin/reports/summary")
     public AdminReportsSummaryResponse adminReportsSummary() {
         return adminReportingService.getAdminReportsSummary();
+    }
+
+    @GetMapping("/admin/reports/compliance")
+    public AdminComplianceReportResponse adminComplianceReport(
+            @PageableDefault(size = 20) Pageable pageable) {
+        return adminComplianceService.getComplianceReport(pageable);
+    }
+
+    @GetMapping("/investors/{investorId}/governance-proposals")
+    public List<ProposalView> investorGovernanceProposals(
+            @PathVariable UUID investorId,
+            @PageableDefault(size = 50) Pageable pageable) {
+        return governanceService.getInvestorGovernanceProposals(investorId, pageable);
     }
 
     @GetMapping("/search/listings")

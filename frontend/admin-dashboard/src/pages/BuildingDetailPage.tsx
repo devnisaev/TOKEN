@@ -29,7 +29,7 @@ export function BuildingDetailPage() {
     );
   }
 
-  const { building, tokenizedFlatCount, availableFlatCount } = data;
+  const { building, tokenizedFlatCount, availableFlatCount, approvedValuationCount, latestNavAttestedAt } = data;
 
   return (
     <div className="space-y-6">
@@ -48,7 +48,7 @@ export function BuildingDetailPage() {
         </Link>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total flats</CardTitle>
@@ -72,6 +72,20 @@ export function BuildingDetailPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Status</CardTitle>
           </CardHeader>
           <CardContent className="text-2xl font-bold">{building.status}</CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">NAV attested</CardTitle>
+          </CardHeader>
+          <CardContent className="text-2xl font-bold">{approvedValuationCount ?? 0}</CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Latest attestation</CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm font-medium">
+            {latestNavAttestedAt ? new Date(latestNavAttestedAt).toLocaleDateString() : '—'}
+          </CardContent>
         </Card>
       </div>
 

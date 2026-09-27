@@ -71,6 +71,32 @@ export interface OrderStatusEvent {
   tradeStatus: string | null;
 }
 
+export interface Payout {
+  id: string;
+  recipientInvestorId: string;
+  amount: number;
+  grossAmountUsd?: number | null;
+  withholdingAmountUsd?: number | null;
+  purpose: string;
+  period?: string | null;
+  status: string;
+  completedAt?: string | null;
+}
+
+export interface GovernanceProposal {
+  id: string;
+  flatId: string;
+  title: string;
+  description: string;
+  status: string;
+  quorumPct: number;
+  votesFor: number;
+  votesAgainst: number;
+  closesAt: string;
+  closedAt?: string | null;
+  createdAt?: string | null;
+}
+
 export interface Trade {
   id: string;
   orderId: string;

@@ -33,6 +33,8 @@ services:
     url: http://localhost:8098/api
   integration-hub:
     url: http://localhost:8099/api
+  governance:
+    url: http://localhost:8100/api
 
 tokenrealty:
   jwt:

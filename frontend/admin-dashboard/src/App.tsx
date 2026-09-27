@@ -11,6 +11,10 @@ import { FlatFormPage } from '@/pages/FlatFormPage';
 import { FlatTokenizePage } from '@/pages/FlatTokenizePage';
 import { LoginPage } from '@/pages/LoginPage';
 import { MaintenanceTicketsPage } from '@/pages/MaintenanceTicketsPage';
+import { GovernanceAdminPage } from '@/pages/GovernanceAdminPage';
+import { IntegrationsPage } from '@/pages/IntegrationsPage';
+import { IntegrationsDeliveriesPage } from '@/pages/IntegrationsDeliveriesPage';
+import { ComplianceReportsPage } from '@/pages/ComplianceReportsPage';
 import { OrderDetailPage } from '@/pages/OrderDetailPage';
 import { OrdersPage } from '@/pages/OrdersPage';
 
@@ -39,6 +43,10 @@ export function App() {
           <Route path="compliance" element={<CompliancePage />} />
           <Route path="document-reviews" element={<DocumentReviewsPage />} />
           <Route path="maintenance" element={<MaintenanceTicketsPage />} />
+          <Route path="governance" element={<GovernanceAdminPage />} />
+          <Route path="integrations" element={<IntegrationsPage />} />
+          <Route path="integrations/deliveries" element={<IntegrationsDeliveriesPage />} />
+          <Route path="reports/compliance" element={<ComplianceReportsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

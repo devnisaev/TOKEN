@@ -3,13 +3,20 @@ package com.tokenrealty.reporting.controller;
 import com.tokenrealty.reporting.dto.ReportingDtos.DividendsResponse;
 import com.tokenrealty.reporting.dto.ReportingDtos.OccupancyResponse;
 import com.tokenrealty.reporting.dto.ReportingDtos.RegulatoryExportResponse;
+import com.tokenrealty.reporting.dto.ReportingDtos.SurveillanceAlertItem;
+import com.tokenrealty.reporting.dto.ReportingDtos.TaxSummaryItem;
 import com.tokenrealty.reporting.dto.ReportingDtos.TradingSummaryResponse;
 import com.tokenrealty.reporting.service.ReportingQueryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1/reports")
@@ -37,5 +44,18 @@ public class ReportingController {
     public RegulatoryExportResponse export(
             @RequestParam(defaultValue = "json") String format) {
         return queryService.regulatoryExport(format);
+    }
+
+    @GetMapping("/tax-summaries")
+    public Page<TaxSummaryItem> taxSummaries(
+            @RequestParam(required = false) UUID recipientInvestorId,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return queryService.taxSummaries(recipientInvestorId, pageable);
+    }
+
+    @GetMapping("/surveillance-alerts")
+    public Page<SurveillanceAlertItem> surveillanceAlerts(
+            @PageableDefault(size = 20) Pageable pageable) {
+        return queryService.surveillanceAlerts(pageable);
     }
 }

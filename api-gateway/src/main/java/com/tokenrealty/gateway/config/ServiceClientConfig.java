@@ -59,4 +59,25 @@ public class ServiceClientConfig {
             ObjectProvider<ServiceTokenProvider> serviceTokenProvider) {
         return ServiceRestClientBuilder.build(baseUrl, serviceTokenProvider);
     }
+
+    @Bean("governanceRestClient")
+    RestClient governanceRestClient(
+            @Value("${services.governance.url}") String baseUrl,
+            ObjectProvider<ServiceTokenProvider> serviceTokenProvider) {
+        return ServiceRestClientBuilder.build(baseUrl, serviceTokenProvider);
+    }
+
+    @Bean("valuationRestClient")
+    RestClient valuationRestClient(
+            @Value("${services.valuation.url}") String baseUrl,
+            ObjectProvider<ServiceTokenProvider> serviceTokenProvider) {
+        return ServiceRestClientBuilder.build(baseUrl, serviceTokenProvider);
+    }
+
+    @Bean("integrationHubRestClient")
+    RestClient integrationHubRestClient(
+            @Value("${services.integration-hub.url}") String baseUrl,
+            ObjectProvider<ServiceTokenProvider> serviceTokenProvider) {
+        return ServiceRestClientBuilder.build(baseUrl, serviceTokenProvider);
+    }
 }

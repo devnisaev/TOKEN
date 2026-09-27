@@ -29,6 +29,9 @@ export function Header() {
           <NavLink to="/dividends" className={({ isActive }) => navLinkClass(isActive)}>
             Dividends
           </NavLink>
+          <NavLink to="/governance" className={({ isActive }) => navLinkClass(isActive)}>
+            Governance
+          </NavLink>
           <NavLink to="/settings/notifications" className={({ isActive }) => navLinkClass(isActive)}>
             Notifications
           </NavLink>

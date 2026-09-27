@@ -12,6 +12,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAccount } from 'wagmi';
 
+function formatBuyError(error: unknown): string {
+  if (!(error instanceof Error)) return 'Order failed';
+  if (error.message.toLowerCase().includes('self-trading')) {
+    return 'You cannot buy from your own secondary listing. Self-trading is not permitted on this platform.';
+  }
+  return error.message;
+}
+
 export function ListingDetailPage() {
   const { listingId } = useParams<{ listingId: string }>();
   const navigate = useNavigate();
@@ -142,7 +150,7 @@ export function ListingDetailPage() {
                 </div>
                 {buyMutation.error && (
                   <p className="text-sm text-destructive">
-                    {buyMutation.error instanceof Error ? buyMutation.error.message : 'Order failed'}
+                    {formatBuyError(buyMutation.error)}
                   </p>
                 )}
                 <Button type="submit" className="w-full" disabled={buyMutation.isPending}>
