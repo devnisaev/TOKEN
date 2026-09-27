@@ -14,6 +14,12 @@ export function BuildingDetailPage() {
     enabled: !!buildingId,
   });
 
+  const healthQuery = useQuery({
+    queryKey: ['building-health', buildingId],
+    queryFn: () => api.getBuildingHealth(buildingId!),
+    enabled: !!buildingId,
+  });
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20 text-muted-foreground">
@@ -85,6 +91,16 @@ export function BuildingDetailPage() {
           </CardHeader>
           <CardContent className="text-sm font-medium">
             {latestNavAttestedAt ? new Date(latestNavAttestedAt).toLocaleDateString() : '—'}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Avg health</CardTitle>
+          </CardHeader>
+          <CardContent className="text-2xl font-bold">
+            {healthQuery.data && healthQuery.data.assetCount > 0
+              ? `${healthQuery.data.averageHealthScore.toFixed(1)}%`
+              : '—'}
           </CardContent>
         </Card>
       </div>

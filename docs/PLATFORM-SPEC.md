@@ -464,6 +464,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 | **Phase 19** | Operations alerting ✅ | Operator alert records, expiry scheduler, alert generation (753–777) |
 | **Phase 20** | Operations automation ✅ | KPI snapshots, scheduled alerts, maintenance signals, health recompute (778–802) |
 | **Phase 21** | Portfolio health & notifications ✅ | Alert notifications, building rollups, investor portfolio health (803–827) |
+| **Phase 22** | Building operations UI ✅ | Health history, admin building health, sustainability scores (828–852) |
 
 See diagrams: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml), [`diagrams/09-phase-12-asset-generalization.puml`](diagrams/09-phase-12-asset-generalization.puml), [`diagrams/10-phase-13-rwa-exchange.puml`](diagrams/10-phase-13-rwa-exchange.puml).
 
@@ -1744,7 +1745,32 @@ Guide: [rules/phase-21-services.md](rules/phase-21-services.md)
 
 ---
 
-## 28. Diagram Index
+## 28. Phase 22 — Building Operations UI
+
+**Status:** Complete (tracks 828–852). Asset health history, admin building health dashboard, building detail widget, investor sustainability health.
+
+Guide: [rules/phase-22-services.md](rules/phase-22-services.md)
+
+### 28.1 Goals
+
+- [x] Asset health history by flat (`GET /v1/reports/asset-health-scores?flatId=…`)
+- [x] Admin building health page (`/building-health`)
+- [x] Building detail health summary card
+- [x] Investor sustainability health score display
+
+### 28.2 Track backlog (828–852)
+
+| Track range | Focus |
+|-------------|-------|
+| 828–832 | Asset health history API |
+| 833–837 | Admin building health page |
+| 838–842 | Building detail health widget |
+| 843–847 | Investor sustainability health |
+| 848–852 | Integration tests; docs |
+
+---
+
+## 29. Diagram Index
 
 | File | Description |
 |------|-------------|
@@ -1763,7 +1789,7 @@ Guide: [rules/phase-21-services.md](rules/phase-21-services.md)
 
 ---
 
-## 29. Open Questions & Decisions
+## 30. Open Questions & Decisions
 
 | # | Question | Options | Decision |
 |---|----------|---------|----------|
@@ -1788,7 +1814,7 @@ Guide: [rules/phase-21-services.md](rules/phase-21-services.md)
 
 ---
 
-## 30. Cursor Rules & Coding Standards
+## 31. Cursor Rules & Coding Standards
 
 Agent and IDE conventions live in `.cursor/rules/` (adapted from Titan fintech rules).
 

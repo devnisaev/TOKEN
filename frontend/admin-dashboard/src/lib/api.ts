@@ -286,6 +286,10 @@ export const api = {
     return request<BuildingHealthItem[]>('/v1/reports/building-health');
   },
 
+  getBuildingHealth(buildingId: string) {
+    return request<BuildingHealthItem>(`/v1/reports/building-health/${buildingId}`);
+  },
+
   generateOperatorAlerts(insuranceWithinDays = 30) {
     return request<GenerateOperatorAlertsResponse>(
       `/v1/reports/operator-alerts/generate?insuranceWithinDays=${insuranceWithinDays}`,

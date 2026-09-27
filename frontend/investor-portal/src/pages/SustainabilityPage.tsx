@@ -18,6 +18,12 @@ export function SustainabilityPage() {
     enabled: !!flatId,
   });
 
+  const healthQuery = useQuery({
+    queryKey: ['portfolio-health', flatId],
+    queryFn: () => api.getPortfolioHealth([flatId!]),
+    enabled: !!flatId,
+  });
+
   if (!flatId) {
     return <p className="text-destructive p-4">Missing flat id.</p>;
   }
@@ -36,6 +42,30 @@ export function SustainabilityPage() {
       {esgQuery.isLoading && <p className="text-muted-foreground">Loading ESG profile…</p>}
       {esgQuery.isError && (
         <p className="text-muted-foreground">No ESG profile published for this asset yet.</p>
+      )}
+
+      {healthQuery.data?.[0]?.healthScore != null && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Asset health score</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-3 gap-4 text-sm">
+            <div>
+              <p className="text-muted-foreground">Composite score</p>
+              <p className="text-lg font-semibold">
+                {healthQuery.data[0].healthScore!.toFixed(1)}%
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">ESG factor</p>
+              <p className="text-lg font-semibold">{healthQuery.data[0].esgFactor ?? '—'}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Occupancy factor</p>
+              <p className="text-lg font-semibold">{healthQuery.data[0].occupancyFactor ?? '—'}</p>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {esg && (

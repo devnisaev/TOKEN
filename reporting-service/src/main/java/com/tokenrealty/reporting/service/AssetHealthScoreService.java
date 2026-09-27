@@ -37,6 +37,12 @@ public class AssetHealthScoreService {
                 .toList();
     }
 
+    public List<AssetHealthScoreItem> listHistoryByFlat(UUID flatId) {
+        return assetHealthScoreRecordRepository.findByFlatIdOrderByComputedAtDesc(flatId).stream()
+                .map(this::toItem)
+                .toList();
+    }
+
     @Transactional
     public AssetHealthScoreItem record(RecordAssetHealthScoreRequest request) {
         BigDecimal healthScore = compositeScore(

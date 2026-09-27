@@ -91,7 +91,11 @@ public class ReportingController {
 
     @GetMapping("/asset-health-scores")
     public List<AssetHealthScoreItem> assetHealthScores(
-            @RequestParam(required = false) UUID buildingId) {
+            @RequestParam(required = false) UUID buildingId,
+            @RequestParam(required = false) UUID flatId) {
+        if (flatId != null) {
+            return assetHealthScoreService.listHistoryByFlat(flatId);
+        }
         return buildingId != null
                 ? assetHealthScoreService.listByBuilding(buildingId)
                 : assetHealthScoreService.listAll();

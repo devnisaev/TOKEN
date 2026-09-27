@@ -139,9 +139,13 @@ KPI snapshot history, scheduled alert generation, maintenance ticket signals, au
 
 Alert notifications, building health rollups, investor portfolio health view. See [docs/PLATFORM-SPEC.md §27](docs/PLATFORM-SPEC.md#27-phase-21--portfolio-health--alert-notifications) and [docs/rules/phase-21-services.md](docs/rules/phase-21-services.md).
 
-### Phase 22 — in progress (roadmap)
+### Phase 22 — complete
 
-Building health admin UI, asset health history, investor sustainability health scores. Tracks 828–852 — [phase-22-services.md](docs/rules/phase-22-services.md).
+Building health admin UI, asset health history, investor sustainability health scores. See [docs/PLATFORM-SPEC.md §28](docs/PLATFORM-SPEC.md#28-phase-22--building-operations-ui) and [docs/rules/phase-22-services.md](docs/rules/phase-22-services.md).
+
+### Phase 23 — in progress (roadmap)
+
+Operator alert summaries, health trend detection, operations export, weekly digest. Tracks 853–877 — [phase-23-services.md](docs/rules/phase-23-services.md).
 
 **Do not spin out:** limits/policy service, config service, Payment escrow, Issuance deploy/transfer core.
 

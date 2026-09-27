@@ -42,6 +42,9 @@ export function Header() {
           <NavLink to="/operator-alerts" className={({ isActive }) => navLinkClass(isActive)}>
             Alerts
           </NavLink>
+          <NavLink to="/building-health" className={({ isActive }) => navLinkClass(isActive)}>
+            Health
+          </NavLink>
           <NavLink to="/indices/manage" className={({ isActive }) => navLinkClass(isActive)}>
             Indices
           </NavLink>
