@@ -18,6 +18,9 @@ public final class DownstreamServices {
     public static final ServiceSpec REPORTING = new ServiceSpec("Reporting service");
     public static final ServiceSpec SEARCH = new ServiceSpec("Search service");
     public static final ServiceSpec SETTLEMENT = new ServiceSpec("Settlement service");
+    public static final ServiceSpec VALUATION = new ServiceSpec("Valuation service");
+    public static final ServiceSpec INTEGRATION_HUB = new ServiceSpec("Integration Hub service");
+    public static final ServiceSpec GOVERNANCE = new ServiceSpec("Governance service");
 
     private DownstreamServices() {
     }

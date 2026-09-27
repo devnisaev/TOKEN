@@ -29,7 +29,21 @@ public interface ValuationEventPublisher {
     ) {
     }
 
+    record NavAttestedEvent(
+            UUID flatId,
+            UUID buildingId,
+            UUID valuationRequestId,
+            UUID navSnapshotId,
+            BigDecimal valueUsd,
+            long totalTokens,
+            BigDecimal navPerTokenUsd,
+            Instant attestedAt
+    ) {
+    }
+
     void publishValuationUpdated(ValuationUpdatedEvent event);
 
     void publishValuationApproved(ValuationApprovedEvent event);
+
+    void publishNavAttested(NavAttestedEvent event);
 }

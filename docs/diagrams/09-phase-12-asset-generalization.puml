@@ -1,0 +1,58 @@
+@startuml 09-phase-12-asset-generalization
+' TokenRealty — Phase 12 Universal Asset Tokenization
+' Render: plantuml docs/diagrams/09-phase-12-asset-generalization.puml
+
+title TokenRealty — Phase 12 Asset Generalization (Tracks 578–602)
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+package "Property Registry :8081" as REG #LightBlue {
+  component "Building\n(optional wrapper)" as BLD
+  component "AssetUnit\n(was Flat)" as UNIT
+  component "SPV + Documents" as SPV
+}
+
+package "Income models" as INC #Wheat {
+  component "Rent lease" as RENT
+  component "Operator revenue share" as OPS
+  component "Membership / usage" as MEM
+  component "Land appreciation" as LAND
+}
+
+package "Asset archetypes" as ARCH #LightGreen {
+  component "House / Villa" as HOUSE
+  component "Land parcel" as PARCEL
+  component "Gym / Pool / Station" as COMM
+  component "Warehouse / Industrial" as IND
+}
+
+cloud "External" as EXT {
+  component "Operator P&L feed" as PL
+  component "Land registry / cadastral" as CAD
+}
+
+ARCH --> BLD : 1:1 or N:1
+BLD --> UNIT : 1..N tokenizable units
+UNIT --> SPV
+UNIT --> ISS : one TokenContract each
+
+package "Token Issuance :8082" as ISS {
+  component "ERC-1400 per AssetUnit" as TOK
+}
+
+EXT --> REG
+INC --> RENT
+INC --> OPS
+INC --> MEM
+INC --> LAND
+OPS --> PL
+
+note right of UNIT
+  propertyCategory:
+  GYM, POOL, SERVICE_STATION,
+  SINGLE_FAMILY_HOUSE, LAND_PARCEL…
+  operatingModel + liquidityTier
+end note
+
+@enduml

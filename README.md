@@ -6,7 +6,7 @@ Real-estate tokenization platform — fractional property ownership, crypto paym
 
 | Layer | Count | Notes |
 |-------|-------|-------|
-| Backend microservices | **19** | Spring Boot 4 / Java 21 |
+| Backend microservices | **20** | Spring Boot 4 / Java 21 |
 | Frontend apps | **3** | React 19 + Vite (investor, admin, tenant) |
 | Shared Maven libraries | **6** | security, web, jpa, kafka, events, outbox |
 
@@ -33,6 +33,7 @@ Real-estate tokenization platform — fractional property ownership, crypto paym
 | Corporate Actions | `corporate-actions-service/` | 8097 | Implemented (dividend orchestration) |
 | Search | `search-service/` | 8098 | Implemented (Kafka search index) |
 | Integration Hub | `integration-hub-service/` | 8099 | Implemented (webhook relay + retries) |
+| Governance | `governance-service/` | 8100 | Implemented (proposals, votes) |
 
 ### Implementation phases
 
@@ -42,8 +43,14 @@ Real-estate tokenization platform — fractional property ownership, crypto paym
 | Phase 7 | Complete | 403–477 | [phase-7-services.md](docs/rules/phase-7-services.md) |
 | Phase 8 | Complete | 478–502 | [phase-8-services.md](docs/rules/phase-8-services.md) |
 | Phase 9 | Complete | 503–527 | [phase-9-services.md](docs/rules/phase-9-services.md) |
+| Phase 10 | Complete | 528–552 | [phase-10-services.md](docs/rules/phase-10-services.md) |
+| Phase 11 | Planned | 553–577 | [phase-11-services.md](docs/rules/phase-11-services.md) — institutional UI & BFF |
+| Phase 12 | Planned | 578–602 | [phase-12-services.md](docs/rules/phase-12-services.md) — universal asset tokenization |
+| Phase 13 | Planned | 603–627 | [phase-13-services.md](docs/rules/phase-13-services.md) — RWA order book (CLOB) |
+| Phase 14 | Planned | 628–652 | [phase-14-services.md](docs/rules/phase-14-services.md) — AMM liquidity pools |
+| Phase 15 | Planned | 653–677 | [phase-15-services.md](docs/rules/phase-15-services.md) — OTC, indices, lending |
 
-**Platform status:** Phases 0–9 complete (tracks 1–527). Latest: stock-split consumer loop (Corporate Actions → Issuance → Reporting).
+**Platform status:** Phases 0–10 complete (tracks 1–552). Roadmap: universal assets (houses, land, gyms, stations) + RWA crypto exchange (CLOB, AMM, OTC) — tracks 553–677.
 
 ## Shared libraries
 

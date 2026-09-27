@@ -44,6 +44,12 @@ Central documentation for the TokenRealty real-estate tokenization platform.
 | [rules/phase-7-services.md](rules/phase-7-services.md) | — (Phase 7 event mesh, tracks 403–477) |
 | [rules/phase-8-services.md](rules/phase-8-services.md) | — (Phase 8 production hardening, tracks 478–502) |
 | [rules/phase-9-services.md](rules/phase-9-services.md) | — (Phase 9 downstream consumers, tracks 503–527) |
+| [rules/phase-10-services.md](rules/phase-10-services.md) | — (Phase 10 institutional expansion, tracks 528–552) |
+| [rules/phase-11-services.md](rules/phase-11-services.md) | — (Phase 11 institutional UI & BFF, tracks 553–577) |
+| [rules/phase-12-services.md](rules/phase-12-services.md) | — (Phase 12 universal asset tokenization, tracks 578–602) |
+| [rules/phase-13-services.md](rules/phase-13-services.md) | — (Phase 13 RWA order book / CLOB, tracks 603–627) |
+| [rules/phase-14-services.md](rules/phase-14-services.md) | — (Phase 14 AMM liquidity pools, tracks 628–652) |
+| [rules/phase-15-services.md](rules/phase-15-services.md) | — (Phase 15 OTC, indices, lending, tracks 653–677) |
 | [rules/observability.md](rules/observability.md) | — (traceId, JSON logs, Prometheus) |
 | [rules/commit-messages.md](rules/commit-messages.md) | [commit-messages.mdc](../.cursor/rules/commit-messages.mdc) |
 | [rules/e2e-testing.md](rules/e2e-testing.md) | — (Playwright smoke + full flow, demo-start) |

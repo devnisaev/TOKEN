@@ -1,0 +1,68 @@
+@startuml 08-phase-10-institutional-expansion
+' TokenRealty — Phase 10 Institutional Expansion
+' Render: plantuml docs/diagrams/08-phase-10-institutional-expansion.puml
+
+title TokenRealty — Phase 10 Institutional Expansion (Tracks 528–552)
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+cloud "External Providers" as EXT {
+  component "AVM / Market Data" as AVM
+  component "Fireblocks Custody" as FB
+  component "MoonPay / Stripe" as RAMP
+}
+
+package "Integration Hub :8099" as HUB #Gold {
+  component "Webhook Relay" as RELAY
+  component "Credential Vault\n(KMS / AES)" as CREDS
+}
+
+package "Extended Core" as CORE #LightBlue {
+  component "Valuation :8095" as VAL
+  component "Payment :8085" as PAY
+  component "Marketplace :8084" as MP
+  component "Reporting :8093" as REP
+}
+
+package "New Service" as NEW #LightGreen {
+  component "Governance :8100" as GOV
+}
+
+queue "Kafka" as KAFKA #Wheat
+
+database "PostgreSQL" as PG
+
+AVM --> RELAY : valuation feed webhook
+RAMP --> RELAY : payment webhook
+FB --> CREDS : API keys
+
+RELAY --> VAL : POST /feeds/{provider}
+RELAY --> PAY : payment confirm
+
+VAL --> KAFKA : nav.attested\nvaluation.approved
+PAY --> KAFKA : payout.completed\n(withholding)
+MP --> KAFKA : order.matched\n(surveillance)
+GOV --> KAFKA : governance.proposal.closed
+
+KAFKA --> REP : TaxSummaryRecord\nSurveillanceAlertRecord
+
+VAL --> PG
+PAY --> PG
+MP --> PG
+REP --> PG
+GOV --> PG
+HUB --> PG
+
+note right of GOV
+  Token-holder proposals
+  quorum votes on flat params
+end note
+
+note bottom of HUB
+  Extend — do NOT duplicate:
+  Payment escrow, Issuance core,
+  Compliance limits engine
+end note
+
+@enduml

@@ -47,4 +47,12 @@ public class WebhookController {
             @RequestHeader(value = "X-Signature", required = false) String signature) {
         webhookRelayService.acceptPaymentWebhook(provider, rawBody, payloadDigest, signature);
     }
+
+    @PostMapping("/valuation/{provider}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void receiveValuationFeedWebhook(
+            @PathVariable String provider,
+            @RequestBody String rawBody) {
+        webhookRelayService.acceptValuationFeedWebhook(provider, rawBody);
+    }
 }

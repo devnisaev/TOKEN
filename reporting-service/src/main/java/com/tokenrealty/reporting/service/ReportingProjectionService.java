@@ -9,6 +9,8 @@ import com.tokenrealty.reporting.entity.OrderMatchedRecord;
 import com.tokenrealty.reporting.entity.RentCollectedRecord;
 import com.tokenrealty.reporting.entity.StockSplitRecord;
 import com.tokenrealty.reporting.entity.StuckSagaRecord;
+import com.tokenrealty.reporting.entity.SurveillanceAlertRecord;
+import com.tokenrealty.reporting.entity.TaxSummaryRecord;
 import com.tokenrealty.reporting.entity.TradeSettledRecord;
 import com.tokenrealty.reporting.entity.ValuationApprovedRecord;
 import com.tokenrealty.reporting.repository.BuildingApprovedRecordRepository;
@@ -18,6 +20,8 @@ import com.tokenrealty.reporting.repository.OrderMatchedRecordRepository;
 import com.tokenrealty.reporting.repository.RentCollectedRecordRepository;
 import com.tokenrealty.reporting.repository.StockSplitRecordRepository;
 import com.tokenrealty.reporting.repository.StuckSagaRecordRepository;
+import com.tokenrealty.reporting.repository.SurveillanceAlertRecordRepository;
+import com.tokenrealty.reporting.repository.TaxSummaryRecordRepository;
 import com.tokenrealty.reporting.repository.TradeSettledRecordRepository;
 import com.tokenrealty.reporting.repository.ValuationApprovedRecordRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +45,8 @@ public class ReportingProjectionService {
     private final ValuationApprovedRecordRepository valuationApprovedRecordRepository;
     private final BuildingApprovedRecordRepository buildingApprovedRecordRepository;
     private final StockSplitRecordRepository stockSplitRecordRepository;
+    private final TaxSummaryRecordRepository taxSummaryRecordRepository;
+    private final SurveillanceAlertRecordRepository surveillanceAlertRecordRepository;
 
     @Transactional
     public void onTradeSettled(KafkaJsonEvent event) {
@@ -59,18 +65,30 @@ public class ReportingProjectionService {
     @Transactional
     public void onOrderMatched(KafkaJsonEvent event) {
         JsonNode payload = event.payload();
+        UUID buyerId = uuid(payload, "buyerId");
+        UUID sellerId = uuid(payload, "sellerId");
         orderMatchedRecordRepository.save(OrderMatchedRecord.builder()
                 .sourceEventId(event.eventId())
                 .orderId(uuid(payload, "orderId"))
                 .listingId(uuid(payload, "listingId"))
                 .flatId(uuid(payload, "flatId"))
                 .contractId(uuid(payload, "contractId"))
-                .buyerId(uuid(payload, "buyerId"))
-                .sellerId(uuid(payload, "sellerId"))
+                .buyerId(buyerId)
+                .sellerId(sellerId)
                 .tokenAmount(longValue(payload, "tokenAmount"))
                 .totalPriceUsd(decimal(payload, "totalPriceUsd"))
                 .matchedAt(event.occurredAt())
                 .build());
+        if (buyerId != null && buyerId.equals(sellerId)) {
+            surveillanceAlertRecordRepository.save(SurveillanceAlertRecord.builder()
+                    .sourceEventId(event.eventId())
+                    .orderId(uuid(payload, "orderId"))
+                    .buyerId(buyerId)
+                    .sellerId(sellerId)
+                    .alertType("SELF_TRADE")
+                    .detectedAt(event.occurredAt())
+                    .build());
+        }
     }
 
     @Transactional
@@ -162,6 +180,24 @@ public class ReportingProjectionService {
                 .splitRatio(decimal(payload, "splitRatio"))
                 .newTotalSupply(longValue(payload, "newTotalSupply"))
                 .newTokenPriceUsd(decimal(payload, "newTokenPriceUsd"))
+                .completedAt(parseInstant(payload, "completedAt", event.occurredAt()))
+                .build());
+    }
+
+    @Transactional
+    public void onPayoutCompleted(KafkaJsonEvent event) {
+        JsonNode payload = event.payload();
+        BigDecimal withholding = decimal(payload, "withholdingAmountUsd");
+        if (withholding == null || withholding.compareTo(BigDecimal.ZERO) <= 0) {
+            return;
+        }
+        taxSummaryRecordRepository.save(TaxSummaryRecord.builder()
+                .sourceEventId(event.eventId())
+                .payoutId(uuid(payload, "payoutId"))
+                .recipientInvestorId(uuid(payload, "recipientInvestorId"))
+                .grossAmountUsd(decimal(payload, "grossAmountUsd"))
+                .withholdingAmountUsd(withholding)
+                .netAmountUsd(decimal(payload, "netAmountUsd"))
                 .completedAt(parseInstant(payload, "completedAt", event.occurredAt()))
                 .build());
     }

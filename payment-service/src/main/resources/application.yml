@@ -78,6 +78,8 @@ tokenrealty:
       poll-ms: 3000
     reconciliation:
       cron: ${PAYMENT_RECONCILIATION_CRON:0 0 */6 * * *}
+    tax:
+      withholding-rate: ${PAYMENT_TAX_WITHHOLDING_RATE:0}
     webhook:
       stripe-secret: ${PAYMENT_WEBHOOK_STRIPE_SECRET:}
       moonpay-secret: ${PAYMENT_WEBHOOK_MOONPAY_SECRET:}

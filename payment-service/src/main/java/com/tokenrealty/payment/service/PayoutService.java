@@ -44,6 +44,8 @@ public class PayoutService {
                 .recipientInvestorId(request.recipientInvestorId())
                 .recipientWallet(request.recipientWallet())
                 .amount(request.amount())
+                .grossAmountUsd(request.grossAmountUsd())
+                .withholdingAmountUsd(request.withholdingAmountUsd())
                 .currency(request.currency())
                 .purpose(request.purpose())
                 .referenceId(request.referenceId())
@@ -66,7 +68,10 @@ public class PayoutService {
                     saved.getRecipientWallet(),
                     saved.getPurpose(),
                     saved.getTxHash(),
-                    saved.getCompletedAt()));
+                    saved.getCompletedAt(),
+                    saved.getGrossAmountUsd(),
+                    saved.getWithholdingAmountUsd(),
+                    saved.getAmount()));
         }
         if (saved.getPurpose() == Payout.PayoutPurpose.RENT) {
             UUID tenantId = saved.getTenantId() != null ? saved.getTenantId() : saved.getRecipientInvestorId();

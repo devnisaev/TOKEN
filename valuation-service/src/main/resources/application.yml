@@ -48,6 +48,7 @@ tokenrealty:
     topic:
       valuation-updated: tokenrealty.valuation.updated.v1
       valuation-approved: tokenrealty.valuation.approved.v1
+      nav-attested: tokenrealty.valuation.nav.attested.v1
 
 jackson2:
   serialization:

@@ -194,7 +194,10 @@ jobs:
           ./token-realty-app/mvnw -f reporting-service/pom.xml test -Dtest=SettlementStuckReportingIntegrationTest -q
           ./token-realty-app/mvnw -f reporting-service/pom.xml test -Dtest=ValuationApprovedReportingIntegrationTest,BuildingApprovedReportingIntegrationTest,StockSplitCompletedReportingIntegrationTest -q
           ./token-realty-app/mvnw -f corporate-actions-service/pom.xml test -Dtest=StockSplitOutboxIntegrationTest -q
-          ./token-realty-app/mvnw -f payment-service/pom.xml test -Dtest=PaymentWebhookIntegrationTest -q
+          ./token-realty-app/mvnw -f payment-service/pom.xml test -Dtest=PaymentWebhookIntegrationTest,DividendWithholdingIntegrationTest -q
+          ./token-realty-app/mvnw -f valuation-service/pom.xml test -Dtest=ValuationFeedIntegrationTest -q
+          ./token-realty-app/mvnw -f reporting-service/pom.xml test -Dtest=TaxSummaryReportingIntegrationTest -q
+          ./token-realty-app/mvnw -f governance-service/pom.xml test -Dtest=GovernanceIntegrationTest -q
 
   integration-hub-tests:
     runs-on: ubuntu-latest

@@ -436,11 +436,14 @@ Emitted when admin requests a stock split via `POST /v1/corporate-actions/stock-
   "recipientWallet": "0x...",
   "purpose": "DIVIDEND",
   "txHash": "0x...",
-  "completedAt": "2025-09-25T16:00:00Z"
+  "completedAt": "2025-09-25T16:00:00Z",
+  "grossAmountUsd": "250.00",
+  "withholdingAmountUsd": "37.50",
+  "netAmountUsd": "212.50"
 }
 ```
 
-Issuance updates `DividendPayment.txHash` and status `PAID` on consume.
+Issuance updates `DividendPayment.txHash` and status `PAID` on consume. Reporting projects `TaxSummaryRecord` from gross/withholding/net (Phase 10).
 
 ---
 
@@ -542,6 +545,8 @@ See [PLATFORM-SPEC.md §12](PLATFORM-SPEC.md#12-phase-6--planned-services).
 | `tokenrealty.settlement.stuck.v1` | Settlement Service | Notification, Reporting | Implemented (outbox + consumers) |
 | `tokenrealty.settlement.recovered.v1` | Settlement Service | Audit Ledger, Notification | Implemented (outbox + consumers) |
 | `tokenrealty.valuation.approved.v1` | Valuation Service | Audit Ledger, Notification | Implemented (outbox + consumers) |
+| `tokenrealty.valuation.nav.attested.v1` | Valuation Service | Reporting (optional), Audit Ledger | Implemented (outbox on approve) |
+| `tokenrealty.governance.proposal.closed.v1` | Governance Service | Notification, Reporting (optional) | Implemented (outbox on close) |
 
 **Phase 7 consumer wiring (Registry):**
 
@@ -559,8 +564,60 @@ See [PLATFORM-SPEC.md §12](PLATFORM-SPEC.md#12-phase-6--planned-services).
 
 | Consumer service | Topics |
 |------------------|--------|
-| Reporting | `trade.settled`, `dividend.distributed`, `rent.collected`, `order.matched`, `flat.tokenized`, `building.approved` |
+| Reporting | `trade.settled`, `dividend.distributed`, `rent.collected`, `order.matched`, `flat.tokenized`, `building.approved`, `payout.completed` (tax), `order.matched` (surveillance) |
 | Settlement Saga | `order.matched`, `payment.confirmed`, `transfer.completed`, `trade.settled`, `payout.completed` |
 | Audit Ledger | `kyc-approved`, `kyc-revoked`, `trade.settled`, `document.uploaded`, `order.matched` |
 | Corporate Actions | `rent.collected`, `dividend.distributed` |
 | Search | `listing.created`, `flat.tokenized`, `building.approved`, `valuation.updated` (implemented) |
+
+---
+
+## Phase 10 — topics (institutional expansion)
+
+See [PLATFORM-SPEC.md §16](PLATFORM-SPEC.md#16-phase-10--institutional-expansion).
+
+### `tokenrealty.valuation.nav.attested.v1`
+
+| | |
+|---|---|
+| **Publisher** | Valuation Service (outbox after approve) |
+| **Consumers** | Reporting (optional), Audit Ledger |
+| **Partition key** | `flatId` |
+
+**Payload:**
+
+```json
+{
+  "flatId": "uuid",
+  "buildingId": "uuid",
+  "valuationRequestId": "uuid",
+  "navSnapshotId": "uuid",
+  "valueUsd": "450000.00",
+  "totalTokens": 10000,
+  "navPerTokenUsd": "45.00",
+  "attestedAt": "2026-09-27T12:00:00Z"
+}
+```
+
+---
+
+### `tokenrealty.governance.proposal.closed.v1`
+
+| | |
+|---|---|
+| **Publisher** | Governance Service (outbox after close) |
+| **Consumers** | Notification, Reporting (optional) |
+| **Partition key** | `proposalId` |
+
+**Payload:**
+
+```json
+{
+  "proposalId": "uuid",
+  "flatId": "uuid",
+  "quorumPct": "51.00",
+  "votesFor": 120,
+  "votesAgainst": 45,
+  "closedAt": "2026-09-27T12:00:00Z"
+}
+```

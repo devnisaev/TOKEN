@@ -37,6 +37,7 @@
         <module>corporate-actions-service</module>
         <module>search-service</module>
         <module>integration-hub-service</module>
+        <module>governance-service</module>
     </modules>
 
     <properties>

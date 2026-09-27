@@ -70,6 +70,12 @@ public class ReportingEventListener {
                 projectionService::onStockSplitCompleted);
     }
 
+    @KafkaListener(topics = "${tokenrealty.kafka.topic.payout-completed}")
+    public void onPayoutCompleted(String message) {
+        ingest(message, ReportingKafkaEventTypes.PAYOUT_COMPLETED,
+                projectionService::onPayoutCompleted);
+    }
+
     private void ingest(String message, String eventType,
                         java.util.function.Consumer<com.tokenrealty.events.kafka.KafkaJsonEvent> handler) {
         eventConsumer.consume(message, eventType, "Reporting projection failed", handler);

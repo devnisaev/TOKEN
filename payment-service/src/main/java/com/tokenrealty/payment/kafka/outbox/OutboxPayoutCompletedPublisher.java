@@ -27,6 +27,9 @@ public class OutboxPayoutCompletedPublisher implements PayoutCompletedPublisher 
                 .put("purpose", event.purpose().name())
                 .put("txHash", event.txHash())
                 .put("completedAt", event.completedAt().toString())
+                .putIfPresent("grossAmountUsd", event.grossAmountUsd())
+                .putIfPresent("withholdingAmountUsd", event.withholdingAmountUsd())
+                .putIfPresent("netAmountUsd", event.netAmountUsd())
                 .enqueue(outboxWriter, payoutCompletedTopic, event.payoutId());
     }
 }

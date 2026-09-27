@@ -3,6 +3,7 @@ package com.tokenrealty.integration.integration;
 import com.tokenrealty.integration.client.ComplianceClient;
 import com.tokenrealty.integration.client.DocumentClient;
 import com.tokenrealty.integration.client.PaymentClient;
+import com.tokenrealty.integration.client.ValuationClient;
 import com.tokenrealty.integration.entity.IntegrationDelivery;
 import com.tokenrealty.integration.entity.IntegrationDeliveryStatus;
 import com.tokenrealty.integration.entity.IntegrationType;
@@ -42,6 +43,7 @@ class WebhookRelayIntegrationTest {
     @MockitoBean ComplianceClient complianceClient;
     @MockitoBean DocumentClient documentClient;
     @MockitoBean PaymentClient paymentClient;
+    @MockitoBean ValuationClient valuationClient;
 
     @BeforeEach
     void cleanDeliveries() {
@@ -147,6 +149,25 @@ class WebhookRelayIntegrationTest {
         IntegrationDelivery delivery = deliveryRepository.findAll().getFirst();
         assertThat(delivery.getIntegrationType()).isEqualTo(IntegrationType.PAYMENT);
         assertThat(delivery.getProvider()).isEqualTo("stripe");
+        assertThat(delivery.getStatus()).isEqualTo(IntegrationDeliveryStatus.DELIVERED);
+    }
+
+    @Test
+    void valuationFeedWebhook_relaysToValuationAndMarksDelivered() throws Exception {
+        String body = "{\"buildingId\":\"550e8400-e29b-41d4-a716-446655440001\","
+                + "\"flatId\":\"550e8400-e29b-41d4-a716-446655440002\","
+                + "\"valueUsd\":\"750000.00\",\"totalTokens\":1000}";
+
+        mockMvc.perform(post("/v1/integrations/webhooks/valuation/corelogic")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isNoContent());
+
+        verify(valuationClient).forwardValuationFeedWebhook("corelogic", body);
+
+        IntegrationDelivery delivery = deliveryRepository.findAll().getFirst();
+        assertThat(delivery.getIntegrationType()).isEqualTo(IntegrationType.VALUATION_FEED);
+        assertThat(delivery.getProvider()).isEqualTo("corelogic");
         assertThat(delivery.getStatus()).isEqualTo(IntegrationDeliveryStatus.DELIVERED);
     }
 

@@ -61,9 +61,9 @@
 
 <h1>TokenRealty Platform — Implementation Spec &amp; TODO</h1>
 <p class="meta">
-  <strong>Version:</strong> 1.0 &nbsp;|&nbsp;
-  <strong>Date:</strong> 2025-09-25 &nbsp;|&nbsp;
-  <strong>Status:</strong> Planning / Reference<br>
+  <strong>Version:</strong> 1.5 &nbsp;|&nbsp;
+  <strong>Date:</strong> 2026-09-27 &nbsp;|&nbsp;
+  <strong>Status:</strong> Phases 0–10 complete (1–552); Phases 11–15 planned (553–677)<br>
   Markdown source: <a href="PLATFORM-SPEC.md">PLATFORM-SPEC.md</a>
 </p>
 
@@ -84,17 +84,18 @@
 </nav>
 
 <h2 id="vision">1. Vision</h2>
-<p>TokenRealty tokenizes real estate (buildings, flats, other property) so investors can <strong>buy fractional ownership</strong> and <strong>earn rental income</strong> using cryptocurrency (USDC, MATIC, ETH).</p>
+<p>TokenRealty tokenizes <strong>any real-estate asset</strong> — apartments, houses, land, gyms, pools, service stations — so investors can <strong>buy fractional ownership</strong>, <strong>trade on an RWA exchange</strong>, and <strong>earn income</strong> using cryptocurrency (USDC primary).</p>
 
 <table>
   <tr><th>Capability</th><th>Description</th></tr>
-  <tr><td>Asset registry</td><td>Buildings, flats, SPVs, valuations, legal documents</td></tr>
-  <tr><td>Tokenization</td><td>ERC-1400 property tokens on Polygon per flat</td></tr>
+  <tr><td>Asset registry</td><td>Buildings, asset units, SPVs, valuations, legal documents</td></tr>
+  <tr><td>Tokenization</td><td>ERC-1400 property tokens on Polygon per tokenizable unit</td></tr>
   <tr><td>Primary market</td><td>Investors buy tokens with crypto</td></tr>
-  <tr><td>Secondary market</td><td>P2P token trading with compliance gates</td></tr>
-  <tr><td>Rental operations</td><td>Lease management, crypto rent, pro-rata dividends</td></tr>
-  <tr><td>Compliance</td><td>KYC/AML whitelist (off-chain + on-chain)</td></tr>
-  <tr><td>Documents</td><td>Title deeds, leases on IPFS</td></tr>
+  <tr><td>Secondary / RWA exchange</td><td>CLOB order book + AMM pools + OTC (Phases 13–15)</td></tr>
+  <tr><td>Income</td><td>Rent, operator revenue share, membership fees → dividends</td></tr>
+  <tr><td>Compliance</td><td>KYC/AML whitelist; jurisdiction and accredited gates</td></tr>
+  <tr><td>Documents</td><td>Title deeds, operating licenses, environmental audits on IPFS</td></tr>
+  <tr><td>Governance</td><td>Token-holder proposals (Governance <code>:8100</code>)</td></tr>
 </table>
 
 <h2 id="current">2. Current State</h2>
@@ -262,7 +263,92 @@ Clients → API Gateway (:8080)
     <h4><a href="diagrams/07-build-phases.puml">07-build-phases</a></h4>
     <p>Implementation phase Gantt timeline</p>
   </div>
+  <div class="diagram-card">
+    <h4><a href="diagrams/08-phase-10-institutional-expansion.puml">08-phase-10-institutional-expansion</a></h4>
+    <p>Phase 10 Hub → Valuation/Payment/Governance extensions</p>
+  </div>
+  <div class="diagram-card">
+    <h4><a href="diagrams/09-phase-12-asset-generalization.puml">09-phase-12-asset-generalization</a></h4>
+    <p>Phase 12 AssetUnit archetypes and income models</p>
+  </div>
+  <div class="diagram-card">
+    <h4><a href="diagrams/10-phase-13-rwa-exchange.puml">10-phase-13-rwa-exchange</a></h4>
+    <p>Phases 13–15 CLOB, AMM, OTC, indices, settlement</p>
+  </div>
 </div>
+
+<h2 id="phase10">16. Phase 10 — Institutional Expansion</h2>
+<p>Adapts institutional/DeFi expansion ideas by extending existing services and adding <strong>Governance Service</strong> (<code>:8100</code>).</p>
+<table>
+  <tr><th>Tier</th><th>Focus</th><th>Tracks</th></tr>
+  <tr><td>P1</td><td>Hub valuation feed + custody adapters</td><td>528–537</td></tr>
+  <tr><td>P2</td><td>Valuation AVM ingest + NAV attestation outbox</td><td>538–547</td></tr>
+  <tr><td>P3</td><td>Tax withholding, Reporting, Governance MVP, surveillance</td><td>548–552</td></tr>
+</table>
+<p>Guide: <a href="rules/phase-10-services.md">phase-10-services.md</a> · Diagram: <a href="diagrams/08-phase-10-institutional-expansion.puml">08-phase-10-institutional-expansion.puml</a></p>
+<ul class="todo">
+  <li><span class="badge badge-done">done</span> Integration Hub valuation feed webhook relay</li>
+  <li><span class="badge badge-done">done</span> Valuation AVM feed ingest + <code>nav.attested</code> outbox</li>
+  <li><span class="badge badge-done">done</span> Payment dividend withholding + Reporting tax projections</li>
+  <li><span class="badge badge-done">done</span> Marketplace self-trade guard + surveillance alerts</li>
+  <li><span class="badge badge-done">done</span> Governance Service <code>:8100</code></li>
+</ul>
+
+<h3 id="phase10-ui">16.6 Frontend &amp; BFF (planned — see Phase 11)</h3>
+<p>Phase 10 backend (528–552) is complete; UI is <strong>Phase 11</strong> (tracks 553–577). See <a href="PLATFORM-SPEC.md#17-phase-11--institutional-ui--bff">§17 in PLATFORM-SPEC.md</a>.</p>
+
+<h4>Investor Portal (<code>:5173</code>)</h4>
+<table>
+  <tr><th>Route</th><th>Change</th></tr>
+  <tr><td><code>/dividends</code></td><td>Extend — gross / withholding / net columns</td></tr>
+  <tr><td><code>/governance</code></td><td>New — open proposals for held flats</td></tr>
+  <tr><td><code>/governance/:id</code></td><td>New — vote FOR/AGAINST</td></tr>
+  <tr><td><code>/listings/:id</code></td><td>Extend — self-trade blocked error UX</td></tr>
+</table>
+
+<h4>Admin Dashboard (<code>:5174</code>)</h4>
+<table>
+  <tr><th>Route</th><th>Change</th></tr>
+  <tr><td><code>/governance</code></td><td>New — create, list, close proposals</td></tr>
+  <tr><td><code>/integrations</code></td><td>New — Hub credentials (AVM feed, custody)</td></tr>
+  <tr><td><code>/integrations/deliveries</code></td><td>New — webhook delivery log</td></tr>
+  <tr><td><code>/reports/compliance</code></td><td>New — tax summaries + surveillance alerts</td></tr>
+  <tr><td><code>/buildings/:id</code></td><td>Extend — NAV attestation badge</td></tr>
+</table>
+
+<h4>Gateway prerequisites</h4>
+<ul>
+  <li>Proxy <code>/api/v1/governance/**</code> → Governance <code>:8100</code></li>
+  <li>Reporting read APIs: <code>GET /v1/reports/tax-summaries</code>, <code>/surveillance-alerts</code></li>
+  <li>BFF: <code>GET /v1/bff/investors/{id}/governance-proposals</code>, admin compliance aggregate</li>
+</ul>
+<p>Tenant portal: no Phase 10 UI changes.</p>
+
+<h2 id="phase11">17. Phase 11 — Institutional UI &amp; BFF (planned)</h2>
+<p>Tracks <strong>553–577</strong>. Guide: <a href="rules/phase-11-services.md">phase-11-services.md</a></p>
+
+<h2 id="phase12">18. Phase 12 — Universal Asset Tokenization (planned)</h2>
+<p>Tracks <strong>578–602</strong>. Tokenize houses, land, gyms, pools, service stations via <strong>AssetUnit</strong> model.</p>
+<table>
+  <tr><th>Archetype</th><th>Examples</th><th>Income</th></tr>
+  <tr><td>Residential whole</td><td>House, villa</td><td>Rent</td></tr>
+  <tr><td>Land</td><td>Plot, development land</td><td>Appreciation / ground lease</td></tr>
+  <tr><td>Operating commercial</td><td>Gym, pool, service station</td><td>Operator revenue / franchise</td></tr>
+  <tr><td>Industrial</td><td>Warehouse</td><td>Triple-net rent</td></tr>
+</table>
+<p>New metadata: <code>operatingModel</code>, <code>liquidityTier</code> (TIER_1–3), operating licenses. Guide: <a href="rules/phase-12-services.md">phase-12-services.md</a> · Diagram: <a href="diagrams/09-phase-12-asset-generalization.puml">09-phase-12-asset-generalization</a></p>
+
+<h2 id="phase13">19. Phase 13 — RWA Order Book / CLOB (planned)</h2>
+<p>Tracks <strong>603–627</strong>. Evolve Marketplace to central limit order book: bid/ask, depth, NAV bands, market data. Settlement reuses existing escrow saga.</p>
+<p>Guide: <a href="rules/phase-13-services.md">phase-13-services.md</a> · UI: <code>/exchange/{contractId}</code></p>
+
+<h2 id="phase14">20. Phase 14 — AMM Liquidity Pools (planned)</h2>
+<p>Tracks <strong>628–652</strong>. Token/USDC pools for TIER_1 assets; LP tokens; NAV circuit breakers.</p>
+<p>Guide: <a href="rules/phase-14-services.md">phase-14-services.md</a> · UI: <code>/exchange/{contractId}/swap</code></p>
+
+<h2 id="phase15">21. Phase 15 — Institutional Exchange (planned)</h2>
+<p>Tracks <strong>653–677</strong>. OTC/RFQ block trades, REIT-style index baskets, token-collateral lending, Market Maker API.</p>
+<p>Guide: <a href="rules/phase-15-services.md">phase-15-services.md</a> · Diagram: <a href="diagrams/10-phase-13-rwa-exchange.puml">10-phase-13-rwa-exchange</a></p>
 
 <p><strong>Render diagrams:</strong></p>
 <pre>brew install plantuml

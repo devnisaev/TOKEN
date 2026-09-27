@@ -69,6 +69,7 @@ Human-readable expansions: [docs/rules/](docs/rules/) — incl. [commit-messages
 | Corporate Actions | 8097 | `com.tokenrealty.corporateactions` |
 | Search | 8098 | `com.tokenrealty.search` |
 | Integration Hub | 8099 | `com.tokenrealty.integration` |
+| Governance | 8100 | `com.tokenrealty.governance` |
 
 ### Phase 6 — complete
 
@@ -85,6 +86,24 @@ Production hardening & platform completion (no new services). See [docs/PLATFORM
 ### Phase 9 — complete
 
 Downstream consumer completion (no new services). See [docs/PLATFORM-SPEC.md §15](docs/PLATFORM-SPEC.md#15-phase-9--downstream-consumer-completion) and [docs/rules/phase-9-services.md](docs/rules/phase-9-services.md).
+
+### Phase 10 — complete
+
+Institutional expansion (Gemini roadmap adaptation). See [docs/PLATFORM-SPEC.md §16](docs/PLATFORM-SPEC.md#16-phase-10--institutional-expansion) and [docs/rules/phase-10-services.md](docs/rules/phase-10-services.md).
+
+| Service | Port | Package |
+|---------|------|---------|
+| Governance | 8100 | `com.tokenrealty.governance` |
+
+### Phases 11–15 — planned (roadmap)
+
+| Phase | Focus | Tracks | Guide |
+|-------|-------|--------|-------|
+| 11 | Institutional UI & BFF | 553–577 | [phase-11-services.md](docs/rules/phase-11-services.md) |
+| 12 | Universal asset tokenization (houses, land, gyms, stations) | 578–602 | [phase-12-services.md](docs/rules/phase-12-services.md) |
+| 13 | RWA order book (CLOB) — evolve Marketplace | 603–627 | [phase-13-services.md](docs/rules/phase-13-services.md) |
+| 14 | AMM liquidity pools + NAV circuit breakers | 628–652 | [phase-14-services.md](docs/rules/phase-14-services.md) |
+| 15 | OTC/RFQ, index baskets, token-collateral lending | 653–677 | [phase-15-services.md](docs/rules/phase-15-services.md) |
 
 **Do not spin out:** limits/policy service, config service, Payment escrow, Issuance deploy/transfer core.
 

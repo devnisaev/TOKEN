@@ -1,9 +1,9 @@
 # TokenRealty Platform — Implementation Spec & TODO
 
-> **Version:** 1.3  
-> **Date:** 2026-09-26  
-> **Status:** Phases 0–9 complete (tracks 1–527)  
-> **Purpose:** Master specification and implementation backlog for the TokenRealty real-estate tokenization platform (buy, sell, rent with cryptocurrency).
+> **Version:** 1.5  
+> **Date:** 2026-09-27  
+> **Status:** Phases 0–10 complete (tracks 1–552); Phases 11–15 planned (553–677)  
+> **Purpose:** Master specification and implementation backlog for the TokenRealty real-estate tokenization platform (buy, sell, rent, and exchange fractional property with cryptocurrency).
 
 ---
 
@@ -24,27 +24,35 @@
 13. [Phase 7 — Event Mesh & Production Integrations](#13-phase-7--event-mesh--production-integrations)
 14. [Phase 8 — Production Hardening & Platform Completion](#14-phase-8--production-hardening--platform-completion)
 15. [Phase 9 — Downstream Consumer Completion](#15-phase-9--downstream-consumer-completion)
-16. [Diagram Index](#16-diagram-index)
-17. [Open Questions & Decisions](#17-open-questions--decisions)
-18. [Cursor Rules & Coding Standards](#18-cursor-rules--coding-standards)
+16. [Phase 10 — Institutional Expansion](#16-phase-10--institutional-expansion)
+17. [Phase 11 — Institutional UI & BFF](#17-phase-11--institutional-ui--bff)
+18. [Phase 12 — Universal Asset Tokenization](#18-phase-12--universal-asset-tokenization)
+19. [Phase 13 — RWA Order Book Exchange (CLOB)](#19-phase-13--rwa-order-book-exchange-clob)
+20. [Phase 14 — AMM Liquidity Pools](#20-phase-14--amm-liquidity-pools)
+21. [Phase 15 — Institutional Exchange (OTC, Indices, Lending)](#21-phase-15--institutional-exchange-otc-indices-lending)
+22. [Diagram Index](#22-diagram-index)
+23. [Open Questions & Decisions](#23-open-questions--decisions)
+24. [Cursor Rules & Coding Standards](#24-cursor-rules--coding-standards)
 
 ---
 
 ## 1. Vision
 
-TokenRealty tokenizes real estate assets (buildings, flats, and other property types) so investors can **buy fractional ownership** and **earn rental income** using cryptocurrency (USDC, MATIC, ETH).
+TokenRealty tokenizes **any real-estate asset** — apartments, private houses, land parcels, gyms, pools, service stations, warehouses, hospitality — so investors can **buy fractional ownership**, **trade on an RWA exchange**, and **earn income** (rent, operator revenue, membership fees) using cryptocurrency (USDC primary).
 
 ### Core capabilities (target)
 
 | Capability | Description |
 |------------|-------------|
-| **Asset registry** | Buildings, flats, SPVs, valuations, legal documents as source of truth |
-| **Tokenization** | ERC-1400 property tokens deployed on Polygon per flat |
+| **Asset registry** | Buildings, asset units (flats, houses, land, commercial operators), SPVs, valuations, legal documents |
+| **Tokenization** | ERC-1400 property tokens deployed on Polygon per tokenizable unit |
 | **Primary market** | Investors buy tokens with crypto |
-| **Secondary market** | Peer-to-peer token trading with compliance gates |
-| **Rental operations** | Lease management, rent collection in crypto, pro-rata dividends |
-| **Compliance** | KYC/AML whitelist (off-chain + on-chain) |
-| **Documents** | Title deeds, leases stored on IPFS with verifiable CIDs |
+| **Secondary market** | Listing-take today → **CLOB order book** + optional **AMM pools** (Phases 13–14) |
+| **RWA exchange** | NAV-banded limit orders, market data, OTC/RFQ, index baskets, collateral lending (Phases 13–15) |
+| **Rental & operator income** | Leases, operator revenue share, membership fees → pro-rata dividends |
+| **Compliance** | KYC/AML whitelist (off-chain + on-chain); jurisdiction and accredited-investor gates |
+| **Documents** | Title deeds, operating licenses, environmental audits on IPFS with verifiable CIDs |
+| **Governance** | Token-holder proposals on flat/asset parameters (Governance `:8100`) |
 
 ---
 
@@ -444,8 +452,16 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 | **Phase 7** | Event mesh & production integrations | Wire Phase 6 publishers to consumers; Hub payment webhooks; OpenSearch (optional) |
 | **Phase 8** | Production hardening & platform completion | CI coverage; stock-split outbox; document verify; payment webhook HMAC; Reporting/Audit consumers |
 | **Phase 9** | Downstream consumer completion | Issuance stock-split consumer; completion outbox; Reporting building.approved + stock-split projections |
+| **Phase 10** | Institutional expansion | Hub adapters; NAV attestation; tax withholding; Governance `:8100`; surveillance (backend) |
+| **Phase 11** | Institutional UI & BFF | Portal governance, compliance reports, integrations admin; gateway proxies (553–577) |
+| **Phase 12** | Universal asset tokenization | Houses, land, gyms, pools, stations; `AssetUnit`; operating models; liquidity tiers (578–602) |
+| **Phase 13** | RWA order book (CLOB) | Limit orders, depth, NAV bands, market data; evolve Marketplace (603–627) |
+| **Phase 14** | AMM liquidity pools | Token/USDC pools, LP tokens, NAV circuit breakers (628–652) |
+| **Phase 15** | Institutional exchange | OTC/RFQ, REIT-style index baskets, token-collateral lending (653–677) |
 
-See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml).
+See diagrams: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml), [`diagrams/09-phase-12-asset-generalization.puml`](diagrams/09-phase-12-asset-generalization.puml), [`diagrams/10-phase-13-rwa-exchange.puml`](diagrams/10-phase-13-rwa-exchange.puml).
+
+**Recommended Phase 12–15 build order:** Asset generalization → CLOB → AMM (optional per tier) → OTC/indices/lending.
 
 **Recommended Phase 6 build order:** Reporting → Settlement Saga → Valuation/NAV → Audit Ledger → Corporate Actions → Search → Integration Hub.
 
@@ -609,7 +625,7 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 | Legal / SPV | `legalJurisdiction` | `SpvEntity` | State/province (e.g. Delaware, DIFC) |
 | Legal / SPV | `ownershipType` | `SpvEntity` | `DIRECT_DEED`, `SPV_SHARE_EQUITY`, `PART_DEBT_INSTRUMENT`, `PROFIT_SHARING_AGREEMENT` |
 | Legal / SPV | `registrationNumber`, `registrationCountry` | `SpvEntity` | Already existed |
-| Physical | `propertyCategory` | `Building` | `RESIDENTIAL_FLAT`, `COMMERCIAL_BUILDING`, … |
+| Physical | `propertyCategory` | `Building` | `RESIDENTIAL_FLAT`, `COMMERCIAL_BUILDING`, `SINGLE_FAMILY_HOUSE`, `LAND_PARCEL`, …; Phase 12 adds `GYM`, `SWIMMING_POOL`, `SERVICE_STATION`, `HOSPITALITY` |
 | Physical | `constructionYear` | `Building` | Already existed |
 | Physical | `cadastralReference` | `Building`, `Flat` | Land registry / title deed parcel ID |
 | Physical | `areaSqm`, `netUsableAreaSqm` | `Flat` | Gross vs net usable area |
@@ -889,6 +905,7 @@ Blueprint for legal, physical, and financial metadata required for tokenized rea
 - [x] Admin building detail BFF + flat CRUD UI + order monitoring
 - [x] Investor portfolio BFF + dividend history page + JWT refresh rotation
 - [x] Playwright E2E smoke suite (`frontend/e2e/`) in CI
+- [ ] Phase 10 institutional UI — governance, tax/withholding, surveillance, integrations admin (see [§16.6](#166-frontend--bff-planned--ui-not-in-phase-10-scope))
 
 See [docs/rules/investor-portal.md](rules/investor-portal.md), [docs/rules/admin-dashboard.md](rules/admin-dashboard.md), [docs/rules/api-gateway-bff.md](rules/api-gateway-bff.md), [docs/rules/e2e-testing.md](rules/e2e-testing.md).
 
@@ -1191,7 +1208,382 @@ Human-readable guide: [rules/phase-9-services.md](rules/phase-9-services.md).
 
 ---
 
-## 16. Diagram Index
+## 16. Phase 10 — Institutional Expansion
+
+Adapts institutional/DeFi expansion ideas (AVM feeds, custody, ramp, governance, surveillance) by **extending existing services** and adding **Governance Service** (`:8100`).
+
+Human-readable guide: [rules/phase-10-services.md](rules/phase-10-services.md).  
+Architecture: [diagrams/08-phase-10-institutional-expansion.puml](diagrams/08-phase-10-institutional-expansion.puml).
+
+### 16.1 Tier 1 — Integration Hub (implemented)
+
+- [x] Hub `VALUATION_FEED` + `CUSTODY` integration types; valuation feed webhook relay
+- [x] Fireblocks credential type on credential API (`IntegrationType.CUSTODY`)
+- [x] MoonPay/Stripe ramp via existing payment webhook path
+
+### 16.2 Tier 2 — Valuation depth (implemented)
+
+- [x] AVM feed ingest `POST /v1/valuations/feeds/{provider}`
+- [x] Outbox `valuation.nav.attested.v1` on approve
+
+### 16.3 Tier 3 — Tax, surveillance, governance (implemented)
+
+- [x] Payment configurable withholding on dividend payouts
+- [x] Reporting `TaxSummaryRecord` + `SurveillanceAlertRecord`
+- [x] Marketplace self-trade rejection on secondary buy
+- [x] Governance Service `:8100` — proposals, votes, `governance.proposal.closed` outbox
+
+### 16.4 Track backlog (528–552)
+
+| Track range | Focus |
+|-------------|-------|
+| 528–537 | Hub valuation feed + custody adapters |
+| 538–547 | Valuation feed ingest + NAV attestation |
+| 548–552 | Tax withholding; Reporting; Governance MVP; surveillance |
+
+### 16.5 New service
+
+| Service | Port | Folder |
+|---------|------|--------|
+| Governance | 8100 | `governance-service/` |
+
+**Still extend (not new services):** Payment escrow, Issuance deploy/transfer, Compliance limits — per platform rules.
+
+### 16.6 Frontend & BFF (planned — see §17)
+
+Phase 10 tracks **528–552** delivered **backend-only** institutional capabilities. Full UI/BFF backlog is **Phase 11** — see [§17](#17-phase-11--institutional-ui--bff).
+
+#### 16.6.1 Gateway & read-API prerequisites
+
+| Prerequisite | Owner | Notes |
+|--------------|-------|-------|
+| Gateway proxy `/api/v1/governance/**` → `:8100` | API Gateway | Match existing service route pattern |
+| `GET /v1/reports/tax-summaries` (paginated, filter by investor) | Reporting | Projections exist; query endpoint missing |
+| `GET /v1/reports/surveillance-alerts` (paginated, admin) | Reporting | Projections exist; query endpoint missing |
+| Payout/dividend API exposes `grossAmountUsd`, `withholdingAmountUsd`, `netAmountUsd` | Payment or BFF | Fields on `Payout` entity; investor dividends view needs them |
+| OpenAPI + codegen for governance + new reporting paths | `frontend/openapi/` | Regenerate `shared-api-types` |
+
+#### 16.6.2 Investor Portal (`frontend/investor-portal/`, `:5173`)
+
+| Route | Change | Backend |
+|-------|--------|---------|
+| `/dividends` | **Extend** — add Gross / Withholding / Net columns and YTD withholding summary | `GET /v1/investors/{id}/dividends` or enriched BFF |
+| `/governance` | **New** — list open proposals for flats in portfolio | `GET /v1/governance/proposals` + BFF filter by holdings |
+| `/governance/:proposalId` | **New** — proposal detail + FOR/AGAINST vote | `POST /v1/governance/proposals/{id}/votes` |
+| `/listings/:id` (secondary buy) | **Extend** — friendly error when self-trade blocked | Marketplace `ValidationException` → ProblemDetail `422` |
+| Nav (header) | Add **Governance** link when user holds tokens | — |
+
+**UX notes:** Show quorum progress bar (`votesFor` / `votesAgainst` vs `quorumPct`). Disable vote button after `closesAt` or when status ≠ `OPEN`. Use logged-in `investorId` from JWT for `CastVoteRequest`.
+
+#### 16.6.3 Admin Dashboard (`frontend/admin-dashboard/`, `:5174`)
+
+| Route | Change | Backend |
+|-------|--------|---------|
+| `/governance` | **New** — create proposal, list all, close | `POST /v1/governance/proposals`, `GET …/proposals`, `POST …/close` |
+| `/governance/:proposalId` | **New** — vote tally, close action, closed outcome | `ProposalView` |
+| `/integrations` | **New** — credential list + rotate for `VALUATION_FEED`, `CUSTODY` | Integration Hub credential API |
+| `/integrations/deliveries` | **New** — webhook delivery log (provider, type, status) | Integration Hub delivery records |
+| `/reports/compliance` | **New** — tax summaries table + surveillance alerts | Reporting query endpoints (16.6.1) |
+| `/buildings/:id` or flat detail | **Extend** — NAV attestation badge + last AVM feed timestamp | Valuation `GET /v1/valuations/…` + `nav.attested` metadata |
+| `/` (dashboard) | **Extend** — compliance widget: open surveillance alert count | BFF aggregate |
+
+**UX notes:** Governance create form: `flatId`, title, description, quorum %, closes-at (datetime). Integrations page: never display raw secrets after rotate — show last-four + provider only.
+
+#### 16.6.4 Tenant Portal
+
+No Phase 10 UI changes — institutional features target investors and platform operators.
+
+#### 16.6.5 Gateway BFF aggregates (planned)
+
+| BFF endpoint | Purpose |
+|--------------|---------|
+| `GET /v1/bff/investors/{id}/governance-proposals` | Open proposals filtered to investor's held `flatId`s |
+| `GET /v1/bff/admin/reports/compliance` | Tax summaries + surveillance alerts for admin compliance page |
+| Extend `GET /v1/bff/admin/reports/summary` | Add `openSurveillanceAlerts`, `ytdWithholdingUsd` counters |
+
+#### 16.6.6 E2E & CI (planned)
+
+- [ ] OpenAPI codegen includes governance + tax/surveillance report paths
+- [ ] Playwright smoke: investor governance vote flow (mock or test proposal)
+- [ ] Playwright smoke: admin surveillance alerts table renders
+- [ ] Extend `frontend/e2e/` admin + investor route coverage
+
+#### 16.6.7 Suggested UI track backlog (553–577)
+
+| Track range | Focus |
+|-------------|-------|
+| 553–557 | Gateway governance proxy; Reporting tax/surveillance read APIs; OpenAPI codegen |
+| 558–562 | Investor dividends withholding columns; self-trade error UX |
+| 563–567 | Investor governance list + vote pages |
+| 568–572 | Admin governance CRUD; integrations credentials page |
+| 573–577 | Admin compliance reports; NAV attestation on building detail; BFF aggregates; E2E |
+
+---
+
+## 17. Phase 11 — Institutional UI & BFF
+
+**Status:** Planned (tracks 553–577). Exposes Phase 10 backend in React portals and gateway BFF.
+
+Guide: [rules/phase-11-services.md](rules/phase-11-services.md)
+
+### 17.1 Goals
+
+- [ ] Gateway proxy `/api/v1/governance/**` → Governance `:8100`
+- [ ] Reporting read APIs: tax summaries, surveillance alerts
+- [ ] Investor: dividends withholding, governance vote, self-trade UX
+- [ ] Admin: governance CRUD, Hub integrations, compliance reports, NAV badge
+- [ ] OpenAPI codegen + Playwright E2E
+
+**No new microservices.**
+
+### 17.2 Gateway prerequisites
+
+| Prerequisite | Owner |
+|--------------|-------|
+| Proxy `/api/v1/governance/**` | API Gateway |
+| `GET /v1/reports/tax-summaries` | Reporting |
+| `GET /v1/reports/surveillance-alerts` | Reporting |
+| Dividend/payout gross/withholding/net fields | Payment or BFF |
+| `GET /v1/bff/investors/{id}/governance-proposals` | API Gateway |
+| `GET /v1/bff/admin/reports/compliance` | API Gateway |
+
+### 17.3 Investor Portal (`frontend/investor-portal/`, `:5173`)
+
+| Route | Change | Backend |
+|-------|--------|---------|
+| `/dividends` | Extend — Gross / Withholding / Net + YTD summary | Dividends or BFF |
+| `/governance` | New — open proposals for held flats | `GET /v1/governance/proposals` + BFF filter |
+| `/governance/:proposalId` | New — vote FOR/AGAINST, quorum bar | `POST /v1/governance/proposals/{id}/votes` |
+| `/listings/:id` | Extend — self-trade blocked error UX | Marketplace ProblemDetail |
+| Header nav | Add Governance link when user holds tokens | — |
+
+### 17.4 Admin Dashboard (`frontend/admin-dashboard/`, `:5174`)
+
+| Route | Change | Backend |
+|-------|--------|---------|
+| `/governance` | New — create, list, close proposals | Governance API |
+| `/integrations` | New — credentials for `VALUATION_FEED`, `CUSTODY` | Integration Hub |
+| `/integrations/deliveries` | New — webhook delivery log | Integration Hub |
+| `/reports/compliance` | New — tax + surveillance tables | Reporting |
+| `/buildings/:id` | Extend — NAV attestation badge | Valuation |
+
+Tenant portal: no Phase 11 changes.
+
+### 17.5 Track backlog (553–577)
+
+| Track range | Focus |
+|-------------|-------|
+| 553–557 | Gateway governance proxy; Reporting read APIs; OpenAPI codegen |
+| 558–562 | Investor dividends withholding; self-trade UX |
+| 563–567 | Investor governance list + vote |
+| 568–572 | Admin governance CRUD; integrations page |
+| 573–577 | Admin compliance reports; NAV badge; BFF aggregates; E2E |
+
+---
+
+## 18. Phase 12 — Universal Asset Tokenization
+
+**Status:** Planned (tracks 578–602). Tokenize **any real-estate asset** — not only flats in multi-unit buildings.
+
+Guide: [rules/phase-12-services.md](rules/phase-12-services.md) · Diagram: [diagrams/09-phase-12-asset-generalization.puml](diagrams/09-phase-12-asset-generalization.puml)
+
+### 18.1 Problem
+
+Current model: **Building → Flat → Token**. Works for apartments; awkward for a standalone house, land parcel, gym, or service station (each is typically **one asset, one SPV, one token series**).
+
+### 18.2 Solution — AssetUnit
+
+Generalize **Flat** → **`AssetUnit`** (alias or evolution):
+
+```text
+Building (optional 1:1 wrapper for standalone assets)
+  └── AssetUnit (house, land parcel, gym, pump island, flat 3B…)
+        └── TokenContract (ERC-1400)
+        └── Valuation / NAV
+        └── Documents (TITLE_DEED, OPERATING_LICENSE, …)
+        └── Income stream (rent / operator / membership)
+```
+
+### 18.3 Asset archetypes
+
+| Archetype | Examples | Typical income | Key documents |
+|-----------|----------|----------------|---------------|
+| Residential whole | House, villa | Rent / short-stay | Title deed, survey, zoning |
+| Land | Plot, agricultural, development | Appreciation; ground lease | Cadastral ref, land-use cert |
+| Operating commercial | Gym, pool, car wash, service station | Operator P&L, franchise | Operator agreement, licenses, environmental |
+| Hospitality / leisure | Hotel wing, marina | ADR × occupancy | Management agreement |
+| Industrial | Warehouse, logistics | Triple-net rent | Tenant lease, capex plan |
+
+### 18.4 New registry metadata
+
+| Field | Purpose |
+|-------|---------|
+| `propertyCategory` | Add `GYM`, `SWIMMING_POOL`, `SERVICE_STATION`, `HOSPITALITY`, … |
+| `operatingModel` | `PURE_RENT`, `OPERATOR_REVENUE_SHARE`, `MEMBERSHIP`, `DEVELOPMENT` |
+| `liquidityTier` | `TIER_1` (daily CLOB), `TIER_2` (weekly), `TIER_3` (RFQ only) — used by Phases 13–15 |
+| `licenseTypes[]` | Health permit, fuel storage, pool safety |
+| `developmentStage` | Land: `RAW` → `PERMITTED` → `STABILIZED` |
+| `environmentalRiskTier` | Gas stations, industrial |
+| `occupancyOrUtilization` | Hotel %, gym members, station throughput |
+
+### 18.5 Service extensions
+
+| Service | Deliverable |
+|---------|-------------|
+| Property Registry | AssetUnit API; expanded categories |
+| Rental | Operator revenue-share; non-lease income |
+| Valuation | KPI-linked NAV; land comparables |
+| Document | `OPERATING_LICENSE`, `FRANCHISE_AGREEMENT`, … |
+| Integration Hub | Operator P&L webhook adapter (optional) |
+| Marketplace / Search | Category + liquidity tier filters |
+
+### 18.6 Track backlog (578–602)
+
+| Track range | Focus |
+|-------------|-------|
+| 578–582 | Category enum; `operatingModel`, `liquidityTier` |
+| 583–587 | AssetUnit API; house + land registration |
+| 588–592 | Document types; compliance for operating licenses |
+| 593–597 | Operator revenue ingestion; valuation KPIs |
+| 598–602 | Marketplace/Search filters; integration tests; admin registration UI |
+
+---
+
+## 19. Phase 13 — RWA Order Book Exchange (CLOB)
+
+**Status:** Planned (tracks 603–627). Evolve Marketplace from listing-take to **central limit order book** with NAV guardrails.
+
+Guide: [rules/phase-13-services.md](rules/phase-13-services.md) · Diagram: [diagrams/10-phase-13-rwa-exchange.puml](diagrams/10-phase-13-rwa-exchange.puml)
+
+### 19.1 Exchange capabilities
+
+| Capability | Description |
+|------------|-------------|
+| **CLOB** | Bid/ask per property token (`TOKEN/USDC`); price-time priority; partial fills |
+| **NAV band** | Orders outside ±X% of attested NAV flagged or rejected |
+| **Market data** | Depth, trades, 24h volume, last vs NAV |
+| **Min tick / lot** | Per `liquidityTier` and asset category |
+| **Settlement** | Reuse existing saga: match → escrow → transfer → `trade.settled` |
+
+Listing-take remains fallback for `TIER_3` and thin markets.
+
+### 19.2 CLOB vs current MVP
+
+| | MVP (today) | Phase 13 |
+|---|-------------|----------|
+| Model | Seller listing → buyer takes | Limit order book |
+| Price | Fixed listing price | Limit / market vs best ask |
+| Partial fill | No | Yes |
+| NAV check | None on secondary | Band vs `nav.attested` |
+
+### 19.3 Exchange-native compliance
+
+KYC before match (existing) · jurisdiction restrictions · accredited-only partitions · self-trade/wash surveillance (Phase 10) · ERC-1400 holding period locks · tax reporting on trades.
+
+### 19.4 API sketch (Marketplace extension)
+
+- `POST /v1/exchange/orders` — place limit bid/ask
+- `DELETE /v1/exchange/orders/{id}` — cancel
+- `GET /v1/exchange/book/{contractId}` — depth
+- `GET /v1/exchange/trades/{contractId}` — recent trades
+- `GET /v1/exchange/ticker/{contractId}` — last, volume, navDelta
+
+Proposed Kafka: `order.placed`, `order.cancelled`, `trade.executed` (settlement unchanged).
+
+### 19.5 UI
+
+Investor: `/exchange/{contractId}` — depth chart, order entry, open orders.
+
+### 19.6 Track backlog (603–627)
+
+| Track range | Focus |
+|-------------|-------|
+| 603–607 | Order book schema; place/cancel API |
+| 608–612 | Matching engine; partial fills |
+| 613–617 | NAV band (Valuation client) |
+| 618–622 | Market data; SSE/WebSocket depth |
+| 623–627 | Integration tests; exchange UI; wash surveillance |
+
+**Evolve Marketplace `:8084`** — split to dedicated exchange service only at scale.
+
+---
+
+## 20. Phase 14 — AMM Liquidity Pools
+
+**Status:** Planned (tracks 628–652). **Automated market maker** pools (`PropertyToken ↔ USDC`) for `TIER_1` assets.
+
+Guide: [rules/phase-14-services.md](rules/phase-14-services.md)
+
+### 20.1 Goals
+
+- [ ] Pools per `TIER_1` contract (not raw land / pre-stabilization)
+- [ ] LP tokens; swap fees (protocol + optional SPV share)
+- [ ] **NAV circuit breaker** — pause when pool price diverges > Y% from attested NAV
+- [ ] Swaps via Payment escrow + Compliance KYC (same invariants)
+- [ ] Flash-loan protection hooks
+
+### 20.2 Pool lifecycle
+
+Admin/governance approves pool → seed liquidity → swaps (KYC) → `nav.attested` triggers breaker check → LP withdraw (lock period).
+
+### 20.3 Track backlog (628–652)
+
+| Track range | Focus |
+|-------------|-------|
+| 628–632 | Pool registry + create/seed |
+| 633–637 | Swap quote + execute |
+| 638–642 | LP deposit/withdraw; fees |
+| 643–647 | NAV circuit breaker |
+| 648–652 | Tests; investor swap UI; admin pools page |
+
+---
+
+## 21. Phase 15 — Institutional Exchange (OTC, Indices, Lending)
+
+**Status:** Planned (tracks 653–677). Institutional-grade trading and DeFi-adjacent products.
+
+Guide: [rules/phase-15-services.md](rules/phase-15-services.md)
+
+### 21.1 OTC / RFQ desk
+
+Block trades ($500k+) for `TIER_2`/`TIER_3` assets: request → quote → accept → compliance + escrow + on-chain settlement. Admin `/otc` queue.
+
+### 21.2 REIT-style index baskets
+
+Corporate Actions defines weighted basket of underlying tokens → index ERC-1400 token → rebalance events → aggregate dividends from underlying `payout.completed`. Examples: “US commercial operators”, “NNN industrial”, “Residential yield”.
+
+### 21.3 Token-collateral lending
+
+Stake property tokens → borrow USDC. Max LTV 50–65% of attested NAV (tier-dependent). Liquidation via CLOB/AMM/OTC. Ledger in Payment. Custody via Fireblocks (Phase 10). Requires Phases 13–14 for liquidation paths.
+
+### 21.4 Market Maker API
+
+Authenticated bulk quotes and order entry for institutions.
+
+### 21.5 Optional: cross-chain listing
+
+Integration Hub + Issuance bridge — secondary chain listing for foreign investors (sub-track if timeboxed).
+
+### 21.6 Track backlog (653–677)
+
+| Track range | Focus |
+|-------------|-------|
+| 653–657 | RFQ request/quote/accept; OTC settlement |
+| 658–662 | Index definition; index token issuance |
+| 663–667 | Index dividend aggregation; Reporting |
+| 668–672 | Collateral deposit, borrow, LTV; Payment ledger |
+| 673–677 | Liquidation; Market Maker API; institutional UI + E2E |
+
+### 21.7 UI summary (Phases 13–15)
+
+| Portal | Routes |
+|--------|--------|
+| Investor | `/exchange/{contractId}`, `/exchange/{contractId}/swap`, `/indices`, `/lending` |
+| Admin | `/pools`, `/otc`, `/indices/manage` |
+
+---
+
+## 22. Diagram Index
 
 | File | Description |
 |------|-------------|
@@ -1202,12 +1594,15 @@ Human-readable guide: [rules/phase-9-services.md](rules/phase-9-services.md).
 | [`diagrams/05-rent-flow.puml`](diagrams/05-rent-flow.puml) | Rent collection → dividend flow |
 | [`diagrams/06-kafka-events.puml`](diagrams/06-kafka-events.puml) | Event bus topology |
 | [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml) | Implementation phase timeline (Phases 0–6) |
+| [`diagrams/08-phase-10-institutional-expansion.puml`](diagrams/08-phase-10-institutional-expansion.puml) | Phase 10 Hub → Valuation/Payment/Governance extensions |
+| [`diagrams/09-phase-12-asset-generalization.puml`](diagrams/09-phase-12-asset-generalization.puml) | Phase 12 AssetUnit archetypes and income models |
+| [`diagrams/10-phase-13-rwa-exchange.puml`](diagrams/10-phase-13-rwa-exchange.puml) | Phases 13–15 CLOB, AMM, OTC, indices, settlement |
 
 **Render PlantUML:** Use [PlantUML online](https://www.plantuml.com/plantuml/uml/), VS Code PlantUML extension, or `plantuml docs/diagrams/*.puml`.
 
 ---
 
-## 17. Open Questions & Decisions
+## 23. Open Questions & Decisions
 
 | # | Question | Options | Decision |
 |---|----------|---------|----------|
@@ -1224,10 +1619,15 @@ Human-readable guide: [rules/phase-9-services.md](rules/phase-9-services.md).
 | 11 | Phase 6 first service | Reporting vs Settlement Saga vs Valuation | **Reporting** (`:8093`) — lowest risk, read-only, immediate admin value |
 | 12 | Corporate Actions extraction | Keep in Issuance vs dedicated service | **Dedicated service** — Issuance keeps deploy/transfer only |
 | 13 | Search backend | PostgreSQL vs OpenSearch | **OpenSearch** when listing/building count exceeds ~10k or full-text needed |
+| 14 | Flat vs AssetUnit | Rename `Flat` vs alias/wrapper | **TBD** — prefer backward-compatible alias in Phase 12 |
+| 15 | Exchange service split | Evolve Marketplace vs new `:8101` Exchange | **Evolve Marketplace** until volume justifies split |
+| 16 | AMM curve | Constant-product vs stable-swap for RE tokens | **TBD** — prototype constant-product with strict NAV breaker |
+| 17 | Index token standard | Wrapper contract vs ERC-1400 partition | **TBD** — Phase 15 spike with Issuance |
+| 18 | Lending scope | Payment module vs dedicated Lending service | **Payment module first**; dedicated service if LTV volume grows |
 
 ---
 
-## 18. Cursor Rules & Coding Standards
+## 24. Cursor Rules & Coding Standards
 
 Agent and IDE conventions live in `.cursor/rules/` (adapted from Titan fintech rules).
 

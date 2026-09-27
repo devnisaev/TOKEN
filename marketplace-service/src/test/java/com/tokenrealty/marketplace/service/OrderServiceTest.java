@@ -229,6 +229,31 @@ class OrderServiceTest {
     }
 
     @Test
+    @DisplayName("placeBuyOrder rejects self-trade on secondary listing")
+    void placeBuyOrder_rejectsSelfTrade() {
+        UUID sellerId = UUID.randomUUID();
+        listing.setListingType(Listing.ListingType.SECONDARY);
+        listing.setSellerInvestorId(sellerId);
+        listing.setSellerWallet("0xSeller");
+
+        PlaceOrderRequest request = PlaceOrderRequest.builder()
+                .listingId(listingId)
+                .buyerId(sellerId)
+                .buyerWallet("0xSeller")
+                .tokenAmount(10L)
+                .build();
+
+        when(listingRepository.findById(listingId)).thenReturn(Optional.of(listing));
+        when(complianceClient.checkWallet("0xSeller"))
+                .thenReturn(new ComplianceClient.ComplianceCheckResponse(
+                        "0xSeller", true, "APPROVED", sellerId, "US", null));
+
+        assertThatThrownBy(() -> orderService.placeBuyOrder(request))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining("Self-trading is not permitted");
+    }
+
+    @Test
     @DisplayName("placeBuyOrder on secondary listing matches pending sell order")
     void placeBuyOrderOnSecondaryMatchesPendingSellOrder() {
         listing.setListingType(Listing.ListingType.SECONDARY);

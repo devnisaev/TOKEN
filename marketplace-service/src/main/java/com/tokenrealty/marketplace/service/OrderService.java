@@ -75,6 +75,11 @@ public class OrderService {
                 && listing.getSellerWallet() != null) {
             assertWalletApproved(listing.getSellerWallet(), "Seller");
         }
+        if (listing.getListingType() == Listing.ListingType.SECONDARY
+                && listing.getSellerInvestorId() != null
+                && listing.getSellerInvestorId().equals(request.buyerId())) {
+            raiseValidation("Self-trading is not permitted on secondary listings");
+        }
 
         BigDecimal totalPrice = listing.getPriceUsd()
                 .multiply(BigDecimal.valueOf(request.tokenAmount()))

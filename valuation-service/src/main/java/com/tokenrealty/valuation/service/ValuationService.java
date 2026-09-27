@@ -96,6 +96,17 @@ public class ValuationService {
                         approvedAt,
                         reviewedBy));
 
+        valuationEventPublisher.publishNavAttested(
+                new ValuationEventPublisher.NavAttestedEvent(
+                        request.getFlatId(),
+                        request.getBuildingId(),
+                        request.getId(),
+                        snapshot.getId(),
+                        request.getValueUsd(),
+                        request.getTotalTokens(),
+                        navPerTokenUsd,
+                        approvedAt));
+
         return toResponse(request);
     }
 

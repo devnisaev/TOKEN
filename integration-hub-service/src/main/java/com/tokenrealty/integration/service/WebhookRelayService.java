@@ -3,6 +3,7 @@ package com.tokenrealty.integration.service;
 import com.tokenrealty.integration.client.ComplianceClient;
 import com.tokenrealty.integration.client.DocumentClient;
 import com.tokenrealty.integration.client.PaymentClient;
+import com.tokenrealty.integration.client.ValuationClient;
 import com.tokenrealty.integration.entity.IntegrationType;
 import com.tokenrealty.integration.dto.IntegrationDtos.IntegrationDeliveryView;
 import com.tokenrealty.integration.entity.IntegrationDelivery;
@@ -25,6 +26,7 @@ public class WebhookRelayService {
     private final ComplianceClient complianceClient;
     private final DocumentClient documentClient;
     private final PaymentClient paymentClient;
+    private final ValuationClient valuationClient;
 
     @Value("${tokenrealty.integration.retry.max-attempts:5}")
     private int maxAttempts;
@@ -59,6 +61,11 @@ public class WebhookRelayService {
             String signature) {
         UUID deliveryId = deliveryService.createPendingPaymentDelivery(
                 provider, rawBody, payloadDigest, signature);
+        relayDelivery(deliveryId);
+    }
+
+    public void acceptValuationFeedWebhook(String provider, String rawBody) {
+        UUID deliveryId = deliveryService.createPendingValuationFeedDelivery(provider, rawBody);
         relayDelivery(deliveryId);
     }
 
@@ -107,6 +114,10 @@ public class WebhookRelayService {
                     delivery.getPayload(),
                     delivery.getPayloadDigest(),
                     delivery.getSignature());
+            return;
+        }
+        if (delivery.getIntegrationType() == IntegrationType.VALUATION_FEED) {
+            valuationClient.forwardValuationFeedWebhook(delivery.getProvider(), delivery.getPayload());
             return;
         }
         complianceClient.forwardKycWebhook(

@@ -11,6 +11,7 @@ public final class ReportingKafkaEventTypes {
     public static final String SETTLEMENT_STUCK = "tokenrealty.settlement.stuck.v1";
     public static final String VALUATION_APPROVED = "tokenrealty.valuation.approved.v1";
     public static final String STOCK_SPLIT_COMPLETED = "tokenrealty.issuance.stock-split.completed.v1";
+    public static final String PAYOUT_COMPLETED = "tokenrealty.payment.payout.completed.v1";
 
     private ReportingKafkaEventTypes() {
     }

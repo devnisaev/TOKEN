@@ -1,0 +1,69 @@
+@startuml 10-phase-13-rwa-exchange
+' TokenRealty — Phase 13–15 RWA Exchange Architecture
+' Render: plantuml docs/diagrams/10-phase-13-rwa-exchange.puml
+
+title TokenRealty — RWA Exchange (Phases 13–15, Tracks 603–677)
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+package "Investor / Admin UI" as UI #LightGreen {
+  component "Order entry" as OE
+  component "Depth / book" as DEPTH
+  component "OTC desk" as OTC_UI
+}
+
+package "Marketplace / Exchange :8084" as MP #Gold {
+  component "CLOB\n(Phase 13)" as CLOB
+  component "Listing fallback\n(current MVP)" as LIST
+  component "RFQ / OTC\n(Phase 15)" as RFQ
+  component "Market Maker API" as MM
+}
+
+package "Liquidity (Phase 14)" as LIQ #Wheat {
+  component "AMM pools\nToken ↔ USDC" as AMM
+  component "NAV circuit breaker" as CB
+}
+
+package "Core settlement" as CORE #LightBlue {
+  component "Payment :8085" as PAY
+  component "Compliance :8087" as COMP
+  component "Issuance :8082" as ISS
+  component "Valuation :8095" as VAL
+  component "Corporate Actions :8097" as CA
+}
+
+queue "Kafka" as KAFKA
+database "PostgreSQL" as PG
+
+UI --> CLOB
+UI --> AMM
+UI --> RFQ
+CLOB --> COMP : KYC before match
+CLOB --> PAY : escrow
+CLOB --> ISS : transfer
+VAL --> CLOB : NAV band / oracle
+VAL --> CB
+AMM --> CB
+AMM --> PAY
+RFQ --> PAY
+CA --> MP : index rebalance
+
+MP --> KAFKA : order.matched\ntrade.settled
+PAY --> KAFKA
+VAL --> KAFKA : nav.attested
+
+note bottom of CLOB
+  Pairs: TOKEN/USDC
+  NAV band: orders outside ±X%
+  of attested NAV need review
+  liquidityTier per asset
+end note
+
+note right of CA
+  Phase 15: REIT-style
+  index baskets + dividend
+  from underlying payouts
+end note
+
+@enduml

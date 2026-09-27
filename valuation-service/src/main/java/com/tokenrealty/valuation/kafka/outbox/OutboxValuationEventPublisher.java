@@ -19,6 +19,9 @@ public class OutboxValuationEventPublisher implements ValuationEventPublisher {
     @Value("${tokenrealty.kafka.topic.valuation-approved:" + ValuationKafkaEventTypes.VALUATION_APPROVED + "}")
     private String valuationApprovedTopic;
 
+    @Value("${tokenrealty.kafka.topic.nav-attested:" + ValuationKafkaEventTypes.NAV_ATTESTED + "}")
+    private String navAttestedTopic;
+
     @Override
     public void publishValuationUpdated(ValuationUpdatedEvent event) {
         OutboxPayload.start()
@@ -44,5 +47,19 @@ public class OutboxValuationEventPublisher implements ValuationEventPublisher {
                 .put("approvedAt", event.approvedAt().toString())
                 .put("reviewedBy", event.reviewedBy())
                 .enqueue(outboxWriter, valuationApprovedTopic, event.flatId().toString());
+    }
+
+    @Override
+    public void publishNavAttested(NavAttestedEvent event) {
+        OutboxPayload.start()
+                .put("flatId", event.flatId())
+                .put("buildingId", event.buildingId())
+                .put("valuationRequestId", event.valuationRequestId())
+                .put("navSnapshotId", event.navSnapshotId())
+                .put("valueUsd", event.valueUsd().toPlainString())
+                .put("totalTokens", event.totalTokens())
+                .put("navPerTokenUsd", event.navPerTokenUsd().toPlainString())
+                .put("attestedAt", event.attestedAt().toString())
+                .enqueue(outboxWriter, navAttestedTopic, event.flatId().toString());
     }
 }

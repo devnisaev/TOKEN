@@ -29,6 +29,12 @@ public class Payout extends BaseEntity {
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
 
+    @Column(name = "gross_amount_usd", precision = 19, scale = 2)
+    private BigDecimal grossAmountUsd;
+
+    @Column(name = "withholding_amount_usd", precision = 19, scale = 2)
+    private BigDecimal withholdingAmountUsd;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     private PaymentCurrency currency;

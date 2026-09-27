@@ -2,6 +2,7 @@ package com.tokenrealty.payment.kafka.events;
 
 import com.tokenrealty.payment.entity.Payout;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -12,6 +13,9 @@ public record PayoutCompletedEvent(
         String recipientWallet,
         Payout.PayoutPurpose purpose,
         String txHash,
-        Instant completedAt
+        Instant completedAt,
+        BigDecimal grossAmountUsd,
+        BigDecimal withholdingAmountUsd,
+        BigDecimal netAmountUsd
 ) {
 }

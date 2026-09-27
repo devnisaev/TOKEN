@@ -75,8 +75,24 @@ public final class PaymentDtos {
             UUID flatId,
             UUID tenantId,
             @Size(max = 20) String period,
-            UUID dividendPaymentId
+            UUID dividendPaymentId,
+            BigDecimal grossAmountUsd,
+            BigDecimal withholdingAmountUsd
     ) {
+        public CreatePayoutRequest(
+                UUID recipientInvestorId,
+                String recipientWallet,
+                BigDecimal amount,
+                PaymentCurrency currency,
+                Payout.PayoutPurpose purpose,
+                UUID referenceId,
+                UUID flatId,
+                UUID tenantId,
+                String period,
+                UUID dividendPaymentId) {
+            this(recipientInvestorId, recipientWallet, amount, currency, purpose,
+                    referenceId, flatId, tenantId, period, dividendPaymentId, null, null);
+        }
     }
 
     @Builder
