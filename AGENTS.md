@@ -119,9 +119,13 @@ Institutional exchange: OTC/RFQ desk, REIT-style index baskets, token-collateral
 
 Institutional exchange completion: index dividend aggregation, loan liquidation, OTC surveillance, index token issuance, cross-chain bridge MVP. See [docs/PLATFORM-SPEC.md §22](docs/PLATFORM-SPEC.md#22-phase-16--institutional-exchange-completion) and [docs/rules/phase-16-services.md](docs/rules/phase-16-services.md).
 
-### Phase 17 — in progress (roadmap)
+### Phase 17 — complete
 
-ESG metrics, IoT utilization feeds, insurance metadata, operator KPI dashboards. Tracks 703–727 — [phase-17-services.md](docs/rules/phase-17-services.md).
+ESG metrics, IoT utilization feeds, insurance metadata, reporting ESG snapshots, admin/investor sustainability UI. See [docs/PLATFORM-SPEC.md §23](docs/PLATFORM-SPEC.md#23-phase-17--esg--asset-operations) and [docs/rules/phase-17-services.md](docs/rules/phase-17-services.md).
+
+### Phase 18 — in progress (roadmap)
+
+Operator KPI dashboards, asset health scores, insurance expiry alerts. Tracks 728–752 — [phase-18-services.md](docs/rules/phase-18-services.md).
 
 **Do not spin out:** limits/policy service, config service, Payment escrow, Issuance deploy/transfer core.
 

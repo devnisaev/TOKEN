@@ -22,6 +22,7 @@ import type {
   CreateGovernanceProposalRequest,
   CreateIndexRequest,
   CreateLiquidityPoolRequest,
+  EsgProfile,
   GovernanceProposal,
   LiquidityPool,
   PropertyIndex,
@@ -237,6 +238,10 @@ export const api = {
   },
 
   listSurveillanceAlerts() {
-    return request<SpringPage<SurveillanceAlertItem>>('/v1/reporting/surveillance-alerts?size=50');
+    return request<SpringPage<SurveillanceAlertItem>>('/v1/reports/surveillance-alerts?size=50');
+  },
+
+  listEsgProfiles() {
+    return request<EsgProfile[]>('/v1/esg');
   },
 };

@@ -86,6 +86,17 @@ export interface PropertyIndex {
   createdAt: string;
 }
 
+export interface EsgProfile {
+  id: string;
+  flatId: string | null;
+  buildingId: string;
+  carbonScore: number | null;
+  energyRating: string | null;
+  environmentalRiskTier: string | null;
+  lastAssessedAt: string | null;
+  createdAt: string;
+}
+
 export interface CreateIndexRequest {
   name: string;
   symbol: string;

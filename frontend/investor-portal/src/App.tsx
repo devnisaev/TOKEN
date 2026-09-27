@@ -16,6 +16,7 @@ import { ExchangePage } from '@/pages/ExchangePage';
 import { PoolSwapPage } from '@/pages/PoolSwapPage';
 import { IndicesPage } from '@/pages/IndicesPage';
 import { LendingPage } from '@/pages/LendingPage';
+import { SustainabilityPage } from '@/pages/SustainabilityPage';
 
 export function App() {
   return (
@@ -39,6 +40,7 @@ export function App() {
           <Route path="exchange/:contractId/swap" element={<PoolSwapPage />} />
           <Route path="indices" element={<IndicesPage />} />
           <Route path="lending" element={<LendingPage />} />
+          <Route path="assets/:flatId/sustainability" element={<SustainabilityPage />} />
           <Route path="dividends" element={<DividendsPage />} />
           <Route path="governance" element={<GovernancePage />} />
           <Route path="governance/:proposalId" element={<GovernanceDetailPage />} />

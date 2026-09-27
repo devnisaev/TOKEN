@@ -50,9 +50,10 @@ Real-estate tokenization platform — fractional property ownership, crypto paym
 | Phase 14 | Complete | 628–652 | [phase-14-services.md](docs/rules/phase-14-services.md) — AMM liquidity pools |
 | Phase 15 | Complete | 653–677 | [phase-15-services.md](docs/rules/phase-15-services.md) — OTC, indices, lending |
 | Phase 16 | Complete | 678–702 | [phase-16-services.md](docs/rules/phase-16-services.md) — exchange completion, liquidation, bridge |
-| Phase 17 | In progress | 703–727 | [phase-17-services.md](docs/rules/phase-17-services.md) — ESG, IoT feeds, insurance |
+| Phase 17 | Complete | 703–727 | [phase-17-services.md](docs/rules/phase-17-services.md) — ESG, IoT feeds, insurance |
+| Phase 18 | In progress | 728–752 | [phase-18-services.md](docs/rules/phase-18-services.md) — operator KPIs, asset health |
 
-**Platform status:** Phases 0–16 complete (tracks 1–702). Phase 17 ESG & asset operations (703–727) in progress.
+**Platform status:** Phases 0–17 complete (tracks 1–727). Phase 18 operator analytics (728–752) in progress.
 
 ## Shared libraries
 

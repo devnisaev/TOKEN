@@ -22,6 +22,7 @@ import { PoolsPage } from '@/pages/PoolsPage';
 import { OtcPage } from '@/pages/OtcPage';
 import { IndicesManagePage } from '@/pages/IndicesManagePage';
 import { SurveillancePage } from '@/pages/SurveillancePage';
+import { EsgPage } from '@/pages/EsgPage';
 
 export function App() {
   return (
@@ -49,6 +50,7 @@ export function App() {
           <Route path="otc" element={<OtcPage />} />
           <Route path="indices/manage" element={<IndicesManagePage />} />
           <Route path="surveillance" element={<SurveillancePage />} />
+          <Route path="esg" element={<EsgPage />} />
           <Route path="orders/:orderId" element={<OrderDetailPage />} />
           <Route path="compliance" element={<CompliancePage />} />
           <Route path="document-reviews" element={<DocumentReviewsPage />} />

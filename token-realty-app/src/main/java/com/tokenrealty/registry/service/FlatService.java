@@ -114,6 +114,13 @@ public class FlatService {
     }
 
     @Transactional
+    public FlatResponse updateOccupancy(UUID id, UpdateOccupancyRequest request) {
+        Flat flat = getOrThrow(id);
+        flat.setOccupancyOrUtilization(request.occupancyOrUtilization());
+        return mapper.toFlatResponse(flatRepository.save(flat));
+    }
+
+    @Transactional
     public FlatResponse updateStatus(UUID id, Flat.FlatStatus newStatus) {
         Flat flat = getOrThrow(id);
         log.info("Flat {} status {} -> {}", id, flat.getStatus(), newStatus);

@@ -3,6 +3,8 @@ package com.tokenrealty.integration.dto;
 import com.tokenrealty.integration.entity.IntegrationDeliveryStatus;
 import com.tokenrealty.integration.entity.IntegrationType;
 import com.tokenrealty.integration.entity.BridgeTransfer;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -53,6 +55,24 @@ public final class IntegrationDtos {
             @NotNull UUID investorId,
             @NotBlank @Size(max = 66) String walletAddress,
             @NotNull @Min(1) Long tokenAmount
+    ) {
+    }
+
+    @Builder
+    public record IngestIotReadingRequest(
+            @NotNull UUID flatId,
+            @NotBlank @Size(max = 64) String provider,
+            @NotNull @DecimalMin("0") @DecimalMax("100") java.math.BigDecimal occupancyPct
+    ) {
+    }
+
+    @Builder
+    public record IotReadingResponse(
+            UUID id,
+            UUID flatId,
+            String provider,
+            java.math.BigDecimal occupancyPct,
+            Instant recordedAt
     ) {
     }
 

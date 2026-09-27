@@ -66,6 +66,15 @@ public class FlatController {
         return flatService.update(id, request);
     }
 
+    @PatchMapping("/flats/{id}/occupancy")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROPERTY_MANAGER')")
+    @Operation(summary = "Update occupancy/utilization from IoT feed")
+    public FlatResponse updateOccupancy(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateOccupancyRequest request) {
+        return flatService.updateOccupancy(id, request);
+    }
+
     @PatchMapping("/flats/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update flat status")

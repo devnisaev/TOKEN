@@ -1,21 +1,18 @@
 package com.tokenrealty.reporting.controller;
 
-import com.tokenrealty.reporting.dto.ReportingDtos.DividendsResponse;
-import com.tokenrealty.reporting.dto.ReportingDtos.OccupancyResponse;
-import com.tokenrealty.reporting.dto.ReportingDtos.RegulatoryExportResponse;
-import com.tokenrealty.reporting.dto.ReportingDtos.SurveillanceAlertItem;
-import com.tokenrealty.reporting.dto.ReportingDtos.TaxSummaryItem;
-import com.tokenrealty.reporting.dto.ReportingDtos.TradingSummaryResponse;
+import com.tokenrealty.reporting.dto.ReportingDtos.*;
+import com.tokenrealty.reporting.service.EsgSnapshotService;
 import com.tokenrealty.reporting.service.ReportingQueryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -24,6 +21,7 @@ import java.util.UUID;
 public class ReportingController {
 
     private final ReportingQueryService queryService;
+    private final EsgSnapshotService esgSnapshotService;
 
     @GetMapping("/trading-summary")
     public TradingSummaryResponse tradingSummary() {
@@ -57,5 +55,20 @@ public class ReportingController {
     public Page<SurveillanceAlertItem> surveillanceAlerts(
             @PageableDefault(size = 20) Pageable pageable) {
         return queryService.surveillanceAlerts(pageable);
+    }
+
+    @GetMapping("/esg-snapshots")
+    public List<EsgSnapshotItem> esgSnapshots(
+            @RequestParam(required = false) UUID buildingId) {
+        return buildingId != null
+                ? esgSnapshotService.listByBuilding(buildingId)
+                : esgSnapshotService.listAll();
+    }
+
+    @PostMapping("/esg-snapshots")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
+    public EsgSnapshotItem recordEsgSnapshot(@Valid @RequestBody RecordEsgSnapshotRequest request) {
+        return esgSnapshotService.record(request);
     }
 }

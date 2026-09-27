@@ -340,4 +340,54 @@ public class PropertyDtos {
             String uploadedBy,
             Instant createdAt
     ) {}
+
+    // ─── ESG & Insurance (Phase 17) ─────────────────────────────────────────
+
+    @Builder
+    public record UpsertEsgProfileRequest(
+            UUID flatId,
+            @NotNull UUID buildingId,
+            @DecimalMin("0") @DecimalMax("100") BigDecimal carbonScore,
+            EsgProfile.EnergyRating energyRating,
+            EsgProfile.EnvironmentalRiskTier environmentalRiskTier
+    ) {}
+
+    @Builder
+    public record EsgProfileResponse(
+            UUID id,
+            UUID flatId,
+            UUID buildingId,
+            BigDecimal carbonScore,
+            EsgProfile.EnergyRating energyRating,
+            EsgProfile.EnvironmentalRiskTier environmentalRiskTier,
+            Instant lastAssessedAt,
+            Instant createdAt
+    ) {}
+
+    @Builder
+    public record CreateInsurancePolicyRequest(
+            UUID flatId,
+            @NotNull UUID buildingId,
+            @NotBlank @Size(max = 120) String provider,
+            @NotBlank @Size(max = 64) String policyNumber,
+            @NotNull @DecimalMin("0.01") BigDecimal coverageUsd,
+            @NotNull Instant expiresAt
+    ) {}
+
+    @Builder
+    public record InsurancePolicyResponse(
+            UUID id,
+            UUID flatId,
+            UUID buildingId,
+            String provider,
+            String policyNumber,
+            BigDecimal coverageUsd,
+            Instant expiresAt,
+            InsurancePolicy.PolicyStatus status,
+            Instant createdAt
+    ) {}
+
+    public record UpdateOccupancyRequest(
+            @NotNull @DecimalMin("0") @DecimalMax("100") BigDecimal occupancyOrUtilization
+    ) {}
 }

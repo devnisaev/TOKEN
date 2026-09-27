@@ -144,6 +144,17 @@ export interface IndexConstituent {
   weightBps: number;
 }
 
+export interface EsgProfile {
+  id: string;
+  flatId: string | null;
+  buildingId: string;
+  carbonScore: number | null;
+  energyRating: string | null;
+  environmentalRiskTier: string | null;
+  lastAssessedAt: string | null;
+  createdAt: string;
+}
+
 export interface PropertyIndex {
   id: string;
   name: string;

@@ -459,6 +459,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 | **Phase 14** | AMM liquidity pools ✅ | Token/USDC pools, LP tokens, NAV circuit breakers (628–652) |
 | **Phase 15** | Institutional exchange ✅ | OTC/RFQ, REIT-style index baskets, token-collateral lending (653–677) |
 | **Phase 16** | Exchange completion ✅ | Index dividends, liquidation, surveillance, bridge (678–702) |
+| **Phase 17** | ESG & asset operations ✅ | IoT feeds, insurance, ESG profiles (703–727) |
 
 See diagrams: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml), [`diagrams/09-phase-12-asset-generalization.puml`](diagrams/09-phase-12-asset-generalization.puml), [`diagrams/10-phase-13-rwa-exchange.puml`](diagrams/10-phase-13-rwa-exchange.puml).
 
@@ -1610,7 +1611,34 @@ Guide: [rules/phase-16-services.md](rules/phase-16-services.md)
 
 ---
 
-## 23. Diagram Index
+## 23. Phase 17 — ESG & Asset Operations
+
+**Status:** Complete (tracks 703–727). ESG metrics, IoT utilization feeds, insurance metadata, operator KPI dashboards.
+
+Guide: [rules/phase-17-services.md](rules/phase-17-services.md)
+
+### 23.1 Goals
+
+- [x] ESG profile CRUD (`/v1/esg`) — carbon score, energy rating, environmental risk tier
+- [x] Insurance policy registry (`/v1/insurance`)
+- [x] IoT reading ingest (`/v1/integrations/iot/readings`) → flat occupancy update
+- [x] Reporting ESG snapshot projections
+- [x] Admin ESG dashboard (`/esg`)
+- [x] Investor sustainability page (`/assets/:flatId/sustainability`)
+
+### 23.2 Track backlog (703–727)
+
+| Track range | Focus |
+|-------------|-------|
+| 703–707 | ESG profile entity + API |
+| 708–712 | IoT feed ingest; Registry occupancy sync |
+| 713–717 | Insurance policy entity + API |
+| 718–722 | Reporting ESG projections |
+| 723–727 | Admin/investor UI; E2E tests |
+
+---
+
+## 24. Diagram Index
 
 | File | Description |
 |------|-------------|

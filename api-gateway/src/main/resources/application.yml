@@ -91,6 +91,9 @@ tokenrealty:
           - /api/v1/flats
           - /api/v1/spv
           - /api/v1/documents
+          - /api/v1/esg
+          - /api/v1/insurance
+          - /api/v1/asset-units
       - id: token-issuance
         target: http://localhost:8082
         paths:

@@ -79,4 +79,26 @@ public final class ReportingDtos {
             Instant detectedAt
     ) {
     }
+
+    public record RecordEsgSnapshotRequest(
+            UUID flatId,
+            UUID buildingId,
+            BigDecimal carbonScore,
+            String energyRating,
+            String environmentalRiskTier,
+            BigDecimal occupancyPct
+    ) {
+    }
+
+    public record EsgSnapshotItem(
+            UUID id,
+            UUID flatId,
+            UUID buildingId,
+            BigDecimal carbonScore,
+            String energyRating,
+            String environmentalRiskTier,
+            BigDecimal occupancyPct,
+            Instant snapshotAt
+    ) {
+    }
 }

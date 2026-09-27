@@ -8,6 +8,7 @@ import type {
   BookDepthResponse,
   ExchangeOrder,
   ExchangeTicker,
+  EsgProfile,
   LendingDashboard,
   LiquidityPool,
   PoolSwap,
@@ -154,6 +155,10 @@ export const api = {
 
   listIndices() {
     return request<PropertyIndex[]>('/v1/corporate-actions/indices');
+  },
+
+  getEsgByFlat(flatId: string) {
+    return request<EsgProfile>(`/v1/esg/by-flat/${flatId}`);
   },
 
   getLendingDashboard(investorId: string) {

@@ -27,6 +27,8 @@ services:
     url: ${VALUATION_URL:http://localhost:8095/api}
   rental:
     url: ${RENTAL_URL:http://localhost:8086/api}
+  property-registry:
+    url: ${PROPERTY_REGISTRY_URL:http://localhost:8081/api}
 
 tokenrealty:
   jwt:
