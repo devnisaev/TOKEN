@@ -1,6 +1,6 @@
 # Phase 15 — Institutional Exchange (OTC, Indices, Lending)
 
-**Status:** Planned (tracks 653–677). **OTC/RFQ desk**, **REIT-style index baskets**, and **token-collateral lending** for mature secondary markets.
+**Status:** Complete (tracks 653–677). **OTC/RFQ desk**, **REIT-style index baskets**, and **token-collateral lending** for mature secondary markets.
 
 Master spec: [PLATFORM-SPEC.md §21](../PLATFORM-SPEC.md#21-phase-15--institutional-exchange-otc-indices-lending) · Diagram: [10-phase-13-rwa-exchange.puml](../diagrams/10-phase-13-rwa-exchange.puml)
 

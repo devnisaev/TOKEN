@@ -139,6 +139,50 @@ export interface PoolSwap {
   createdAt: string;
 }
 
+export interface IndexConstituent {
+  contractId: string;
+  weightBps: number;
+}
+
+export interface PropertyIndex {
+  id: string;
+  name: string;
+  symbol: string;
+  description: string | null;
+  indexContractId: string | null;
+  status: string;
+  constituents: IndexConstituent[];
+  createdAt: string;
+}
+
+export interface LendingDashboard {
+  investorId: string;
+  totalCollateralUsd: number;
+  totalOutstandingUsd: number;
+  availableBorrowUsd: number;
+  collateral: Array<{
+    id: string;
+    investorId: string;
+    contractId: string;
+    tokenAmount: number;
+    navPerTokenUsd: number;
+    collateralValueUsd: number;
+    liquidityTier: string;
+    status: string;
+    createdAt: string;
+  }>;
+  loans: Array<{
+    id: string;
+    investorId: string;
+    collateralPositionId: string;
+    principalUsd: number;
+    outstandingUsd: number;
+    interestRateBps: number;
+    status: string;
+    createdAt: string;
+  }>;
+}
+
 export interface Order {
   id: string;
   listingId: string;

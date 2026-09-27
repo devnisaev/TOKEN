@@ -19,6 +19,8 @@ import { OrderDetailPage } from '@/pages/OrderDetailPage';
 import { OrdersPage } from '@/pages/OrdersPage';
 import { StandaloneAssetFormPage } from '@/pages/StandaloneAssetFormPage';
 import { PoolsPage } from '@/pages/PoolsPage';
+import { OtcPage } from '@/pages/OtcPage';
+import { IndicesManagePage } from '@/pages/IndicesManagePage';
 
 export function App() {
   return (
@@ -43,6 +45,8 @@ export function App() {
           <Route path="buildings/:buildingId" element={<BuildingDetailPage />} />
           <Route path="orders" element={<OrdersPage />} />
           <Route path="pools" element={<PoolsPage />} />
+          <Route path="otc" element={<OtcPage />} />
+          <Route path="indices/manage" element={<IndicesManagePage />} />
           <Route path="orders/:orderId" element={<OrderDetailPage />} />
           <Route path="compliance" element={<CompliancePage />} />
           <Route path="document-reviews" element={<DocumentReviewsPage />} />

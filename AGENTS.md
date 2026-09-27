@@ -111,11 +111,13 @@ RWA order book (CLOB) in Marketplace — limit orders, matching engine, NAV band
 
 AMM liquidity pools in Marketplace — constant-product swaps, LP positions, NAV circuit breakers on `nav.attested`, investor swap UI, admin pools page. See [docs/PLATFORM-SPEC.md §20](docs/PLATFORM-SPEC.md#20-phase-14--amm-liquidity-pools) and [docs/rules/phase-14-services.md](docs/rules/phase-14-services.md).
 
-### Phase 15 — planned (roadmap)
+### Phase 15 — complete
 
-| Phase | Focus | Tracks | Guide |
-|-------|-------|--------|-------|
-| 15 | OTC/RFQ, index baskets, token-collateral lending | 653–677 | [phase-15-services.md](docs/rules/phase-15-services.md) |
+Institutional exchange: OTC/RFQ desk, REIT-style index baskets, token-collateral lending, market maker bulk API. See [docs/PLATFORM-SPEC.md §21](docs/PLATFORM-SPEC.md#21-phase-15--institutional-exchange-otc-indices-lending) and [docs/rules/phase-15-services.md](docs/rules/phase-15-services.md).
+
+### Phase 16 — in progress (roadmap)
+
+Institutional exchange completion: index dividend aggregation, loan liquidation, OTC surveillance, index token issuance, cross-chain bridge MVP. Tracks 678–702 — [phase-16-services.md](docs/rules/phase-16-services.md).
 
 **Do not spin out:** limits/policy service, config service, Payment escrow, Issuance deploy/transfer core.
 

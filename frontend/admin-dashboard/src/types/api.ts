@@ -53,6 +53,47 @@ export interface CreateLiquidityPoolRequest {
   lpLockDays?: number;
 }
 
+export interface RfqRequest {
+  id: string;
+  contractId: string;
+  flatId: string;
+  buildingId: string;
+  side: string;
+  tokenAmount: number;
+  notionalUsd: number;
+  requesterId: string;
+  walletAddress: string;
+  liquidityTier: string;
+  expiresAt: string;
+  status: string;
+  acceptedQuoteId: string | null;
+  createdAt: string;
+}
+
+export interface IndexConstituent {
+  contractId: string;
+  weightBps: number;
+}
+
+export interface PropertyIndex {
+  id: string;
+  name: string;
+  symbol: string;
+  description: string | null;
+  indexContractId: string | null;
+  status: string;
+  constituents: IndexConstituent[];
+  createdAt: string;
+}
+
+export interface CreateIndexRequest {
+  name: string;
+  symbol: string;
+  description?: string;
+  indexContractId?: string;
+  constituents: IndexConstituent[];
+}
+
 export interface CreateStandaloneAssetRequest {
   name: string;
   address: string;

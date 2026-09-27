@@ -14,6 +14,8 @@ import { PortfolioPage } from '@/pages/PortfolioPage';
 import { SellTokensPage } from '@/pages/SellTokensPage';
 import { ExchangePage } from '@/pages/ExchangePage';
 import { PoolSwapPage } from '@/pages/PoolSwapPage';
+import { IndicesPage } from '@/pages/IndicesPage';
+import { LendingPage } from '@/pages/LendingPage';
 
 export function App() {
   return (
@@ -35,6 +37,8 @@ export function App() {
           <Route path="portfolio/sell/:contractId" element={<SellTokensPage />} />
           <Route path="exchange/:contractId" element={<ExchangePage />} />
           <Route path="exchange/:contractId/swap" element={<PoolSwapPage />} />
+          <Route path="indices" element={<IndicesPage />} />
+          <Route path="lending" element={<LendingPage />} />
           <Route path="dividends" element={<DividendsPage />} />
           <Route path="governance" element={<GovernancePage />} />
           <Route path="governance/:proposalId" element={<GovernanceDetailPage />} />

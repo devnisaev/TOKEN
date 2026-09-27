@@ -3,6 +3,7 @@ package com.tokenrealty.marketplace.dto;
 import com.tokenrealty.marketplace.entity.Listing;
 import com.tokenrealty.marketplace.entity.MarketOrder;
 import com.tokenrealty.marketplace.entity.Trade;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 
@@ -10,6 +11,8 @@ import com.tokenrealty.marketplace.entity.ExchangeFill;
 import com.tokenrealty.marketplace.entity.ExchangeOrder;
 import com.tokenrealty.marketplace.entity.LiquidityPool;
 import com.tokenrealty.marketplace.entity.PoolSwap;
+import com.tokenrealty.marketplace.entity.RfqQuote;
+import com.tokenrealty.marketplace.entity.RfqRequest;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -338,6 +341,79 @@ public final class MarketplaceDtos {
             UUID paymentId,
             PoolSwap.SwapStatus status,
             Instant createdAt
+    ) {
+    }
+
+    @Builder
+    public record CreateRfqRequest(
+            @NotNull UUID contractId,
+            @NotNull UUID flatId,
+            @NotNull UUID buildingId,
+            @NotNull RfqRequest.RfqSide side,
+            @NotNull @Min(1) Long tokenAmount,
+            @NotNull @DecimalMin("0.01") BigDecimal indicativePriceUsd,
+            @NotNull UUID requesterId,
+            @NotBlank @Size(max = 66) String walletAddress,
+            @Size(max = 20) String liquidityTier,
+            @NotNull Instant expiresAt
+    ) {
+    }
+
+    @Builder
+    public record SubmitRfqQuoteRequest(
+            @NotNull UUID quoterId,
+            @NotBlank @Size(max = 66) String walletAddress,
+            @NotNull @DecimalMin("0.01") BigDecimal pricePerTokenUsd
+    ) {
+    }
+
+    @Builder
+    public record AcceptRfqQuoteRequest(
+            @NotNull UUID requesterId,
+            @NotNull UUID quoteId
+    ) {
+    }
+
+    @Builder
+    public record RfqRequestResponse(
+            UUID id,
+            UUID contractId,
+            UUID flatId,
+            UUID buildingId,
+            RfqRequest.RfqSide side,
+            long tokenAmount,
+            BigDecimal notionalUsd,
+            UUID requesterId,
+            String walletAddress,
+            String liquidityTier,
+            Instant expiresAt,
+            RfqRequest.RfqStatus status,
+            UUID acceptedQuoteId,
+            Instant createdAt
+    ) {
+    }
+
+    @Builder
+    public record RfqQuoteResponse(
+            UUID id,
+            UUID rfqRequestId,
+            UUID quoterId,
+            String walletAddress,
+            BigDecimal pricePerTokenUsd,
+            BigDecimal totalPriceUsd,
+            RfqQuote.QuoteStatus status,
+            Instant createdAt
+    ) {
+    }
+
+    public record BulkExchangeOrderRequest(
+            @NotNull @Size(min = 1, max = 50) List<@Valid PlaceExchangeOrderRequest> orders
+    ) {
+    }
+
+    public record BulkExchangeOrderResponse(
+            int placedCount,
+            List<ExchangeOrderResponse> orders
     ) {
     }
 }

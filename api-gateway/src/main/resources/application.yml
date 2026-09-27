@@ -115,6 +115,7 @@ tokenrealty:
           - /api/v1/payments
           - /api/v1/payouts
           - /api/v1/wallet-balances
+          - /api/v1/lending
       - id: rental
         target: http://localhost:8086
         paths:

@@ -4,5 +4,8 @@ public enum LedgerAccountCode {
     ESCROW,
     INVESTOR_AVAILABLE,
     PLATFORM_FEE,
-    SPV_COLLECTION
+    SPV_COLLECTION,
+    COLLATERAL,
+    LOAN_PRINCIPAL,
+    LOAN_INTEREST
 }

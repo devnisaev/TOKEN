@@ -30,6 +30,27 @@ public class LedgerService {
                 LedgerEntry.EntryType.CREDIT, amount, currency);
     }
 
+    public void recordBorrow(UUID loanId, BigDecimal amount, PaymentCurrency currency) {
+        UUID transactionId = UUID.randomUUID();
+        saveEntry(transactionId, null, null, LedgerAccountCode.LOAN_PRINCIPAL,
+                LedgerEntry.EntryType.DEBIT, amount, currency, loanId);
+        saveEntry(transactionId, null, null, LedgerAccountCode.INVESTOR_AVAILABLE,
+                LedgerEntry.EntryType.CREDIT, amount, currency, loanId);
+    }
+
+    public void recordRepay(UUID loanId, BigDecimal principal, BigDecimal interest, PaymentCurrency currency) {
+        UUID transactionId = UUID.randomUUID();
+        BigDecimal total = principal.add(interest);
+        saveEntry(transactionId, null, null, LedgerAccountCode.INVESTOR_AVAILABLE,
+                LedgerEntry.EntryType.DEBIT, total, currency, loanId);
+        saveEntry(transactionId, null, null, LedgerAccountCode.LOAN_PRINCIPAL,
+                LedgerEntry.EntryType.CREDIT, principal, currency, loanId);
+        if (interest.signum() > 0) {
+            saveEntry(transactionId, null, null, LedgerAccountCode.LOAN_INTEREST,
+                    LedgerEntry.EntryType.CREDIT, interest, currency, loanId);
+        }
+    }
+
     private void saveEntry(
             UUID transactionId,
             UUID paymentId,
@@ -39,6 +60,19 @@ public class LedgerService {
             BigDecimal amount,
             PaymentCurrency currency
     ) {
+        saveEntry(transactionId, paymentId, payoutId, accountCode, entryType, amount, currency, null);
+    }
+
+    private void saveEntry(
+            UUID transactionId,
+            UUID paymentId,
+            UUID payoutId,
+            LedgerAccountCode accountCode,
+            LedgerEntry.EntryType entryType,
+            BigDecimal amount,
+            PaymentCurrency currency,
+            UUID referenceId
+    ) {
         LedgerEntry entry = LedgerEntry.builder()
                 .transactionId(transactionId)
                 .paymentId(paymentId)
@@ -47,6 +81,7 @@ public class LedgerService {
                 .entryType(entryType)
                 .amount(amount)
                 .currency(currency)
+                .referenceId(referenceId)
                 .build();
         ledgerEntryRepository.save(entry);
     }

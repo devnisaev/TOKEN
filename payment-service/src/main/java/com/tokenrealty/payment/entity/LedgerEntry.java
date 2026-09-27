@@ -35,6 +35,9 @@ public class LedgerEntry {
     @Column(name = "payout_id")
     private UUID payoutId;
 
+    @Column(name = "reference_id")
+    private UUID referenceId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "account_code", nullable = false, length = 30)
     private LedgerAccountCode accountCode;

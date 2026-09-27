@@ -20,9 +20,12 @@ import type {
   IssueTokenRequest,
   ComplianceReport,
   CreateGovernanceProposalRequest,
+  CreateIndexRequest,
   CreateLiquidityPoolRequest,
   GovernanceProposal,
   LiquidityPool,
+  PropertyIndex,
+  RfqRequest,
   IntegrationCredential,
   IntegrationDelivery,
   MaintenanceTicket,
@@ -212,6 +215,21 @@ export const api = {
 
   createLiquidityPool(body: CreateLiquidityPoolRequest) {
     return request<LiquidityPool>('/v1/pools', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
+
+  listOpenRfq() {
+    return request<SpringPage<RfqRequest>>('/v1/exchange/rfq?size=50');
+  },
+
+  listIndices() {
+    return request<PropertyIndex[]>('/v1/corporate-actions/indices');
+  },
+
+  createIndex(body: CreateIndexRequest) {
+    return request<PropertyIndex>('/v1/corporate-actions/indices', {
       method: 'POST',
       body: JSON.stringify(body),
     });

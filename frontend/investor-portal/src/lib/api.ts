@@ -8,8 +8,10 @@ import type {
   BookDepthResponse,
   ExchangeOrder,
   ExchangeTicker,
+  LendingDashboard,
   LiquidityPool,
   PoolSwap,
+  PropertyIndex,
   PlaceExchangeOrderRequest,
   SwapQuote,
   PlaceOrderRequest,
@@ -145,6 +147,25 @@ export const api = {
     body: { direction: string; amountIn: number; investorId: string; walletAddress: string },
   ) {
     return request<PoolSwap>(`/v1/pools/${poolId}/swaps`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
+
+  listIndices() {
+    return request<PropertyIndex[]>('/v1/corporate-actions/indices');
+  },
+
+  getLendingDashboard(investorId: string) {
+    return request<LendingDashboard>(`/v1/lending/dashboard?investorId=${investorId}`);
+  },
+
+  borrowAgainstCollateral(body: {
+    investorId: string;
+    collateralPositionId: string;
+    borrowAmountUsd: number;
+  }) {
+    return request<{ id: string; outstandingUsd: number; status: string }>('/v1/lending/borrow', {
       method: 'POST',
       body: JSON.stringify(body),
     });
