@@ -105,7 +105,20 @@ export interface OperatorKpiResponse {
   atRiskAssetCount: number;
   esgSnapshotCount: number;
   openOperatorAlertCount: number;
+  openMaintenanceTicketCount: number;
   generatedAt: string;
+}
+
+export interface OperatorKpiSnapshotItem {
+  id: string;
+  averageOccupancyPct: number;
+  averageCarbonScore: number;
+  averageHealthScore: number;
+  trackedAssetCount: number;
+  atRiskAssetCount: number;
+  openOperatorAlertCount: number;
+  openMaintenanceTicketCount: number;
+  snapshotAt: string;
 }
 
 export interface OperatorAlertItem {

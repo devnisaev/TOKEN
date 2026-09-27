@@ -1,5 +1,6 @@
 package com.tokenrealty.reporting.service;
 
+import com.tokenrealty.reporting.client.RentalClient;
 import com.tokenrealty.reporting.dto.ReportingDtos.OperatorKpiResponse;
 import com.tokenrealty.reporting.entity.AssetHealthScoreRecord;
 import com.tokenrealty.reporting.entity.EsgSnapshotRecord;
@@ -25,6 +26,7 @@ public class OperatorKpiService {
     private final EsgSnapshotRecordRepository esgSnapshotRecordRepository;
     private final AssetHealthScoreRecordRepository assetHealthScoreRecordRepository;
     private final OperatorAlertService operatorAlertService;
+    private final RentalClient rentalClient;
     private final Clock clock;
 
     public OperatorKpiResponse dashboard() {
@@ -54,6 +56,7 @@ public class OperatorKpiService {
                 atRiskCount,
                 esgSnapshots.size(),
                 operatorAlertService.countOpen(),
+                rentalClient.countOpenMaintenanceTickets(),
                 now);
     }
 

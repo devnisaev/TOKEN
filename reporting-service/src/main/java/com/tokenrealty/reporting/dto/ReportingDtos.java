@@ -131,8 +131,25 @@ public final class ReportingDtos {
             long atRiskAssetCount,
             long esgSnapshotCount,
             long openOperatorAlertCount,
+            long openMaintenanceTicketCount,
             Instant generatedAt
     ) {
+    }
+
+    public record OperatorKpiSnapshotItem(
+            UUID id,
+            BigDecimal averageOccupancyPct,
+            BigDecimal averageCarbonScore,
+            BigDecimal averageHealthScore,
+            long trackedAssetCount,
+            long atRiskAssetCount,
+            long openOperatorAlertCount,
+            long openMaintenanceTicketCount,
+            Instant snapshotAt
+    ) {
+    }
+
+    public record RecomputeAssetHealthResponse(int assetsRecomputed) {
     }
 
     public record OperatorAlertItem(

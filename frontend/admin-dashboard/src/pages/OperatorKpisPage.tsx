@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 function formatPct(value: number) {
@@ -7,9 +8,21 @@ function formatPct(value: number) {
 }
 
 export function OperatorKpisPage() {
+  const queryClient = useQueryClient();
   const kpisQuery = useQuery({
     queryKey: ['operator-kpis'],
     queryFn: () => api.getOperatorKpis(),
+  });
+  const snapshotsQuery = useQuery({
+    queryKey: ['kpi-snapshots'],
+    queryFn: () => api.listKpiSnapshots(),
+  });
+  const recomputeMutation = useMutation({
+    mutationFn: () => api.recomputeAssetHealthScores(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['operator-kpis'] });
+      queryClient.invalidateQueries({ queryKey: ['asset-health-scores'] });
+    },
   });
   const healthQuery = useQuery({
     queryKey: ['asset-health-scores'],
@@ -24,10 +37,21 @@ export function OperatorKpisPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-6">
-      <h1 className="text-2xl font-semibold">Operator KPIs</h1>
-      <p className="text-muted-foreground">
-        Portfolio health, occupancy, and insurance expiry alerts
-      </p>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold">Operator KPIs</h1>
+          <p className="text-muted-foreground">
+            Portfolio health, occupancy, and insurance expiry alerts
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          disabled={recomputeMutation.isPending}
+          onClick={() => recomputeMutation.mutate()}
+        >
+          {recomputeMutation.isPending ? 'Recomputing…' : 'Recompute health'}
+        </Button>
+      </div>
 
       {kpisQuery.isLoading && <p className="text-muted-foreground">Loading KPIs…</p>}
       {kpis && (
@@ -113,6 +137,39 @@ export function OperatorKpisPage() {
           ))}
           {healthQuery.data?.length === 0 && (
             <p className="text-muted-foreground">No health scores recorded yet.</p>
+          )}
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-lg font-medium">KPI snapshot history</h2>
+        {snapshotsQuery.isLoading && <p className="text-muted-foreground">Loading snapshots…</p>}
+        <div className="grid gap-3">
+          {snapshotsQuery.data?.slice(0, 5).map((snapshot) => (
+            <Card key={snapshot.id}>
+              <CardContent className="flex flex-wrap items-center gap-6 py-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Snapshot</p>
+                  <p className="font-medium">{new Date(snapshot.snapshotAt).toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Health / Occ</p>
+                  <p className="font-medium">
+                    {snapshot.averageHealthScore.toFixed(1)}% /{' '}
+                    {snapshot.averageOccupancyPct.toFixed(1)}%
+                  </p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Alerts / Maint.</p>
+                  <p className="font-medium">
+                    {snapshot.openOperatorAlertCount} / {snapshot.openMaintenanceTicketCount}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+          {snapshotsQuery.data?.length === 0 && (
+            <p className="text-muted-foreground">No KPI snapshots recorded yet.</p>
           )}
         </div>
       </section>

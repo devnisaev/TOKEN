@@ -462,6 +462,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 | **Phase 17** | ESG & asset operations ✅ | IoT feeds, insurance, ESG profiles (703–727) |
 | **Phase 18** | Operator analytics ✅ | KPI dashboards, asset health scores, insurance expiry alerts (728–752) |
 | **Phase 19** | Operations alerting ✅ | Operator alert records, expiry scheduler, alert generation (753–777) |
+| **Phase 20** | Operations automation ✅ | KPI snapshots, scheduled alerts, maintenance signals, health recompute (778–802) |
 
 See diagrams: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml), [`diagrams/09-phase-12-asset-generalization.puml`](diagrams/09-phase-12-asset-generalization.puml), [`diagrams/10-phase-13-rwa-exchange.puml`](diagrams/10-phase-13-rwa-exchange.puml).
 
@@ -1690,7 +1691,33 @@ Guide: [rules/phase-19-services.md](rules/phase-19-services.md)
 
 ---
 
-## 26. Diagram Index
+## 26. Phase 20 — Operations Automation
+
+**Status:** Complete (tracks 778–802). KPI snapshot history, scheduled alert generation, maintenance ticket signals, auto health recompute.
+
+Guide: [rules/phase-20-services.md](rules/phase-20-services.md)
+
+### 26.1 Goals
+
+- [x] KPI snapshot records (`GET/POST /v1/reports/kpi-snapshots`)
+- [x] Scheduled alert generation and KPI snapshots
+- [x] Open maintenance ticket count on operator KPIs
+- [x] Auto health recompute from ESG snapshots
+- [x] Admin dashboard operations widget
+
+### 26.2 Track backlog (778–802)
+
+| Track range | Focus |
+|-------------|-------|
+| 778–782 | KPI snapshot entity + API |
+| 783–787 | Scheduled automation in Reporting |
+| 788–792 | Rental client; maintenance count on KPIs |
+| 793–797 | Auto health recompute service |
+| 798–802 | Admin dashboard widget; integration tests |
+
+---
+
+## 27. Diagram Index
 
 | File | Description |
 |------|-------------|
@@ -1709,7 +1736,7 @@ Guide: [rules/phase-19-services.md](rules/phase-19-services.md)
 
 ---
 
-## 27. Open Questions & Decisions
+## 28. Open Questions & Decisions
 
 | # | Question | Options | Decision |
 |---|----------|---------|----------|
@@ -1734,7 +1761,7 @@ Guide: [rules/phase-19-services.md](rules/phase-19-services.md)
 
 ---
 
-## 28. Cursor Rules & Coding Standards
+## 29. Cursor Rules & Coding Standards
 
 Agent and IDE conventions live in `.cursor/rules/` (adapted from Titan fintech rules).
 

@@ -1,10 +1,12 @@
 package com.tokenrealty.reporting.controller;
 
 import com.tokenrealty.reporting.dto.ReportingDtos.*;
+import com.tokenrealty.reporting.service.AssetHealthRecomputeService;
 import com.tokenrealty.reporting.service.AssetHealthScoreService;
 import com.tokenrealty.reporting.service.EsgSnapshotService;
 import com.tokenrealty.reporting.service.OperatorAlertService;
 import com.tokenrealty.reporting.service.OperatorKpiService;
+import com.tokenrealty.reporting.service.OperatorKpiSnapshotService;
 import com.tokenrealty.reporting.service.ReportingQueryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,8 @@ public class ReportingController {
     private final AssetHealthScoreService assetHealthScoreService;
     private final OperatorKpiService operatorKpiService;
     private final OperatorAlertService operatorAlertService;
+    private final OperatorKpiSnapshotService operatorKpiSnapshotService;
+    private final AssetHealthRecomputeService assetHealthRecomputeService;
 
     @GetMapping("/trading-summary")
     public TradingSummaryResponse tradingSummary() {
@@ -115,5 +119,23 @@ public class ReportingController {
     @PreAuthorize("hasRole('ADMIN')")
     public OperatorAlertItem acknowledgeOperatorAlert(@PathVariable UUID id) {
         return operatorAlertService.acknowledge(id);
+    }
+
+    @GetMapping("/kpi-snapshots")
+    public List<OperatorKpiSnapshotItem> kpiSnapshots() {
+        return operatorKpiSnapshotService.listRecent();
+    }
+
+    @PostMapping("/kpi-snapshots")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
+    public OperatorKpiSnapshotItem recordKpiSnapshot() {
+        return operatorKpiSnapshotService.recordNow();
+    }
+
+    @PostMapping("/asset-health-scores/recompute")
+    @PreAuthorize("hasRole('ADMIN')")
+    public RecomputeAssetHealthResponse recomputeAssetHealthScores() {
+        return assetHealthRecomputeService.recomputeFromEsgSnapshots();
     }
 }

@@ -30,6 +30,8 @@ server:
 services:
   property-registry:
     url: ${PROPERTY_REGISTRY_URL:http://localhost:8081/api}
+  rental:
+    url: ${RENTAL_SERVICE_URL:http://localhost:8086/api}
 
 tokenrealty:
   jwt:

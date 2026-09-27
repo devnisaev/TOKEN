@@ -131,9 +131,13 @@ Operator KPI dashboards, asset health scores, insurance expiry alerts. See [docs
 
 Operations alerting and automation: operator alert records, scheduled insurance expiry sweep, alert generation from health/ESG/insurance signals. See [docs/PLATFORM-SPEC.md §25](docs/PLATFORM-SPEC.md#25-phase-19--operations-alerting--automation) and [docs/rules/phase-19-services.md](docs/rules/phase-19-services.md).
 
-### Phase 20 — in progress (roadmap)
+### Phase 20 — complete
 
-KPI snapshot history, scheduled alert generation, maintenance ticket signals, auto health recompute. Tracks 778–802 — [phase-20-services.md](docs/rules/phase-20-services.md).
+KPI snapshot history, scheduled alert generation, maintenance ticket signals, auto health recompute. See [docs/PLATFORM-SPEC.md §26](docs/PLATFORM-SPEC.md#26-phase-20--operations-automation) and [docs/rules/phase-20-services.md](docs/rules/phase-20-services.md).
+
+### Phase 21 — in progress (roadmap)
+
+Alert notifications, building health rollups, investor portfolio health view. Tracks 803–827 — [phase-21-services.md](docs/rules/phase-21-services.md).
 
 **Do not spin out:** limits/policy service, config service, Payment escrow, Issuance deploy/transfer core.
 

@@ -28,6 +28,7 @@ import type {
   GenerateOperatorAlertsResponse,
   OperatorAlertItem,
   OperatorKpiResponse,
+  OperatorKpiSnapshotItem,
   GovernanceProposal,
   LiquidityPool,
   PropertyIndex,
@@ -252,6 +253,16 @@ export const api = {
 
   getOperatorKpis() {
     return request<OperatorKpiResponse>('/v1/reports/operator-kpis');
+  },
+
+  listKpiSnapshots() {
+    return request<OperatorKpiSnapshotItem[]>('/v1/reports/kpi-snapshots');
+  },
+
+  recomputeAssetHealthScores() {
+    return request<{ assetsRecomputed: number }>('/v1/reports/asset-health-scores/recompute', {
+      method: 'POST',
+    });
   },
 
   listAssetHealthScores() {
