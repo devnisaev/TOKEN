@@ -11,4 +11,6 @@ public interface AssetHealthScoreRecordRepository extends JpaRepository<AssetHea
     List<AssetHealthScoreRecord> findByBuildingIdOrderByComputedAtDesc(UUID buildingId);
 
     List<AssetHealthScoreRecord> findAllByOrderByComputedAtDesc();
+
+    List<AssetHealthScoreRecord> findByFlatIdIn(java.util.Collection<UUID> flatIds);
 }

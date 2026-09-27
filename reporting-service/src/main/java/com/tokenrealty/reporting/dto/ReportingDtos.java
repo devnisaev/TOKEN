@@ -170,4 +170,21 @@ public final class ReportingDtos {
             long openAlertCount
     ) {
     }
+
+    public record BuildingHealthItem(
+            UUID buildingId,
+            BigDecimal averageHealthScore,
+            long assetCount,
+            long atRiskAssetCount
+    ) {
+    }
+
+    public record PortfolioHealthItem(
+            UUID flatId,
+            UUID buildingId,
+            BigDecimal healthScore,
+            BigDecimal esgFactor,
+            BigDecimal occupancyFactor
+    ) {
+    }
 }

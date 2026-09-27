@@ -21,6 +21,7 @@ public final class DownstreamServices {
     public static final ServiceSpec VALUATION = new ServiceSpec("Valuation service");
     public static final ServiceSpec INTEGRATION_HUB = new ServiceSpec("Integration Hub service");
     public static final ServiceSpec GOVERNANCE = new ServiceSpec("Governance service");
+    public static final ServiceSpec NOTIFICATION = new ServiceSpec("Notification service");
 
     private DownstreamServices() {
     }

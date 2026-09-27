@@ -149,6 +149,13 @@ export interface AssetHealthScoreItem {
   computedAt: string;
 }
 
+export interface BuildingHealthItem {
+  buildingId: string;
+  averageHealthScore: number;
+  assetCount: number;
+  atRiskAssetCount: number;
+}
+
 export interface InsuranceExpiryAlert {
   id: string;
   flatId: string | null;

@@ -11,6 +11,7 @@ import { GovernanceDetailPage } from '@/pages/GovernanceDetailPage';
 import { GovernancePage } from '@/pages/GovernancePage';
 import { NotificationPreferencesPage } from '@/pages/NotificationPreferencesPage';
 import { PortfolioPage } from '@/pages/PortfolioPage';
+import { PortfolioHealthPage } from '@/pages/PortfolioHealthPage';
 import { SellTokensPage } from '@/pages/SellTokensPage';
 import { ExchangePage } from '@/pages/ExchangePage';
 import { PoolSwapPage } from '@/pages/PoolSwapPage';
@@ -35,6 +36,7 @@ export function App() {
           <Route path="orders" element={<OrdersPage />} />
           <Route path="orders/:orderId" element={<OrderStatusPage />} />
           <Route path="portfolio" element={<PortfolioPage />} />
+          <Route path="portfolio/health" element={<PortfolioHealthPage />} />
           <Route path="portfolio/sell/:contractId" element={<SellTokensPage />} />
           <Route path="exchange/:contractId" element={<ExchangePage />} />
           <Route path="exchange/:contractId/swap" element={<PoolSwapPage />} />

@@ -263,6 +263,14 @@ export interface Trade {
   updatedAt?: string;
 }
 
+export interface PortfolioHealthItem {
+  flatId: string;
+  buildingId: string | null;
+  healthScore: number | null;
+  esgFactor: number | null;
+  occupancyFactor: number | null;
+}
+
 export interface NotificationPreferences {
   userId: string;
   emailEnabled: boolean;

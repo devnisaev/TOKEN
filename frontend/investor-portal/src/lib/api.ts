@@ -18,6 +18,7 @@ import type {
   PlaceOrderRequest,
   PlaceSellOrderRequest,
   PortfolioBffDetail,
+  PortfolioHealthItem,
   SpringPage,
   TokenResponse,
   Trade,
@@ -159,6 +160,14 @@ export const api = {
 
   getEsgByFlat(flatId: string) {
     return request<EsgProfile>(`/v1/esg/by-flat/${flatId}`);
+  },
+
+  getPortfolioHealth(flatIds: string[]) {
+    if (flatIds.length === 0) {
+      return Promise.resolve([] as PortfolioHealthItem[]);
+    }
+    const params = flatIds.map((id) => `flatIds=${id}`).join('&');
+    return request<PortfolioHealthItem[]>(`/v1/reports/portfolio-health?${params}`);
   },
 
   getLendingDashboard(investorId: string) {

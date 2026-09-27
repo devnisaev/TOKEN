@@ -1,13 +1,18 @@
+import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+type AlertTab = 'open' | 'acknowledged';
+
 export function OperatorAlertsPage() {
+  const [tab, setTab] = useState<AlertTab>('open');
   const queryClient = useQueryClient();
   const alertsQuery = useQuery({
-    queryKey: ['operator-alerts'],
-    queryFn: () => api.listOperatorAlerts(),
+    queryKey: ['operator-alerts', tab],
+    queryFn: () =>
+      tab === 'open' ? api.listOperatorAlerts() : api.listAcknowledgedOperatorAlerts(),
   });
 
   const generateMutation = useMutation({
@@ -43,6 +48,23 @@ export function OperatorAlertsPage() {
         </Button>
       </div>
 
+      <div className="flex gap-2">
+        <Button
+          size="sm"
+          variant={tab === 'open' ? 'default' : 'outline'}
+          onClick={() => setTab('open')}
+        >
+          Open
+        </Button>
+        <Button
+          size="sm"
+          variant={tab === 'acknowledged' ? 'default' : 'outline'}
+          onClick={() => setTab('acknowledged')}
+        >
+          Acknowledged
+        </Button>
+      </div>
+
       {generateMutation.data && (
         <p className="text-sm text-muted-foreground">
           Created {generateMutation.data.alertsCreated} new alerts ·{' '}
@@ -61,14 +83,16 @@ export function OperatorAlertsPage() {
                   · {alert.severity}
                 </span>
               </CardTitle>
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={acknowledgeMutation.isPending}
-                onClick={() => acknowledgeMutation.mutate(alert.id)}
-              >
-                Acknowledge
-              </Button>
+              {tab === 'open' && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={acknowledgeMutation.isPending}
+                  onClick={() => acknowledgeMutation.mutate(alert.id)}
+                >
+                  Acknowledge
+                </Button>
+              )}
             </CardHeader>
             <CardContent className="space-y-1 text-sm">
               <p>{alert.message}</p>
@@ -79,7 +103,9 @@ export function OperatorAlertsPage() {
           </Card>
         ))}
         {alertsQuery.data?.content.length === 0 && (
-          <p className="text-muted-foreground">No open operator alerts.</p>
+          <p className="text-muted-foreground">
+            {tab === 'open' ? 'No open operator alerts.' : 'No acknowledged alerts yet.'}
+          </p>
         )}
       </div>
     </div>

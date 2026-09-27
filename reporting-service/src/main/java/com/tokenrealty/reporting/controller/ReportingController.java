@@ -3,6 +3,7 @@ package com.tokenrealty.reporting.controller;
 import com.tokenrealty.reporting.dto.ReportingDtos.*;
 import com.tokenrealty.reporting.service.AssetHealthRecomputeService;
 import com.tokenrealty.reporting.service.AssetHealthScoreService;
+import com.tokenrealty.reporting.service.BuildingHealthService;
 import com.tokenrealty.reporting.service.EsgSnapshotService;
 import com.tokenrealty.reporting.service.OperatorAlertService;
 import com.tokenrealty.reporting.service.OperatorKpiService;
@@ -32,6 +33,7 @@ public class ReportingController {
     private final OperatorAlertService operatorAlertService;
     private final OperatorKpiSnapshotService operatorKpiSnapshotService;
     private final AssetHealthRecomputeService assetHealthRecomputeService;
+    private final BuildingHealthService buildingHealthService;
 
     @GetMapping("/trading-summary")
     public TradingSummaryResponse tradingSummary() {
@@ -108,6 +110,12 @@ public class ReportingController {
         return operatorAlertService.listOpen(pageable);
     }
 
+    @GetMapping("/operator-alerts/acknowledged")
+    public Page<OperatorAlertItem> acknowledgedOperatorAlerts(
+            @PageableDefault(size = 20) Pageable pageable) {
+        return operatorAlertService.listAcknowledged(pageable);
+    }
+
     @PostMapping("/operator-alerts/generate")
     @PreAuthorize("hasRole('ADMIN')")
     public GenerateOperatorAlertsResponse generateOperatorAlerts(
@@ -137,5 +145,20 @@ public class ReportingController {
     @PreAuthorize("hasRole('ADMIN')")
     public RecomputeAssetHealthResponse recomputeAssetHealthScores() {
         return assetHealthRecomputeService.recomputeFromEsgSnapshots();
+    }
+
+    @GetMapping("/building-health")
+    public List<BuildingHealthItem> buildingHealthRollups() {
+        return buildingHealthService.listBuildingRollups();
+    }
+
+    @GetMapping("/building-health/{buildingId}")
+    public BuildingHealthItem buildingHealth(@PathVariable UUID buildingId) {
+        return buildingHealthService.getBuildingRollup(buildingId);
+    }
+
+    @GetMapping("/portfolio-health")
+    public List<PortfolioHealthItem> portfolioHealth(@RequestParam List<UUID> flatIds) {
+        return buildingHealthService.portfolioHealth(flatIds);
     }
 }

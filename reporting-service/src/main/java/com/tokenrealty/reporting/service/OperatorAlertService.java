@@ -1,5 +1,6 @@
 package com.tokenrealty.reporting.service;
 
+import com.tokenrealty.reporting.client.NotificationClient;
 import com.tokenrealty.reporting.client.PropertyRegistryClient;
 import com.tokenrealty.reporting.client.PropertyRegistryClient.InsuranceExpiryAlertView;
 import com.tokenrealty.reporting.dto.ReportingDtos.GenerateOperatorAlertsResponse;
@@ -39,11 +40,20 @@ public class OperatorAlertService {
     private final AssetHealthScoreRecordRepository assetHealthScoreRecordRepository;
     private final EsgSnapshotRecordRepository esgSnapshotRecordRepository;
     private final PropertyRegistryClient propertyRegistryClient;
+    private final NotificationClient notificationClient;
     private final Clock clock;
 
     public Page<OperatorAlertItem> listOpen(Pageable pageable) {
+        return listByStatus(AlertStatus.OPEN, pageable);
+    }
+
+    public Page<OperatorAlertItem> listAcknowledged(Pageable pageable) {
+        return listByStatus(AlertStatus.ACKNOWLEDGED, pageable);
+    }
+
+    private Page<OperatorAlertItem> listByStatus(AlertStatus status, Pageable pageable) {
         return operatorAlertRecordRepository
-                .findByStatusOrderByDetectedAtDesc(AlertStatus.OPEN, pageable)
+                .findByStatusOrderByDetectedAtDesc(status, pageable)
                 .map(this::toItem);
     }
 
@@ -161,6 +171,9 @@ public class OperatorAlertService {
                 .message(message)
                 .detectedAt(detectedAt)
                 .build());
+        if (severity == AlertSeverity.CRITICAL) {
+            notificationClient.sendOperatorAlert(alertType, severity.name(), message);
+        }
         return true;
     }
 

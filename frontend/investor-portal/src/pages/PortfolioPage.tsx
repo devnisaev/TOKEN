@@ -37,6 +37,9 @@ export function PortfolioPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Portfolio</h1>
           <p className="mt-1 text-muted-foreground">USDC balances, token holdings, and recent dividends</p>
+          <Link to="/portfolio/health" className="text-sm text-primary underline-offset-4 hover:underline">
+            View portfolio health
+          </Link>
         </div>
         <ConnectWalletButton />
       </div>

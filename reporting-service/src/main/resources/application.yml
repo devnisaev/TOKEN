@@ -32,6 +32,8 @@ services:
     url: ${PROPERTY_REGISTRY_URL:http://localhost:8081/api}
   rental:
     url: ${RENTAL_SERVICE_URL:http://localhost:8086/api}
+  notification:
+    url: ${NOTIFICATION_SERVICE_URL:http://localhost:8089/api}
 
 tokenrealty:
   jwt:

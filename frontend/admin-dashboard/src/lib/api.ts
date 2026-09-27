@@ -26,6 +26,7 @@ import type {
   EsgProfile,
   InsuranceExpiryAlert,
   GenerateOperatorAlertsResponse,
+  BuildingHealthItem,
   OperatorAlertItem,
   OperatorKpiResponse,
   OperatorKpiSnapshotItem,
@@ -275,6 +276,14 @@ export const api = {
 
   listOperatorAlerts() {
     return request<SpringPage<OperatorAlertItem>>('/v1/reports/operator-alerts?size=50');
+  },
+
+  listAcknowledgedOperatorAlerts() {
+    return request<SpringPage<OperatorAlertItem>>('/v1/reports/operator-alerts/acknowledged?size=50');
+  },
+
+  listBuildingHealth() {
+    return request<BuildingHealthItem[]>('/v1/reports/building-health');
   },
 
   generateOperatorAlerts(insuranceWithinDays = 30) {

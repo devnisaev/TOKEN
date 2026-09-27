@@ -463,6 +463,7 @@ See diagram: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml)
 | **Phase 18** | Operator analytics ✅ | KPI dashboards, asset health scores, insurance expiry alerts (728–752) |
 | **Phase 19** | Operations alerting ✅ | Operator alert records, expiry scheduler, alert generation (753–777) |
 | **Phase 20** | Operations automation ✅ | KPI snapshots, scheduled alerts, maintenance signals, health recompute (778–802) |
+| **Phase 21** | Portfolio health & notifications ✅ | Alert notifications, building rollups, investor portfolio health (803–827) |
 
 See diagrams: [`diagrams/07-build-phases.puml`](diagrams/07-build-phases.puml), [`diagrams/09-phase-12-asset-generalization.puml`](diagrams/09-phase-12-asset-generalization.puml), [`diagrams/10-phase-13-rwa-exchange.puml`](diagrams/10-phase-13-rwa-exchange.puml).
 
@@ -1717,7 +1718,33 @@ Guide: [rules/phase-20-services.md](rules/phase-20-services.md)
 
 ---
 
-## 27. Diagram Index
+## 27. Phase 21 — Portfolio Health & Alert Notifications
+
+**Status:** Complete (tracks 803–827). Critical alert notifications, building health rollups, acknowledged alert history, investor portfolio health view.
+
+Guide: [rules/phase-21-services.md](rules/phase-21-services.md)
+
+### 27.1 Goals
+
+- [x] Critical operator alert notifications via Notification Service
+- [x] Acknowledged alerts history API
+- [x] Building health rollups + portfolio health by flat IDs
+- [x] Investor `/portfolio/health` page
+- [x] Admin acknowledged alerts tab
+
+### 27.2 Track backlog (803–827)
+
+| Track range | Focus |
+|-------------|-------|
+| 803–807 | Notification client; CRITICAL alert dispatch |
+| 808–812 | Acknowledged alerts history |
+| 813–817 | Building + portfolio health APIs |
+| 818–822 | Investor portfolio health UI |
+| 823–827 | Admin acknowledged tab; tests |
+
+---
+
+## 28. Diagram Index
 
 | File | Description |
 |------|-------------|
@@ -1736,7 +1763,7 @@ Guide: [rules/phase-20-services.md](rules/phase-20-services.md)
 
 ---
 
-## 28. Open Questions & Decisions
+## 29. Open Questions & Decisions
 
 | # | Question | Options | Decision |
 |---|----------|---------|----------|
@@ -1761,7 +1788,7 @@ Guide: [rules/phase-20-services.md](rules/phase-20-services.md)
 
 ---
 
-## 29. Cursor Rules & Coding Standards
+## 30. Cursor Rules & Coding Standards
 
 Agent and IDE conventions live in `.cursor/rules/` (adapted from Titan fintech rules).
 

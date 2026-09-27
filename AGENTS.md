@@ -135,9 +135,13 @@ Operations alerting and automation: operator alert records, scheduled insurance 
 
 KPI snapshot history, scheduled alert generation, maintenance ticket signals, auto health recompute. See [docs/PLATFORM-SPEC.md §26](docs/PLATFORM-SPEC.md#26-phase-20--operations-automation) and [docs/rules/phase-20-services.md](docs/rules/phase-20-services.md).
 
-### Phase 21 — in progress (roadmap)
+### Phase 21 — complete
 
-Alert notifications, building health rollups, investor portfolio health view. Tracks 803–827 — [phase-21-services.md](docs/rules/phase-21-services.md).
+Alert notifications, building health rollups, investor portfolio health view. See [docs/PLATFORM-SPEC.md §27](docs/PLATFORM-SPEC.md#27-phase-21--portfolio-health--alert-notifications) and [docs/rules/phase-21-services.md](docs/rules/phase-21-services.md).
+
+### Phase 22 — in progress (roadmap)
+
+Building health admin UI, asset health history, investor sustainability health scores. Tracks 828–852 — [phase-22-services.md](docs/rules/phase-22-services.md).
 
 **Do not spin out:** limits/policy service, config service, Payment escrow, Issuance deploy/transfer core.
 
